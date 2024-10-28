@@ -13,5 +13,7 @@ UCLASS()
 class PORTGAME_API APGGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
+public:
+	APGGameMode();
 };
