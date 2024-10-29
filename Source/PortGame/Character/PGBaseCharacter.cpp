@@ -19,6 +19,10 @@ APGBaseCharacter::APGBaseCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 
+	//가속력
+	//원래값 2048
+	GetCharacterMovement()->MaxAcceleration = 1500.0f;
+
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
@@ -37,6 +41,12 @@ APGBaseCharacter::APGBaseCharacter()
 		GetMesh()->SetSkeletalMesh(Skeletal.Object);
 	}
 
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstance(TEXT("/Script/Engine.AnimBlueprint'/Game/PortGame/Animation/ABP_Animation.ABP_Animation_C'"));
+	if (AnimInstance.Class)
+
+	{
+		GetMesh()->SetAnimInstanceClass(AnimInstance.Class);
+	}
 
 }
 

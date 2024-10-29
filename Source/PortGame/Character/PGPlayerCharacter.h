@@ -69,7 +69,5 @@ protected:
 	
 
 	
-
-
 	
 };

@@ -151,7 +151,7 @@ void APGPlayerCharacter::Move(const FInputActionValue& Value)
 		// add movement 
 		AddMovementInput(ForwardDirection, MovementVector.X);
 		AddMovementInput(RightDirection, MovementVector.Y);
-		UE_LOG(LogTemp, Warning, TEXT("X : %f ,Y : %f"), MovementVector.X, MovementVector.Y);
+		
 	}
 
 }
