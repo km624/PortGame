@@ -59,6 +59,15 @@ APGPlayerCharacter::APGPlayerCharacter()
 	else
 		UE_LOG(LogTemp, Warning, TEXT("ERRor  failed"));
 
+	//에임 바인딩
+	static ConstructorHelpers::FObjectFinder<UInputAction> Aim(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Aim.IA_Aim'"));
+	if (Aim.Object)
+	{
+		AimAction = Aim.Object;
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("ERRor  failed"));
+
 }
 
 void APGPlayerCharacter::BeginPlay()
@@ -86,7 +95,12 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APGPlayerCharacter::Look);
 	
+		//Attack
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &APGPlayerCharacter::Attack);
+
+		//Aiming
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &APGPlayerCharacter::PressAim);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &APGPlayerCharacter::ReleasedAim);
 	}
 	else
 	{
@@ -185,6 +199,31 @@ void APGPlayerCharacter::Attack()
 
 	ComboStart();
 	
+}
+
+void APGPlayerCharacter::PressAim()
+{
+	UE_LOG(LogTemp, Warning, TEXT("aim"));
+	bIsAim = true;
+}
+
+void APGPlayerCharacter::ReleasedAim()
+{
+	UE_LOG(LogTemp, Warning, TEXT("aimOut"));
+	bIsAim = false;
+}
+
+float APGPlayerCharacter::ReturnAimOffset()
+{
+	FRotator rtemp = GetActorRotation() - GetBaseAimRotation();
+
+		rtemp.Normalize();
+
+		float Direction = rtemp.Pitch; 
+		
+		AimOffset = FMath::Clamp(Direction, -55.0f, 55.0f);
+
+	return AimOffset;
 }
 
 

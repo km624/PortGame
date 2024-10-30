@@ -3,7 +3,10 @@
 
 #include "Animation/PGAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Character.h"
+//#include "GameFramework/Character.h"
+#include "Character/PGPlayerCharacter.h"
+#include "Kismet/KismetMathLibrary.h"
+
 
 UPGAnimInstance::UPGAnimInstance()
 {
@@ -36,6 +39,17 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsFalling = Movement->IsFalling();
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
 		CharacterDirection = CalculateDirection(Owner->GetVelocity(), Owner->GetActorRotation());
-		
 	}
+	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(Owner);
+	if (IsValid(playerCharacter))
+	{
+		bIsAiming = playerCharacter->bIsAim;
+	}
+
+	if (bIsAiming)
+		AimOffset = playerCharacter->ReturnAimOffset();
+	else
+		AimOffset = 0.0f;
+	
 }
+

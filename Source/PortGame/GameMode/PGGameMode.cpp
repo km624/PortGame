@@ -8,10 +8,10 @@
 
 APGGameMode::APGGameMode()
 {
-	static::ConstructorHelpers::FClassFinder<APGPlayerCharacter> PlayerCharacter
-	(TEXT("/Script/Engine.Blueprint'/Game/PortGame/Blueprint/BP_PlayerCharacter.BP_PlayerCharacter_C'"));
-	if(PlayerCharacter.Class)
-		DefaultPawnClass = PlayerCharacter.Class;
-
+	//static::ConstructorHelpers::FClassFinder<APGPlayerCharacter> PlayerCharacter
+	//(TEXT("/Script/Engine.Blueprint'/Game/PortGame/Blueprint/BP_PlayerCharacter.BP_PlayerCharacter_C'"));
+	//if(PlayerCharacter.Class)
+		//DefaultPawnClass = PlayerCharacter.Class;
+	DefaultPawnClass = APGPlayerCharacter::StaticClass();
 	PlayerControllerClass = APGPlayerController::StaticClass();
 }

@@ -71,7 +71,7 @@ void APGBaseCharacter::ComboStart()
 {
 	if (CurrentCombo == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ComboStart"));
+		//UE_LOG(LogTemp, Warning, TEXT("ComboBegin"));
 		ComboBegin();
 		return;
 	}
@@ -82,11 +82,11 @@ void APGBaseCharacter::ComboStart()
 	if (ComboTimerHandle.IsValid())
 	{
 		HasNextComboCommand = true;
-		UE_LOG(LogTemp, Warning, TEXT("IsValid"));
+		//UE_LOG(LogTemp, Warning, TEXT("IsValid"));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("IsnotValid"));
+		//UE_LOG(LogTemp, Warning, TEXT("IsnotValid"));
 		HasNextComboCommand = false;
 	}
 }
@@ -123,7 +123,7 @@ void APGBaseCharacter::ComboCheckTimer()
 {
 	int32 ComboIndex = CurrentCombo - 1;
 	ensure(ComboData->EffectiveFrameCount.IsValidIndex(ComboIndex));
-	UE_LOG(LogTemp, Warning, TEXT("ComboCheckTimer"));
+	//UE_LOG(LogTemp, Warning, TEXT("ComboCheckTimer"));
 	 //어택 스피드도 스텟에서
 	//const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
 	//발동할 시간 정보를 얻기위한 변수
@@ -133,17 +133,18 @@ void APGBaseCharacter::ComboCheckTimer()
 		//타이머 발동
 		// ComboCheck 함수 실행
 		//가록 마지막의 의미 반복하지 않도록 -  False
-		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &APGBaseCharacter::ComboCheck,  ComboEffectiveTime,false);
+		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &APGBaseCharacter::ComboCheck,  ComboEffectiveTime,false,0.05f);
 	}
 
 }
 
 void APGBaseCharacter::ComboCheck()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ComboCheck"));
+	//UE_LOG(LogTemp, Warning, TEXT("ComboCheck"));
 	ComboTimerHandle.Invalidate();
 	if (HasNextComboCommand)
 	{
+		//UE_LOG(LogTemp, Warning, TEXT("ComboStart"));
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
 		//maxComboCount 콤보 값을 벗어나면 안되기 때문에 
@@ -157,20 +158,18 @@ void APGBaseCharacter::ComboCheck()
 		//몽타주 다음 섹션을 연결
 		AnimInstance->Montage_SetNextSection(AnimInstance->Montage_GetCurrentSection() , NextSection, ComboMontage);
 			
-		float TEST = AnimInstance->Montage_GetPosition(ComboMontage);
 		
-		UE_LOG(LogTemp, Warning, TEXT("%f"), TEST);
 		//몽타주 다음 섹션 재생
 		//AnimInstance->Montage_JumpToSection(NextSection, ComboMontage);
 
-		ComboCheckTimer();
-		HasNextComboCommand = false;
+		//ComboCheckTimer();
+		//HasNextComboCommand = false;
 	}
 }
 
 void APGBaseCharacter::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
-	UE_LOG(LogTemp, Warning, TEXT("END"));
+	//UE_LOG(LogTemp, Warning, TEXT("END"));
 	
 	ensure(CurrentCombo != 0);
 	CurrentCombo = 0;
@@ -179,6 +178,24 @@ void APGBaseCharacter::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnde
 
 	//12강 AI  - AI가 끝날때를 파악할 수 있게 추가
 	//NotifyComboActionEnd();
+}
+
+void APGBaseCharacter::ComboSectionEnd()
+{
+	
+	if (HasNextComboCommand)
+	{
+		ComboCheckTimer();
+		HasNextComboCommand = false;
+		//UE_LOG(LogTemp, Warning, TEXT("ComboSectionEnd_Go"));
+	}
+		
+	else
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("ComboSectionEnd_Stop"));
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		AnimInstance->Montage_Stop(0.25f,ComboMontage);
+	}
 }
 
 

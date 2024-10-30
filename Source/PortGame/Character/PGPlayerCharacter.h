@@ -62,11 +62,27 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction>AttackAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction>AimAction;
+
 	//매개변수 받기 위해 헤더 인클루드
 	void Move(const struct FInputActionValue& Value);
 	void Look(const struct FInputActionValue& Value);
 
+	//공격
 	void Attack();
+
+	//에임 누르기
+	void PressAim();
+	//에임 땟을때
+	void ReleasedAim();
+public:
+	UPROPERTY()
+	uint8 bIsAim : 1;
+
+	UPROPERTY()
+	float AimOffset;
+	float ReturnAimOffset();
 
 	
 

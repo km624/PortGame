@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/ComboCheckInterface.h"
 #include "PGBaseCharacter.generated.h"
 
 UCLASS()
-class PORTGAME_API APGBaseCharacter : public ACharacter
+class PORTGAME_API APGBaseCharacter : public ACharacter , public IComboCheckInterface
 {
 	GENERATED_BODY()
 
@@ -15,6 +16,7 @@ public:
 	// Sets default values for this character's properties
 	APGBaseCharacter();
 
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> ComboMontage;
@@ -33,7 +35,8 @@ protected:
 	//몽타주 엔드 델리게이트 형식
 	void ComboEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	
-	void TestVoid(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	virtual void ComboSectionEnd() override;
+
 	int32 CurrentCombo = 0;
 
 	FTimerHandle ComboTimerHandle;
