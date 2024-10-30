@@ -16,6 +16,30 @@ public:
 	APGBaseCharacter();
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> ComboMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UComboData> ComboData;
+
+	void ComboStart();
+
+	void ComboBegin();
+
+	void ComboCheckTimer();
+
+	void ComboCheck();
+
+	//몽타주 엔드 델리게이트 형식
+	void ComboEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	
+	void TestVoid(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	int32 CurrentCombo = 0;
+
+	FTimerHandle ComboTimerHandle;
+
+	//발동 타이머 이전에 입력 들어왔나 체크
+	bool HasNextComboCommand = false;
+
 
 };

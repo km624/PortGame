@@ -51,6 +51,14 @@ APGPlayerCharacter::APGPlayerCharacter()
 	else
 		UE_LOG(LogTemp, Warning, TEXT("ERRor  failed"));
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> Attack(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Attack.IA_Attack'"));
+	if (Attack.Object)
+	{
+		AttackAction = Attack.Object;
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("ERRor  failed"));
+
 }
 
 void APGPlayerCharacter::BeginPlay()
@@ -77,6 +85,8 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APGPlayerCharacter::Look);
+	
+		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &APGPlayerCharacter::Attack);
 	}
 	else
 	{
@@ -169,5 +179,14 @@ void APGPlayerCharacter::Look(const FInputActionValue& Value)
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
+
+void APGPlayerCharacter::Attack()
+{
+
+	ComboStart();
+	
+}
+
+
 
 

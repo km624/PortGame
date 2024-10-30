@@ -4,6 +4,9 @@
 #include "Character/PGBaseCharacter.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Data/ComboData.h"
+#include "Animation/AnimMontage.h"
+
 
 
 // Sets default values
@@ -48,6 +51,134 @@ APGBaseCharacter::APGBaseCharacter()
 		GetMesh()->SetAnimInstanceClass(AnimInstance.Class);
 	}
 
+	//Combo 값들 넣어줌
+	static ConstructorHelpers::FObjectFinder<UAnimMontage>comboMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Combo/ComboMontage1.ComboMontage1'"));
+	if (comboMontage.Object)
+	{
+		ComboMontage = comboMontage.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UComboData>comboData(TEXT("/Script/PortGame.ComboData'/Game/PortGame/Animation/Combo/ComboData.ComboData'"));
+	if (comboData.Object)
+	{
+		ComboData = comboData.Object;
+	}
+
+
+}
+
+void APGBaseCharacter::ComboStart()
+{
+	if (CurrentCombo == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ComboStart"));
+		ComboBegin();
+		return;
+	}
+
+	
+	//타이머가 설정이 안되있을때는 입력을 놓쳤거나
+	// 콤보 다 했을때
+	if (ComboTimerHandle.IsValid())
+	{
+		HasNextComboCommand = true;
+		UE_LOG(LogTemp, Warning, TEXT("IsValid"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("IsnotValid"));
+		HasNextComboCommand = false;
+	}
+}
+
+void APGBaseCharacter::ComboBegin()
+{
+	// Combo Status
+	CurrentCombo = 1;
+
+	// Movement Setting
+	//None 지정하면 이동기능 없애서 이동 멈춤
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+	// Animation Setting
+	//const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(ComboMontage, 1.0f);
+
+	//몽타주 종료될때  ComboActiosnEnd 함수 호출 되게 델리게이트 호출
+	FOnMontageEnded EndDelegate;
+	
+	EndDelegate.BindUObject(this, &APGBaseCharacter::ComboEnd);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
+
+	/*FName TEST = AnimInstance->Montage_GetCurrentSection();
+	FString TEST2 = TEST.ToString();
+	UE_LOG(LogTemp, Warning, TEXT("%s"), *TEST2);*/
+
+	ComboTimerHandle.Invalidate();
+	ComboCheckTimer();
+}
+
+void APGBaseCharacter::ComboCheckTimer()
+{
+	int32 ComboIndex = CurrentCombo - 1;
+	ensure(ComboData->EffectiveFrameCount.IsValidIndex(ComboIndex));
+	UE_LOG(LogTemp, Warning, TEXT("ComboCheckTimer"));
+	 //어택 스피드도 스텟에서
+	//const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
+	//발동할 시간 정보를 얻기위한 변수
+	float ComboEffectiveTime = (ComboData->EffectiveFrameCount[ComboIndex] / ComboData->FrameRate);
+	if (ComboEffectiveTime > 0.0f)
+	{
+		//타이머 발동
+		// ComboCheck 함수 실행
+		//가록 마지막의 의미 반복하지 않도록 -  False
+		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &APGBaseCharacter::ComboCheck,  ComboEffectiveTime,false);
+	}
+
+}
+
+void APGBaseCharacter::ComboCheck()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ComboCheck"));
+	ComboTimerHandle.Invalidate();
+	if (HasNextComboCommand)
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+		//maxComboCount 콤보 값을 벗어나면 안되기 때문에 
+		//다음 콤보 숫자 저장 
+		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboData->MaxComboCount);
+
+		//다음 섹션의 이름 정보 저장
+		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboData->MontageSectionName, CurrentCombo);
+
+		
+		//몽타주 다음 섹션을 연결
+		AnimInstance->Montage_SetNextSection(AnimInstance->Montage_GetCurrentSection() , NextSection, ComboMontage);
+			
+		float TEST = AnimInstance->Montage_GetPosition(ComboMontage);
+		
+		UE_LOG(LogTemp, Warning, TEXT("%f"), TEST);
+		//몽타주 다음 섹션 재생
+		//AnimInstance->Montage_JumpToSection(NextSection, ComboMontage);
+
+		ComboCheckTimer();
+		HasNextComboCommand = false;
+	}
+}
+
+void APGBaseCharacter::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	UE_LOG(LogTemp, Warning, TEXT("END"));
+	
+	ensure(CurrentCombo != 0);
+	CurrentCombo = 0;
+	//캐릭터 무브먼트 이동 못한거 다시 복구
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	//12강 AI  - AI가 끝날때를 파악할 수 있게 추가
+	//NotifyComboActionEnd();
 }
 
 

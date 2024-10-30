@@ -29,7 +29,6 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	if (Movement)
 	{
-		
 		Velocity = Movement->Velocity;
 		GroundSpeed = Velocity.Size2D();
 		bIsIdle = GroundSpeed < MovingThreshould;
@@ -37,6 +36,6 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsFalling = Movement->IsFalling();
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
 		CharacterDirection = CalculateDirection(Owner->GetVelocity(), Owner->GetActorRotation());
-		UE_LOG(LogTemp, Warning, TEXT("%f"), CharacterDirection);
+		
 	}
 }
