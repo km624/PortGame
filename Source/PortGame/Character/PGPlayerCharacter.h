@@ -81,7 +81,9 @@ public:
 	uint8 bIsAim : 1;
 
 	UPROPERTY()
-	float AimOffset;
+	float AimOffsetPitch;
+	UPROPERTY()
+	float AimOffsetYaw;
 	float ReturnAimOffset();
 
 	

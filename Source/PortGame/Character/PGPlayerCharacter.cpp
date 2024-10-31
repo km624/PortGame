@@ -217,13 +217,14 @@ float APGPlayerCharacter::ReturnAimOffset()
 {
 	FRotator rtemp = GetActorRotation() - GetBaseAimRotation();
 
+
 		rtemp.Normalize();
 
 		float Direction = rtemp.Pitch; 
-		
-		AimOffset = FMath::Clamp(Direction, -55.0f, 55.0f);
+		float Direction2 = GetBaseAimRotation().Yaw;
+		AimOffsetPitch = FMath::Clamp(Direction, -55.0f, 55.0f);
 
-	return AimOffset;
+	return AimOffsetPitch;
 }
 
 

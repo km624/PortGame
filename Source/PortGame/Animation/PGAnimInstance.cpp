@@ -39,6 +39,7 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsFalling = Movement->IsFalling();
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
 		CharacterDirection = CalculateDirection(Owner->GetVelocity(), Owner->GetActorRotation());
+		UE_LOG(LogTemp, Warning, TEXT("%f"), GroundSpeed);
 	}
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(Owner);
 	if (IsValid(playerCharacter))
@@ -47,9 +48,9 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	}
 
 	if (bIsAiming)
-		AimOffset = playerCharacter->ReturnAimOffset();
+		AimOffsetPitch = playerCharacter->ReturnAimOffset();
 	else
-		AimOffset = 0.0f;
+		AimOffsetPitch = 0.0f;
 	
 }
 

@@ -58,12 +58,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	float CharacterDirection;
 
+	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Aim)
 	uint8 bIsAiming : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Aim)
-	float AimOffset;
+	float AimOffsetPitch;
 
+	
+	
+
+	
 	
 
 
