@@ -86,7 +86,15 @@ public:
 	float AimOffsetYaw;
 	float ReturnAimOffset();
 
+	//¹«±â 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Equipment, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USkeletalMeshComponent> Weapon;
 	
+	void EquidWeapon();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
+	TObjectPtr<USkeletalMesh>WeaponMesh;
 
 	
 	

@@ -64,14 +64,14 @@ APGBaseCharacter::APGBaseCharacter()
 		ComboData = comboData.Object;
 	}
 
-
+	
 }
 
 void APGBaseCharacter::ComboStart()
 {
 	if (CurrentCombo == 0)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("ComboBegin"));
+		
 		ComboBegin();
 		return;
 	}
@@ -82,11 +82,11 @@ void APGBaseCharacter::ComboStart()
 	if (ComboTimerHandle.IsValid())
 	{
 		HasNextComboCommand = true;
-		//UE_LOG(LogTemp, Warning, TEXT("IsValid"));
+		
 	}
 	else
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("IsnotValid"));
+		
 		HasNextComboCommand = false;
 	}
 }
@@ -107,13 +107,8 @@ void APGBaseCharacter::ComboBegin()
 
 	//몽타주 종료될때  ComboActiosnEnd 함수 호출 되게 델리게이트 호출
 	FOnMontageEnded EndDelegate;
-	
 	EndDelegate.BindUObject(this, &APGBaseCharacter::ComboEnd);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
-
-	/*FName TEST = AnimInstance->Montage_GetCurrentSection();
-	FString TEST2 = TEST.ToString();
-	UE_LOG(LogTemp, Warning, TEXT("%s"), *TEST2);*/
 
 	ComboTimerHandle.Invalidate();
 	ComboCheckTimer();
@@ -133,8 +128,9 @@ void APGBaseCharacter::ComboCheckTimer()
 		//타이머 발동
 		// ComboCheck 함수 실행
 		//가록 마지막의 의미 반복하지 않도록 -  False
-		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &APGBaseCharacter::ComboCheck,  ComboEffectiveTime,false,0.05f);
+		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &APGBaseCharacter::ComboCheck,  ComboEffectiveTime,false);
 	}
+	
 
 }
 
@@ -142,11 +138,15 @@ void APGBaseCharacter::ComboCheck()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("ComboCheck"));
 	ComboTimerHandle.Invalidate();
+
+
 	if (HasNextComboCommand)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("ComboStart"));
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
+		FOnMontageEnded* CurrentMontage = AnimInstance->Montage_GetEndedDelegate(ComboMontage);
+		CurrentMontage->Unbind();
 		//maxComboCount 콤보 값을 벗어나면 안되기 때문에 
 		//다음 콤보 숫자 저장 
 		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboData->MaxComboCount);
@@ -159,12 +159,23 @@ void APGBaseCharacter::ComboCheck()
 		AnimInstance->Montage_SetNextSection(AnimInstance->Montage_GetCurrentSection() , NextSection, ComboMontage);
 			
 		
+		
 		//몽타주 다음 섹션 재생
-		//AnimInstance->Montage_JumpToSection(NextSection, ComboMontage);
+		AnimInstance->Montage_Play(ComboMontage, 1.0f);
+		AnimInstance->Montage_JumpToSection(NextSection, ComboMontage);
 
-		//ComboCheckTimer();
-		//HasNextComboCommand = false;
+		FOnMontageEnded EndDelegate;
+		EndDelegate.BindUObject(this, &APGBaseCharacter::ComboEnd);
+		AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
+
+		if (CurrentCombo == ComboData->MaxComboCount)
+			return;
+		
+		ComboCheckTimer();
+		HasNextComboCommand = false;
 	}
+	
+		
 }
 
 void APGBaseCharacter::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
@@ -180,23 +191,26 @@ void APGBaseCharacter::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnde
 	//NotifyComboActionEnd();
 }
 
-void APGBaseCharacter::ComboSectionEnd()
-{
-	
-	if (HasNextComboCommand)
-	{
-		ComboCheckTimer();
-		HasNextComboCommand = false;
-		//UE_LOG(LogTemp, Warning, TEXT("ComboSectionEnd_Go"));
-	}
-		
-	else
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("ComboSectionEnd_Stop"));
-		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		AnimInstance->Montage_Stop(0.25f,ComboMontage);
-	}
-}
+
+
+// 콤보 섹션 있게 하는 노티파이
+//void APGBaseCharacter::ComboSectionEnd()
+//{
+//	
+//	//if (HasNextComboCommand)
+//	//{
+//	//	ComboCheckTimer();
+//	//	HasNextComboCommand = false;
+//	//	//UE_LOG(LogTemp, Warning, TEXT("ComboSectionEnd_Go"));
+//	//}
+//	//	
+//	//else
+//	//{
+//	//	//UE_LOG(LogTemp, Warning, TEXT("ComboSectionEnd_Stop"));
+//	//	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+//	//	AnimInstance->Montage_Stop(0.25f,ComboMontage);
+//	//}
+//}
 
 
 

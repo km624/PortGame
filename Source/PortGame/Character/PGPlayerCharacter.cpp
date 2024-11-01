@@ -68,6 +68,11 @@ APGPlayerCharacter::APGPlayerCharacter()
 	else
 		UE_LOG(LogTemp, Warning, TEXT("ERRor  failed"));
 
+	//¹«±â
+	//½ºÄÌ·¹Å» ÄÄÆ÷³ÍÆ® Ãß°¡
+	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	Weapon->SetupAttachment(GetMesh(), TEXT("weaponRifleSocket"));
+
 }
 
 void APGPlayerCharacter::BeginPlay()
@@ -75,6 +80,8 @@ void APGPlayerCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	SetCharacterData(CurrentControlData);
+
+	EquidWeapon();
 
 }
 
@@ -225,6 +232,12 @@ float APGPlayerCharacter::ReturnAimOffset()
 		AimOffsetPitch = FMath::Clamp(Direction, -55.0f, 55.0f);
 
 	return AimOffsetPitch;
+}
+
+void APGPlayerCharacter::EquidWeapon()
+{
+	Weapon->SetSkeletalMesh(WeaponMesh);
+
 }
 
 

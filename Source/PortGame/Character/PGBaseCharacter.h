@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "Interface/ComboCheckInterface.h"
+//#include "Interface/ComboCheckInterface.h"
 #include "PGBaseCharacter.generated.h"
 
 UCLASS()
-class PORTGAME_API APGBaseCharacter : public ACharacter , public IComboCheckInterface
+class PORTGAME_API APGBaseCharacter : public ACharacter 
 {
 	GENERATED_BODY()
 
@@ -35,9 +35,12 @@ protected:
 	//몽타주 엔드 델리게이트 형식
 	void ComboEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	
-	virtual void ComboSectionEnd() override;
+	//노티파이 인터페이스
+	//virtual void ComboSectionEnd();
 
 	int32 CurrentCombo = 0;
+
+	
 
 	FTimerHandle ComboTimerHandle;
 
