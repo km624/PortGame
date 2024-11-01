@@ -71,7 +71,7 @@ APGPlayerCharacter::APGPlayerCharacter()
 	//¹«±â
 	//½ºÄÌ·¹Å» ÄÄÆ÷³ÍÆ® Ãß°¡
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-	Weapon->SetupAttachment(GetMesh(), TEXT("weaponRifleSocket"));
+	Weapon->SetupAttachment(GetMesh(), TEXT("weaponSowrdSocket"));
 
 }
 

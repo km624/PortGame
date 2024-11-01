@@ -52,7 +52,7 @@ APGBaseCharacter::APGBaseCharacter()
 	}
 
 	//Combo 값들 넣어줌
-	static ConstructorHelpers::FObjectFinder<UAnimMontage>comboMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Combo/ComboMontage1.ComboMontage1'"));
+	/*static ConstructorHelpers::FObjectFinder<UAnimMontage>comboMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Combo/ComboMontage1.ComboMontage1'"));
 	if (comboMontage.Object)
 	{
 		ComboMontage = comboMontage.Object;
@@ -62,7 +62,7 @@ APGBaseCharacter::APGBaseCharacter()
 	if (comboData.Object)
 	{
 		ComboData = comboData.Object;
-	}
+	}*/
 
 	
 }
@@ -83,6 +83,7 @@ void APGBaseCharacter::ComboStart()
 	{
 		HasNextComboCommand = true;
 		
+
 	}
 	else
 	{
@@ -111,6 +112,7 @@ void APGBaseCharacter::ComboBegin()
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
 
 	ComboTimerHandle.Invalidate();
+	ComboTimerdelayHandle.Invalidate();
 	ComboCheckTimer();
 }
 
@@ -118,7 +120,7 @@ void APGBaseCharacter::ComboCheckTimer()
 {
 	int32 ComboIndex = CurrentCombo - 1;
 	ensure(ComboData->EffectiveFrameCount.IsValidIndex(ComboIndex));
-	//UE_LOG(LogTemp, Warning, TEXT("ComboCheckTimer"));
+	UE_LOG(LogTemp, Warning, TEXT("ComboCheckTimer"));
 	 //어택 스피드도 스텟에서
 	//const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
 	//발동할 시간 정보를 얻기위한 변수
@@ -129,6 +131,10 @@ void APGBaseCharacter::ComboCheckTimer()
 		// ComboCheck 함수 실행
 		//가록 마지막의 의미 반복하지 않도록 -  False
 		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &APGBaseCharacter::ComboCheck,  ComboEffectiveTime,false);
+
+		//딜레이를 위한 타이머 ,깡통 타이머
+		/*GetWorld()->GetTimerManager().SetTimer(ComboTimerdelayHandle,
+			FTimerDelegate::CreateLambda([this]() {ComboOK = true; }), ComoboDelay, false);*/
 	}
 	
 
@@ -138,10 +144,11 @@ void APGBaseCharacter::ComboCheck()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("ComboCheck"));
 	ComboTimerHandle.Invalidate();
-
+	ComboTimerdelayHandle.Invalidate();
 
 	if (HasNextComboCommand)
 	{
+		
 		//UE_LOG(LogTemp, Warning, TEXT("ComboStart"));
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
@@ -171,7 +178,9 @@ void APGBaseCharacter::ComboCheck()
 		if (CurrentCombo == ComboData->MaxComboCount)
 			return;
 		
+		
 		ComboCheckTimer();
+
 		HasNextComboCommand = false;
 	}
 	

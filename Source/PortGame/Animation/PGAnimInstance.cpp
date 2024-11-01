@@ -39,7 +39,7 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsFalling = Movement->IsFalling();
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
 		CharacterDirection = CalculateDirection(Owner->GetVelocity(), Owner->GetActorRotation());
-		UE_LOG(LogTemp, Warning, TEXT("%f"), GroundSpeed);
+		//UE_LOG(LogTemp, Warning, TEXT("%f"), GroundSpeed);
 	}
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(Owner);
 	if (IsValid(playerCharacter))

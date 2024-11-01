@@ -18,10 +18,10 @@ public:
 
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category =Combo)
 	TObjectPtr<class UAnimMontage> ComboMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combo, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UComboData> ComboData;
 
 	void ComboStart();
@@ -40,9 +40,16 @@ protected:
 
 	int32 CurrentCombo = 0;
 
-	
-
 	FTimerHandle ComboTimerHandle;
+
+	FTimerHandle ComboTimerdelayHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combo)
+	float ComoboDelay;
+
+	uint8 ComboOK : 1;
+
+	
 
 	//발동 타이머 이전에 입력 들어왔나 체크
 	bool HasNextComboCommand = false;
