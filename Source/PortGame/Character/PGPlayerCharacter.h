@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/PGBaseCharacter.h"
+#include "Components/TimelineComponent.h"
 #include "PGPlayerCharacter.generated.h"
 
 /**
@@ -32,6 +33,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void Tick(float DeltaTime) override;
 
 	void SetCharacterData(EControlData DataName);
 
@@ -86,6 +89,19 @@ public:
 	float AimOffsetYaw;
 	float ReturnAimOffset();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Aim")
+	TObjectPtr<class UCurveFloat> AimCurve;
+
+	FTimeline AimTimeline;
+
+	UFUNCTION()
+	void AimUpdate(float deltaTime);
+
+	
+
+
+
+
 	//무기 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Equipment, Meta = (AllowPrivateAccess = "true"))
@@ -97,5 +113,31 @@ protected:
 	TObjectPtr<USkeletalMesh>WeaponMesh;
 
 	
+	//총 발사 구현
+public: 
+	int32 ammoMaxCount = 10;
+
+	int32 currentammo;
+	float reloadingTime = 3.0f;
+
+	float ShootInterval = 1.0f;
+
+	float traceDistance = 1000.0f;
+
+	void StartFire();
+
+	void StopFire();
+
+	void Reloading();
+
+	FTimerHandle FireTimerHandle;
+	FTimerHandle ReloadTimerHandle;
+	//UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	//class USkeletalMeshComponent* WeaponSkeletalMeshComponent;
+
 	
+	void FireWithLineTrace();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim")
+	TObjectPtr<class UAnimMontage> ReloadMwontage;
 };

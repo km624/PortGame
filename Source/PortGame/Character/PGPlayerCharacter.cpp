@@ -11,9 +11,13 @@
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
 #include "PGCharacterData.h"
+#include "Components/TimelineComponent.h"
+
 
 APGPlayerCharacter::APGPlayerCharacter()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	static ConstructorHelpers::FObjectFinder<UPGCharacterData> CharacterData
 	(TEXT("/Script/PortGame.PGCharacterData'/Game/PortGame/Input/PG_InputData.PG_InputData'"));
 	if (CharacterData.Object)
@@ -73,6 +77,15 @@ APGPlayerCharacter::APGPlayerCharacter()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetMesh(), TEXT("weaponSowrdSocket"));
 
+	static ConstructorHelpers::FObjectFinder<UCurveFloat>Cuve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Animation/aim/NewCurveBase.NewCurveBase'"));
+	if (Cuve.Object)
+	{
+		AimCurve = Cuve.Object;
+	}
+
+
+	//TEST 무기
+	//WeaponSkeletalMeshComponent->SetSkeletalMesh(WeaponMesh);
 }
 
 void APGPlayerCharacter::BeginPlay()
@@ -83,6 +96,12 @@ void APGPlayerCharacter::BeginPlay()
 
 	EquidWeapon();
 
+	FOnTimelineFloat TimelineProgress;
+	TimelineProgress.BindUFunction(this, FName("AimUpdate")); 
+	AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
+
+	currentammo = ammoMaxCount;
+	
 }
 
 //인풋 매핑 - 액션에 함수 바인딩
@@ -107,12 +126,22 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		//Aiming
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &APGPlayerCharacter::PressAim);
+		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Ongoing, this, &APGPlayerCharacter::StartFire);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &APGPlayerCharacter::ReleasedAim);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
+
+}
+
+void APGPlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	AimTimeline.TickTimeline(DeltaTime);
+	
 
 }
 
@@ -203,21 +232,25 @@ void APGPlayerCharacter::Look(const FInputActionValue& Value)
 
 void APGPlayerCharacter::Attack()
 {
-
+	
 	ComboStart();
 	
 }
 
 void APGPlayerCharacter::PressAim()
 {
-	UE_LOG(LogTemp, Warning, TEXT("aim"));
 	bIsAim = true;
+	AimTimeline.PlayFromStart();
+	FireWithLineTrace();
+	UE_LOG(LogTemp, Warning, TEXT("onclick"));
+	
 }
 
 void APGPlayerCharacter::ReleasedAim()
 {
-	UE_LOG(LogTemp, Warning, TEXT("aimOut"));
+	StopFire();
 	bIsAim = false;
+	AimTimeline.Reverse();
 }
 
 float APGPlayerCharacter::ReturnAimOffset()
@@ -234,11 +267,110 @@ float APGPlayerCharacter::ReturnAimOffset()
 	return AimOffsetPitch;
 }
 
+void APGPlayerCharacter::AimUpdate(float deltaTime)
+{
+	
+	float Aim = FMath::Lerp( 300, 100, deltaTime);
+	SpringArm->TargetArmLength = Aim;
+
+}
+
 void APGPlayerCharacter::EquidWeapon()
 {
 	Weapon->SetSkeletalMesh(WeaponMesh);
 
 }
+
+void APGPlayerCharacter::StartFire()
+{
+	
+		
+		if (!FireTimerHandle.IsValid()&& !ReloadTimerHandle.IsValid())
+		{
+			GetWorld()->GetTimerManager().SetTimer(
+				FireTimerHandle,
+				[this]() {FireWithLineTrace(); }, ShootInterval, true
+			);
+		}
+		
+
+
+}
+
+void APGPlayerCharacter::StopFire()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Stop"));
+	if (FireTimerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(FireTimerHandle);
+	}
+
+}
+
+void APGPlayerCharacter::Reloading()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(ReloadMwontage, 1.0f);
+	GetWorld()->GetTimerManager().SetTimer(
+		ReloadTimerHandle,
+		[this]() {
+			currentammo = ammoMaxCount;
+			UE_LOG(LogTemp, Warning, TEXT("Reloading"));
+			ReloadTimerHandle.Invalidate();
+		}, reloadingTime, false
+	);
+}
+
+void APGPlayerCharacter::FireWithLineTrace()
+{
+	
+	if (currentammo <= 0)
+	{
+		StopFire();
+		Reloading();
+		UE_LOG(LogTemp, Warning, TEXT("NoArmo"));
+		return;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Time : %lf"),GetWorld()->GetTimeSeconds());
+	currentammo--;
+
+	const FVector start = GetActorLocation();
+	const FVector end = (GetControlRotation().Vector() * traceDistance ) + start;
+	FHitResult hitResult;
+	FCollisionQueryParams collisionParams;
+	collisionParams.AddIgnoredActor(this);
+	
+	const UWorld* currentWorld = GetWorld();
+	DrawDebugLine(currentWorld, start, end, FColor::Red, false, 1.0f);
+	if (currentWorld)
+	{
+
+	
+
+		// 명중!
+		if (currentWorld->LineTraceSingleByChannel(
+			hitResult,
+			start,
+			end,
+			ECC_Visibility,
+			collisionParams))
+		{
+			if (hitResult.GetActor())
+			{
+				auto* hitActor = hitResult.GetActor();
+				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Hit Actor Name: %s"), *hitActor->GetActorLabel()));
+			}
+
+		}
+		
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("%d"),currentammo);
+	
+
+}
+
+
 
 
 
