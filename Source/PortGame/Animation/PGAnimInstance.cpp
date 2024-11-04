@@ -44,7 +44,7 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(Owner);
 	if (IsValid(playerCharacter))
 	{
-		bIsAiming = playerCharacter->bIsAim;
+		bIsAiming = playerCharacter->GetCurrentIsAiming();
 	}
 
 	if (bIsAiming)

@@ -74,8 +74,8 @@ APGPlayerCharacter::APGPlayerCharacter()
 
 	//무기
 	//스켈레탈 컴포넌트 추가
-	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-	Weapon->SetupAttachment(GetMesh(), TEXT("weaponSowrdSocket"));
+	/*Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	Weapon->SetupAttachment(GetMesh(), TEXT("weaponSowrdSocket"));*/
 
 	static ConstructorHelpers::FObjectFinder<UCurveFloat>Cuve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Animation/aim/NewCurveBase.NewCurveBase'"));
 	if (Cuve.Object)
@@ -94,13 +94,13 @@ void APGPlayerCharacter::BeginPlay()
 
 	SetCharacterData(CurrentControlData);
 
-	EquidWeapon();
+	//EquidWeapon();
 
 	FOnTimelineFloat TimelineProgress;
 	TimelineProgress.BindUFunction(this, FName("AimUpdate")); 
 	AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
 
-	currentammo = ammoMaxCount;
+	//currentammo = ammoMaxCount;
 	
 }
 
@@ -125,8 +125,9 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Triggered, this, &APGPlayerCharacter::Attack);
 
 		//Aiming
+		//CharacterType에 따라 바인딩 
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &APGPlayerCharacter::PressAim);
-		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Ongoing, this, &APGPlayerCharacter::StartFire);
+		//EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Ongoing, this, &APGPlayerCharacter::StartFire);
 		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &APGPlayerCharacter::ReleasedAim);
 	}
 	else
@@ -233,39 +234,27 @@ void APGPlayerCharacter::Look(const FInputActionValue& Value)
 void APGPlayerCharacter::Attack()
 {
 	
-	ComboStart();
+	AttackToComponent();
 	
 }
 
 void APGPlayerCharacter::PressAim()
 {
 	bIsAim = true;
+	
 	AimTimeline.PlayFromStart();
-	FireWithLineTrace();
+	//FireWithLineTrace();
 	UE_LOG(LogTemp, Warning, TEXT("onclick"));
 	
 }
 
 void APGPlayerCharacter::ReleasedAim()
 {
-	StopFire();
+	//StopFire();
 	bIsAim = false;
 	AimTimeline.Reverse();
 }
 
-float APGPlayerCharacter::ReturnAimOffset()
-{
-	FRotator rtemp = GetActorRotation() - GetBaseAimRotation();
-
-
-		rtemp.Normalize();
-
-		float Direction = rtemp.Pitch; 
-		float Direction2 = GetBaseAimRotation().Yaw;
-		AimOffsetPitch = FMath::Clamp(Direction, -55.0f, 55.0f);
-
-	return AimOffsetPitch;
-}
 
 void APGPlayerCharacter::AimUpdate(float deltaTime)
 {
@@ -274,101 +263,101 @@ void APGPlayerCharacter::AimUpdate(float deltaTime)
 	SpringArm->TargetArmLength = Aim;
 
 }
-
-void APGPlayerCharacter::EquidWeapon()
-{
-	Weapon->SetSkeletalMesh(WeaponMesh);
-
-}
-
-void APGPlayerCharacter::StartFire()
-{
-	
-		
-		if (!FireTimerHandle.IsValid()&& !ReloadTimerHandle.IsValid())
-		{
-			GetWorld()->GetTimerManager().SetTimer(
-				FireTimerHandle,
-				[this]() {FireWithLineTrace(); }, ShootInterval, true
-			);
-		}
-		
-
-
-}
-
-void APGPlayerCharacter::StopFire()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Stop"));
-	if (FireTimerHandle.IsValid())
-	{
-		GetWorldTimerManager().ClearTimer(FireTimerHandle);
-	}
-
-}
-
-void APGPlayerCharacter::Reloading()
-{
-	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(ReloadMwontage, 1.0f);
-	GetWorld()->GetTimerManager().SetTimer(
-		ReloadTimerHandle,
-		[this]() {
-			currentammo = ammoMaxCount;
-			UE_LOG(LogTemp, Warning, TEXT("Reloading"));
-			ReloadTimerHandle.Invalidate();
-		}, reloadingTime, false
-	);
-}
-
-void APGPlayerCharacter::FireWithLineTrace()
-{
-	
-	if (currentammo <= 0)
-	{
-		StopFire();
-		Reloading();
-		UE_LOG(LogTemp, Warning, TEXT("NoArmo"));
-		return;
-	}
-	UE_LOG(LogTemp, Warning, TEXT("Time : %lf"),GetWorld()->GetTimeSeconds());
-	currentammo--;
-
-	const FVector start = GetActorLocation();
-	const FVector end = (GetControlRotation().Vector() * traceDistance ) + start;
-	FHitResult hitResult;
-	FCollisionQueryParams collisionParams;
-	collisionParams.AddIgnoredActor(this);
-	
-	const UWorld* currentWorld = GetWorld();
-	DrawDebugLine(currentWorld, start, end, FColor::Red, false, 1.0f);
-	if (currentWorld)
-	{
-
-	
-
-		// 명중!
-		if (currentWorld->LineTraceSingleByChannel(
-			hitResult,
-			start,
-			end,
-			ECC_Visibility,
-			collisionParams))
-		{
-			if (hitResult.GetActor())
-			{
-				auto* hitActor = hitResult.GetActor();
-				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Hit Actor Name: %s"), *hitActor->GetActorLabel()));
-			}
-
-		}
-		
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("%d"),currentammo);
-	
-
-}
+//
+//void APGPlayerCharacter::EquidWeapon()
+//{
+//	Weapon->SetSkeletalMesh(WeaponMesh);
+//
+//}
+//
+//void APGPlayerCharacter::StartFire()
+//{
+//	
+//		
+//		if (!FireTimerHandle.IsValid()&& !ReloadTimerHandle.IsValid())
+//		{
+//			GetWorld()->GetTimerManager().SetTimer(
+//				FireTimerHandle,
+//				[this]() {FireWithLineTrace(); }, ShootInterval, true
+//			);
+//		}
+//		
+//
+//
+//}
+//
+//void APGPlayerCharacter::StopFire()
+//{
+//	UE_LOG(LogTemp, Warning, TEXT("Stop"));
+//	if (FireTimerHandle.IsValid())
+//	{
+//		GetWorldTimerManager().ClearTimer(FireTimerHandle);
+//	}
+//
+//}
+//
+//void APGPlayerCharacter::Reloading()
+//{
+//	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+//	AnimInstance->Montage_Play(ReloadMwontage, 1.0f);
+//	GetWorld()->GetTimerManager().SetTimer(
+//		ReloadTimerHandle,
+//		[this]() {
+//			currentammo = ammoMaxCount;
+//			UE_LOG(LogTemp, Warning, TEXT("Reloading"));
+//			ReloadTimerHandle.Invalidate();
+//		}, reloadingTime, false
+//	);
+//}
+//
+//void APGPlayerCharacter::FireWithLineTrace()
+//{
+//	
+//	if (currentammo <= 0)
+//	{
+//		StopFire();
+//		Reloading();
+//		UE_LOG(LogTemp, Warning, TEXT("NoArmo"));
+//		return;
+//	}
+//	UE_LOG(LogTemp, Warning, TEXT("Time : %lf"),GetWorld()->GetTimeSeconds());
+//	currentammo--;
+//
+//	const FVector start = GetActorLocation();
+//	const FVector end = (GetControlRotation().Vector() * traceDistance ) + start;
+//	FHitResult hitResult;
+//	FCollisionQueryParams collisionParams;
+//	collisionParams.AddIgnoredActor(this);
+//	
+//	const UWorld* currentWorld = GetWorld();
+//	DrawDebugLine(currentWorld, start, end, FColor::Red, false, 1.0f);
+//	if (currentWorld)
+//	{
+//
+//	
+//
+//		// 명중!
+//		if (currentWorld->LineTraceSingleByChannel(
+//			hitResult,
+//			start,
+//			end,
+//			ECC_Visibility,
+//			collisionParams))
+//		{
+//			if (hitResult.GetActor())
+//			{
+//				auto* hitActor = hitResult.GetActor();
+//				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Hit Actor Name: %s"), *hitActor->GetActorLabel()));
+//			}
+//
+//		}
+//		
+//	}
+//
+//	UE_LOG(LogTemp, Warning, TEXT("%d"),currentammo);
+//	
+//
+//}
 
 
 

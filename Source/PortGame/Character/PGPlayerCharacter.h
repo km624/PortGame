@@ -12,7 +12,7 @@
  */
 
 UENUM()
-enum class EControlData: uint8
+enum class EControlData : uint8
 {
 	Base,
 	Two
@@ -79,15 +79,11 @@ protected:
 	void PressAim();
 	//에임 땟을때
 	void ReleasedAim();
-public:
-	UPROPERTY()
-	uint8 bIsAim : 1;
 
-	UPROPERTY()
-	float AimOffsetPitch;
-	UPROPERTY()
-	float AimOffsetYaw;
-	float ReturnAimOffset();
+	//에임 
+
+//에임중 카메라
+protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Aim")
 	TObjectPtr<class UCurveFloat> AimCurve;
@@ -103,41 +99,41 @@ public:
 
 
 	//무기 
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Equipment, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USkeletalMeshComponent> Weapon;
-	
-	void EquidWeapon();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
-	TObjectPtr<USkeletalMesh>WeaponMesh;
-
-	
-	//총 발사 구현
-public: 
-	int32 ammoMaxCount = 10;
-
-	int32 currentammo;
-	float reloadingTime = 3.0f;
-
-	float ShootInterval = 1.0f;
-
-	float traceDistance = 1000.0f;
-
-	void StartFire();
-
-	void StopFire();
-
-	void Reloading();
-
-	FTimerHandle FireTimerHandle;
-	FTimerHandle ReloadTimerHandle;
-	//UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	//class USkeletalMeshComponent* WeaponSkeletalMeshComponent;
-
-	
-	void FireWithLineTrace();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim")
-	TObjectPtr<class UAnimMontage> ReloadMwontage;
+//protected:
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Equipment, Meta = (AllowPrivateAccess = "true"))
+//	TObjectPtr<class USkeletalMeshComponent> Weapon;
+//	
+//	void EquidWeapon();
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
+//	TObjectPtr<USkeletalMesh>WeaponMesh;
+//
+//	
+//	//총 발사 구현
+//public: 
+//	int32 ammoMaxCount = 10;
+//
+//	int32 currentammo;
+//	float reloadingTime = 3.0f;
+//
+//	float ShootInterval = 1.0f;
+//
+//	float traceDistance = 1000.0f;
+//
+//	void StartFire();
+//
+//	void StopFire();
+//
+//	void Reloading();
+//
+//	FTimerHandle FireTimerHandle;
+//	FTimerHandle ReloadTimerHandle;
+//	//UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+//	//class USkeletalMeshComponent* WeaponSkeletalMeshComponent;
+//
+//	
+//	void FireWithLineTrace();
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim")
+//	TObjectPtr<class UAnimMontage> ReloadMwontage;
 };
