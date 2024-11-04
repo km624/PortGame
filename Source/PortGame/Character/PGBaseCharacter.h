@@ -49,10 +49,14 @@ protected:
 
 	uint8 ComboOK : 1;
 
-	
-
 	//발동 타이머 이전에 입력 들어왔나 체크
 	bool HasNextComboCommand = false;
+
+	//스텟 관한 (Hp)
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UPGStatComponent> Stat;
 
 
 };

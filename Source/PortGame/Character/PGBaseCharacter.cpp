@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Data/ComboData.h"
 #include "Animation/AnimMontage.h"
+#include "Component/PGStatComponent.h"
 
 
 
@@ -63,6 +64,10 @@ APGBaseCharacter::APGBaseCharacter()
 	{
 		ComboData = comboData.Object;
 	}*/
+
+	//StatComponent Ãß°¡
+	Stat = CreateDefaultSubobject<UPGStatComponent>(TEXT("STAT"));
+
 
 	
 }

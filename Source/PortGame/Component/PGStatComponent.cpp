@@ -7,6 +7,8 @@
 UPGStatComponent::UPGStatComponent()
 {
 	bWantsInitializeComponent = true;
+	
+
 
 }
 
@@ -14,14 +16,29 @@ void UPGStatComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-
-
+	SetHp(MaxHp);
 
 }
 
 void UPGStatComponent::SetHp(float NewHp)
 {
+	CurrentHp = NewHp;
 
+	OnHpChanged.Broadcast(NewHp);
+
+	UE_LOG(LogTemp, Warning, TEXT("%f"), CurrentHp);
+	if (CurrentHp <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Á×À½"));
+		OnHpZero.Broadcast();
+	}
+}
+
+void UPGStatComponent::Damaged(float Damage)
+{
+	
+	SetHp(CurrentHp-Damage);
+	
 }
 
 
