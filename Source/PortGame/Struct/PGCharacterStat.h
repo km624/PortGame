@@ -16,6 +16,7 @@ struct  FPGCharacterStat : public FTableRowBase
 	GENERATED_BODY()
 
 public:
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float MaxHp;
 

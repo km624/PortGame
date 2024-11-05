@@ -11,6 +11,9 @@ DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
 // Hp 변경됨
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHpChangedDelegate, float /*CurrentHp*/);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, FPGCharacterStat /*Stat*/);
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnCharacterLevelChangedDelegate, float /*Level*/);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PORTGAME_API UPGStatComponent : public UActorComponent
@@ -28,6 +31,11 @@ protected:
 protected:
 	void SetHp(float NewHp);
 
+	void SetStat(FName rarity);
+
+	void SetLevelCharacter(int32 level);
+	
+
 
 public:
 	FOnHpChangedDelegate OnHpChanged;
@@ -39,9 +47,12 @@ protected:
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float CurrentHp;
 	
-	//임시 maxp
+	////임시 maxp
+	//UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
+	//float MaxHp=100.0f;S
+
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
-	float MaxHp=100.0f;
+	float CurrentCharacterLevel;
 
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta= (AllowPrivateAccess="true"))

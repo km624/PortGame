@@ -34,6 +34,14 @@ void UPGStatComponent::SetHp(float NewHp)
 	}
 }
 
+void UPGStatComponent::SetStat(FName rarity)
+{
+}
+
+void UPGStatComponent::SetLevelCharacter(int32 level)
+{
+}
+
 void UPGStatComponent::Damaged(float Damage)
 {
 	
