@@ -13,10 +13,12 @@ AWeapon::AWeapon()
 {
 	WeaponaSkeletalComponent = 
 		CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+
+	SetRootComponent(WeaponaSkeletalComponent);
 	
 }
 
-void AWeapon::WeaponAttachment(APGBaseCharacter* BaseCharacter)
+void AWeapon::OnInitializeWeapon(APGBaseCharacter* BaseCharacter)
 {
 	OwnerCharacter = Cast<APGBaseCharacter>(BaseCharacter);
 	SLOG(TEXT("WeaponAttachment"));
@@ -25,7 +27,7 @@ void AWeapon::WeaponAttachment(APGBaseCharacter* BaseCharacter)
 
 void AWeapon::Attack()
 {
-	SLOG(TEXT("Attack"));
+	
 }
 
 void AWeapon::BeginPlay()

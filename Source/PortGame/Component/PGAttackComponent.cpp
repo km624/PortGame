@@ -29,7 +29,7 @@ void UPGAttackComponent::SetUpWeapon()
 {
 	if (WeaponClass)
 	{
-		// SpawnActor를 통해 weapon 데이터를 기반으로 한 액터 생성
+		
 		AWeapon* spawnWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClass);
 
 		Weapon = spawnWeapon;
@@ -37,7 +37,9 @@ void UPGAttackComponent::SetUpWeapon()
 		APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
 
 
-		spawnWeapon->WeaponAttachment(BaseCharacter);
+		spawnWeapon->OnInitializeWeapon(BaseCharacter);
+
+		spawnWeapon->AttachToComponent(BaseCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, spawnWeapon->GetWeaponFname());
 		
 	}
 

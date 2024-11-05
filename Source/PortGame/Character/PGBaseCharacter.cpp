@@ -80,7 +80,7 @@ APGBaseCharacter::APGBaseCharacter()
 void APGBaseCharacter::AttackToComponent()
 {
 	AttackComponent->AttackToWeapon();
-	SLOG(TEXT("Base-Attack"));
+	
 }
 
 float APGBaseCharacter::ReturnAimOffset()

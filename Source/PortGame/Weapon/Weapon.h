@@ -15,9 +15,12 @@ public:
 
 	AWeapon();
 
-	virtual void WeaponAttachment(class  APGBaseCharacter* BaseCharacter);
+	virtual void OnInitializeWeapon(class  APGBaseCharacter* BaseCharacter);
 
 	virtual void Attack();
+
+public:
+	FORCEINLINE FName GetWeaponFname(){ return WeaponSocket; }
 
 protected:
 	
@@ -30,12 +33,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
 	TObjectPtr<class APGBaseCharacter> OwnerCharacter;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Equipment, Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USkeletalMeshComponent> WeaponaSkeletalComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	TObjectPtr<USkeletalMesh> WeaponMesh;
 
+	FName WeaponSocket;
+
+	
 
 	//기본 공격 ( 콤보)
 protected:

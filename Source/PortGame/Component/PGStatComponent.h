@@ -15,10 +15,19 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnStatChangedDelegate, FPGCharacterStat /*S
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCharacterLevelChangedDelegate, float /*Level*/);
 
+UENUM(BlueprintType)
+enum class EPlayerRarity :uint8
+{
+	Normal = 0,
+	Rare
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PORTGAME_API UPGStatComponent : public UActorComponent
 {
 	GENERATED_BODY()
+
+private:
 
 public:	
 	
@@ -57,5 +66,8 @@ protected:
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta= (AllowPrivateAccess="true"))
 	FPGCharacterStat BaseStat;
+
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TMap<FName, FPGCharacterStat> map;
 		
 };

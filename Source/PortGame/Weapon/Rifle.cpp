@@ -5,17 +5,26 @@
 #include "Weapon/Rifle.h"
 #include "Character/PGBaseCharacter.h"
 #include "Animation/AnimMontage.h"
+#include "PortGame/PortGame.h"
 
 
-void ARifle::WeaponAttachment(APGBaseCharacter* BaseCharacter)
+
+
+void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter)
 {
-	Super::WeaponAttachment(BaseCharacter);
-	WeaponaSkeletalComponent->
-		SetupAttachment(OwnerCharacter->GetMesh(), TEXT("weaponSowrdSocket"));
-	WeaponaSkeletalComponent->SetSkeletalMesh(WeaponMesh);
+	Super::OnInitializeWeapon(BaseCharacter);
 	
+	if (IsValid(WeaponMesh))
+	{
+		WeaponaSkeletalComponent->SetSkeletalMesh(WeaponMesh);
+
+	}
 	
+	WeaponSocket = TEXT("weaponSowrdSocket");
+
 	Currentammo = ammoMaxCount;
+
+	
 }
 
 void ARifle::Attack()

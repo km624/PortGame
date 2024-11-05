@@ -4,12 +4,20 @@
 #include "Weapon/Sword.h"
 #include "Character/PGBaseCharacter.h"
 
-void ASword::WeaponAttachment(APGBaseCharacter* BaseCharacter)
+
+	
+
+void ASword::OnInitializeWeapon(APGBaseCharacter* BaseCharacter)
 {
-	Super::WeaponAttachment(BaseCharacter);
-	WeaponaSkeletalComponent->
-		SetupAttachment(OwnerCharacter->GetMesh(), TEXT("weaponSowrdSocket"));
-	WeaponaSkeletalComponent->SetSkeletalMesh(WeaponMesh);
+	Super::OnInitializeWeapon(BaseCharacter);
+
+	if (WeaponMesh)
+	{
+		WeaponaSkeletalComponent->SetSkeletalMesh(WeaponMesh);
+
+	}
+	WeaponSocket =  TEXT("weaponSowrdSocket");
+	
 }
 
 void ASword::Attack()

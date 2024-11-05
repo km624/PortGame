@@ -244,7 +244,7 @@ void APGPlayerCharacter::PressAim()
 	
 	AimTimeline.PlayFromStart();
 	//FireWithLineTrace();
-	UE_LOG(LogTemp, Warning, TEXT("onclick"));
+	UE_LOG(LogTemp, Warning, TEXT("onAim"));
 	
 }
 

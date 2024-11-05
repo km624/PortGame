@@ -14,9 +14,12 @@ class PORTGAME_API ASword : public AWeapon
 {
 	GENERATED_BODY()
 
+
 public:
-	virtual void WeaponAttachment(class  APGBaseCharacter* BaseCharacter) override;
+	virtual void OnInitializeWeapon(class  APGBaseCharacter* BaseCharacter) override;
 	
 	virtual void Attack() override;
+
+	
 	
 };
