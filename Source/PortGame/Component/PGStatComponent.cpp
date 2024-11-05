@@ -6,6 +6,12 @@
 
 UPGStatComponent::UPGStatComponent()
 {
+	static ConstructorHelpers::FObjectFinder<UDataTable>DT_STAT(TEXT(""));
+	if (DT_STAT.Object)
+	{
+
+	}
+
 	bWantsInitializeComponent = true;
 	
 
@@ -16,7 +22,7 @@ void UPGStatComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	SetHp(MaxHp);
+	SetHp();
 
 }
 
