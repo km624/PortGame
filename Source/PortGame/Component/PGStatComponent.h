@@ -33,41 +33,45 @@ public:
 	
 	UPGStatComponent();
 
+
+
 protected:
 	virtual void InitializeComponent() override;
 
 	
-protected:
-	void SetHp(float NewHp);
-
-	void SetStat(FName rarity);
-
-	void SetLevelCharacter(int32 level);
-	
-
 
 public:
 	FOnHpChangedDelegate OnHpChanged;
 	FOnHpZeroDelegate OnHpZero;
+	FORCEINLINE void SetBaseStat(FName rarity) { BaseStat = AllStat[rarity]; }
+	FORCEINLINE const FPGCharacterStat& GetBaseStat() const { return BaseStat; }
+	FORCEINLINE float  GetCurrentHp() { return CurrentHp; }
 
 	void Damaged(float Damage);
+	
+protected:
+	void SetHp(float NewHp);
 
+	//void SetStat(FName rarity);
+
+	void SetLevelCharacter(int32 level);
+	
 protected:
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float CurrentHp;
 	
-	////юс╫ц maxp
-	//UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
-	//float MaxHp=100.0f;S
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float CurrentCharacterLevel;
+
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
+	float EXP;
 
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta= (AllowPrivateAccess="true"))
 	FPGCharacterStat BaseStat;
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
-	TMap<FName, FPGCharacterStat> map;
+	TMap<FName, FPGCharacterStat> AllStat;
 		
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 //#include "Interface/ComboCheckInterface.h"
+#include "Interface/PGSetHpbarCharacterInterface.h"
 #include "PGBaseCharacter.generated.h"
 
 UENUM(BlueprintType)
@@ -17,7 +18,7 @@ enum class EPlayerCharacterType :uint8
 
 
 UCLASS()
-class PORTGAME_API APGBaseCharacter : public ACharacter 
+class PORTGAME_API APGBaseCharacter : public ACharacter , public IPGSetHpbarCharacterInterface
 {
 	GENERATED_BODY()
 
@@ -46,6 +47,7 @@ protected:
 
 	UPROPERTY()
 	float AimOffset;
+
 //protected:
 //	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category =Combo)
 //	TObjectPtr<class UAnimMontage> ComboMontage;
@@ -85,12 +87,18 @@ protected:
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UPGStatComponent> Stat;
+	TObjectPtr<class UPGStatComponent> StatComponent;
 
 	//무기
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UPGAttackComponent> AttackComponent;
 
+	//위젯 영역
+protected:
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UPGWidgetComponent> HpBarWidgetComponent;
+
+	virtual void SetUpHpWidget(class UPGUserWidget* InUserWidget) override;
 };

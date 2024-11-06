@@ -30,11 +30,8 @@ UPGStatComponent::UPGStatComponent()
 		for (FName rowName : rowNames)
 		{
 			const FPGCharacterStat* rowInfo = characterstatDataTable->FindRow<FPGCharacterStat>(rowName, contextString);
-			map.Add(rowName, *rowInfo);
-		}
-
-		
-		
+			AllStat.Add(rowName, *rowInfo);
+		}	
 	}
 
 
@@ -48,7 +45,9 @@ void UPGStatComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
+	SetBaseStat(TEXT("Normal"));
 	
+	SetHp(BaseStat.MaxHp);
 
 }
 
@@ -66,9 +65,10 @@ void UPGStatComponent::SetHp(float NewHp)
 	}
 }
 
-void UPGStatComponent::SetStat(FName rarity)
-{
-}
+//void UPGStatComponent::SetStat(FName rarity)
+//{
+//	 BaseStat =  AllStat[rarity];
+//}
 
 void UPGStatComponent::SetLevelCharacter(int32 level)
 {
