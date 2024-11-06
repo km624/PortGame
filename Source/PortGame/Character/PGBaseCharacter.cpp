@@ -11,6 +11,7 @@
 #include "PortGame/PortGame.h"
 #include "UI/PGHPBarWidget.h"
 #include "Component/PGWidgetComponent.h"
+#include "Engine/DamageEvents.h"
 
 
 // Sets default values
@@ -41,7 +42,8 @@ APGBaseCharacter::APGBaseCharacter()
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -100.0f), FRotator(0.0f, -90.0f, 0.0f));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 
-
+	GetCapsuleComponent()->SetCollisionProfileName(TEXT("PGCapsule"));
+	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Skeletal(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
 	if (Skeletal.Object)
 	{
@@ -125,159 +127,76 @@ void APGBaseCharacter::SetUpHpWidget(UPGUserWidget* InUserWidget)
 	
 }
 
-//void APGBaseCharacter::ComboStart()
-//{
-//	if (CurrentCombo == 0)
-//	{
-//		
-//		ComboBegin();
-//		return;
-//	}
-//
-//	
-//	//타이머가 설정이 안되있을때는 입력을 놓쳤거나
-//	// 콤보 다 했을때
-//	if (ComboTimerHandle.IsValid())
-//	{
-//		HasNextComboCommand = true;
-//		
-//
-//	}
-//	else
-//	{
-//		
-//		HasNextComboCommand = false;
-//	}
-//}
-//
-//void APGBaseCharacter::ComboBegin()
-//{
-//	// Combo Status
-//	CurrentCombo = 1;
-//
-//	// Movement Setting
-//	//None 지정하면 이동기능 없애서 이동 멈춤
-//	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
-//
-//	// Animation Setting
-//	//const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
-//	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-//	AnimInstance->Montage_Play(ComboMontage, 1.0f);
-//
-//	//몽타주 종료될때  ComboActiosnEnd 함수 호출 되게 델리게이트 호출
-//	FOnMontageEnded EndDelegate;
-//	EndDelegate.BindUObject(this, &APGBaseCharacter::ComboEnd);
-//	AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
-//
-//	ComboTimerHandle.Invalidate();
-//	ComboTimerdelayHandle.Invalidate();
-//	ComboCheckTimer();
-//}
-//
-//void APGBaseCharacter::ComboCheckTimer()
-//{
-//	int32 ComboIndex = CurrentCombo - 1;
-//	ensure(ComboData->EffectiveFrameCount.IsValidIndex(ComboIndex));
-//	UE_LOG(LogTemp, Warning, TEXT("ComboCheckTimer"));
-//	 //어택 스피드도 스텟에서
-//	//const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
-//	//발동할 시간 정보를 얻기위한 변수
-//	float ComboEffectiveTime = (ComboData->EffectiveFrameCount[ComboIndex] / ComboData->FrameRate);
-//	if (ComboEffectiveTime > 0.0f)
-//	{
-//		//타이머 발동
-//		// ComboCheck 함수 실행
-//		//가록 마지막의 의미 반복하지 않도록 -  False
-//		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &APGBaseCharacter::ComboCheck,  ComboEffectiveTime,false);
-//
-//		//딜레이를 위한 타이머 ,깡통 타이머
-//		/*GetWorld()->GetTimerManager().SetTimer(ComboTimerdelayHandle,
-//			FTimerDelegate::CreateLambda([this]() {ComboOK = true; }), ComoboDelay, false);*/
-//	}
-//	
-//
-//}
-//
-//void APGBaseCharacter::ComboCheck()
-//{
-//	//UE_LOG(LogTemp, Warning, TEXT("ComboCheck"));
-//	ComboTimerHandle.Invalidate();
-//	ComboTimerdelayHandle.Invalidate();
-//
-//	if (HasNextComboCommand)
-//	{
-//		
-//		//UE_LOG(LogTemp, Warning, TEXT("ComboStart"));
-//		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-//
-//		FOnMontageEnded* CurrentMontage = AnimInstance->Montage_GetEndedDelegate(ComboMontage);
-//		CurrentMontage->Unbind();
-//		//maxComboCount 콤보 값을 벗어나면 안되기 때문에 
-//		//다음 콤보 숫자 저장 
-//		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboData->MaxComboCount);
-//
-//		//다음 섹션의 이름 정보 저장
-//		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboData->MontageSectionName, CurrentCombo);
-//
-//		
-//		//몽타주 다음 섹션을 연결
-//		AnimInstance->Montage_SetNextSection(AnimInstance->Montage_GetCurrentSection() , NextSection, ComboMontage);
-//			
-//		
-//		
-//		//몽타주 다음 섹션 재생
-//		AnimInstance->Montage_Play(ComboMontage, 1.0f);
-//		AnimInstance->Montage_JumpToSection(NextSection, ComboMontage);
-//
-//		FOnMontageEnded EndDelegate;
-//		EndDelegate.BindUObject(this, &APGBaseCharacter::ComboEnd);
-//		AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
-//
-//		if (CurrentCombo == ComboData->MaxComboCount)
-//			return;
-//		
-//		
-//		ComboCheckTimer();
-//
-//		HasNextComboCommand = false;
-//	}
-//	
-//		
-//}
-//
-//void APGBaseCharacter::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
-//{
-//	//UE_LOG(LogTemp, Warning, TEXT("END"));
-//	
-//	ensure(CurrentCombo != 0);
-//	CurrentCombo = 0;
-//	//캐릭터 무브먼트 이동 못한거 다시 복구
-//	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-//
-//	//12강 AI  - AI가 끝날때를 파악할 수 있게 추가
-//	//NotifyComboActionEnd();
-//}
+void APGBaseCharacter::AttackHitCheck()
+{
+	UE_LOG(LogTemp, Warning, TEXT("AttackHitCheck"));
+	//hit 결과값을 받아오는 변수
+	FHitResult OutHitResult;
+	//파라미터
+	//traceTag ( 콜리전 분석할때 식별자 정보) , 복잡한 형태의 충돌체도 감지할지 (올라갈때) , 무시할 액터들 
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+
+	//10강 데이터 - 스텟 데이터에서 가져와서 적용
+	//도형 크기 설정
+	//const float AttackRange = StatComponent->GetBaseStat().AttackRange;
+	const float AttackRange = 100.0f;
+	//12강 AI 공격 구현을 위한 
+	const float AttackRadius = 100.0f;
+	const float AttackDamage = StatComponent->GetBaseStat().Attack;
+	//구체 날릴 시작지점->끝지점
+	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+	const FVector End = Start + GetActorForwardVector() * AttackRange;
+
+	//  CCHANNEL_ABACTION 우리가 추가한 Physics 의 매크로
+	bool HitDetected =
+		GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(AttackRadius), Params);
+
+	if (HitDetected)
+	{
+		//헤더파일 추가 해야함
+		//(6강 죽는 모션) 데미지 종류를 지정할 수 있다네
+		FDamageEvent DamageEvent;
+		OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+	}
 
 
+	//Debug Draw  공격범위 알아보기 위한 그려보기
+#if ENABLE_DRAW_DEBUG
 
-// 콤보 섹션 있게 하는 노티파이
-//void APGBaseCharacter::ComboSectionEnd()
-//{
-//	
-//	//if (HasNextComboCommand)
-//	//{
-//	//	ComboCheckTimer();
-//	//	HasNextComboCommand = false;
-//	//	//UE_LOG(LogTemp, Warning, TEXT("ComboSectionEnd_Go"));
-//	//}
-//	//	
-//	//else
-//	//{
-//	//	//UE_LOG(LogTemp, Warning, TEXT("ComboSectionEnd_Stop"));
-//	//	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-//	//	AnimInstance->Montage_Stop(0.25f,ComboMontage);
-//	//}
-//}
+	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+	float CapsuleHalfHeight = AttackRange * 0.5f;
+	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+
+	//DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
+
+	FVector TraceVec = GetActorForwardVector() * AttackRange;
+	FVector Center = GetActorLocation() + TraceVec * 0.5f;
+	float HalfHeight = AttackRange * 0.5f + AttackRadius;
+	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(TraceVec).ToQuat();
+	//FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+	float DebugLifeTime = 5.0f;
+
+	DrawDebugCapsule(GetWorld(),
+		Center,
+		HalfHeight,
+		AttackRadius,
+		CapsuleRot,
+		DrawColor,
+		false,
+		DebugLifeTime);
 
 
+#endif
+}
+
+float APGBaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	//7강에서 추가
+	StatComponent->Damaged(DamageAmount);
+
+	// 받을 데미지 값
+	return DamageAmount;
+}
 

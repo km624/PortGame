@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 //#include "Interface/ComboCheckInterface.h"
 #include "Interface/PGSetHpbarCharacterInterface.h"
+#include "Interface/PlayerAttackInterface.h"
 #include "PGBaseCharacter.generated.h"
 
 UENUM(BlueprintType)
@@ -19,6 +20,7 @@ enum class EPlayerCharacterType :uint8
 
 UCLASS()
 class PORTGAME_API APGBaseCharacter : public ACharacter , public IPGSetHpbarCharacterInterface
+	, public IPlayerAttackInterface
 {
 	GENERATED_BODY()
 
@@ -41,47 +43,13 @@ public:
 
 	float ReturnAimOffset();
 
+	//에임 관해서 
 protected:
 	UPROPERTY()
 	uint8 bIsAim : 1;
 
 	UPROPERTY()
 	float AimOffset;
-
-//protected:
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category =Combo)
-//	TObjectPtr<class UAnimMontage> ComboMontage;
-//
-//	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combo, Meta = (AllowPrivateAccess = "true"))
-//	TObjectPtr<class UComboData> ComboData;
-//
-//	void ComboStart();
-//
-//	void ComboBegin();
-//
-//	void ComboCheckTimer();
-//
-//	void ComboCheck();
-//
-//	//몽타주 엔드 델리게이트 형식
-//	void ComboEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
-//	
-//	//노티파이 인터페이스
-//	//virtual void ComboSectionEnd();
-//
-//	int32 CurrentCombo = 0;
-//
-//	FTimerHandle ComboTimerHandle;
-//
-//	FTimerHandle ComboTimerdelayHandle;
-//
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combo)
-//	float ComoboDelay;
-//
-//	uint8 ComboOK : 1;
-//
-//	//발동 타이머 이전에 입력 들어왔나 체크
-//	bool HasNextComboCommand = false;
 
 	//스텟 관한 (Hp)
 protected:
@@ -101,4 +69,13 @@ protected:
 	TObjectPtr<class UPGWidgetComponent> HpBarWidgetComponent;
 
 	virtual void SetUpHpWidget(class UPGUserWidget* InUserWidget) override;
+
+
+	//공격 
+protected:
+	//공격 체크함수
+	virtual void AttackHitCheck() override;
+
+	//언리얼 자체에서 있는거 사용 - 액터에서부터 구현되있음
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 };

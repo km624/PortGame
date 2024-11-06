@@ -6,6 +6,7 @@
 #include "Character/PGBaseCharacter.h"
 #include "Animation/AnimMontage.h"
 #include "PortGame/PortGame.h"
+#include "Engine/DamageEvents.h"
 
 
 
@@ -20,7 +21,7 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter)
 
 	}
 	
-	WeaponSocket = TEXT("weaponSowrdSocket");
+	WeaponSocket = TEXT("weaponRifleSocket");
 
 	Currentammo = ammoMaxCount;
 
@@ -92,25 +93,27 @@ void ARifle::FireWithLineTrace()
 	FHitResult hitResult;
 	FCollisionQueryParams collisionParams;
 	collisionParams.AddIgnoredActor(this);
+	TArray <AActor*> ignoreActor;
+	ignoreActor.Add(this);
+	ignoreActor.Add(OwnerCharacter);
+	collisionParams.AddIgnoredActors(ignoreActor);
 
 	const UWorld* currentWorld = GetWorld();
 	DrawDebugLine(currentWorld, start, end, FColor::Red, false, 1.0f);
 	if (currentWorld)
 	{
-		// 명중!
-		if (currentWorld->LineTraceSingleByChannel(
+		bool OutHitResult = currentWorld->LineTraceSingleByChannel(
 			hitResult,
 			start,
 			end,
-			ECC_Visibility,
-			collisionParams))
+			ECC_GameTraceChannel1,
+			collisionParams);
+		// 명중!
+		if (OutHitResult)
 		{
-			if (hitResult.GetActor())
-			{
-				auto* hitActor = hitResult.GetActor();
-				GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, FString::Printf(TEXT("Hit Actor Name: %s"), *hitActor->GetActorLabel()));
-			}
 
+			FDamageEvent DamageEvent;
+			hitResult.GetActor()->TakeDamage(10.0f, DamageEvent, OwnerCharacter->GetController(), this);
 		}
 
 	}

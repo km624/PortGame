@@ -63,7 +63,7 @@ APGPlayerCharacter::APGPlayerCharacter()
 	else
 		UE_LOG(LogTemp, Warning, TEXT("ERRor  failed"));
 
-	//에임 바인딩
+	//에임액션 
 	static ConstructorHelpers::FObjectFinder<UInputAction> Aim(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Aim.IA_Aim'"));
 	if (Aim.Object)
 	{
@@ -77,11 +77,11 @@ APGPlayerCharacter::APGPlayerCharacter()
 	/*Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetMesh(), TEXT("weaponSowrdSocket"));*/
 
-	static ConstructorHelpers::FObjectFinder<UCurveFloat>Cuve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Animation/aim/NewCurveBase.NewCurveBase'"));
+	/*static ConstructorHelpers::FObjectFinder<UCurveFloat>Cuve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Animation/aim/NewCurveBase.NewCurveBase'"));
 	if (Cuve.Object)
 	{
 		AimCurve = Cuve.Object;
-	}
+	}*/
 
 
 	//TEST 무기

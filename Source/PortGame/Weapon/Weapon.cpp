@@ -93,7 +93,7 @@ void AWeapon::ComboCheckTimer()
 {
 	int32 ComboIndex = CurrentCombo - 1;
 	ensure(ComboData->EffectiveFrameCount.IsValidIndex(ComboIndex));
-	UE_LOG(LogTemp, Warning, TEXT("ComboCheckTimer"));
+	//UE_LOG(LogTemp, Warning, TEXT("ComboCheckTimer"));
 	//어택 스피드도 스텟에서
    //const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
    //발동할 시간 정보를 얻기위한 변수

@@ -53,16 +53,17 @@ void UPGStatComponent::InitializeComponent()
 
 void UPGStatComponent::SetHp(float NewHp)
 {
-	CurrentHp = NewHp;
+	if (NewHp <= 0)
+	{
+		CurrentHp = 0;
+	}
+	else
+		CurrentHp = NewHp;
 
 	OnHpChanged.Broadcast(NewHp);
 
 	UE_LOG(LogTemp, Warning, TEXT("%f"), CurrentHp);
-	if (CurrentHp <= 0)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("죽음"));
-		OnHpZero.Broadcast();
-	}
+
 }
 
 //void UPGStatComponent::SetStat(FName rarity)
@@ -76,9 +77,18 @@ void UPGStatComponent::SetLevelCharacter(int32 level)
 
 void UPGStatComponent::Damaged(float Damage)
 {
-	
-	SetHp(CurrentHp-Damage);
-	
+	const float PrevHp = CurrentHp;
+
+	//float 이기 때문에 -마이너스가 들어올 수 있어서
+	//범위 넘기지 않게 설정
+	const float ActualDamage = FMath::Clamp<float>(Damage, 0, Damage);
+	SetHp(PrevHp - ActualDamage);
+	if (CurrentHp <= KINDA_SMALL_NUMBER)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("죽음"));
+		OnHpZero.Broadcast();
+	}
+
 }
 
 
