@@ -41,12 +41,16 @@ protected:
 public:
 	FORCEINLINE bool GetCurrentIsAiming() const { return bIsAim; }
 
+	FORCEINLINE bool GetCurrentIsShooting() const { return bIsShoot; }
 	float ReturnAimOffset();
 
 	//에임 관해서 
 protected:
 	UPROPERTY()
 	uint8 bIsAim : 1;
+
+	UPROPERTY()
+	uint8 bIsShoot : 1;
 
 	UPROPERTY()
 	float AimOffset;

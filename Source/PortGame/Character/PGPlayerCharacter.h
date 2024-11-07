@@ -75,6 +75,7 @@ protected:
 	//공격
 	void Attack();
 
+	void ReleasedAttack();
 	//에임 누르기
 	void PressAim();
 	//에임 땟을때

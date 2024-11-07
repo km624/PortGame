@@ -15,6 +15,8 @@ public:
 
 	AWeapon();
 
+	
+
 	virtual void OnInitializeWeapon(class  APGBaseCharacter* BaseCharacter);
 
 	virtual void Attack();

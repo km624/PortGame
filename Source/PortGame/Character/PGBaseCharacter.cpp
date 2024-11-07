@@ -70,6 +70,8 @@ APGBaseCharacter::APGBaseCharacter()
 		ComboData = comboData.Object;
 	}*/
 
+	
+
 	//StatComponent Ãß°¡
 	StatComponent = CreateDefaultSubobject<UPGStatComponent>(TEXT("STAT"));
 

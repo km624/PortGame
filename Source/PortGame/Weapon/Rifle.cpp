@@ -11,6 +11,23 @@
 
 
 
+ARifle::ARifle()
+{
+	PrimaryActorTick.bCanEverTick = true;
+}
+
+void ARifle::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (OwnerCharacter->GetCurrentIsShooting())
+		StartFire();
+	else
+		StopFire();
+	
+
+}
+
 void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter)
 {
 	Super::OnInitializeWeapon(BaseCharacter);
@@ -32,8 +49,8 @@ void ARifle::Attack()
 {
 	Super::Attack();
 
-	if (OwnerCharacter->GetCurrentIsAiming())
-		StartFire();
+	if (OwnerCharacter->GetCurrentIsShooting())
+		FireWithLineTrace();
 	else
 		ComboStart();
 }

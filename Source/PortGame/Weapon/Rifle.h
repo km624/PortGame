@@ -16,6 +16,10 @@ class PORTGAME_API ARifle : public AWeapon
 
 
 public:
+	ARifle();
+
+	virtual void Tick(float DeltaTime) override;
+
 	virtual void OnInitializeWeapon(class  APGBaseCharacter* BaseCharacter) override;
 
 	virtual void Attack() override;
