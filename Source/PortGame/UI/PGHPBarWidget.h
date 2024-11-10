@@ -24,14 +24,19 @@ protected:
 
 public:
 
-	void SetUpWaidget(const FPGCharacterStat& Stat);
+	void SetUpWaidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat, float NewMaxHitGauge);
 
 	UFUNCTION()
 	void UpdateHpBar(float NewCurrentHp);
 
+	void UpdateHitGaugeBar(float NewHitGauge);
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UProgressBar> ProgressBar_HpBar;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UProgressBar>ProgressBar_HitGauge;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> TextBlock_Hp;
@@ -42,5 +47,11 @@ protected:
 	//14°­ ÇöÀç hp
 	UPROPERTY()
 	float CurrentHp;
+
+	UPROPERTY()
+	float MaxHitGauge;
+
+	UPROPERTY()
+	float CurrenHitGauge;
 
 };

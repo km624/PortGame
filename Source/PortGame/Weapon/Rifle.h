@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Weapon.h"
+#include "Struct/PGGunStat.h"
 #include "Rifle.generated.h"
 
 /**
@@ -20,37 +21,63 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnInitializeWeapon(class  APGBaseCharacter* BaseCharacter) override;
+	virtual void OnInitializeWeapon(class  APGBaseCharacter* BaseCharacter,class UWeaponData* weaponData) override;
 
 	virtual void Attack() override;
 
+	
+
 protected:
+	void SetUpGunStat();
+
+	UFUNCTION()
+	void ShootCheck(bool bIsShoot);
 
 	void StartFire();
 
 	void StopFire();
-
+	
+	UFUNCTION()
 	void Reloading();
 
 	void FireWithLineTrace();
 
+	
+
+protected:
+
+	void CheckAimBlock();
+
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim")
+	TSubclassOf<class ABlockAim> BlockAimClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim")
+	TObjectPtr<class ABlockAim> BlockAim;
+
+
 		//ÃÑ ¹ß»ç ±¸Çö
 protected:
-	int32 ammoMaxCount = 10;
+	int32 ammoMaxCount;
 	
 	int32 Currentammo;
-	float reloadingTime = 3.0f;
+	float reloadingTime;
 
-	float ShootInterval = 1.0f;
+	float ShootInterval;
 
-	float traceDistance = 1000.0f;
+	float traceDistance;
 
 	FTimerHandle FireTimerHandle;
 	FTimerHandle ReloadTimerHandle;
-	
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Reload")
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> ReloadMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
+	FPGGunStat GunStat;
+
+
 	
-};
+}; 

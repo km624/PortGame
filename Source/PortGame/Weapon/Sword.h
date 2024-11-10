@@ -16,7 +16,7 @@ class PORTGAME_API ASword : public AWeapon
 
 
 public:
-	virtual void OnInitializeWeapon(class  APGBaseCharacter* BaseCharacter) override;
+	virtual void OnInitializeWeapon(class APGBaseCharacter* BaseCharacter, class UWeaponData* weaponData) override;
 	
 	virtual void Attack() override;
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Struct/PGCharacterStat.h"
 #include "Weapon.generated.h"
 
 UCLASS()
@@ -15,11 +16,11 @@ public:
 
 	AWeapon();
 
-	
-
-	virtual void OnInitializeWeapon(class  APGBaseCharacter* BaseCharacter);
+	virtual void OnInitializeWeapon(class  APGBaseCharacter* BaseCharacter, class UWeaponData* weaponData);
 
 	virtual void Attack();
+
+	
 
 public:
 	FORCEINLINE FName GetWeaponFname(){ return WeaponSocket; }
@@ -36,25 +37,32 @@ protected:
 	TObjectPtr<class APGBaseCharacter> OwnerCharacter;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class USkeletalMeshComponent> WeaponaSkeletalComponent;
+	TObjectPtr<class UStaticMeshComponent> WeaponStaticComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
-	TObjectPtr<USkeletalMesh> WeaponMesh;
+	TObjectPtr<UStaticMesh> WeaponMesh;
 
 	FName WeaponSocket;
+
+public:
+
+	UPROPERTY(EditAnywhere, Category = Stat)
+	FPGCharacterStat ModifierStat;
 
 	
 
 	//기본 공격 ( 콤보)
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Combo)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
 	TObjectPtr<class UAnimMontage> ComboMontage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combo, Meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UComboData> ComboData;
 
 	int32 CurrentCombo = 0;
+
+	float ComboPlayTime;
 
 	FTimerHandle ComboTimerHandle;
 

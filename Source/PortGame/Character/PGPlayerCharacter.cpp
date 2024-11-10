@@ -12,18 +12,23 @@
 #include "Engine/LocalPlayer.h"
 #include "PGCharacterData.h"
 #include "Components/TimelineComponent.h"
+#include "UI/PGHudWidget.h"
+#include "Component/PGStatComponent.h"
 
 
 APGPlayerCharacter::APGPlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	static ConstructorHelpers::FObjectFinder<UPGCharacterData> CharacterData
-	(TEXT("/Script/PortGame.PGCharacterData'/Game/PortGame/Input/PG_InputData.PG_InputData'"));
-	if (CharacterData.Object)
-		ControlDataManager.Add(EControlData::Base, CharacterData.Object);
-	else
-		UE_LOG(LogTemp, Warning, TEXT("ERRor  failed"));
+	static ConstructorHelpers::FObjectFinder<UPGCharacterData> CharacterBaseData
+	(TEXT("/Script/PortGame.PGCharacterData'/Game/PortGame/Input/PG_InputBaseData.PG_InputBaseData'"));
+	if (CharacterBaseData.Object)
+		ControlDataManager.Add(EControlData::Base, CharacterBaseData.Object);
+
+	static ConstructorHelpers::FObjectFinder<UPGCharacterData> CharacterAimData
+	(TEXT("/Script/PortGame.PGCharacterData'/Game/PortGame/Input/PG_InputAimData.PG_InputAimData'"));
+	if (CharacterAimData.Object)
+		ControlDataManager.Add(EControlData::Aim, CharacterAimData.Object);
 	
 	CurrentControlData = EControlData::Base;
 
@@ -38,30 +43,25 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		JumpAction = Jump.Object;
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("ERRor  failed"));
+	
 	static ConstructorHelpers::FObjectFinder<UInputAction> Move(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Move.IA_Move'"));
 	if (Move.Object)
 	{
 		MoveAction = Move.Object;
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("ERRor  failed"));
+	
 	static ConstructorHelpers::FObjectFinder<UInputAction> Look(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Look.IA_Look'"));
 	if (Look.Object)
 	{
 		LookAction = Look.Object;
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("ERRor  failed"));
+
 
 	static ConstructorHelpers::FObjectFinder<UInputAction> Attack(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Attack.IA_Attack'"));
 	if (Attack.Object)
 	{
 		AttackAction = Attack.Object;
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("ERRor  failed"));
 
 	//에임액션 
 	static ConstructorHelpers::FObjectFinder<UInputAction> Aim(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Aim.IA_Aim'"));
@@ -69,21 +69,13 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		AimAction = Aim.Object;
 	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("ERRor  failed"));
 
-	//무기
-	//스켈레탈 컴포넌트 추가
-	/*Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-	Weapon->SetupAttachment(GetMesh(), TEXT("weaponSowrdSocket"));*/
-
-	/*static ConstructorHelpers::FObjectFinder<UCurveFloat>Cuve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Animation/aim/NewCurveBase.NewCurveBase'"));
-	if (Cuve.Object)
+	//장전 액션
+	static ConstructorHelpers::FObjectFinder<UInputAction> Reload(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Reload.IA_Reload'"));
+	if (Reload.Object)
 	{
-		AimCurve = Cuve.Object;
-	}*/
-
-
+		ReloadAction = Reload.Object;
+	}
 	
 }
 
@@ -120,12 +112,20 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	
 		//Attack
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &APGPlayerCharacter::Attack);
+		if(CharacterType ==EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
+			EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Ongoing, this, &APGPlayerCharacter::OnGoingAttack);
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Completed, this, &APGPlayerCharacter::ReleasedAttack);
 		//Aiming
 		//CharacterType에 따라 바인딩 
-		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &APGPlayerCharacter::PressAim);
-		//EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Ongoing, this, &APGPlayerCharacter::StartFire);
-		EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &APGPlayerCharacter::ReleasedAim);
+		if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
+		{
+			EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &APGPlayerCharacter::PressAim);
+			EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Ongoing, this, &APGPlayerCharacter::OnGoingAim);
+			EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &APGPlayerCharacter::ReleasedAim);
+
+			EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &APGPlayerCharacter::PressReload);
+		}
+	
 	}
 	else
 	{
@@ -140,7 +140,7 @@ void APGPlayerCharacter::Tick(float DeltaTime)
 
 	AimTimeline.TickTimeline(DeltaTime);
 	
-
+	
 }
 
 void APGPlayerCharacter::SetCharacterData(EControlData DataName)
@@ -217,12 +217,12 @@ void APGPlayerCharacter::Move(const FInputActionValue& Value)
 void APGPlayerCharacter::Look(const FInputActionValue& Value)
 {
 
-	// input is a Vector2D
+
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
-		// add yaw and pitch input to controller
+		
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
@@ -231,43 +231,106 @@ void APGPlayerCharacter::Look(const FInputActionValue& Value)
 void APGPlayerCharacter::Attack()
 {
 	if (bIsAim)
+	{
+		//AimLocation = Camera->GetComponentLocation();
 		bIsShoot = true;
+	}
 	AttackToComponent();
 	
 }
 
+void APGPlayerCharacter::OnGoingAttack()
+{
+	if (bIsAim)
+	{
+		//AimLocation = Camera->GetComponentLocation();
+		OnbIsShoot.Broadcast(bIsShoot);
+	}
+}
+
 void APGPlayerCharacter::ReleasedAttack()
 {
-	bIsShoot = false;
+	if (bIsAim)
+	{
+		bIsShoot = false;
+		
+		OnbIsShoot.Broadcast(bIsShoot);
+		
+	}
+
 }
 
 
 
 void APGPlayerCharacter::PressAim()
 {
-	bIsAim = true;
 	
-	AimTimeline.PlayFromStart();
-	//FireWithLineTrace();
-	UE_LOG(LogTemp, Warning, TEXT("onAim"));
+		bIsAim = true;
+		OnbIsAim.Broadcast(bIsAim);
+
+		SetCharacterData(EControlData::Aim);
+		AimTimeline.PlayFromStart();
+
+		AimLocation = Camera->GetComponentLocation();
 	
+
+}
+
+void APGPlayerCharacter::OnGoingAim()
+{
+	
+		AimLocation = Camera->GetComponentLocation();
 }
 
 void APGPlayerCharacter::ReleasedAim()
 {
-	//StopFire();
-	bIsAim = false;
-	bIsShoot = false;
-	AimTimeline.Reverse();
+	
+		bIsAim = false;
+		OnbIsAim.Broadcast(bIsAim);
+
+		bIsShoot = false;
+		OnbIsShoot.Broadcast(bIsShoot);
+		SetCharacterData(EControlData::Base);
+		AimTimeline.Reverse();
+	
+
 }
+
+void APGPlayerCharacter::PressReload()
+{
+	ReloadToWeapon();
+}
+
 
 
 void APGPlayerCharacter::AimUpdate(float deltaTime)
 {
 	
-	float Aim = FMath::Lerp( 300, 100, deltaTime);
+	float Aim = FMath::Lerp( 300, 125, deltaTime);
+	double SoccketOffsetY= FMath::Lerp(0, 45, deltaTime);
+	double SoccketOffsetZ = FMath::Lerp(0, -20, deltaTime);
 	SpringArm->TargetArmLength = Aim;
+	SpringArm->SocketOffset.Set(0, SoccketOffsetY, SoccketOffsetZ);
 
+}
+
+
+void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
+{
+	if (hudWidget)
+	{
+		hudWidget->SetUpWaidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat(), StatComponent->GetMaxHitGauge());
+		UE_LOG(LogTemp, Warning, TEXT("hudwidget %f"), StatComponent->GetCurrentHp());
+		hudWidget->UpdateHpBar(StatComponent->GetCurrentHp());
+		hudWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
+
+		//델리게이트 바인딩
+		StatComponent->OnStatChanged.AddUObject(hudWidget, &UPGHudWidget::SetUpWaidget);
+		StatComponent->OnHpChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateHpBar);
+		StatComponent->OnHitGaugeChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateHitGaugeBar);
+
+		OnbIsAim.AddUObject(hudWidget, &UPGHudWidget::CorssHairEnable);
+	}
 }
 
 

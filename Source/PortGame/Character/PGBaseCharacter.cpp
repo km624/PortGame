@@ -56,27 +56,12 @@ APGBaseCharacter::APGBaseCharacter()
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstance.Class);
 	}
-
-	//Combo 값들 넣어줌
-	/*static ConstructorHelpers::FObjectFinder<UAnimMontage>comboMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Combo/ComboMontage1.ComboMontage1'"));
-	if (comboMontage.Object)
-	{
-		ComboMontage = comboMontage.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UComboData>comboData(TEXT("/Script/PortGame.ComboData'/Game/PortGame/Animation/Combo/ComboData.ComboData'"));
-	if (comboData.Object)
-	{
-		ComboData = comboData.Object;
-	}*/
-
-	
-
+	//Attack 컴포넌트 추가
+	AttackComponent = CreateDefaultSubobject<UPGAttackComponent>(TEXT("ATTACK_COMP"));
 	//StatComponent 추가
 	StatComponent = CreateDefaultSubobject<UPGStatComponent>(TEXT("STAT"));
 
-	//Attack 컴포넌트 추가
-	AttackComponent = CreateDefaultSubobject<UPGAttackComponent>(TEXT("ATTACK_COMP"));
+
 
 	//widget 컴포넌트 추가
 	HpBarWidgetComponent = CreateDefaultSubobject<UPGWidgetComponent>(TEXT("Widget"));
@@ -88,7 +73,7 @@ APGBaseCharacter::APGBaseCharacter()
 		HpBarWidgetComponent->SetWidgetClass(HpBarWidgetClass.Class);
 		HpBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 		// 위젯 크기 여기서 지정 ( 가느다란 크기)s
-		HpBarWidgetComponent->SetDrawSize(FVector2D(200.0f, 50.0f));
+		HpBarWidgetComponent->SetDrawSize(FVector2D(200.0f, 40.0f));
 
 		HpBarWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
@@ -97,6 +82,29 @@ APGBaseCharacter::APGBaseCharacter()
 		UE_LOG(LogTemp, Warning, TEXT("WidgetClassFail"));
 	}
 	
+	//hitMontage
+	static ConstructorHelpers::FObjectFinder<class UAnimMontage>
+		MONTAGE_HIT(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/HitMontage.HitMontage'"));
+	if (MONTAGE_HIT.Object)
+	{
+		HitMontage = MONTAGE_HIT.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<class UAnimMontage>
+		MONTAGE_DEAD(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/DeadSMontage.DeadSMontage'"));
+	if (MONTAGE_DEAD.Object)
+	{
+		DeadMontage = MONTAGE_DEAD.Object;
+	}
+
+}
+
+void APGBaseCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	StatComponent->OnHitGaugeZero.AddUObject(this, &ThisClass::PlayHitMontage);
+
+	StatComponent->OnHpZero.AddUObject(this, &ThisClass::SetDead);
 }
 
 void APGBaseCharacter::AttackToComponent()
@@ -115,15 +123,48 @@ float APGBaseCharacter::ReturnAimOffset()
 	return AimOffset;
 }
 
+
+
+void APGBaseCharacter::ReloadToWeapon()
+{
+	bIsReload = true;
+	OnbIsReload.Broadcast();
+}
+
+FPGCharacterStat APGBaseCharacter::GetTotalStat()
+{
+	return StatComponent->GetTotalStat();
+}
+
+void APGBaseCharacter::SetUpBaseStat(FName baseStat)
+{
+	StatComponent->SetBaseStat(baseStat);
+}
+
+void APGBaseCharacter::SetUpModifierStat(FPGCharacterStat ModiferStat)
+{
+	StatComponent->SetModifierStat(ModiferStat);
+}
+
+
+void APGBaseCharacter::HiddenWidget()
+{
+	HpBarWidgetComponent->SetVisibility(false);
+}
+
 void APGBaseCharacter::SetUpHpWidget(UPGUserWidget* InUserWidget)
 {
 	UPGHPBarWidget* HpBarWidget = Cast<UPGHPBarWidget>(InUserWidget);
 	if (HpBarWidget)
 	{
-		HpBarWidget->SetUpWaidget(StatComponent->GetBaseStat());
+		HpBarWidget->SetUpWaidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat(),StatComponent->GetMaxHitGauge());
 		HpBarWidget->UpdateHpBar(StatComponent->GetCurrentHp());
+		HpBarWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
+
 		//위젯 영역
 		StatComponent->OnHpChanged.AddUObject(HpBarWidget, &UPGHPBarWidget::UpdateHpBar);
+		StatComponent->OnHitGaugeChanged.AddUObject(HpBarWidget, &UPGHPBarWidget::UpdateHitGaugeBar);
+		StatComponent->OnStatChanged.AddUObject(HpBarWidget, &UPGHPBarWidget::SetUpWaidget);
 
 	}
 	
@@ -141,10 +182,10 @@ void APGBaseCharacter::AttackHitCheck()
 	//10강 데이터 - 스텟 데이터에서 가져와서 적용
 	//도형 크기 설정
 	//const float AttackRange = StatComponent->GetBaseStat().AttackRange;
-	const float AttackRange = 100.0f;
+	const float AttackRange = StatComponent->GetTotalStat().AttackRange;
 	//12강 AI 공격 구현을 위한 
-	const float AttackRadius = 100.0f;
-	const float AttackDamage = StatComponent->GetBaseStat().Attack;
+	const float AttackRadius = StatComponent->GetTotalStat().AttackRange;
+	const float AttackDamage = StatComponent->GetTotalStat().Attack;
 	//구체 날릴 시작지점->끝지점
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
@@ -201,4 +242,38 @@ float APGBaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	// 받을 데미지 값
 	return DamageAmount;
 }
+
+void APGBaseCharacter::PlayHitMontage()
+{
+	//맞는 애니메이션
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->StopAllMontages(0.0f);
+	AnimInstance->Montage_Play(HitMontage, 1.0f);
+	FOnMontageEnded EndDelegate;
+	EndDelegate.BindUObject(this, &APGBaseCharacter::HitMontageEnd);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, HitMontage);
+
+}
+
+void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	//StatComponent->ResetHitGauge();
+}
+
+void APGBaseCharacter::SetDead()
+{
+	//이동 기능 제한
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	//콤보 도중 죽을 수 있으니까 다른 몽타주 멈춤
+	AnimInstance->StopAllMontages(0.0f);
+	AnimInstance->Montage_Play(DeadMontage, 1.0f);
+
+	
+	SetActorEnableCollision(false);
+	
+	HpBarWidgetComponent->SetHiddenInGame(true);
+}
+
 

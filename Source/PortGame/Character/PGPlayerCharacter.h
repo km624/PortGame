@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/PGBaseCharacter.h"
 #include "Components/TimelineComponent.h"
+#include "Interface/PGHudWidgetInterface.h"
 #include "PGPlayerCharacter.generated.h"
 
 /**
@@ -15,12 +16,12 @@ UENUM()
 enum class EControlData : uint8
 {
 	Base,
-	Two
+	Aim
 
 };
 
 UCLASS()
-class PORTGAME_API APGPlayerCharacter : public APGBaseCharacter
+class PORTGAME_API APGPlayerCharacter : public APGBaseCharacter,public IPGHudWidgetInterface
 {
 	GENERATED_BODY()
 public:
@@ -35,6 +36,8 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void Tick(float DeltaTime) override;
+
+
 
 	void SetCharacterData(EControlData DataName);
 
@@ -68,6 +71,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction>AimAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction>ReloadAction;
+
 	//매개변수 받기 위해 헤더 인클루드
 	void Move(const struct FInputActionValue& Value);
 	void Look(const struct FInputActionValue& Value);
@@ -75,13 +81,24 @@ protected:
 	//공격
 	void Attack();
 
+	void OnGoingAttack();
+
 	void ReleasedAttack();
+
 	//에임 누르기
 	void PressAim();
+
+	void OnGoingAim();
 	//에임 땟을때
 	void ReleasedAim();
 
+	void PressReload();
+
 	//에임 
+
+public:
+
+	void SetAimTargetLocation();
 
 //에임중 카메라
 protected:
@@ -95,46 +112,11 @@ protected:
 	void AimUpdate(float deltaTime);
 
 	
+protected:
+	virtual void SetUpHudWidget(class UPGHudWidget* hudWidget) override;
 
 
 
 
-	//무기 
-//protected:
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Equipment, Meta = (AllowPrivateAccess = "true"))
-//	TObjectPtr<class USkeletalMeshComponent> Weapon;
-//	
-//	void EquidWeapon();
-//
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
-//	TObjectPtr<USkeletalMesh>WeaponMesh;
-//
-//	
-//	//총 발사 구현
-//public: 
-//	int32 ammoMaxCount = 10;
-//
-//	int32 currentammo;
-//	float reloadingTime = 3.0f;
-//
-//	float ShootInterval = 1.0f;
-//
-//	float traceDistance = 1000.0f;
-//
-//	void StartFire();
-//
-//	void StopFire();
-//
-//	void Reloading();
-//
-//	FTimerHandle FireTimerHandle;
-//	FTimerHandle ReloadTimerHandle;
-//	//UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-//	//class USkeletalMeshComponent* WeaponSkeletalMeshComponent;
-//
-//	
-//	void FireWithLineTrace();
-//
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim")
-//	TObjectPtr<class UAnimMontage> ReloadMwontage;
+	
 };

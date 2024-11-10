@@ -32,9 +32,10 @@ UPGStatComponent::UPGStatComponent()
 			const FPGCharacterStat* rowInfo = characterstatDataTable->FindRow<FPGCharacterStat>(rowName, contextString);
 			AllStat.Add(rowName, *rowInfo);
 		}	
+
 	}
 
-
+	CurrentCharacterRarity = TEXT("Normal");
 	
 	
 	bWantsInitializeComponent = true;
@@ -45,10 +46,19 @@ void UPGStatComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	SetBaseStat(TEXT("Normal"));
-	
-	SetHp(BaseStat.MaxHp);
+	SetMaxHitGauge(15.0f);
+	SetCurrentRarity(CurrentCharacterRarity);
 
+	SetHp(GetTotalStat().MaxHp);
+
+	SetHitGauge(MaxHitGauge);
+
+}
+
+void UPGStatComponent::SetCurrentRarity(FName rarity)
+{
+	if(AllStat.Find(rarity))
+		SetBaseStat(CurrentCharacterRarity);
 }
 
 void UPGStatComponent::SetHp(float NewHp)
@@ -60,35 +70,62 @@ void UPGStatComponent::SetHp(float NewHp)
 	else
 		CurrentHp = NewHp;
 
-	OnHpChanged.Broadcast(NewHp);
+	OnHpChanged.Broadcast(CurrentHp);
 
-	UE_LOG(LogTemp, Warning, TEXT("%f"), CurrentHp);
+	
 
 }
 
-//void UPGStatComponent::SetStat(FName rarity)
-//{
-//	 BaseStat =  AllStat[rarity];
-//}
+void UPGStatComponent::SetHitGauge(float NewHitGauge)
+{
+	if (NewHitGauge <= 0)
+	{
+		CurretHitGauge = 0;
+	}
+	else
+		CurretHitGauge = NewHitGauge;
+
+	
+	OnHitGaugeChanged.Broadcast(CurretHitGauge);
+	//UE_LOG(LogTemp, Warning, TEXT("current hitGauge:  %f"), CurretHitGauge);
+
+}
+
+
 
 void UPGStatComponent::SetLevelCharacter(int32 level)
 {
+
+}
+
+void UPGStatComponent::ResetHitGauge()
+{
+	SetHitGauge(MaxHitGauge);
 }
 
 void UPGStatComponent::Damaged(float Damage)
 {
 	const float PrevHp = CurrentHp;
-
-	//float 이기 때문에 -마이너스가 들어올 수 있어서
-	//범위 넘기지 않게 설정
 	const float ActualDamage = FMath::Clamp<float>(Damage, 0, Damage);
+
+	const float PrevHitGauge = CurretHitGauge;
+	
+
 	SetHp(PrevHp - ActualDamage);
+	SetHitGauge(PrevHitGauge - ActualDamage);
+
+	if (CurretHitGauge <= KINDA_SMALL_NUMBER)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("GaugeEnd"));
+		OnHitGaugeZero.Broadcast();
+		ResetHitGauge();
+	}
 	if (CurrentHp <= KINDA_SMALL_NUMBER)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("죽음"));
+		UE_LOG(LogTemp, Warning, TEXT("Stat : Dead"));
 		OnHpZero.Broadcast();
 	}
-
+	
 }
 
 

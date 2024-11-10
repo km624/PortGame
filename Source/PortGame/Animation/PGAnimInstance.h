@@ -66,6 +66,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Aim)
 	float AimOffsetPitch;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Reload)
+	uint8 bIsReloading : 1;
+
 	
 	
 

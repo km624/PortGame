@@ -25,16 +25,25 @@ protected:
 	
 
 public:
+	void SetWeaponClass();
+
 	void SetUpWeapon();
 
 	void AttackToWeapon();
 
+	
+
 
 public:	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "WeaponClass")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UWeaponData> WeaponData;
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Weapon)
 	TSubclassOf<class AWeapon> WeaponClass;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
 	TObjectPtr<class AWeapon> Weapon;
 
 	

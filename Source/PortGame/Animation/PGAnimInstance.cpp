@@ -51,6 +51,11 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		AimOffsetPitch = playerCharacter->ReturnAimOffset();
 	else
 		AimOffsetPitch = 0.0f;
+
+	if (IsValid(playerCharacter))
+	{
+		bIsReloading = playerCharacter->GetCurrentIsReloading();
+	}
 	
 }
 

@@ -3,20 +3,25 @@
 
 #include "Weapon/Sword.h"
 #include "Character/PGBaseCharacter.h"
+#include "Data/WeaponData.h"
 
 
 	
 
-void ASword::OnInitializeWeapon(APGBaseCharacter* BaseCharacter)
+void ASword::OnInitializeWeapon(APGBaseCharacter* BaseCharacter,UWeaponData* weaponData)
 {
-	Super::OnInitializeWeapon(BaseCharacter);
+	Super::OnInitializeWeapon(BaseCharacter, weaponData);
 
 	if (WeaponMesh)
 	{
-		WeaponaSkeletalComponent->SetSkeletalMesh(WeaponMesh);
+		WeaponStaticComponent->SetStaticMesh(WeaponMesh);
 
 	}
-	WeaponSocket =  TEXT("weaponSowrdSocket");
+	if (weaponData)
+	{
+		WeaponSocket = weaponData->WeaponSocket;
+	}
+
 	
 }
 

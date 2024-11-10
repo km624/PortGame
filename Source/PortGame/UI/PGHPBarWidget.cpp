@@ -9,6 +9,7 @@
 UPGHPBarWidget::UPGHPBarWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
 	MaxHp = -1.0f;
+	MaxHitGauge = -1.0f;
 }
 
 void UPGHPBarWidget::NativeConstruct()
@@ -26,9 +27,11 @@ void UPGHPBarWidget::NativeConstruct()
 	}
 }
 
-void UPGHPBarWidget::SetUpWaidget(const FPGCharacterStat& Stat)
+void UPGHPBarWidget::SetUpWaidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat, float NewMaxHitGauge)
 {
-	MaxHp = Stat.MaxHp;
+	UE_LOG(LogTemp, Warning, TEXT("SetupWidget"));
+	MaxHp = (Stat + ModifierStat).MaxHp;
+	MaxHitGauge = NewMaxHitGauge;
 	if (ProgressBar_HpBar)
 	{
 		ProgressBar_HpBar->SetPercent(CurrentHp / MaxHp);
@@ -37,6 +40,14 @@ void UPGHPBarWidget::SetUpWaidget(const FPGCharacterStat& Stat)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("progress miss"));
 	}
+
+	if (ProgressBar_HitGauge)
+	{
+
+		ProgressBar_HitGauge->SetPercent(CurrenHitGauge / MaxHitGauge);
+
+	}
+
 	if(TextBlock_Hp)
 	{
 		TextBlock_Hp->SetText(FText::FromString(
@@ -71,4 +82,16 @@ void UPGHPBarWidget::UpdateHpBar(float NewCurrentHp)
 	}
 
 
+}
+
+void UPGHPBarWidget::UpdateHitGaugeBar(float NewHitGauge)
+{
+	CurrenHitGauge = NewHitGauge;
+	//ensure(CurrenHitGauge > 0.0f);
+	if (ProgressBar_HitGauge)
+	{
+
+		ProgressBar_HitGauge->SetPercent(CurrenHitGauge / MaxHitGauge);
+
+	}
 }

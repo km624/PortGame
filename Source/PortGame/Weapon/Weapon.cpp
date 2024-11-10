@@ -7,20 +7,30 @@
 #include "Data/ComboData.h"
 #include "Animation/AnimMontage.h"
 #include "PortGame/PortGame.h"
+#include "Data/WeaponData.h"
 
 
 AWeapon::AWeapon()
 {
-	WeaponaSkeletalComponent = 
-		CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	WeaponStaticComponent = 
+		CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon"));
 
-	SetRootComponent(WeaponaSkeletalComponent);
+	SetRootComponent(WeaponStaticComponent);
+	WeaponStaticComponent->SetCollisionProfileName(TEXT("WeaponColli"));
 	
 }
 
-void AWeapon::OnInitializeWeapon(APGBaseCharacter* BaseCharacter)
+void AWeapon::OnInitializeWeapon(APGBaseCharacter* BaseCharacter,UWeaponData* weaponData)
 {
 	OwnerCharacter = Cast<APGBaseCharacter>(BaseCharacter);
+	if (weaponData)
+	{
+		WeaponMesh = weaponData->WeaponMesh;
+		ModifierStat = weaponData->ModifierStat;
+		ComboMontage = weaponData->ComboMontage;
+		ComboData = weaponData->ComboData;
+	}
+
 	SLOG(TEXT("WeaponAttachment"));
 }
 
@@ -29,6 +39,8 @@ void AWeapon::Attack()
 {
 	
 }
+
+
 
 void AWeapon::BeginPlay()
 {
@@ -77,7 +89,9 @@ void AWeapon::ComboBegin()
 	// Animation Setting
 	//const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(ComboMontage, 1.0f);
+	ComboPlayTime = OwnerCharacter->GetTotalStat().AttackSpeed;
+
+	AnimInstance->Montage_Play(ComboMontage, ComboPlayTime);
 
 	//몽타주 종료될때  ComboActiosnEnd 함수 호출 되게 델리게이트 호출
 	FOnMontageEnded EndDelegate;
@@ -97,7 +111,7 @@ void AWeapon::ComboCheckTimer()
 	//어택 스피드도 스텟에서
    //const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
    //발동할 시간 정보를 얻기위한 변수
-	float ComboEffectiveTime = (ComboData->EffectiveFrameCount[ComboIndex] / ComboData->FrameRate);
+	float ComboEffectiveTime = (ComboData->EffectiveFrameCount[ComboIndex] / ComboData->FrameRate) /ComboPlayTime;
 	if (ComboEffectiveTime > 0.0f)
 	{
 		//타이머 발동
@@ -141,7 +155,7 @@ void AWeapon::ComboCheck()
 
 
 		//몽타주 다음 섹션 재생
-		AnimInstance->Montage_Play(ComboMontage, 1.0f);
+		AnimInstance->Montage_Play(ComboMontage, ComboPlayTime);
 		AnimInstance->Montage_JumpToSection(NextSection, ComboMontage);
 
 		FOnMontageEnded EndDelegate;
