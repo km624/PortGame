@@ -9,6 +9,7 @@
 #include "Engine/DamageEvents.h"
 #include "Weapon/BlockAim.h"
 #include "Data/WeaponData.h"
+#include "Data/GunWeaponData.h"
 
 
 
@@ -28,10 +29,10 @@ void ARifle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (OwnerCharacter->GetCurrentIsAiming())
+	/*if (OwnerCharacter->GetCurrentIsAiming())
 		CheckAimBlock();
 	else
-		BlockAim->SetActorHiddenInGame(true);
+		BlockAim->SetActorHiddenInGame(true);*/
 
 }
 
@@ -50,26 +51,27 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 		&ThisClass::Reloading);
 	if (weaponData)
 	{
-		WeaponSocket = weaponData->WeaponSocket;
-		GunStat = weaponData->GunStat;
-		ReloadMontage = weaponData->ReloadMontage;
+		UGunWeaponData* gunWeaponData = Cast<UGunWeaponData>(weaponData);
+		WeaponSocket = gunWeaponData->WeaponSocket;
+		GunStat = gunWeaponData->GunStat;
+		ReloadMontage = gunWeaponData->ReloadMontage;
 
 		SetUpGunStat();
 	}
 	Currentammo = ammoMaxCount;
 
-	//조준선 블락 생성
-	if (BlockAimClass)
-	{
-		ABlockAim* spawnBlockAim = GetWorld()->SpawnActor<ABlockAim>(BlockAimClass);
-		BlockAim = spawnBlockAim;
-		if (BlockAim)
-		{
-			BlockAim->AttachToComponent(WeaponStaticComponent,
-				FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	////조준선 블락 생성
+	//if (BlockAimClass)
+	//{
+	//	ABlockAim* spawnBlockAim = GetWorld()->SpawnActor<ABlockAim>(BlockAimClass);
+	//	BlockAim = spawnBlockAim;
+	//	if (BlockAim)
+	//	{
+	//		BlockAim->AttachToComponent(WeaponStaticComponent,
+	//			FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
-		}
-	}
+	//	}
+	//}
 	
 }
 
@@ -172,13 +174,12 @@ void ARifle::FireWithLineTrace()
 	UE_LOG(LogTemp, Warning, TEXT("Time : %lf"), GetWorld()->GetTimeSeconds());
 	Currentammo--;
 	
-	const FVector start = WeaponStaticComponent->GetSocketLocation(WeaponSocket);
-	
-	//카메라 시작지점
-	FVector Loc = OwnerCharacter->GetAimLocation();
 
-	const FVector end = Loc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() *traceDistance;
-	
+	const FVector Camerastart = OwnerCharacter->GetAimLocation();
+	//카메라 시작지점
+	FVector CameraLoc = OwnerCharacter->GetAimLocation();
+	const FVector CameraEnd = CameraLoc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() * (traceDistance);
+
 	FHitResult hitResult;
 	FCollisionQueryParams collisionParams;
 	TArray <AActor*> ignoreActor;
@@ -187,6 +188,47 @@ void ARifle::FireWithLineTrace()
 	collisionParams.AddIgnoredActors(ignoreActor);
 
 	const UWorld* currentWorld = GetWorld();
+
+	FVector end;
+	DrawDebugLine(currentWorld, Camerastart, CameraEnd, FColor::Green, false, 1.0f);
+	if (currentWorld)
+	{
+		bool OutHitResult = currentWorld->LineTraceSingleByChannel(
+			hitResult,
+			Camerastart,
+			CameraEnd,
+			ECollisionChannel::ECC_Visibility,
+			collisionParams);
+		// 명중!
+		if (OutHitResult)
+		{
+		
+			FVector ForwardVector = GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector();
+			FVector HitLocationWithOffset = hitResult.Location + (ForwardVector * 50.0f);
+			end = HitLocationWithOffset;
+			//end = hitResult.Location;
+			UE_LOG(LogTemp, Warning, TEXT("Hit"));
+		}
+		else
+			end = CameraLoc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() * traceDistance;
+
+	}
+
+
+	const FVector start = WeaponStaticComponent->GetSocketLocation(WeaponSocket);
+	//카메라 시작지점
+	//FVector Loc = OwnerCharacter->GetAimLocation();
+
+	//const FVector end = Loc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() *traceDistance;
+	
+	/*FHitResult hitResult;
+	FCollisionQueryParams collisionParams;
+	TArray <AActor*> ignoreActor;
+	ignoreActor.Add(this);
+	ignoreActor.Add(OwnerCharacter);
+	collisionParams.AddIgnoredActors(ignoreActor);
+
+	const UWorld* currentWorld = GetWorld();*/
 	DrawDebugLine(currentWorld, start, end, FColor::Red, false, 1.0f);
 	if (currentWorld)
 	{
@@ -213,7 +255,8 @@ void ARifle::FireWithLineTrace()
 
 void ARifle::CheckAimBlock()
 {
-	const FVector start = WeaponStaticComponent->GetSocketLocation(WeaponSocket);
+	//const FVector start = WeaponStaticComponent->GetSocketLocation(WeaponSocket);
+	 const FVector start = OwnerCharacter->GetAimLocation();
 	//카메라 시작지점
 	FVector Loc = OwnerCharacter->GetAimLocation();
 	const FVector end = Loc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() * (traceDistance);
@@ -242,6 +285,7 @@ void ARifle::CheckAimBlock()
 			{
 				BlockAim->SetActorHiddenInGame(false);
 				BlockAim->SetActorLocation(hitResult.Location);
+				TestAim = hitResult.Location;
 			}
 		}
 		else

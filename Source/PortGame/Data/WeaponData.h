@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "Struct/PGCharacterStat.h"
-#include "Struct/PGGunStat.h"
 #include "WeaponData.generated.h"
 
 /**
@@ -39,12 +38,6 @@ public:
 	TObjectPtr<class UComboData> ComboData;
 	//몽타주 섹션이름
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
-	TObjectPtr<class UAnimMontage> ReloadMontage;
-
-	UPROPERTY(EditAnywhere, Category = Gun)
-	FPGGunStat GunStat;
 
 	
 };

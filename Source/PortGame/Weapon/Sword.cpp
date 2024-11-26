@@ -4,6 +4,7 @@
 #include "Weapon/Sword.h"
 #include "Character/PGBaseCharacter.h"
 #include "Data/WeaponData.h"
+#include "Data/SwordWeaponData.h"
 
 
 	
@@ -19,7 +20,8 @@ void ASword::OnInitializeWeapon(APGBaseCharacter* BaseCharacter,UWeaponData* wea
 	}
 	if (weaponData)
 	{
-		WeaponSocket = weaponData->WeaponSocket;
+		USwordWeaponData* swordWeaponData = Cast<USwordWeaponData>(weaponData);
+		WeaponSocket = swordWeaponData->WeaponSocket;
 	}
 
 	

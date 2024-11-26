@@ -176,6 +176,7 @@ void APGPlayerCharacter::SetCharacterData(EControlData DataName)
 	GetCharacterMovement()->AirControl = NewCharacterData->AirControl;
 
 	//스프링 암
+	
 	SpringArm->TargetArmLength = NewCharacterData->TargetArmLength;
 	SpringArm->SetRelativeRotation(NewCharacterData->RelativeRotation);
 	SpringArm->bUsePawnControlRotation = NewCharacterData->bUsePawnControlRotation;
@@ -306,11 +307,14 @@ void APGPlayerCharacter::PressReload()
 void APGPlayerCharacter::AimUpdate(float deltaTime)
 {
 	
-	float Aim = FMath::Lerp( 300, 125, deltaTime);
+	//float Aim = FMath::Lerp( 300, 125, deltaTime);
+	float AimX = FMath::Lerp(0, 100, deltaTime);
+	float AimY = FMath::Lerp(0, 70, deltaTime);
 	double SoccketOffsetY= FMath::Lerp(0, 45, deltaTime);
 	double SoccketOffsetZ = FMath::Lerp(0, -20, deltaTime);
-	SpringArm->TargetArmLength = Aim;
-	SpringArm->SocketOffset.Set(0, SoccketOffsetY, SoccketOffsetZ);
+	//SpringArm->TargetArmLength = Aim;
+	Camera->SetRelativeLocation(FVector(AimX, AimY, 0.0f));
+	//SpringArm->SocketOffset.Set(0, SoccketOffsetY, SoccketOffsetZ);
 
 }
 

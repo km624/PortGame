@@ -78,6 +78,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	FPGGunStat GunStat;
 
+protected:
+	FVector TestAim;
+
 
 	
 }; 
