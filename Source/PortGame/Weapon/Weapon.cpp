@@ -84,7 +84,7 @@ void AWeapon::ComboBegin()
 
 	// Movement Setting
 	//None 지정하면 이동기능 없애서 이동 멈춤
-	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+	//OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 	
 	// Animation Setting
 	//const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
@@ -181,7 +181,7 @@ void AWeapon::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 	ensure(CurrentCombo != 0);
 	CurrentCombo = 0;
 	//캐릭터 무브먼트 이동 못한거 다시 복구
-	OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+	//OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
 	//12강 AI  - AI가 끝날때를 파악할 수 있게 추가
 	//NotifyComboActionEnd();

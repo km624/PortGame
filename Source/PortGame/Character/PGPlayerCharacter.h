@@ -74,6 +74,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction>ReloadAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction>TargetAction;
+
 	//매개변수 받기 위해 헤더 인클루드
 	void Move(const struct FInputActionValue& Value);
 	void Look(const struct FInputActionValue& Value);
@@ -116,7 +119,23 @@ protected:
 	virtual void SetUpHudWidget(class UPGHudWidget* hudWidget) override;
 
 
+protected:
+	// 가장 가까운 적을 찾는 함수
+	UFUNCTION()
+	void FindClosestEnemy();
 
+	void TargetLockOn(AActor* targetActor,float dt);
+
+protected:
+	// 검색 반경
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))
+	float SearchDistance =1000.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<AActor> TargetActor;
+
+
+	
 
 	
 };

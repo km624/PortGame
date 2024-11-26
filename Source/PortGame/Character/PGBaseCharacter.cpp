@@ -172,53 +172,127 @@ void APGBaseCharacter::SetUpHpWidget(UPGUserWidget* InUserWidget)
 
 void APGBaseCharacter::AttackHitCheck()
 {
-	UE_LOG(LogTemp, Warning, TEXT("AttackHitCheck"));
-	//hit 결과값을 받아오는 변수
-	FHitResult OutHitResult;
-	//파라미터
-	//traceTag ( 콜리전 분석할때 식별자 정보) , 복잡한 형태의 충돌체도 감지할지 (올라갈때) , 무시할 액터들 
+	//UE_LOG(LogTemp, Warning, TEXT("AttackHitCheck"));
+	////hit 결과값을 받아오는 변수
+	//FHitResult OutHitResult;
+	////파라미터
+	////traceTag ( 콜리전 분석할때 식별자 정보) , 복잡한 형태의 충돌체도 감지할지 (올라갈때) , 무시할 액터들 
+	//FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+
+	////10강 데이터 - 스텟 데이터에서 가져와서 적용
+	////도형 크기 설정
+	////const float AttackRange = StatComponent->GetBaseStat().AttackRange;
+	//const float AttackRange = StatComponent->GetTotalStat().AttackRange;
+	////12강 AI 공격 구현을 위한 
+	//const float AttackRadius = StatComponent->GetTotalStat().AttackRange;
+	//const float AttackDamage = StatComponent->GetTotalStat().Attack;
+	////구체 날릴 시작지점->끝지점
+	//const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+	//const FVector End = Start + GetActorForwardVector() * AttackRange;
+
+	////  CCHANNEL_ABACTION 우리가 추가한 Physics 의 매크로
+	//bool HitDetected =
+	//	GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(AttackRadius), Params);
+
+	//if (HitDetected)
+	//{
+	//	//헤더파일 추가 해야함
+	//	//(6강 죽는 모션) 데미지 종류를 지정할 수 있다네
+	//	FDamageEvent DamageEvent;
+	//	OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+	//}
+
+	
+	TArray<FHitResult> OutHitResults;
+
+	// 충돌 쿼리 파라미터 설정
+	// traceTag: 충돌 분석 시 식별자 정보
+	// bTraceComplex: 복잡한 충돌체도 감지할지 여부
+	// IgnoreActor: 충돌 체크 시 무시할 액터
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
 
-	//10강 데이터 - 스텟 데이터에서 가져와서 적용
-	//도형 크기 설정
-	//const float AttackRange = StatComponent->GetBaseStat().AttackRange;
+	// 스탯 컴포넌트에서 공격 범위, 반경, 데미지 값을 가져옴
 	const float AttackRange = StatComponent->GetTotalStat().AttackRange;
-	//12강 AI 공격 구현을 위한 
 	const float AttackRadius = StatComponent->GetTotalStat().AttackRange;
 	const float AttackDamage = StatComponent->GetTotalStat().Attack;
-	//구체 날릴 시작지점->끝지점
+
+	// 공격 시작 지점 계산: 현재 액터의 위치에서 전방 벡터와 캡슐 반경을 이용
 	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
+
+	// 공격 끝 지점 계산: 시작 지점에서 전방 벡터 방향으로 공격 범위 만큼 이동
 	const FVector End = Start + GetActorForwardVector() * AttackRange;
 
-	//  CCHANNEL_ABACTION 우리가 추가한 Physics 의 매크로
-	bool HitDetected =
-		GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(AttackRadius), Params);
+	// SweepMultiByChannel을 사용하여 충돌 감지 수행
+	bool HitDetected = GetWorld()->SweepMultiByChannel(
+		OutHitResults,
+		Start,
+		End,
+		FQuat::Identity,
+		ECC_GameTraceChannel1,
+		FCollisionShape::MakeSphere(AttackRadius),
+		Params
+	);
 
+	// 히트가 감지된 경우 처리
 	if (HitDetected)
 	{
-		//헤더파일 추가 해야함
-		//(6강 죽는 모션) 데미지 종류를 지정할 수 있다네
-		FDamageEvent DamageEvent;
-		OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+		// 히트된 모든 결과를 순회
+		for (const FHitResult& Hit : OutHitResults)
+		{
+			// 히트된 액터가 유효한지 확인
+			if (Hit.GetActor())
+			{
+				// 데미지 이벤트 생성
+				FDamageEvent DamageEvent;
+
+				// 히트된 액터에 데미지 적용
+				Hit.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+			}
+		}
 	}
 
 
 	//Debug Draw  공격범위 알아보기 위한 그려보기
+//#if ENABLE_DRAW_DEBUG
+//
+//	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+//	float CapsuleHalfHeight = AttackRange * 0.5f;
+//	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+//
+//	//DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
+//
+//	FVector TraceVec = GetActorForwardVector() * AttackRange;
+//	FVector Center = GetActorLocation() + TraceVec * 0.5f;
+//	float HalfHeight = AttackRange * 0.5f + AttackRadius;
+//	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(TraceVec).ToQuat();
+//	//FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+//	float DebugLifeTime = 5.0f;
+//
+//	DrawDebugCapsule(GetWorld(),
+//		Center,
+//		HalfHeight,
+//		AttackRadius,
+//		CapsuleRot,
+//		DrawColor,
+//		false,
+//		DebugLifeTime);
+//
+//
+//#endif
+
 #if ENABLE_DRAW_DEBUG
 
 	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
 	float CapsuleHalfHeight = AttackRange * 0.5f;
 	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
 
-	//DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
-
 	FVector TraceVec = GetActorForwardVector() * AttackRange;
 	FVector Center = GetActorLocation() + TraceVec * 0.5f;
 	float HalfHeight = AttackRange * 0.5f + AttackRadius;
 	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(TraceVec).ToQuat();
-	//FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
 	float DebugLifeTime = 5.0f;
 
+	// SweepMulti와 동일한 범위를 그려줌
 	DrawDebugCapsule(GetWorld(),
 		Center,
 		HalfHeight,
@@ -227,7 +301,6 @@ void APGBaseCharacter::AttackHitCheck()
 		DrawColor,
 		false,
 		DebugLifeTime);
-
 
 #endif
 }
