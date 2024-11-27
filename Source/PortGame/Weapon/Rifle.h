@@ -44,19 +44,6 @@ protected:
 
 	
 
-protected:
-
-	void CheckAimBlock();
-
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim")
-	TSubclassOf<class ABlockAim> BlockAimClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aim")
-	TObjectPtr<class ABlockAim> BlockAim;
-
-
 		//ÃÑ ¹ß»ç ±¸Çö
 protected:
 	int32 ammoMaxCount;
@@ -70,6 +57,8 @@ protected:
 
 	FTimerHandle FireTimerHandle;
 	FTimerHandle ReloadTimerHandle;
+	FTimerHandle StopTimerHandle;
+
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
@@ -78,8 +67,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	FPGGunStat GunStat;
 
-protected:
-	FVector TestAim;
+
 
 
 	

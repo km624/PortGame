@@ -12,18 +12,8 @@ UPGStatComponent::UPGStatComponent()
 	{
 		UDataTable* characterstatDataTable = DT_STAT.Object;
 
-		//// 행을 하나씩 얻는 방법
-		//const FName normal = TEXT("Normal");
-		//const FName rare = TEXT("Rare");
-
 		FString contextString;
-		//const FPGCharacterStat* normalInfo = characterstatDataTable->FindRow<FPGCharacterStat>(normal, contextString);
-		//const FPGCharacterStat* normalInfo = characterstatDataTable->FindRow<FPGCharacterStat>(normal, contextString);
-
-		//// 행에 대한 모든 내용을 얻는 방법
-		//TArray<FPGCharacterStat*> infos;
-		//characterstatDataTable->GetAllRows< FPGCharacterStat>(contextString, infos);
-
+	
 		//행의 네임을 가져와서 그 순 차례대로 하나씩 찾는법으로 map에 추가
 		TArray<FName> rowNames = characterstatDataTable->GetRowNames();
 

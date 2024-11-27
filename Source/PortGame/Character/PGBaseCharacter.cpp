@@ -127,7 +127,6 @@ float APGBaseCharacter::ReturnAimOffset()
 
 void APGBaseCharacter::ReloadToWeapon()
 {
-	bIsReload = true;
 	OnbIsReload.Broadcast();
 }
 
@@ -172,35 +171,6 @@ void APGBaseCharacter::SetUpHpWidget(UPGUserWidget* InUserWidget)
 
 void APGBaseCharacter::AttackHitCheck()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("AttackHitCheck"));
-	////hit 결과값을 받아오는 변수
-	//FHitResult OutHitResult;
-	////파라미터
-	////traceTag ( 콜리전 분석할때 식별자 정보) , 복잡한 형태의 충돌체도 감지할지 (올라갈때) , 무시할 액터들 
-	//FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
-
-	////10강 데이터 - 스텟 데이터에서 가져와서 적용
-	////도형 크기 설정
-	////const float AttackRange = StatComponent->GetBaseStat().AttackRange;
-	//const float AttackRange = StatComponent->GetTotalStat().AttackRange;
-	////12강 AI 공격 구현을 위한 
-	//const float AttackRadius = StatComponent->GetTotalStat().AttackRange;
-	//const float AttackDamage = StatComponent->GetTotalStat().Attack;
-	////구체 날릴 시작지점->끝지점
-	//const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
-	//const FVector End = Start + GetActorForwardVector() * AttackRange;
-
-	////  CCHANNEL_ABACTION 우리가 추가한 Physics 의 매크로
-	//bool HitDetected =
-	//	GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, ECC_GameTraceChannel1, FCollisionShape::MakeSphere(AttackRadius), Params);
-
-	//if (HitDetected)
-	//{
-	//	//헤더파일 추가 해야함
-	//	//(6강 죽는 모션) 데미지 종류를 지정할 수 있다네
-	//	FDamageEvent DamageEvent;
-	//	OutHitResult.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
-	//}
 
 	
 	TArray<FHitResult> OutHitResults;
@@ -252,33 +222,6 @@ void APGBaseCharacter::AttackHitCheck()
 	}
 
 
-	//Debug Draw  공격범위 알아보기 위한 그려보기
-//#if ENABLE_DRAW_DEBUG
-//
-//	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
-//	float CapsuleHalfHeight = AttackRange * 0.5f;
-//	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
-//
-//	//DrawDebugCapsule(GetWorld(), CapsuleOrigin, CapsuleHalfHeight, AttackRadius, FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(), DrawColor, false, 5.0f);
-//
-//	FVector TraceVec = GetActorForwardVector() * AttackRange;
-//	FVector Center = GetActorLocation() + TraceVec * 0.5f;
-//	float HalfHeight = AttackRange * 0.5f + AttackRadius;
-//	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(TraceVec).ToQuat();
-//	//FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
-//	float DebugLifeTime = 5.0f;
-//
-//	DrawDebugCapsule(GetWorld(),
-//		Center,
-//		HalfHeight,
-//		AttackRadius,
-//		CapsuleRot,
-//		DrawColor,
-//		false,
-//		DebugLifeTime);
-//
-//
-//#endif
 
 #if ENABLE_DRAW_DEBUG
 
@@ -342,7 +285,7 @@ void APGBaseCharacter::SetDead()
 	//콤보 도중 죽을 수 있으니까 다른 몽타주 멈춤
 	AnimInstance->StopAllMontages(0.0f);
 	AnimInstance->Montage_Play(DeadMontage, 1.0f);
-
+	bIsDead = true;
 	
 	SetActorEnableCollision(false);
 	

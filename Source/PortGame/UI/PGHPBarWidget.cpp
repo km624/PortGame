@@ -29,7 +29,7 @@ void UPGHPBarWidget::NativeConstruct()
 
 void UPGHPBarWidget::SetUpWaidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat, float NewMaxHitGauge)
 {
-	UE_LOG(LogTemp, Warning, TEXT("SetupWidget"));
+	//UE_LOG(LogTemp, Warning, TEXT("SetupWidget"));
 	MaxHp = (Stat + ModifierStat).MaxHp;
 	MaxHitGauge = NewMaxHitGauge;
 	if (ProgressBar_HpBar)

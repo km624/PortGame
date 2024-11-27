@@ -16,23 +16,12 @@
 ARifle::ARifle()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	static ConstructorHelpers::FClassFinder<ABlockAim>
-		BlockingAim(TEXT("/Script/Engine.Blueprint'/Game/PortGame/Weapon/BP_BlockAim.BP_BlockAim_C'"));
-	if (BlockingAim.Class)
-	{
-		BlockAimClass = BlockingAim.Class;
-	}
-
+	
 }
 
 void ARifle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	/*if (OwnerCharacter->GetCurrentIsAiming())
-		CheckAimBlock();
-	else
-		BlockAim->SetActorHiddenInGame(true);*/
 
 }
 
@@ -60,19 +49,6 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 	}
 	Currentammo = ammoMaxCount;
 
-	////조준선 블락 생성
-	//if (BlockAimClass)
-	//{
-	//	ABlockAim* spawnBlockAim = GetWorld()->SpawnActor<ABlockAim>(BlockAimClass);
-	//	BlockAim = spawnBlockAim;
-	//	if (BlockAim)
-	//	{
-	//		BlockAim->AttachToComponent(WeaponStaticComponent,
-	//			FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-
-	//	}
-	//}
-	
 }
 
 void ARifle::Attack()
@@ -80,17 +56,22 @@ void ARifle::Attack()
 	Super::Attack();
 	if (OwnerCharacter->GetCurrentIsShooting())
 	{
-		if (!FireTimerHandle.IsValid() && !ReloadTimerHandle.IsValid()
-			&&CurrentCombo==0)
+		if (!FireTimerHandle.IsValid() && !ReloadTimerHandle.IsValid() && !StopTimerHandle.IsValid()
+			&& CurrentCombo == 0)
+		{
 			FireWithLineTrace();
+			StartFire();
+		}
+			
 	}
 	else
 	{
+		
 		if (ReloadTimerHandle.IsValid())
 		{
 			GetWorldTimerManager().ClearTimer(ReloadTimerHandle);
 			UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-			//AnimInstance->Montage_Stop(0.0f, ReloadMontage);
+			
 			AnimInstance->StopAllMontages(0.0f);
 			OwnerCharacter->SetbIsReload(false);
 		}
@@ -112,13 +93,10 @@ void ARifle::SetUpGunStat()
 void ARifle::ShootCheck(bool bIsShoot)
 {
 	if (bIsShoot)
-		StartFire();
+		Attack();
 	else
-	{
 		StopFire();
-		
-	}
-	
+
 }
 
 void ARifle::StartFire()
@@ -135,10 +113,19 @@ void ARifle::StartFire()
 
 void ARifle::StopFire()
 {
+	if (StopTimerHandle.IsValid())return;
 	UE_LOG(LogTemp, Warning, TEXT("Stop"));
 	if (FireTimerHandle.IsValid())
 	{
+
 		GetWorldTimerManager().ClearTimer(FireTimerHandle);
+		GetWorld()->GetTimerManager().SetTimer(
+			StopTimerHandle,
+			[this]() {
+				GetWorldTimerManager().ClearTimer(StopTimerHandle);
+			}, 
+			ShootInterval, false
+		);
 	}
 
 }
@@ -146,14 +133,15 @@ void ARifle::StopFire()
 void ARifle::Reloading()
 {
 	if (ReloadTimerHandle.IsValid())return;
-
+	SLOG(TEXT("RELOADING"));
+	OwnerCharacter->SetbIsReload(true);
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(ReloadMontage, 1.0f);
 	GetWorld()->GetTimerManager().SetTimer(
 		ReloadTimerHandle,
 		[this]() {
 			Currentammo = ammoMaxCount;
-			UE_LOG(LogTemp, Warning, TEXT("Reloading"));
+			//UE_LOG(LogTemp, Warning, TEXT("Reloading"));
 			OwnerCharacter->SetbIsReload(false);
 			ReloadTimerHandle.Invalidate();
 		}, reloadingTime, false
@@ -206,29 +194,16 @@ void ARifle::FireWithLineTrace()
 			FVector ForwardVector = GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector();
 			FVector HitLocationWithOffset = hitResult.Location + (ForwardVector * 50.0f);
 			end = HitLocationWithOffset;
-			//end = hitResult.Location;
-			UE_LOG(LogTemp, Warning, TEXT("Hit"));
+			
+			//UE_LOG(LogTemp, Warning, TEXT("Hit"));
 		}
 		else
 			end = CameraLoc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() * traceDistance;
 
 	}
 
-
 	const FVector start = WeaponStaticComponent->GetSocketLocation(WeaponSocket);
-	//카메라 시작지점
-	//FVector Loc = OwnerCharacter->GetAimLocation();
-
-	//const FVector end = Loc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() *traceDistance;
 	
-	/*FHitResult hitResult;
-	FCollisionQueryParams collisionParams;
-	TArray <AActor*> ignoreActor;
-	ignoreActor.Add(this);
-	ignoreActor.Add(OwnerCharacter);
-	collisionParams.AddIgnoredActors(ignoreActor);
-
-	const UWorld* currentWorld = GetWorld();*/
 	DrawDebugLine(currentWorld, start, end, FColor::Red, false, 1.0f);
 	if (currentWorld)
 	{
@@ -253,44 +228,6 @@ void ARifle::FireWithLineTrace()
 
 }
 
-void ARifle::CheckAimBlock()
-{
-	//const FVector start = WeaponStaticComponent->GetSocketLocation(WeaponSocket);
-	 const FVector start = OwnerCharacter->GetAimLocation();
-	//카메라 시작지점
-	FVector Loc = OwnerCharacter->GetAimLocation();
-	const FVector end = Loc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() * (traceDistance);
 
-	FHitResult hitResult;
-	FCollisionQueryParams collisionParams;
-	TArray <AActor*> ignoreActor;
-	ignoreActor.Add(this);
-	ignoreActor.Add(OwnerCharacter);
-	collisionParams.AddIgnoredActors(ignoreActor);
-
-	const UWorld* currentWorld = GetWorld();
-	
-	if (currentWorld)
-	{
-		bool OutHitResult = currentWorld->LineTraceSingleByChannel(
-			hitResult,
-			start,
-			end,
-			ECollisionChannel::ECC_Visibility,
-			collisionParams);
-		// 명중!
-		if (OutHitResult)
-		{
-			if (BlockAim)
-			{
-				BlockAim->SetActorHiddenInGame(false);
-				BlockAim->SetActorLocation(hitResult.Location);
-				TestAim = hitResult.Location;
-			}
-		}
-		else
-			BlockAim->SetActorHiddenInGame(true);
-	}
-}
 
 

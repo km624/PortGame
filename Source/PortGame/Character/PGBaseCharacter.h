@@ -90,8 +90,6 @@ protected:
 	void ReloadToWeapon();
 
 
-
-
 	//½ºÅÝ °üÇÑ 
 public:
 	FPGCharacterStat GetTotalStat();
@@ -99,11 +97,14 @@ public:
 	void SetUpBaseStat(FName baseStat);
 
 	void SetUpModifierStat(FPGCharacterStat ModiferStat);
-	
+
+	FORCEINLINE bool GetbIsDead() { return bIsDead; }
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UPGStatComponent> StatComponent;
+
+	uint8 bIsDead : 1;
 
 	
 

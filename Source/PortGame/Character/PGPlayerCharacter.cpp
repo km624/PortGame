@@ -18,6 +18,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "PortGame/PortGame.h"
 #include "MotionWarpingComponent.h"
+#include "Component/TargetingComponent.h"
 
 
 
@@ -26,7 +27,10 @@ APGPlayerCharacter::APGPlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	TargetingComponent = CreateDefaultSubobject<UTargetingComponent>(TEXT("Targeting_Comp"));
+
 	MotionWarpingComponent = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("Motion_Warp"));
+	
 	
 	static ConstructorHelpers::FObjectFinder<UPGCharacterData> CharacterBaseData
 	(TEXT("/Script/PortGame.PGCharacterData'/Game/PortGame/Input/PG_InputBaseData.PG_InputBaseData'"));
@@ -119,10 +123,11 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APGPlayerCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APGPlayerCharacter::SetNoneMove);
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APGPlayerCharacter::Look);
-	
+		
 		//Attack
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &APGPlayerCharacter::Attack);
 		if(CharacterType ==EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
@@ -139,7 +144,7 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 			EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &APGPlayerCharacter::PressReload);
 		}
 
-		EnhancedInputComponent->BindAction(TargetAction, ETriggerEvent::Started, this, &APGPlayerCharacter::FindClosestEnemy);
+		EnhancedInputComponent->BindAction(TargetAction, ETriggerEvent::Started, this, &APGPlayerCharacter::FindClosestEnemyToComp);
 	
 	}
 	else
@@ -154,9 +159,15 @@ void APGPlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	AimTimeline.TickTimeline(DeltaTime);
-	if (bIsTargetLock)
+	if (TargetingComponent->GetbIsTargetLock())
 	{
-		TargetLockOn(TargetActor, DeltaTime);
+		TargetingComponent->TargetLockOn(DeltaTime);
+	}
+	else
+	{
+		if (bIsAttackRotation&& bIsMoving)
+			SetAttackRotation(DeltaTime);
+
 	}
 	
 	
@@ -230,7 +241,21 @@ void APGPlayerCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(ForwardDirection, MovementVector.X);
 		AddMovementInput(RightDirection, MovementVector.Y);
 		
+		bIsMoving = true;
+
+		if (!TargetingComponent->GetbIsTargetLock())
+		{
+			FVector CurrentLocation = GetActorLocation();
+			FVector MovementDirection = (ForwardDirection * MovementVector.X) + (RightDirection * MovementVector.Y);
+			AttackVector = MovementDirection;	
+		}
+		
 	}
+}
+
+void APGPlayerCharacter::SetNoneMove()
+{
+	bIsMoving = false;
 
 }
 
@@ -252,18 +277,17 @@ void APGPlayerCharacter::Attack()
 {
 	if (bIsAim)
 	{
-		//AimLocation = Camera->GetComponentLocation();
 		bIsShoot = true;
 	}
 	AttackToComponent();
-	
+
 }
 
 void APGPlayerCharacter::OnGoingAttack()
 {
 	if (bIsAim)
 	{
-		//AimLocation = Camera->GetComponentLocation();
+		
 		OnbIsShoot.Broadcast(bIsShoot);
 	}
 }
@@ -279,7 +303,6 @@ void APGPlayerCharacter::ReleasedAttack()
 	}
 
 }
-
 
 
 void APGPlayerCharacter::PressAim()
@@ -326,14 +349,10 @@ void APGPlayerCharacter::PressReload()
 void APGPlayerCharacter::AimUpdate(float deltaTime)
 {
 	
-	//float Aim = FMath::Lerp( 300, 125, deltaTime);
-	float AimX = FMath::Lerp(0, 100, deltaTime);
-	float AimY = FMath::Lerp(0, 70, deltaTime);
-	double SoccketOffsetY= FMath::Lerp(0, 45, deltaTime);
-	double SoccketOffsetZ = FMath::Lerp(0, -20, deltaTime);
-	//SpringArm->TargetArmLength = Aim;
+	float AimX = FMath::Lerp(0, 150, deltaTime);
+	float AimY = FMath::Lerp(0, 50, deltaTime);
+
 	Camera->SetRelativeLocation(FVector(AimX, AimY, 0.0f));
-	//SpringArm->SocketOffset.Set(0, SoccketOffsetY, SoccketOffsetZ);
 
 }
 
@@ -343,7 +362,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 	if (hudWidget)
 	{
 		hudWidget->SetUpWaidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat(), StatComponent->GetMaxHitGauge());
-		UE_LOG(LogTemp, Warning, TEXT("hudwidget %f"), StatComponent->GetCurrentHp());
+		//UE_LOG(LogTemp, Warning, TEXT("hudwidget %f"), StatComponent->GetCurrentHp());
 		hudWidget->UpdateHpBar(StatComponent->GetCurrentHp());
 		hudWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
 
@@ -356,156 +375,38 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 	}
 }
 
-void APGPlayerCharacter::FindClosestEnemy()
+void APGPlayerCharacter::FindClosestEnemyToComp()
 {
-	if (bIsTargetLock)
-	{
-		TargetActor = NULL;
-		bIsTargetLock = false;
-		return;
-	}
-	
-	TArray<FHitResult> OutHitResults;
-
-	
-	FCollisionQueryParams Params(SCENE_QUERY_STAT(Target), false, this);
-
-	// 스탯 컴포넌트에서 공격 범위, 반경, 데미지 값을 가져옴
-	const float SerachRange = SearchDistance;
-	const float SerachRadius = SearchDistance;
-	
-
-	// 공격 시작 지점 계산: 현재 액터의 위치에서 전방 벡터와 캡슐 반경을 이용
-	//const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
-	const FVector Start = GetActorLocation() + GetControlRotation().Vector() * (SerachRadius);
-		//+GetControlRotation().Vector() * (SerachRadius*0.5f);
-
-	// 공격 끝 지점 계산: 시작 지점에서 전방 벡터 방향으로 공격 범위 만큼 이동
-	//const FVector End = Start + GetActorForwardVector()*SearchDistance;
-		const FVector End = GetActorLocation() + GetControlRotation().Vector() * (SerachRadius);
-		//+GetControlRotation().Vector() * (SerachRadius * 0.25f);
-
-	// SweepMultiByChannel을 사용하여 충돌 감지 수행
-	bool HitDetected = GetWorld()->SweepMultiByChannel(
-		OutHitResults,
-		Start,
-		End,
-		FQuat::Identity,
-		ECC_GameTraceChannel1,
-		FCollisionShape::MakeSphere(SerachRadius),
-		Params
-	);
-
-	// 히트가 감지된 경우 처리
-	if (HitDetected)
-	{
-		AActor* ClosestEnemy = nullptr;
-		float MinDistanceSq = FMath::Square(SerachRadius*2);
-		// 히트된 모든 결과를 순회
-		for (const FHitResult& Hit : OutHitResults)
-		{
-			AActor* Actor = Hit.GetActor();
-			if (Actor)
-			{
-				if (Actor && Actor->ActorHasTag(TEXT("Enemy")))
-				{
-					
-					// 캐릭터와 적 사이의 거리 계산 (제곱 거리 사용하여 성능 최적화)
-					float DistanceSq = FVector::DistSquared(GetActorLocation(), Actor->GetActorLocation());
-					if (DistanceSq < MinDistanceSq)
-					{
-						MinDistanceSq = DistanceSq;
-						ClosestEnemy = Actor;
-						TargetActor = Actor;
-						bIsTargetLock = true;
-					}
-				}
-			}
-		
-		}
-		if (ClosestEnemy)
-		{
-			SLOG( TEXT("%s"), *ClosestEnemy->GetActorLabel());
-			
-		}
-			
-		
-	}
-	else
-		TargetActor = nullptr;
-
-
-
-#if ENABLE_DRAW_DEBUG
-
-	// 캡슐의 중앙 위치 계산: 시작점과 끝점의 중간
-	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
-	// 캡슐의 절반 높이 계산: 검색 범위의 절반
-	float CapsuleHalfHeight = SerachRange * 0.5f;
-	// 캡슐의 회전 계산: 전방 벡터 방향으로 회전
-	FRotator CapsuleRotation = GetActorRotation();
-
-	// 히트 감지 여부에 따라 색상 설정
-	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
-	// 디버그 캡슐의 지속 시간 설정 (1초)
-	float DebugLifeTime = 1.0f;
-
-	// 디버그 캡슐 그리기
-	DrawDebugCapsule(GetWorld(),
-		CapsuleOrigin,
-		CapsuleHalfHeight,
-		SerachRadius,
-		CapsuleRotation.Quaternion(),
-		DrawColor,
-		false,
-		DebugLifeTime
-	);
-	
-#endif
-
-	
+	TargetingComponent->SetTargetLock();
 }
 
-void APGPlayerCharacter::TargetLockOn(AActor* targetActor,float dt)
-{
-	
-	if (CharcterTargetDistance(targetActor) > SearchDistance)
-	{
-		TargetActor = NULL;
-		bIsTargetLock = false;
-		return;
-	}
-	SetMotionWarpingLocation(targetActor->GetActorLocation());
-	FRotator newRotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), targetActor->GetActorLocation());
-	
-	FRotator newnewRotator = FMath::RInterpTo(GetControlRotation(), newRotator, dt,3.0f);
-	GetController()->SetControlRotation(newnewRotator);
-}
-
-float APGPlayerCharacter::CharcterTargetDistance(AActor* targetActors)
-{
-	// 내 액터의 위치 가져오기
-	FVector MyLocation = GetActorLocation();
-	FVector TargetLocation = TargetActor->GetActorLocation();
-	float Distance = FVector::Dist(MyLocation, TargetLocation);
-	SLOG(TEXT("Distance :%f"), Distance);
-	return Distance;
-}
 
 void APGPlayerCharacter::SetMotionWarpingLocation(FVector targetPos)
 {
-	if (bIsTargetLock)
+	if (TargetingComponent->GetbIsTargetLock())
 	{
-		if (CharcterTargetDistance(TargetActor) > 300.0f)
+		if (TargetingComponent->CharcterTargetDistance() > 300.0f)
 		{
 			MotionWarpingComponent->RemoveWarpTarget(TEXT("Target"));
 			return;
 		}
 
 	}
-	
 	MotionWarpingComponent->AddOrUpdateWarpTargetFromLocation(TEXT("Target"), targetPos);
 	
+}
+
+
+
+void APGPlayerCharacter::SetAttackRotation(float dt)
+{
+	FRotator CurrentRotation = GetActorRotation();
+	FRotator TargetRotation = AttackVector.Rotation();
+
+	// RotationSpeed에 따라 회전 속도를 조절
+	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, dt, 7.0f);
+
+	SetActorRotation(NewRotation);
 }
 
 

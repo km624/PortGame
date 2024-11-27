@@ -79,6 +79,8 @@ protected:
 
 	//매개변수 받기 위해 헤더 인클루드
 	void Move(const struct FInputActionValue& Value);
+	void SetNoneMove();
+
 	void Look(const struct FInputActionValue& Value);
 
 	//공격
@@ -88,20 +90,18 @@ protected:
 
 	void ReleasedAttack();
 
-	//에임 누르기
+	
+	//공격 - > 총
 	void PressAim();
 
 	void OnGoingAim();
-	//에임 땟을때
+	
 	void ReleasedAim();
 
 	void PressReload();
 
 	//에임 
 
-public:
-
-	void SetAimTargetLocation();
 
 //에임중 카메라
 protected:
@@ -114,41 +114,47 @@ protected:
 	UFUNCTION()
 	void AimUpdate(float deltaTime);
 
-	
+
+	//HUD
 protected:
 	virtual void SetUpHudWidget(class UPGHudWidget* hudWidget) override;
 
 
+	//타겟팅
 protected:
-	// 가장 가까운 적을 찾는 함수
-	UFUNCTION()
-	void FindClosestEnemy();
 
-	void TargetLockOn(AActor* targetActor,float dt);
-
-	float CharcterTargetDistance(AActor* targetActors);
+	void FindClosestEnemyToComp();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))
-	uint8 bIsTargetLock : 1;
+	TObjectPtr<class UTargetingComponent> TargetingComponent;
 
-	// 검색 반경
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))
-	float SearchDistance =1000.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<AActor> TargetActor;
 
+	//모션워핑
 public:
+
 	void SetMotionWarpingLocation(FVector targetPos);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MotionWarping, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComponent;
-
-
-
 	
 
-	
+	//공격중 회전구현
+public:
+	FORCEINLINE void SetbIsAttackRotation(bool bisRot) { bIsAttackRotation = bisRot;}
+
+protected:
+
+	void SetAttackRotation(float dt);
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
+	FVector AttackVector;
+
+
+	uint8 bIsAttackRotation : 1;
+
+	uint8 bIsMoving : 1;
 };

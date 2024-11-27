@@ -8,7 +8,7 @@
 #include "Animation/AnimMontage.h"
 #include "PortGame/PortGame.h"
 #include "Data/WeaponData.h"
-
+#include "Character/PGPlayerCharacter.h"
 
 AWeapon::AWeapon()
 {
@@ -58,6 +58,7 @@ void AWeapon::ComboStart()
 	{
 
 		ComboBegin();
+		
 		return;
 	}
 
@@ -82,9 +83,7 @@ void AWeapon::ComboBegin()
 	// Combo Status
 	CurrentCombo = 1;
 
-	// Movement Setting
-	//None 지정하면 이동기능 없애서 이동 멈춤
-	//OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
 	
 	// Animation Setting
 	//const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
@@ -93,10 +92,19 @@ void AWeapon::ComboBegin()
 
 	AnimInstance->Montage_Play(ComboMontage, ComboPlayTime);
 
+	//플레이어 캐릭터만 값 받아서 돌리기
+	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OwnerCharacter);
+	if (playerCharacter)
+	{
+		playerCharacter->SetbIsAttackRotation(true);
+	}
 	//몽타주 종료될때  ComboActiosnEnd 함수 호출 되게 델리게이트 호출
 	FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &AWeapon::ComboEnd);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
+
+
+
 
 	ComboTimerHandle.Invalidate();
 	ComboTimerdelayHandle.Invalidate();
@@ -158,6 +166,13 @@ void AWeapon::ComboCheck()
 		AnimInstance->Montage_Play(ComboMontage, ComboPlayTime);
 		AnimInstance->Montage_JumpToSection(NextSection, ComboMontage);
 
+		//플레이어 캐릭터만 값 받아서 돌리기
+		APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OwnerCharacter);
+		if (playerCharacter)
+		{
+			playerCharacter->SetbIsAttackRotation(true);
+		}
+
 		FOnMontageEnded EndDelegate;
 		EndDelegate.BindUObject(this, &AWeapon::ComboEnd);
 		AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
@@ -180,9 +195,12 @@ void AWeapon::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 
 	ensure(CurrentCombo != 0);
 	CurrentCombo = 0;
-	//캐릭터 무브먼트 이동 못한거 다시 복구
-	//OwnerCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-
+	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OwnerCharacter);
+	if (playerCharacter)
+	{
+		playerCharacter->SetbIsAttackRotation(false);
+	}
+	
 	//12강 AI  - AI가 끝날때를 파악할 수 있게 추가
 	//NotifyComboActionEnd();
 }
