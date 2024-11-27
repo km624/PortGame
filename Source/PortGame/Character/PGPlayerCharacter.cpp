@@ -16,12 +16,18 @@
 #include "Component/PGStatComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "PortGame/PortGame.h"
+#include "MotionWarpingComponent.h"
+
+
 
 
 APGPlayerCharacter::APGPlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	MotionWarpingComponent = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("Motion_Warp"));
+	
 	static ConstructorHelpers::FObjectFinder<UPGCharacterData> CharacterBaseData
 	(TEXT("/Script/PortGame.PGCharacterData'/Game/PortGame/Input/PG_InputBaseData.PG_InputBaseData'"));
 	if (CharacterBaseData.Object)
@@ -148,7 +154,7 @@ void APGPlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	AimTimeline.TickTimeline(DeltaTime);
-	if (TargetActor)
+	if (bIsTargetLock)
 	{
 		TargetLockOn(TargetActor, DeltaTime);
 	}
@@ -352,7 +358,13 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 
 void APGPlayerCharacter::FindClosestEnemy()
 {
-
+	if (bIsTargetLock)
+	{
+		TargetActor = NULL;
+		bIsTargetLock = false;
+		return;
+	}
+	
 	TArray<FHitResult> OutHitResults;
 
 	
@@ -405,13 +417,18 @@ void APGPlayerCharacter::FindClosestEnemy()
 						MinDistanceSq = DistanceSq;
 						ClosestEnemy = Actor;
 						TargetActor = Actor;
+						bIsTargetLock = true;
 					}
 				}
 			}
 		
 		}
-		if(ClosestEnemy)
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *ClosestEnemy->GetActorLabel());
+		if (ClosestEnemy)
+		{
+			SLOG( TEXT("%s"), *ClosestEnemy->GetActorLabel());
+			
+		}
+			
 		
 	}
 	else
@@ -451,10 +468,44 @@ void APGPlayerCharacter::FindClosestEnemy()
 
 void APGPlayerCharacter::TargetLockOn(AActor* targetActor,float dt)
 {
+	
+	if (CharcterTargetDistance(targetActor) > SearchDistance)
+	{
+		TargetActor = NULL;
+		bIsTargetLock = false;
+		return;
+	}
+	SetMotionWarpingLocation(targetActor->GetActorLocation());
 	FRotator newRotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), targetActor->GetActorLocation());
 	
 	FRotator newnewRotator = FMath::RInterpTo(GetControlRotation(), newRotator, dt,3.0f);
 	GetController()->SetControlRotation(newnewRotator);
+}
+
+float APGPlayerCharacter::CharcterTargetDistance(AActor* targetActors)
+{
+	// 내 액터의 위치 가져오기
+	FVector MyLocation = GetActorLocation();
+	FVector TargetLocation = TargetActor->GetActorLocation();
+	float Distance = FVector::Dist(MyLocation, TargetLocation);
+	SLOG(TEXT("Distance :%f"), Distance);
+	return Distance;
+}
+
+void APGPlayerCharacter::SetMotionWarpingLocation(FVector targetPos)
+{
+	if (bIsTargetLock)
+	{
+		if (CharcterTargetDistance(TargetActor) > 300.0f)
+		{
+			MotionWarpingComponent->RemoveWarpTarget(TEXT("Target"));
+			return;
+		}
+
+	}
+	
+	MotionWarpingComponent->AddOrUpdateWarpTargetFromLocation(TEXT("Target"), targetPos);
+	
 }
 
 

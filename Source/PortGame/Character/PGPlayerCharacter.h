@@ -126,13 +126,26 @@ protected:
 
 	void TargetLockOn(AActor* targetActor,float dt);
 
+	float CharcterTargetDistance(AActor* targetActors);
+
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))
+	uint8 bIsTargetLock : 1;
+
 	// 검색 반경
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))
 	float SearchDistance =1000.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<AActor> TargetActor;
+
+public:
+	void SetMotionWarpingLocation(FVector targetPos);
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MotionWarping, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComponent;
+
 
 
 	
