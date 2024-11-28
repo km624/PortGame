@@ -55,7 +55,7 @@ void UTargetingComponent::SetSideTargetLock(float direction)
 {
 
 	if (!bIsTargetLock) return;
-
+	FindClosestEnemy();
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(GetOwner());
 	const FVector palyerLocation = playerCharacter->GetActorLocation();
 	// 가장 가까운 액터의 위치
@@ -82,6 +82,8 @@ void UTargetingComponent::SetSideTargetLock(float direction)
 	
 	if (FindSideActor)
 	{
+		
+		TargetActor = FindSideActor;
 		DrawDebugLine(GetWorld(), palyerLocation, FindSideActor->GetActorLocation(), FColor::Green, false, 1.0f, 0, 2.0f);
 	}
 		
@@ -221,7 +223,7 @@ AActor* UTargetingComponent::FindSideClosetEnemy(const TArray<AActor*>& Actors, 
 		if (DotProduct > FMath::Cos(FMath::DegreesToRadians(90.0f)))
 		{
 			float Distance = FVector::Dist(Origin, Actor->GetActorLocation());
-			if (Distance < MinDist)
+			if (Distance < MinDist&&Distance< SearchDistance)
 			{
 				MinDist = Distance;
 				Closest = Actor;
