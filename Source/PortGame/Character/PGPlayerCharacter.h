@@ -77,6 +77,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction>TargetAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction>TargetSideAction;
+
+
 	//매개변수 받기 위해 헤더 인클루드
 	void Move(const struct FInputActionValue& Value);
 	void SetNoneMove();
@@ -124,6 +128,8 @@ protected:
 protected:
 
 	void FindClosestEnemyToComp();
+
+	void FindSideEnemyToComp(const struct FInputActionValue& Value);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))

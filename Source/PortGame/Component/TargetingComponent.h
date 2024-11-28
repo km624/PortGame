@@ -43,7 +43,7 @@ public:
 
 	void SetTargetLock();
 
-	void FindClosestEnemy();
+	void SetSideTargetLock(float direction);
 
 	void TargetLockOn( float dt);
 
@@ -51,7 +51,9 @@ public:
 
 protected:
 
-	void FindClosestEnemy();
+	AActor* FindClosestEnemy();
+
+	AActor* FindSideClosetEnemy(const TArray<AActor*>& Actors, const FVector& DirectionLocation, const FVector& Origin, const FVector& Direction);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))
@@ -64,6 +66,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<AActor> TargetActor;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))
 	TArray<AActor*> AllTargetActor;
 		
 };

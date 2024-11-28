@@ -94,6 +94,12 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		TargetAction = Targeting.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> SideTargeting(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_ChangeTarget.IA_ChangeTarget'"));
+	if (SideTargeting.Object)
+	{
+		TargetSideAction = SideTargeting.Object;
+	}
 }
 
 void APGPlayerCharacter::BeginPlay()
@@ -145,6 +151,8 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		}
 
 		EnhancedInputComponent->BindAction(TargetAction, ETriggerEvent::Started, this, &APGPlayerCharacter::FindClosestEnemyToComp);
+
+		EnhancedInputComponent->BindAction(TargetSideAction, ETriggerEvent::Started, this, &APGPlayerCharacter::FindSideEnemyToComp);
 	
 	}
 	else
@@ -353,7 +361,7 @@ void APGPlayerCharacter::AimUpdate(float deltaTime)
 	float AimY = FMath::Lerp(0, 50, deltaTime);
 
 	Camera->SetRelativeLocation(FVector(AimX, AimY, 0.0f));
-
+	
 }
 
 
@@ -378,6 +386,15 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 void APGPlayerCharacter::FindClosestEnemyToComp()
 {
 	TargetingComponent->SetTargetLock();
+}
+
+void APGPlayerCharacter::FindSideEnemyToComp(const struct FInputActionValue& Value)
+{
+	
+	float direction = Value.Get<float>();
+	TargetingComponent->SetSideTargetLock(direction);
+	
+	
 }
 
 

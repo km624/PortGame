@@ -12,8 +12,6 @@
 // Sets default values for this component's properties
 UTargetingComponent::UTargetingComponent()
 {
-	
-	
 
 	bWantsInitializeComponent = true;
 }
@@ -40,11 +38,57 @@ void UTargetingComponent::SetTargetLock()
 		bIsTargetLock = false;
 	}
 	else
-		FindClosestEnemy();
+	{
+		AActor* findActor = FindClosestEnemy();
+		if (findActor)
+		{
+			TargetActor = findActor;
+			bIsTargetLock = true;
+		}
+			
+	}
+		
 	
 }
 
-void UTargetingComponent::FindClosestEnemy()
+void UTargetingComponent::SetSideTargetLock(float direction)
+{
+
+	if (!bIsTargetLock) return;
+
+	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(GetOwner());
+	const FVector palyerLocation = playerCharacter->GetActorLocation();
+	// 가장 가까운 액터의 위치
+
+	FVector ClosestLocation = TargetActor->GetActorLocation();
+	FRotator ControlRotation = playerCharacter->GetControlRotation();
+	ControlRotation.Pitch = 0;
+
+	// 컨트롤러 회전을 기준으로 ForwardVector 계산
+	FVector ForwardVector = FRotationMatrix(ControlRotation).GetScaledAxis(EAxis::X);
+
+	// 왼쪽과 오른쪽 방향 벡터 계산
+	FVector FindSideVector = ForwardVector.RotateAngleAxis(direction *90.0f, FVector::UpVector);
+	
+
+	// 왼쪽 방향으로의 새로운 위치
+	FVector FindSideLocaiton = palyerLocation + FindSideVector * SearchDistance * 2; // 거리 조정 가능
+	// 오른쪽 방향으로의 새로운 위치
+
+	AActor* FindSideActor = nullptr;
+
+	// 왼쪽 액터 찾기
+	FindSideActor = FindSideClosetEnemy(AllTargetActor, FindSideLocaiton, palyerLocation, FindSideVector);
+	
+	if (FindSideActor)
+	{
+		DrawDebugLine(GetWorld(), palyerLocation, FindSideActor->GetActorLocation(), FColor::Green, false, 1.0f, 0, 2.0f);
+	}
+		
+	
+}
+
+AActor* UTargetingComponent::FindClosestEnemy()
 {
 	
 
@@ -60,14 +104,16 @@ void UTargetingComponent::FindClosestEnemy()
 
 
 	// 공격 시작 지점 계산: 현재 액터의 위치에서 전방 벡터와 캡슐 반경을 이용
-	//const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
-	const FVector Start = playerCharacter->GetActorLocation() + playerCharacter->GetControlRotation().Vector() * (SerachRadius);
-	//+GetControlRotation().Vector() * (SerachRadius*0.5f);
+	
+	FRotator ControlRotation = playerCharacter->GetControlRotation();
+	ControlRotation.Pitch = 0;
+	
+	const FVector Start = playerCharacter->GetActorLocation() + ControlRotation.Vector() * (SerachRadius);
 
 // 공격 끝 지점 계산: 시작 지점에서 전방 벡터 방향으로 공격 범위 만큼 이동
-//const FVector End = Start + GetActorForwardVector()*SearchDistance;
-	const FVector End = playerCharacter-> GetActorLocation() + playerCharacter->GetControlRotation().Vector() * (SerachRadius);
-	//+GetControlRotation().Vector() * (SerachRadius * 0.25f);
+
+	const FVector End = playerCharacter-> GetActorLocation() + ControlRotation.Vector() * (SerachRadius);
+	
 
 // SweepMultiByChannel을 사용하여 충돌 감지 수행
 	bool HitDetected = GetWorld()->SweepMultiByChannel(
@@ -81,31 +127,22 @@ void UTargetingComponent::FindClosestEnemy()
 	);
 
 	TArray<FTargetDistance> TargetDistances;
-
+	AActor* ClosestEnemy = nullptr;
 	// 히트가 감지된 경우 처리
 	if (HitDetected)
 	{
-		AActor* ClosestEnemy = nullptr;
+		//AActor* ClosestEnemy = nullptr;
 		float MinDistanceSq = FMath::Square(SerachRadius * 2);
 
 		// 히트된 모든 결과를 순회
 		for (const FHitResult& Hit : OutHitResults)
 		{
 			AActor* Actor = Hit.GetActor();
+			
 			if (Actor)
 			{
 				if (Actor && Actor->ActorHasTag(TEXT("Enemy")))
 				{
-
-					// 캐릭터와 적 사이의 거리 계산 (제곱 거리 사용하여 성능 최적화)
-					//float DistanceSq = FVector::DistSquared(playerCharacter->GetActorLocation(), Actor->GetActorLocation());
-					/*if (DistanceSq < MinDistanceSq)
-					{
-						MinDistanceSq = DistanceSq;
-						ClosestEnemy = Actor;
-						TargetActor = Actor;
-						bIsTargetLock = true;
-					}*/
 
 					FVector TargetLocation = Actor->GetActorLocation(); // 타겟 위치 가져오기
 					float Distance = FVector::Dist(playerCharacter->GetActorLocation(), TargetLocation); // 거리 계산
@@ -119,24 +156,26 @@ void UTargetingComponent::FindClosestEnemy()
 			}
 
 		}
-		
-		TargetDistances.Sort();
 
+		TargetDistances.Sort();
 		AllTargetActor.Empty();
 		for (const FTargetDistance& TargetDist : TargetDistances)
 		{
 			AllTargetActor.Add(TargetDist.Target);
 			SLOG(TEXT("Targeting : %s"), *TargetDist.Target->GetActorLabel());
 		}
-		TargetActor= AllTargetActor[0];
-		bIsTargetLock = true;
-
+		//TargetActor = AllTargetActor[0];
+		//bIsTargetLock = true;
+		
+		ClosestEnemy = AllTargetActor[0];
 	}
 	else
-		TargetActor = nullptr;
-
-
-
+	{
+		//TargetActor = nullptr;
+		AllTargetActor.Empty();
+		//return nullptr;
+	}
+		
 #if ENABLE_DRAW_DEBUG
 
 	// 캡슐의 중앙 위치 계산: 시작점과 끝점의 중간
@@ -164,7 +203,33 @@ void UTargetingComponent::FindClosestEnemy()
 
 #endif
 
+	return ClosestEnemy;
+}
 
+AActor* UTargetingComponent::FindSideClosetEnemy(const TArray<AActor*>& Actors, const FVector& DirectionLocation, const FVector& Origin, const FVector& Direction)
+{
+	AActor* Closest = nullptr;
+	float MinDist = FLT_MAX;
+
+	for (AActor* Actor : Actors)
+	{
+		if (Actor == TargetActor)continue;
+		FVector ToActor = Actor->GetActorLocation() - Origin;
+		float DotProduct = FVector::DotProduct(ToActor.GetSafeNormal(), Direction.GetSafeNormal());
+
+		// 지정된 방향과의 각도 체크 (예: 45도 이내)
+		if (DotProduct > FMath::Cos(FMath::DegreesToRadians(90.0f)))
+		{
+			float Distance = FVector::Dist(Origin, Actor->GetActorLocation());
+			if (Distance < MinDist)
+			{
+				MinDist = Distance;
+				Closest = Actor;
+			}
+		}
+	}
+
+	return Closest;
 }
 
 void UTargetingComponent::TargetLockOn(float dt)
@@ -190,6 +255,7 @@ void UTargetingComponent::TargetLockOn(float dt)
 	{
 		TargetActor = NULL;
 		bIsTargetLock = false;
+		AllTargetActor.Empty();
 		return;
 	}
 
@@ -209,6 +275,7 @@ float UTargetingComponent::CharcterTargetDistance()
 	FVector MyLocation = playerCharacter->GetActorLocation();
 	FVector TargetLocation = TargetActor->GetActorLocation();
 	float Distance = FVector::Dist(MyLocation, TargetLocation);
+	//SLOG(TEXT("%f"), Distance);
 	return Distance;
 }
 
