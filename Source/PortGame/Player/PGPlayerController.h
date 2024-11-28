@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Interface/GunRecoilInterface.h"
 #include "PGPlayerController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PORTGAME_API APGPlayerController : public APlayerController
+class PORTGAME_API APGPlayerController : public APlayerController, public IGunRecoilInterface
 {
 	GENERATED_BODY()
 
@@ -30,5 +31,8 @@ protected:
 	//생성할 위젯을 담을 위젯 포인트 보관하는 변수
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
 	TObjectPtr<class UPGHudWidget> PGHudWidget;
+
+protected:
+	virtual void GunRecoilCameraShake(TSubclassOf<class UCameraShakeBase> camerashake) override;
 	
 };

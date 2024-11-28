@@ -10,6 +10,7 @@
 #include "Weapon/BlockAim.h"
 #include "Data/WeaponData.h"
 #include "Data/GunWeaponData.h"
+#include "Interface/GunRecoilInterface.h"
 
 
 
@@ -44,7 +45,8 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 		WeaponSocket = gunWeaponData->WeaponSocket;
 		GunStat = gunWeaponData->GunStat;
 		ReloadMontage = gunWeaponData->ReloadMontage;
-
+		CameraShakeClass = gunWeaponData->CameraShakeClass;
+		
 		SetUpGunStat();
 	}
 	Currentammo = ammoMaxCount;
@@ -222,10 +224,20 @@ void ARifle::FireWithLineTrace()
 		}
 
 	}
-
+	StartGaunRecoil();
+	
 	UE_LOG(LogTemp, Warning, TEXT("%d"), Currentammo);
 
 
+}
+
+void ARifle::StartGaunRecoil()
+{
+	IGunRecoilInterface* gunrecoil = Cast<IGunRecoilInterface>(OwnerCharacter->GetController());
+	if (gunrecoil)
+	{
+		gunrecoil->GunRecoilCameraShake(CameraShakeClass);
+	}
 }
 
 

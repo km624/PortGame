@@ -36,7 +36,7 @@ void UPGStatComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	SetMaxHitGauge(15.0f);
+	SetMaxHitGauge(GetTotalStat().HitGauge);
 	SetCurrentRarity(CurrentCharacterRarity);
 
 	SetHp(GetTotalStat().MaxHp);

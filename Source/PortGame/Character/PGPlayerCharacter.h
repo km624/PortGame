@@ -6,6 +6,7 @@
 #include "Character/PGBaseCharacter.h"
 #include "Components/TimelineComponent.h"
 #include "Interface/PGHudWidgetInterface.h"
+#include "Interface/AttackHitStopInterface.h"
 #include "PGPlayerCharacter.generated.h"
 
 /**
@@ -21,7 +22,7 @@ enum class EControlData : uint8
 };
 
 UCLASS()
-class PORTGAME_API APGPlayerCharacter : public APGBaseCharacter,public IPGHudWidgetInterface
+class PORTGAME_API APGPlayerCharacter : public APGBaseCharacter,public IPGHudWidgetInterface ,public IAttackHitStopInterface
 {
 	GENERATED_BODY()
 public:
@@ -159,8 +160,16 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Attack, meta = (AllowPrivateAccess = "true"))
 	FVector AttackVector;
 
-
 	uint8 bIsAttackRotation : 1;
 
 	uint8 bIsMoving : 1;
+
+//°ø°Ý »ìÂ¦ ¸ØÃß±â
+protected:
+	virtual void AttackHitStop() override;
+
+protected:
+	FTimerHandle HitStoptimerHandle;
+
+
 };

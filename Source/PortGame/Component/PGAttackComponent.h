@@ -31,7 +31,7 @@ public:
 
 	void AttackToWeapon();
 
-	
+	void AttackHitCheck();
 
 
 public:	

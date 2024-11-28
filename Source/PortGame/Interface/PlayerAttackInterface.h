@@ -22,5 +22,5 @@ class PORTGAME_API IPlayerAttackInterface
 
 	
 public:
-	virtual void AttackHitCheck() = 0;
+	virtual void AttackHitCheckToComp() = 0;
 };

@@ -67,6 +67,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	FPGGunStat GunStat;
 
+	//ÃÑ±â¹Ýµ¿
+protected:
+	void StartGaunRecoil();
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CamreShake)
+	TSubclassOf<class UCameraShakeBase> CameraShakeClass;
+
+	
+
 
 
 

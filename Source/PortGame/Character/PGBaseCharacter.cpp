@@ -11,7 +11,8 @@
 #include "PortGame/PortGame.h"
 #include "UI/PGHPBarWidget.h"
 #include "Component/PGWidgetComponent.h"
-#include "Engine/DamageEvents.h"
+//#include "Engine/DamageEvents.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -169,83 +170,9 @@ void APGBaseCharacter::SetUpHpWidget(UPGUserWidget* InUserWidget)
 	
 }
 
-void APGBaseCharacter::AttackHitCheck()
+void APGBaseCharacter::AttackHitCheckToComp()
 {
-
-	
-	TArray<FHitResult> OutHitResults;
-
-	// 충돌 쿼리 파라미터 설정
-	// traceTag: 충돌 분석 시 식별자 정보
-	// bTraceComplex: 복잡한 충돌체도 감지할지 여부
-	// IgnoreActor: 충돌 체크 시 무시할 액터
-	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
-
-	// 스탯 컴포넌트에서 공격 범위, 반경, 데미지 값을 가져옴
-	const float AttackRange = StatComponent->GetTotalStat().AttackRange;
-	const float AttackRadius = StatComponent->GetTotalStat().AttackRange;
-	const float AttackDamage = StatComponent->GetTotalStat().Attack;
-
-	// 공격 시작 지점 계산: 현재 액터의 위치에서 전방 벡터와 캡슐 반경을 이용
-	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius();
-
-	// 공격 끝 지점 계산: 시작 지점에서 전방 벡터 방향으로 공격 범위 만큼 이동
-	const FVector End = Start + GetActorForwardVector() * AttackRange;
-
-	// SweepMultiByChannel을 사용하여 충돌 감지 수행
-	bool HitDetected = GetWorld()->SweepMultiByChannel(
-		OutHitResults,
-		Start,
-		End,
-		FQuat::Identity,
-		ECC_GameTraceChannel1,
-		FCollisionShape::MakeSphere(AttackRadius),
-		Params
-	);
-
-	// 히트가 감지된 경우 처리
-	if (HitDetected)
-	{
-		// 히트된 모든 결과를 순회
-		for (const FHitResult& Hit : OutHitResults)
-		{
-			// 히트된 액터가 유효한지 확인
-			if (Hit.GetActor())
-			{
-				// 데미지 이벤트 생성
-				FDamageEvent DamageEvent;
-
-				// 히트된 액터에 데미지 적용
-				Hit.GetActor()->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
-			}
-		}
-	}
-
-
-
-#if ENABLE_DRAW_DEBUG
-
-	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
-	float CapsuleHalfHeight = AttackRange * 0.5f;
-	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
-
-	FVector TraceVec = GetActorForwardVector() * AttackRange;
-	FVector Center = GetActorLocation() + TraceVec * 0.5f;
-	float HalfHeight = AttackRange * 0.5f + AttackRadius;
-	FQuat CapsuleRot = FRotationMatrix::MakeFromZ(TraceVec).ToQuat();
-	float DebugLifeTime = 5.0f;
-
-	// SweepMulti와 동일한 범위를 그려줌
-	DrawDebugCapsule(GetWorld(),
-		Center,
-		HalfHeight,
-		AttackRadius,
-		CapsuleRot,
-		DrawColor,
-		false,
-		DebugLifeTime);
-
-#endif
+	AttackComponent->AttackHitCheck();
 }
 
 float APGBaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -291,5 +218,7 @@ void APGBaseCharacter::SetDead()
 	
 	HpBarWidgetComponent->SetHiddenInGame(true);
 }
+
+
 
 

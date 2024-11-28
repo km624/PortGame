@@ -24,4 +24,7 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Gun)
 	FPGGunStat GunStat;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
+	TSubclassOf<class UCameraShakeBase> CameraShakeClass;
 };

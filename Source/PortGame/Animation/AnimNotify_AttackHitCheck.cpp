@@ -17,7 +17,7 @@ void UAnimNotify_AttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 		if (AttackPawn)
 		{
 			//캐릭터들의 공격 하는 체크 함수 실행
-			AttackPawn->AttackHitCheck();
+			AttackPawn->AttackHitCheckToComp();
 		}
 	}
 }

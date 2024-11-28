@@ -23,6 +23,8 @@
 
 
 
+
+
 APGPlayerCharacter::APGPlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -288,7 +290,9 @@ void APGPlayerCharacter::Attack()
 		bIsShoot = true;
 	}
 	AttackToComponent();
-
+	
+	
+	
 }
 
 void APGPlayerCharacter::OnGoingAttack()
@@ -424,6 +428,17 @@ void APGPlayerCharacter::SetAttackRotation(float dt)
 	FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, dt, 7.0f);
 
 	SetActorRotation(NewRotation);
+}
+
+void APGPlayerCharacter::AttackHitStop()
+{
+	CustomTimeDilation = 0.1f;
+	GetWorld()->GetTimerManager().SetTimer(
+		HitStoptimerHandle,
+		[this]() {
+			CustomTimeDilation = 1.0f;
+		}, 0.3f, false
+	);
 }
 
 

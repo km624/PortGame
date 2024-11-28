@@ -32,6 +32,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float MovementSpeed;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
+	float HitGauge;
+
 	FPGCharacterStat operator+(const FPGCharacterStat& Other) const
 	{
 		const float* const ThisPtr = reinterpret_cast<const float* const>(this);

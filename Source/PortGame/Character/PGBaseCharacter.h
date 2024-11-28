@@ -130,7 +130,7 @@ protected:
 	//공격 
 protected:
 	//공격 체크함수
-	virtual void AttackHitCheck() override;
+	virtual void AttackHitCheckToComp() override;
 
 	//언리얼 자체에서 있는거 사용 - 액터에서부터 구현되있음
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
@@ -153,6 +153,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TObjectPtr<class UAnimMontage> DeadMontage;
 
+	
 
 
 };
