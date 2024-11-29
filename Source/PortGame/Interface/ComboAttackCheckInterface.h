@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "AttackHitStopInterface.generated.h"
+#include "ComboAttackCheckInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UAttackHitStopInterface : public UInterface
+class UComboAttackCheckInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -16,11 +16,17 @@ class UAttackHitStopInterface : public UInterface
 /**
  * 
  */
-class PORTGAME_API IAttackHitStopInterface
+class PORTGAME_API IComboAttackCheckInterface
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	virtual void ComboCheckStart() = 0;
+
+	virtual void ComboCheckEnd() = 0;
+
+
+
 
 };

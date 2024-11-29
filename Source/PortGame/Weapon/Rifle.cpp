@@ -12,12 +12,9 @@
 #include "Data/GunWeaponData.h"
 #include "Interface/GunRecoilInterface.h"
 
-
-
 ARifle::ARifle()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	
 }
 
 void ARifle::Tick(float DeltaTime)
@@ -68,7 +65,6 @@ void ARifle::Attack()
 	}
 	else
 	{
-		
 		if (ReloadTimerHandle.IsValid())
 		{
 			GetWorldTimerManager().ClearTimer(ReloadTimerHandle);
@@ -78,6 +74,7 @@ void ARifle::Attack()
 			OwnerCharacter->SetbIsReload(false);
 		}
 		ComboStart();
+		
 	}
 		
 }

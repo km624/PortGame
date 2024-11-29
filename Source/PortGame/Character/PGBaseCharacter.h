@@ -25,7 +25,7 @@ DECLARE_MULTICAST_DELEGATE(FOnbIsReloadDelegate);
 
 UCLASS()
 class PORTGAME_API APGBaseCharacter : public ACharacter , public IPGSetHpbarCharacterInterface
-	, public IPlayerAttackInterface
+	,public IPlayerAttackInterface
 {
 	GENERATED_BODY()
 
@@ -39,6 +39,10 @@ protected:
 protected:
 	void AttackToComponent();
 
+protected:
+	virtual void ComboCheckStartToComp() override;
+
+	virtual void ComboCheckEndToComp() override;
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterType" ,Meta = (AllowPrivateAccess = "true"))
 	EPlayerCharacterType CharacterType;
@@ -54,6 +58,8 @@ public:
 
 	FORCEINLINE void SetbIsReload(bool CurrentReolad) { bIsReload = CurrentReolad; }
 	
+	//애니메이션 인스턴스에 필요
+	//에임 중일때 앵니메이션
 	float ReturnAimOffset();
 
 	FORCEINLINE FOnbIshootDelegate& GetbIshootDelegate() { return OnbIsShoot; }

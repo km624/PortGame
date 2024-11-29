@@ -164,12 +164,5 @@ protected:
 
 	uint8 bIsMoving : 1;
 
-//°ø°Ý »ìÂ¦ ¸ØÃß±â
-protected:
-	virtual void AttackHitStop() override;
-
-protected:
-	FTimerHandle HitStoptimerHandle;
-
 
 };

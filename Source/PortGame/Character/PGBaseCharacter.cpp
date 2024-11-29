@@ -114,6 +114,18 @@ void APGBaseCharacter::AttackToComponent()
 	
 }
 
+void APGBaseCharacter::ComboCheckStartToComp()
+{
+	AttackComponent->ComboCheckStart();
+}
+
+
+void APGBaseCharacter::ComboCheckEndToComp()
+{
+	AttackComponent->CombocheckEnd();
+}
+
+
 float APGBaseCharacter::ReturnAimOffset()
 {
 	FRotator rtemp = GetActorRotation() - GetBaseAimRotation();

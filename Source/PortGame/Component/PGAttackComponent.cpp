@@ -30,7 +30,6 @@ void UPGAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//SetUpWeapon();
 }
 
 void UPGAttackComponent::SetWeaponClass()
@@ -47,7 +46,7 @@ void UPGAttackComponent::SetUpWeapon()
 		AWeapon* spawnWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClass);
 
 		Weapon = spawnWeapon;
-		SLOG(TEXT("spawnWeapon"));
+		//SLOG(TEXT("spawnWeapon"));
 		APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
 
 
@@ -56,6 +55,8 @@ void UPGAttackComponent::SetUpWeapon()
 		spawnWeapon->AttachToComponent(BaseCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, spawnWeapon->GetWeaponFname());
 		
 		BaseCharacter->SetUpModifierStat(spawnWeapon->ModifierStat);
+
+		OnNextCombo.AddUObject(Weapon, &AWeapon::SetHasNextCombo);
 	}
 
 
@@ -63,9 +64,32 @@ void UPGAttackComponent::SetUpWeapon()
 
 void UPGAttackComponent::AttackToWeapon()
 {
+	if (ComboTiming)
+	{
+		HasNextComboCommand = true;
+	}
+
 	if (Weapon)
 		Weapon->Attack();
+	//SLOG(TEXT("AttackClick"));
 }
+
+void UPGAttackComponent::ComboCheckStart()
+{
+	ComboTiming = true;
+	//SLOG(TEXT("ComboCheckStart"));
+}
+
+void UPGAttackComponent::CombocheckEnd()
+{
+	OnNextCombo.Broadcast(HasNextComboCommand);
+	
+	//SLOG(TEXT("ComboCheckEnd"));
+	HasNextComboCommand = false;
+	ComboTiming = false;
+	
+}
+
 
 void UPGAttackComponent::AttackHitCheck()
 {
@@ -103,7 +127,7 @@ void UPGAttackComponent::AttackHitCheck()
 				IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
 				if (playerCharacter)
 				{
-					playerCharacter->AttackHitStop();
+					AttackHitStop();
 				}
 				FDamageEvent DamageEvent;
 				Hit.GetActor()->TakeDamage(AttackDamage, DamageEvent, BaseCharacter->GetController(), BaseCharacter);
@@ -137,6 +161,16 @@ void UPGAttackComponent::AttackHitCheck()
 #endif
 }
 
+void UPGAttackComponent::AttackHitStop()
+{
+	GetOwner()->CustomTimeDilation = 0.1f;
+	GetWorld()->GetTimerManager().SetTimer(
+		HitStoptimerHandle,
+		[this]() {
+			GetOwner()->CustomTimeDilation = 1.0f;
+		}, 0.3f, false
+	);
+}
 
 
 

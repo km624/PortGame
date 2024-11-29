@@ -71,6 +71,9 @@ protected:
 
 	bool HasNextComboCommand = false;
 
+public:
+	UFUNCTION()
+	void SetHasNextCombo(bool nextcombo);
 
 protected:
 
@@ -78,11 +81,11 @@ protected:
 
 	void ComboBegin();
 
-	void ComboCheckTimer();
-
 	void ComboCheck();
 
 	//몽타주 엔드 델리게이트 형식
 	void ComboEnd(class UAnimMontage* TargetMontage, bool IsProperlyEnded);
-
+	
+	FOnMontageEnded EndDelegate;
+	FOnMontageEnded* CurrentMontageEndDelegate;
 };

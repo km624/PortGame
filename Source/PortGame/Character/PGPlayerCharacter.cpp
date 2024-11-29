@@ -289,6 +289,7 @@ void APGPlayerCharacter::Attack()
 	{
 		bIsShoot = true;
 	}
+
 	AttackToComponent();
 	
 	
@@ -417,8 +418,6 @@ void APGPlayerCharacter::SetMotionWarpingLocation(FVector targetPos)
 	
 }
 
-
-
 void APGPlayerCharacter::SetAttackRotation(float dt)
 {
 	FRotator CurrentRotation = GetActorRotation();
@@ -430,16 +429,6 @@ void APGPlayerCharacter::SetAttackRotation(float dt)
 	SetActorRotation(NewRotation);
 }
 
-void APGPlayerCharacter::AttackHitStop()
-{
-	CustomTimeDilation = 0.1f;
-	GetWorld()->GetTimerManager().SetTimer(
-		HitStoptimerHandle,
-		[this]() {
-			CustomTimeDilation = 1.0f;
-		}, 0.3f, false
-	);
-}
 
 
 

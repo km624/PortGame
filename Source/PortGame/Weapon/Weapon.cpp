@@ -49,8 +49,14 @@ void AWeapon::BeginPlay()
 }
 
 
-
-
+void AWeapon::SetHasNextCombo(bool nextcombo)
+{
+	HasNextComboCommand = nextcombo;
+	if (HasNextComboCommand)
+	{
+		ComboCheck();
+	}
+}
 
 void AWeapon::ComboStart()
 {
@@ -62,36 +68,16 @@ void AWeapon::ComboStart()
 		return;
 	}
 
-
-	//타이머가 설정이 안되있을때는 입력을 놓쳤거나
-	// 콤보 다 했을때
-	if (ComboTimerHandle.IsValid())
-	{
-		HasNextComboCommand = true;
-
-
-	}
-	else
-	{
-
-		HasNextComboCommand = false;
-	}
 }
 
 void AWeapon::ComboBegin()
 {
-	// Combo Status
-	CurrentCombo = 1;
-
-
 	
-	// Animation Setting
-	//const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
+	CurrentCombo = 1;
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	ComboPlayTime = OwnerCharacter->GetTotalStat().AttackSpeed;
 
 	AnimInstance->Montage_Play(ComboMontage, ComboPlayTime);
-
 	//플레이어 캐릭터만 값 받아서 돌리기
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OwnerCharacter);
 	if (playerCharacter)
@@ -99,58 +85,26 @@ void AWeapon::ComboBegin()
 		playerCharacter->SetbIsAttackRotation(true);
 	}
 	//몽타주 종료될때  ComboActiosnEnd 함수 호출 되게 델리게이트 호출
-	FOnMontageEnded EndDelegate;
+	//FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &AWeapon::ComboEnd);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
-
-
-
-
-	ComboTimerHandle.Invalidate();
-	ComboTimerdelayHandle.Invalidate();
-	ComboCheckTimer();
+	CurrentMontageEndDelegate = AnimInstance->Montage_GetEndedDelegate(ComboMontage);
+	
 }
 
-void AWeapon::ComboCheckTimer()
-{
-	int32 ComboIndex = CurrentCombo - 1;
-	ensure(ComboData->EffectiveFrameCount.IsValidIndex(ComboIndex));
-	//UE_LOG(LogTemp, Warning, TEXT("ComboCheckTimer"));
-	//어택 스피드도 스텟에서
-   //const float AttackSpeedRate = Stat->GetTotalStat().AttackSpeed;
-   //발동할 시간 정보를 얻기위한 변수
-	float ComboEffectiveTime = (ComboData->EffectiveFrameCount[ComboIndex] / ComboData->FrameRate) /ComboPlayTime;
-	if (ComboEffectiveTime > 0.0f)
-	{
-		//타이머 발동
-		// ComboCheck 함수 실행
-		//가록 마지막의 의미 반복하지 않도록 -  False
-		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &AWeapon::ComboCheck, ComboEffectiveTime, false);
-
-		//딜레이를 위한 타이머 ,깡통 타이머
-		/*GetWorld()->GetTimerManager().SetTimer(ComboTimerdelayHandle,
-			FTimerDelegate::CreateLambda([this]() {ComboOK = true; }), ComoboDelay, false);*/
-	}
-
-
-}
 
 void AWeapon::ComboCheck()
 {
-	//UE_LOG(LogTemp, Warning, TEXT("ComboCheck"));
-	ComboTimerHandle.Invalidate();
-	ComboTimerdelayHandle.Invalidate();
-
+	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	if (HasNextComboCommand)
 	{
 
-		//UE_LOG(LogTemp, Warning, TEXT("ComboStart"));
-		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-
-		FOnMontageEnded* CurrentMontage = AnimInstance->Montage_GetEndedDelegate(ComboMontage);
-		CurrentMontage->Unbind();
-		//maxComboCount 콤보 값을 벗어나면 안되기 때문에 
-		//다음 콤보 숫자 저장 
+		if (!CurrentMontageEndDelegate)
+		{
+			SLOG(TEXT("WHartthe"));
+			return;
+		}
+		CurrentMontageEndDelegate->Unbind();
 		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboData->MaxComboCount);
 
 		//다음 섹션의 이름 정보 저장
@@ -160,11 +114,12 @@ void AWeapon::ComboCheck()
 		//몽타주 다음 섹션을 연결
 		AnimInstance->Montage_SetNextSection(AnimInstance->Montage_GetCurrentSection(), NextSection, ComboMontage);
 
-
-
+		//SLOG(TEXT("NextSection : %s"), *NextSection.ToString());
+		
 		//몽타주 다음 섹션 재생
 		AnimInstance->Montage_Play(ComboMontage, ComboPlayTime);
 		AnimInstance->Montage_JumpToSection(NextSection, ComboMontage);
+
 
 		//플레이어 캐릭터만 값 받아서 돌리기
 		APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OwnerCharacter);
@@ -173,26 +128,31 @@ void AWeapon::ComboCheck()
 			playerCharacter->SetbIsAttackRotation(true);
 		}
 
-		FOnMontageEnded EndDelegate;
-		EndDelegate.BindUObject(this, &AWeapon::ComboEnd);
-		AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
+		//FOnMontageEnded EndDelegate;
+		 EndDelegate.BindUObject(this, &AWeapon::ComboEnd);
+		 AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
+		 CurrentMontageEndDelegate = AnimInstance->Montage_GetEndedDelegate(ComboMontage);
 
+		
 		if (CurrentCombo == ComboData->MaxComboCount)
+		{
+
 			return;
-
-
-		ComboCheckTimer();
+		}
+			
 
 		HasNextComboCommand = false;
-	}
 
+		
+	}
+	
 
 }
 
 void AWeapon::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("END"));
 
+	//SLOG(TEXT("MontageEnd"));
 	ensure(CurrentCombo != 0);
 	CurrentCombo = 0;
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OwnerCharacter);
