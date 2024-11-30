@@ -12,3 +12,5 @@
 FString::Printf(TEXT("[LOG] ")) + FString::Printf(_log_, ##__VA_ARGS__),       \
 	true, true,FLinearColor::Green, 3.0f);
 
+#define TAG_ENEMY	TEXT("Enemy")
+#define TAG_PLAYER	TEXT("Player")

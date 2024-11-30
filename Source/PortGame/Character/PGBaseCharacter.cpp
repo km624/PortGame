@@ -5,7 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Data/ComboData.h"
-#include "Animation/AnimMontage.h"
+//#include "Animation/AnimMontage.h"
 #include "Component/PGStatComponent.h"
 #include "Component/PGAttackComponent.h"
 #include "PortGame/PortGame.h"
@@ -13,6 +13,8 @@
 #include "Component/PGWidgetComponent.h"
 //#include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
+#include "Physics/PGCollision.h"
+#include "MotionWarpingComponent.h"
 
 
 // Sets default values
@@ -43,7 +45,8 @@ APGBaseCharacter::APGBaseCharacter()
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -100.0f), FRotator(0.0f, -90.0f, 0.0f));
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 
-	GetCapsuleComponent()->SetCollisionProfileName(TEXT("PGCapsule"));
+	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_PGCAPSULE);
+
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Skeletal(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
 	if (Skeletal.Object)
@@ -62,7 +65,7 @@ APGBaseCharacter::APGBaseCharacter()
 	//StatComponent 추가
 	StatComponent = CreateDefaultSubobject<UPGStatComponent>(TEXT("STAT"));
 
-
+	MotionWarpingComponent = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("Motion_Warp"));
 
 	//widget 컴포넌트 추가
 	HpBarWidgetComponent = CreateDefaultSubobject<UPGWidgetComponent>(TEXT("Widget"));
@@ -106,6 +109,8 @@ void APGBaseCharacter::BeginPlay()
 	StatComponent->OnHitGaugeZero.AddUObject(this, &ThisClass::PlayHitMontage);
 
 	StatComponent->OnHpZero.AddUObject(this, &ThisClass::SetDead);
+
+	//SetPlayerCharacterType();
 }
 
 void APGBaseCharacter::AttackToComponent()
@@ -133,6 +138,7 @@ float APGBaseCharacter::ReturnAimOffset()
 	rtemp.Normalize();
 	float Direction = rtemp.Pitch;
 	AimOffset = FMath::Clamp(Direction, -55.0f, 55.0f);
+	
 	return AimOffset;
 }
 
@@ -191,10 +197,6 @@ float APGBaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	//7강에서 추가
-	StatComponent->Damaged(DamageAmount);
-
-	// 받을 데미지 값
 	return DamageAmount;
 }
 

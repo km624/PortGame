@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "Interface/GunRecoilInterface.h"
+#include "Interface/PlayerCameraShakeInterface.h"
 #include "PGPlayerController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PORTGAME_API APGPlayerController : public APlayerController, public IGunRecoilInterface
+class PORTGAME_API APGPlayerController : public APlayerController, public IPlayerCameraShakeInterface
 {
 	GENERATED_BODY()
 
@@ -33,6 +33,7 @@ protected:
 	TObjectPtr<class UPGHudWidget> PGHudWidget;
 
 protected:
-	virtual void GunRecoilCameraShake(TSubclassOf<class UCameraShakeBase> camerashake) override;
+	//virtual void GunRecoilCameraShake(TSubclassOf<class UCameraShakeBase> camerashake) override;
+	virtual void PlayCameraShake(TSubclassOf<class UCameraShakeBase> camerashake) override;
 	
 };

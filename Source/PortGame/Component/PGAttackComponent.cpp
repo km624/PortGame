@@ -8,12 +8,18 @@
 #include "Data/WeaponData.h"
 #include "Engine/DamageEvents.h"
 #include "Interface/AttackHitStopInterface.h"
+#include "Interface/PlayerCameraShakeInterface.h"
+#include "Physics/PGCollision.h"
 
 UPGAttackComponent::UPGAttackComponent()
 {
 	//PrimaryComponentTick.bCanEverTick = true;
 	bWantsInitializeComponent = true;
-
+	static ConstructorHelpers::FClassFinder<UCameraShakeBase> AttackCameraShake(TEXT("/Script/Engine.Blueprint'/Game/PortGame/Effect/CameraShake/AttackCameraShake.AttackCameraShake_C'"));
+	if (AttackCameraShake.Class)
+	{
+		AttackCameraShakeClass = AttackCameraShake.Class;
+	}
 }
 
 
@@ -71,7 +77,7 @@ void UPGAttackComponent::AttackToWeapon()
 
 	if (Weapon)
 		Weapon->Attack();
-	//SLOG(TEXT("AttackClick"));
+	
 }
 
 void UPGAttackComponent::ComboCheckStart()
@@ -112,7 +118,7 @@ void UPGAttackComponent::AttackHitCheck()
 		Start,
 		End,
 		FQuat::Identity,
-		ECC_GameTraceChannel1,
+		CCHANNEL_PGACTION,
 		FCollisionShape::MakeSphere(AttackRadius),
 		Params
 	);
@@ -163,13 +169,19 @@ void UPGAttackComponent::AttackHitCheck()
 
 void UPGAttackComponent::AttackHitStop()
 {
-	GetOwner()->CustomTimeDilation = 0.1f;
+	GetOwner()->CustomTimeDilation = 0.01f;
 	GetWorld()->GetTimerManager().SetTimer(
 		HitStoptimerHandle,
 		[this]() {
 			GetOwner()->CustomTimeDilation = 1.0f;
-		}, 0.3f, false
+		}, 0.2f, false
 	);
+	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
+	IPlayerCameraShakeInterface* playerCamera = Cast<IPlayerCameraShakeInterface>(BaseCharacter->GetController());
+	if (playerCamera)
+	{
+		playerCamera->PlayCameraShake(AttackCameraShakeClass);
+	}
 }
 
 

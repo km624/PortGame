@@ -30,10 +30,9 @@ APGPlayerCharacter::APGPlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	TargetingComponent = CreateDefaultSubobject<UTargetingComponent>(TEXT("Targeting_Comp"));
+	
+	
 
-	MotionWarpingComponent = CreateDefaultSubobject<UMotionWarpingComponent>(TEXT("Motion_Warp"));
-	
-	
 	static ConstructorHelpers::FObjectFinder<UPGCharacterData> CharacterBaseData
 	(TEXT("/Script/PortGame.PGCharacterData'/Game/PortGame/Input/PG_InputBaseData.PG_InputBaseData'"));
 	if (CharacterBaseData.Object)
@@ -102,6 +101,8 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		TargetSideAction = SideTargeting.Object;
 	}
+
+	Tags.Add(TAG_PLAYER);
 }
 
 void APGPlayerCharacter::BeginPlay()
@@ -367,6 +368,15 @@ void APGPlayerCharacter::AimUpdate(float deltaTime)
 
 	Camera->SetRelativeLocation(FVector(AimX, AimY, 0.0f));
 	
+}
+
+float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (DamageCauser->ActorHasTag(TAG_ENEMY))
+	{
+		StatComponent->Damaged(DamageAmount);
+	}
+	return DamageAmount;
 }
 
 

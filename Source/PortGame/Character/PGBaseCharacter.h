@@ -4,23 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-//#include "Interface/ComboCheckInterface.h"
+#include "Data/CharacterEnumData.h"
 #include "Interface/PGSetHpbarCharacterInterface.h"
 #include "Interface/PlayerAttackInterface.h"
 #include "Struct/PGCharacterStat.h"
 #include "PGBaseCharacter.generated.h"
 
-UENUM(BlueprintType)
-enum class EPlayerCharacterType :uint8
-{
-	BlueArchive = 0,
-	Nikke,
-	ETC
-};
-
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnbIsAimDelegate, bool /*bIsaim*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnbIshootDelegate, bool /*bIsShoot*/);
-//DECLARE_MULTICAST_DELEGATE_OneParam(FOnbIsReloadDelegate, bool /*bIsShoot*/);
+
 DECLARE_MULTICAST_DELEGATE(FOnbIsReloadDelegate);
 
 UCLASS()
@@ -50,6 +42,8 @@ protected:
 	//에임 관해서
 
 public:
+	FORCEINLINE void SetPlayerCharacterType(EPlayerCharacterType newType) { CharacterType = newType; }
+
 	FORCEINLINE bool GetCurrentIsAiming() const { return bIsAim; }
 
 	FORCEINLINE bool GetCurrentIsShooting() const { return bIsShoot; }
@@ -62,19 +56,19 @@ public:
 	//에임 중일때 앵니메이션
 	float ReturnAimOffset();
 
-	FORCEINLINE FOnbIshootDelegate& GetbIshootDelegate() { return OnbIsShoot; }
+	/*FORCEINLINE FOnbIshootDelegate& GetbIshootDelegate() { return OnbIsShoot; }
 
-	FORCEINLINE FOnbIsReloadDelegate& GetbIsReloadDelegate() { return OnbIsReload; }
+	FORCEINLINE FOnbIsReloadDelegate& GetbIsReloadDelegate() { return OnbIsReload; }*/
 
 	FORCEINLINE FVector GetAimLocation() {return AimLocation;}
 
 	
 	
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	uint8 bIsAim : 1;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	uint8 bIsShoot : 1;
 
 	UPROPERTY()
@@ -82,6 +76,8 @@ protected:
 
 	UPROPERTY()
 	float AimOffset;
+
+public:
 
 	FOnbIsAimDelegate OnbIsAim;
 
@@ -159,7 +155,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
 	TObjectPtr<class UAnimMontage> DeadMontage;
 
-	
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MotionWarping, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComponent;
+
 
 
 };

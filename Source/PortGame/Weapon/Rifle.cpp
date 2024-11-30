@@ -10,7 +10,10 @@
 #include "Weapon/BlockAim.h"
 #include "Data/WeaponData.h"
 #include "Data/GunWeaponData.h"
-#include "Interface/GunRecoilInterface.h"
+#include "Interface/PlayerCameraShakeInterface.h"
+#include "Physics/PGCollision.h"
+#include "Interface/AttackHitStopInterface.h"
+#include "Character/PGNpcCharacter.h"
 
 ARifle::ARifle()
 {
@@ -32,10 +35,15 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 		WeaponStaticComponent->SetStaticMesh(WeaponMesh);
 
 	}
-	OwnerCharacter->GetbIshootDelegate().AddUObject(this,
+	/*OwnerCharacter->GetbIshootDelegate().AddUObject(this,
 		&ThisClass::ShootCheck);
 	OwnerCharacter->GetbIsReloadDelegate().AddUObject(this,
+		&ThisClass::Reloading);*/
+	OwnerCharacter->OnbIsShoot.AddUObject(this,
+		&ThisClass::ShootCheck);
+	OwnerCharacter->OnbIsReload.AddUObject(this,
 		&ThisClass::Reloading);
+
 	if (weaponData)
 	{
 		UGunWeaponData* gunWeaponData = Cast<UGunWeaponData>(weaponData);
@@ -55,6 +63,7 @@ void ARifle::Attack()
 	Super::Attack();
 	if (OwnerCharacter->GetCurrentIsShooting())
 	{
+		SLOG(TEXT("Fire"));
 		if (!FireTimerHandle.IsValid() && !ReloadTimerHandle.IsValid() && !StopTimerHandle.IsValid()
 			&& CurrentCombo == 0)
 		{
@@ -65,6 +74,7 @@ void ARifle::Attack()
 	}
 	else
 	{
+		SLOG(TEXT("Combo"));
 		if (ReloadTimerHandle.IsValid())
 		{
 			GetWorldTimerManager().ClearTimer(ReloadTimerHandle);
@@ -147,7 +157,6 @@ void ARifle::Reloading()
 	);
 }
 
-
 void ARifle::FireWithLineTrace()
 {
 	
@@ -165,8 +174,9 @@ void ARifle::FireWithLineTrace()
 	const FVector Camerastart = OwnerCharacter->GetAimLocation();
 	//카메라 시작지점
 	FVector CameraLoc = OwnerCharacter->GetAimLocation();
-	const FVector CameraEnd = CameraLoc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() * (traceDistance);
-
+	//const FVector CameraEnd = CameraLoc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() * (traceDistance);
+	const FVector CameraEnd = CameraLoc +OwnerCharacter->GetController()->GetControlRotation().Vector() * (traceDistance);
+	
 	FHitResult hitResult;
 	FCollisionQueryParams collisionParams;
 	TArray <AActor*> ignoreActor;
@@ -178,27 +188,43 @@ void ARifle::FireWithLineTrace()
 
 	FVector end;
 	DrawDebugLine(currentWorld, Camerastart, CameraEnd, FColor::Green, false, 1.0f);
-	if (currentWorld)
+	
+	//플레이어인지 확인
+	IAttackHitStopInterface* Player = Cast<IAttackHitStopInterface>(OwnerCharacter);
+	if (Player)
 	{
-		bool OutHitResult = currentWorld->LineTraceSingleByChannel(
-			hitResult,
-			Camerastart,
-			CameraEnd,
-			ECollisionChannel::ECC_Visibility,
-			collisionParams);
-		// 명중!
-		if (OutHitResult)
+		if (currentWorld)
 		{
-		
-			FVector ForwardVector = GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector();
-			FVector HitLocationWithOffset = hitResult.Location + (ForwardVector * 50.0f);
-			end = HitLocationWithOffset;
-			
-			//UE_LOG(LogTemp, Warning, TEXT("Hit"));
-		}
-		else
-			end = CameraLoc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() * traceDistance;
+			bool OutHitResult = currentWorld->LineTraceSingleByChannel(
+				hitResult,
+				Camerastart,
+				CameraEnd,
+				ECollisionChannel::ECC_Visibility,
+				collisionParams);
+			// 명중!
+			if (OutHitResult)
+			{
 
+				//FVector ForwardVector = GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector();
+				FVector ForwardVector = OwnerCharacter->GetController()->GetControlRotation().Vector();
+				FVector HitLocationWithOffset = hitResult.Location + (ForwardVector * 50.0f);
+				end = HitLocationWithOffset;
+
+				//UE_LOG(LogTemp, Warning, TEXT("Hit"));
+			}
+			else
+				end = OwnerCharacter->GetController()->GetControlRotation().Vector() * traceDistance;
+			//end = CameraLoc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() * traceDistance;
+
+		}
+	}	
+	else
+	{
+		APGNpcCharacter* NPCPlayer = Cast<APGNpcCharacter>(OwnerCharacter);
+		if (NPCPlayer)
+		{
+			end = NPCPlayer->GetTargetPawn()->GetActorLocation();
+		}
 	}
 
 	const FVector start = WeaponStaticComponent->GetSocketLocation(WeaponSocket);
@@ -210,14 +236,14 @@ void ARifle::FireWithLineTrace()
 			hitResult,
 			start,
 			end,
-			ECC_GameTraceChannel1,
+			CCHANNEL_PGACTION,
 			collisionParams);
 		// 명중!
 		if (OutHitResult)
 		{
 
 			FDamageEvent DamageEvent;
-			hitResult.GetActor()->TakeDamage(5.0f, DamageEvent, OwnerCharacter->GetController(), this);
+			hitResult.GetActor()->TakeDamage(5.0f, DamageEvent, OwnerCharacter->GetController(), OwnerCharacter);
 		}
 
 	}
@@ -230,10 +256,10 @@ void ARifle::FireWithLineTrace()
 
 void ARifle::StartGaunRecoil()
 {
-	IGunRecoilInterface* gunrecoil = Cast<IGunRecoilInterface>(OwnerCharacter->GetController());
+	IPlayerCameraShakeInterface* gunrecoil = Cast<IPlayerCameraShakeInterface>(OwnerCharacter->GetController());
 	if (gunrecoil)
 	{
-		gunrecoil->GunRecoilCameraShake(CameraShakeClass);
+		gunrecoil->PlayCameraShake(CameraShakeClass);
 	}
 }
 

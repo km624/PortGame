@@ -31,6 +31,8 @@ public:
 
 	void AttackToWeapon();
 
+	FORCEINLINE class UWeaponData* GetWeaponData() { return WeaponData; }
+
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UWeaponData> WeaponData;
@@ -47,6 +49,7 @@ public:
 	void ComboCheckStart();
 
 	void CombocheckEnd();
+
 	
 protected:
 	FOnNextComboDelegate OnNextCombo;
@@ -65,6 +68,9 @@ protected:
 protected:
 	FTimerHandle HitStoptimerHandle;
 	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CamreShake)
+	TSubclassOf<class UCameraShakeBase> AttackCameraShakeClass;
 
 
 	

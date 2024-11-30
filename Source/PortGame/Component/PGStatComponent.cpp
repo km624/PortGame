@@ -36,9 +36,9 @@ void UPGStatComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	SetMaxHitGauge(GetTotalStat().HitGauge);
 	SetCurrentRarity(CurrentCharacterRarity);
 
+	SetMaxHitGauge(GetTotalStat().HitGauge);
 	SetHp(GetTotalStat().MaxHp);
 
 	SetHitGauge(MaxHitGauge);
@@ -47,8 +47,11 @@ void UPGStatComponent::InitializeComponent()
 
 void UPGStatComponent::SetCurrentRarity(FName rarity)
 {
-	if(AllStat.Find(rarity))
+	if (AllStat.Find(rarity))
+	{
+		CurrentCharacterRarity = rarity;
 		SetBaseStat(CurrentCharacterRarity);
+	}
 }
 
 void UPGStatComponent::SetHp(float NewHp)

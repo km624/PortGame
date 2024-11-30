@@ -47,7 +47,8 @@ void APGPlayerController::OnPossess(APawn* aPawn)
 	}
 }
 
-void APGPlayerController::GunRecoilCameraShake(TSubclassOf<class UCameraShakeBase> camerashake)
+void APGPlayerController::PlayCameraShake(TSubclassOf<class UCameraShakeBase> camerashake)
 {
 	ClientStartCameraShake(camerashake);
 }
+

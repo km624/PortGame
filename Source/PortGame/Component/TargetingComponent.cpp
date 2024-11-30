@@ -6,6 +6,7 @@
 #include "PortGame/PortGame.h"
 #include "Character/PGPlayerCharacter.h"
 #include "Character/PGBaseCharacter.h"
+#include "Physics/PGCollision.h"
 
 
 
@@ -123,7 +124,7 @@ AActor* UTargetingComponent::FindClosestEnemy()
 		Start,
 		End,
 		FQuat::Identity,
-		ECC_GameTraceChannel1,
+		CCHANNEL_PGACTION,
 		FCollisionShape::MakeSphere(SerachRadius),
 		Params
 	);

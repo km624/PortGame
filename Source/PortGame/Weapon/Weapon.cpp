@@ -9,6 +9,7 @@
 #include "PortGame/PortGame.h"
 #include "Data/WeaponData.h"
 #include "Character/PGPlayerCharacter.h"
+#include "Interface/PGNPCCharacterInterface.h"
 
 AWeapon::AWeapon()
 {
@@ -162,7 +163,16 @@ void AWeapon::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 	}
 	
 	//12강 AI  - AI가 끝날때를 파악할 수 있게 추가
-	//NotifyComboActionEnd();
+	NotifyComboActionEnd();
+}
+
+void AWeapon::NotifyComboActionEnd()
+{
+	IPGNPCCharacterInterface* NPCEnd = Cast<IPGNPCCharacterInterface>(OwnerCharacter);
+	if (NPCEnd)
+	{
+		NPCEnd->NotifyComboEnd();
+	}
 }
 
 

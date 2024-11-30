@@ -5,6 +5,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 //#include "GameFramework/Character.h"
 #include "Character/PGPlayerCharacter.h"
+#include "Character/PGBaseCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
 
 //#include "Kismet/KismetAnimationLibrary.h"
@@ -43,20 +44,20 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		CharacterDirection = CalculateDirection(Owner->GetVelocity(), Owner->GetActorRotation());
 		//UE_LOG(LogTemp, Warning, TEXT("%f"), GroundSpeed);
 	}
-	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(Owner);
-	if (IsValid(playerCharacter))
+	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(Owner);
+	if (IsValid(BaseCharacter))
 	{
-		bIsAiming = playerCharacter->GetCurrentIsAiming();
+		bIsAiming = BaseCharacter->GetCurrentIsAiming();
 	}
 
 	if (bIsAiming)
-		AimOffsetPitch = playerCharacter->ReturnAimOffset();
+		AimOffsetPitch = BaseCharacter->ReturnAimOffset();
 	else
 		AimOffsetPitch = 0.0f;
 
-	if (IsValid(playerCharacter))
+	if (IsValid(BaseCharacter))
 	{
-		bIsReloading = playerCharacter->GetCurrentIsReloading();
+		bIsReloading = BaseCharacter->GetCurrentIsReloading();
 	}
 	
 }

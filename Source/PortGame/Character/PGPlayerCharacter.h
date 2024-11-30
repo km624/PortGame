@@ -119,6 +119,7 @@ protected:
 	UFUNCTION()
 	void AimUpdate(float deltaTime);
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	//HUD
 protected:
@@ -137,16 +138,11 @@ protected:
 	TObjectPtr<class UTargetingComponent> TargetingComponent;
 
 
-
 	//모션워핑
 public:
 
 	void SetMotionWarpingLocation(FVector targetPos);
 
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MotionWarping, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComponent;
-	
 
 	//공격중 회전구현
 public:

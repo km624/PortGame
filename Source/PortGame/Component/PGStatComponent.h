@@ -52,7 +52,7 @@ public:
 
 	FORCEINLINE void SetBaseStat(FName rarity) 
 	{
-		BaseStat = AllStat[rarity]; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat(), GetMaxHitGauge());
+		BaseStat = AllStat[rarity];  OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat(), GetMaxHitGauge());
 	}
 	FORCEINLINE void SetModifierStat(const FPGCharacterStat& InModifierStat)
 		{ ModifierStat = InModifierStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat(), GetMaxHitGauge()); }
