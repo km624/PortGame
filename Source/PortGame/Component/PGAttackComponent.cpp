@@ -149,13 +149,14 @@ void UPGAttackComponent::AttackHitCheck()
 
 					if (parry)
 					{
+						ParryCount++;
 						stoptime = 1.0f;
 						AttackHitStop(stoptime, ParrayCameraShakeClass);
 						NPC->NPCAttackHitStop(stoptime);
 					}
 					else
 					{
-						AttackHitStop(stoptime/0.8f, AttackCameraShakeClass);
+						AttackHitStop(stoptime/0.75f, AttackCameraShakeClass);
 						NPC->NPCAttackHitStop(stoptime);
 					}
 						
@@ -196,9 +197,11 @@ void UPGAttackComponent::AttackHitCheck()
 void UPGAttackComponent::AttackHitStop(float time, TSubclassOf<class UCameraShakeBase> camerashake)
 {
 	GetOwner()->CustomTimeDilation = 0.01f;
+	bIsGodMode = true;
 	GetWorld()->GetTimerManager().SetTimer(
 		HitStoptimerHandle,
 		[this]() {
+			bIsGodMode = false;
 			GetOwner()->CustomTimeDilation = 1.0f;
 		}, time, false
 	);

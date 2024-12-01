@@ -152,6 +152,7 @@ protected:
 	//그로기상태
 	uint8 bIsGroggy : 1;
 
+
 	UFUNCTION()
 	void SetDead();
 

@@ -9,7 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-#include "Engine/LocalPlayer.h"
+//#include "Engine/LocalPlayer.h"
 #include "PGCharacterData.h"
 #include "Components/TimelineComponent.h"
 #include "UI/PGHudWidget.h"
@@ -19,6 +19,7 @@
 #include "PortGame/PortGame.h"
 #include "MotionWarpingComponent.h"
 #include "Component/TargetingComponent.h"
+#include "Component/PGAttackComponent.h"
 
 
 
@@ -376,6 +377,7 @@ void APGPlayerCharacter::AimUpdate(float deltaTime)
 
 float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (AttackComponent->GetbIsGodMode())return DamageAmount;
 	if (DamageCauser->ActorHasTag(TAG_ENEMY))
 	{
 		StatComponent->Damaged(DamageAmount);

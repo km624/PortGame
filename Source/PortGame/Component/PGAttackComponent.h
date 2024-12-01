@@ -75,7 +75,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CamreShake)
 	TSubclassOf<class UCameraShakeBase>	ParrayCameraShakeClass;
 
+public:
+	FORCEINLINE bool GetbIsGodMode() { return bIsGodMode; }
 
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = palyerState)
+	uint8 bIsGodMode : 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = palyerState)
+	int32 ParryCount = 0;
 	
 
 		

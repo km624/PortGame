@@ -165,7 +165,7 @@ void APGNpcCharacter::OnParryStart()
 {
 	
 	bIsParry = true;
-	CustomTimeDilation = 0.25f;
+	CustomTimeDilation = 0.3f;
 	
 		
 }
