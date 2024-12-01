@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotifyState.h"
-#include "ComboCheckAnimNotifyState.generated.h"
+#include "ParringTimeNotifyState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PORTGAME_API UComboCheckAnimNotifyState : public UAnimNotifyState
+class PORTGAME_API UParringTimeNotifyState : public UAnimNotifyState
 {
 	GENERATED_BODY()
 
@@ -18,5 +18,7 @@ public:
 	virtual void NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference) override;
 
 	virtual void NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
-	
+
 };
+	
+

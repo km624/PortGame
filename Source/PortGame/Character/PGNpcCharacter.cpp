@@ -55,12 +55,32 @@ void APGNpcCharacter::BeginPlay()
 
 float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+
 	if (DamageCauser->ActorHasTag(TAG_PLAYER))
 	{
-		StatComponent->Damaged(DamageAmount);
+		if (bIsParry)
+		{
+			SLOG(TEXT("SuccesParray"));
+			StatComponent->HitGaugeDamaged(GetTotalStat().HitGauge);
+			
+		}	
+		else
+			StatComponent->Damaged(DamageAmount);
 	}
 
 	return DamageAmount;
+}
+
+void APGNpcCharacter::NPCAttackHitStop(float time)
+{
+	CustomTimeDilation = 0.01f;
+	GetWorld()->GetTimerManager().SetTimer(
+		NPCHitStoptimerHandle,
+		[this]() {
+			CustomTimeDilation = 1.0f;
+		}, time, false
+	);
+	
 }
 
 float APGNpcCharacter::GetPatrolRadius()
@@ -104,7 +124,7 @@ float APGNpcCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
 				bIsShoot = true;
 				bIsAim = true;
 				
-				SLOG(TEXT("ATTackRange: %f   gundRange : %f"), GetTotalStat().AttackRange * 2.5f, gundata->GunStat.traceDistance * 0.75);
+				
 				return gundata->GunStat.traceDistance * 0.75;
 			}
 		}
@@ -140,5 +160,30 @@ float APGNpcCharacter::AITurnSpeed()
 {
 	return TurnSpeed;
 }
+
+void APGNpcCharacter::OnParryStart()
+{
+	
+	bIsParry = true;
+	CustomTimeDilation = 0.25f;
+	
+		
+}
+
+void APGNpcCharacter::OnParryEnd()
+{
+
+	bIsParry = false;
+	CustomTimeDilation = 1.0f;
+}
+
+bool APGNpcCharacter::GetBisParry() const
+{
+	return bIsParry;
+}
+
+
+
+
 
 

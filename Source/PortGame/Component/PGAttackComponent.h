@@ -63,7 +63,7 @@ public:
 
 	//공격 살짝 멈추기 (플레이어만 해당)
 protected:
-	void AttackHitStop();
+	void AttackHitStop(float time, TSubclassOf<class UCameraShakeBase> camerashake);
 
 protected:
 	FTimerHandle HitStoptimerHandle;
@@ -71,6 +71,9 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CamreShake)
 	TSubclassOf<class UCameraShakeBase> AttackCameraShakeClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CamreShake)
+	TSubclassOf<class UCameraShakeBase>	ParrayCameraShakeClass;
 
 
 	

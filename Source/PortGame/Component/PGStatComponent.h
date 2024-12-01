@@ -72,6 +72,8 @@ public:
 public:
 
 	void Damaged(float Damage);
+	
+	void HitGaugeDamaged(float Damage);
 
 	//юс╫ц
 //protected:

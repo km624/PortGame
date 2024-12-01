@@ -116,19 +116,43 @@ void UPGStatComponent::Damaged(float Damage)
 
 	const float PrevHp = CurrentHp;
 	const float ActualDamage = FMath::Clamp<float>(Damage, 0, Damage);
-	const float PrevHitGauge = CurretHitGauge;
+	//const float PrevHitGauge = CurretHitGauge;
 	
+	
+
+	SetHp(PrevHp - ActualDamage);
+	//SetHitGauge(PrevHitGauge - ActualDamage);
+
+	//if (CurretHitGauge <= KINDA_SMALL_NUMBER)
+	//{
+	//	//UE_LOG(LogTemp, Warning, TEXT("GaugeEnd"));
+	//	OnHitGaugeZero.Broadcast();
+	//	HitGaugeZeroEffect();
+	//}
+	HitGaugeDamaged(Damage);
+
+	if (CurrentHp <= KINDA_SMALL_NUMBER)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Stat : Dead"));
+		OnHpZero.Broadcast();
+	}
+	
+}
+
+void UPGStatComponent::HitGaugeDamaged(float Damage)
+{
+	const float PrevHitGauge = CurretHitGauge;
+
 
 	GetWorld()->GetTimerManager().SetTimer(
 		ResetHitGaugeTimer,
 		[this]() {
-		SetHitGauge(MaxHitGauge);
+			SetHitGauge(GetTotalStat().HitGauge);
 		},
 		3.0f, false
 	);
 
-	SetHp(PrevHp - ActualDamage);
-	SetHitGauge(PrevHitGauge - ActualDamage);
+	SetHitGauge(PrevHitGauge - Damage);
 
 	if (CurretHitGauge <= KINDA_SMALL_NUMBER)
 	{
@@ -136,12 +160,6 @@ void UPGStatComponent::Damaged(float Damage)
 		OnHitGaugeZero.Broadcast();
 		HitGaugeZeroEffect();
 	}
-	if (CurrentHp <= KINDA_SMALL_NUMBER)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Stat : Dead"));
-		OnHpZero.Broadcast();
-	}
-	
 }
 
 

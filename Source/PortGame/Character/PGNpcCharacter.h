@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "Character/PGBaseCharacter.h"
 #include "Interface/PGNPCCharacterInterface.h"
+#include "Interface/NPCParryCheckInterface.h"
 #include "PGNpcCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PORTGAME_API APGNpcCharacter : public APGBaseCharacter ,public IPGNPCCharacterInterface
+class PORTGAME_API APGNpcCharacter : public APGBaseCharacter ,public IPGNPCCharacterInterface , public INPCParryCheckInterface
 {
 	GENERATED_BODY()
 	
@@ -22,6 +23,11 @@ public:
 
 protected:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	virtual void NPCAttackHitStop(float time) override;
+
+protected:
+	FTimerHandle NPCHitStoptimerHandle;
 
 	virtual float GetPatrolRadius() override;
 
@@ -59,6 +65,18 @@ public:
 
 protected:
 	TObjectPtr<APawn> TargetPawn;
+
+	//패리 시스템
+protected:
+	virtual void OnParryStart() override;
+
+	virtual void OnParryEnd() override;
+
+	virtual bool GetBisParry() const override;
+
+protected:
+	UPROPERTY(VisibleAnywhere)
+	uint8 bIsParry : 1;
 
 
 };

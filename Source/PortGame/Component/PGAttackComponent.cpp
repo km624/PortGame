@@ -10,6 +10,8 @@
 #include "Interface/AttackHitStopInterface.h"
 #include "Interface/PlayerCameraShakeInterface.h"
 #include "Physics/PGCollision.h"
+#include "Interface/NPCParryCheckInterface.h"
+
 
 UPGAttackComponent::UPGAttackComponent()
 {
@@ -19,6 +21,11 @@ UPGAttackComponent::UPGAttackComponent()
 	if (AttackCameraShake.Class)
 	{
 		AttackCameraShakeClass = AttackCameraShake.Class;
+	}
+	static ConstructorHelpers::FClassFinder<UCameraShakeBase> ParryCameraShake(TEXT("/Script/Engine.Blueprint'/Game/PortGame/Effect/CameraShake/ParryCameraShake.ParryCameraShake_C'"));
+	if (ParryCameraShake.Class)
+	{
+		ParrayCameraShakeClass = ParryCameraShake.Class;
 	}
 }
 
@@ -122,10 +129,10 @@ void UPGAttackComponent::AttackHitCheck()
 		FCollisionShape::MakeSphere(AttackRadius),
 		Params
 	);
-
+	bool parry=false;
+	float stoptime = 0.2f;
 	if (HitDetected)
 	{
-
 		for (const FHitResult& Hit : OutHitResults)
 		{
 			if (Hit.GetActor())
@@ -133,11 +140,29 @@ void UPGAttackComponent::AttackHitCheck()
 				IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
 				if (playerCharacter)
 				{
-					AttackHitStop();
+					
+					INPCParryCheckInterface* NPC = Cast<INPCParryCheckInterface>(Hit.GetActor());
+					if (NPC)
+					{
+						parry = NPC->GetBisParry();
+					}
+
+					if (parry)
+					{
+						stoptime = 1.0f;
+						AttackHitStop(stoptime, ParrayCameraShakeClass);
+						NPC->NPCAttackHitStop(stoptime);
+					}
+					else
+					{
+						AttackHitStop(stoptime/0.8f, AttackCameraShakeClass);
+						NPC->NPCAttackHitStop(stoptime);
+					}
+						
 				}
 				FDamageEvent DamageEvent;
 				Hit.GetActor()->TakeDamage(AttackDamage, DamageEvent, BaseCharacter->GetController(), BaseCharacter);
-				SLOG(TEXT("HIT : %s"), *Hit.GetActor()->GetActorLabel());
+			
 
 			}
 		}
@@ -168,20 +193,20 @@ void UPGAttackComponent::AttackHitCheck()
 #endif
 }
 
-void UPGAttackComponent::AttackHitStop()
+void UPGAttackComponent::AttackHitStop(float time, TSubclassOf<class UCameraShakeBase> camerashake)
 {
 	GetOwner()->CustomTimeDilation = 0.01f;
 	GetWorld()->GetTimerManager().SetTimer(
 		HitStoptimerHandle,
 		[this]() {
 			GetOwner()->CustomTimeDilation = 1.0f;
-		}, 0.2f, false
+		}, time, false
 	);
 	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
 	IPlayerCameraShakeInterface* playerCamera = Cast<IPlayerCameraShakeInterface>(BaseCharacter->GetController());
 	if (playerCamera)
 	{
-		playerCamera->PlayCameraShake(AttackCameraShakeClass);
+		playerCamera->PlayCameraShake(camerashake);
 	}
 }
 

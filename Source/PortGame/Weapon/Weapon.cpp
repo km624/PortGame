@@ -153,8 +153,9 @@ void AWeapon::ComboCheck()
 void AWeapon::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
 
-	//SLOG(TEXT("MontageEnd"));
-	ensure(CurrentCombo != 0);
+	
+	//ensure(CurrentCombo != 0);
+	
 	CurrentCombo = 0;
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OwnerCharacter);
 	if (playerCharacter)

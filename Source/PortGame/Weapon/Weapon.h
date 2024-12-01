@@ -59,7 +59,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UComboData> ComboData;
-
+	UPROPERTY(VisibleAnywhere)
 	int32 CurrentCombo = 0;
 
 	float ComboPlayTime;
