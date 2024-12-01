@@ -37,6 +37,7 @@ protected:
 
 	virtual float AITurnSpeed() override;
 
+
 	
 
 protected:
@@ -48,6 +49,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TurnSpeed;
+
 
 
 	FAICharacterAttackFinished OnAttackFinished;

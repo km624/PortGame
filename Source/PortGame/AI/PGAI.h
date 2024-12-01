@@ -4,3 +4,4 @@
 #define BBKEY_PATROLPOS TEXT("PatrolPos")
 #define BBKEY_TARGET TEXT("Target")
 #define BBKEY_INATTACKRANGE TEXT("InAttackRange")
+#define BBKEY_CIRCLEPOS TEXT("CirclePos")

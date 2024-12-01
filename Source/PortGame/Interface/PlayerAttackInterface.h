@@ -27,4 +27,6 @@ public:
 	virtual void ComboCheckStartToComp() = 0;
 
 	virtual void ComboCheckEndToComp() = 0;
+
+	virtual void HitGaugeZeroEffect() = 0;
 };

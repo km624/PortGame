@@ -37,4 +37,5 @@ public:
 
 	virtual float AITurnSpeed() = 0;
 
+
 };

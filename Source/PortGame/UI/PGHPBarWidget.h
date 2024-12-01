@@ -22,6 +22,10 @@ protected:
 
 	virtual void NativeConstruct() override;
 
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+	
+
 public:
 
 	void SetUpWaidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat, float NewMaxHitGauge);
@@ -30,6 +34,17 @@ public:
 	void UpdateHpBar(float NewCurrentHp);
 
 	void UpdateHitGaugeBar(float NewHitGauge);
+
+protected:
+	void SmoothingHp(float deltatime);
+
+	void SmoothingHitGauge(float deltatime);
+
+protected:
+
+float PreviousHpPercent;
+
+float PreviousHitGaugePercent;
 
 protected:
 	UPROPERTY(meta = (BindWidget))
@@ -52,6 +67,6 @@ protected:
 	float MaxHitGauge;
 
 	UPROPERTY()
-	float CurrenHitGauge;
+	float CurrentHitGauge;
 
 };

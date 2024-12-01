@@ -2,6 +2,8 @@
 
 
 #include "Component/PGStatComponent.h"
+#include "Interface/PlayerAttackInterface.h"
+#include "TimerManager.h"
 
 
 UPGStatComponent::UPGStatComponent()
@@ -38,10 +40,10 @@ void UPGStatComponent::InitializeComponent()
 
 	SetCurrentRarity(CurrentCharacterRarity);
 
-	SetMaxHitGauge(GetTotalStat().HitGauge);
+	//SetMaxHitGauge(GetTotalStat().HitGauge);
 	SetHp(GetTotalStat().MaxHp);
 
-	SetHitGauge(MaxHitGauge);
+	SetHitGauge(GetTotalStat().HitGauge);
 
 }
 
@@ -93,16 +95,37 @@ void UPGStatComponent::SetLevelCharacter(int32 level)
 
 void UPGStatComponent::ResetHitGauge()
 {
-	SetHitGauge(MaxHitGauge);
+	GetWorld()->GetTimerManager().ClearTimer(ResetHitGaugeTimer);
+	SetHitGauge(GetTotalStat().HitGauge);
+}
+
+void UPGStatComponent::HitGaugeZeroEffect()
+{
+	IPlayerAttackInterface* character = Cast<IPlayerAttackInterface>(GetOwner());
+	if (character)
+	{
+		character->HitGaugeZeroEffect();
+	}
+	ResetHitGauge();
 }
 
 void UPGStatComponent::Damaged(float Damage)
 {
+
+	GetWorld()->GetTimerManager().ClearTimer(ResetHitGaugeTimer);
+
 	const float PrevHp = CurrentHp;
 	const float ActualDamage = FMath::Clamp<float>(Damage, 0, Damage);
-
 	const float PrevHitGauge = CurretHitGauge;
 	
+
+	GetWorld()->GetTimerManager().SetTimer(
+		ResetHitGaugeTimer,
+		[this]() {
+		SetHitGauge(MaxHitGauge);
+		},
+		3.0f, false
+	);
 
 	SetHp(PrevHp - ActualDamage);
 	SetHitGauge(PrevHitGauge - ActualDamage);
@@ -111,7 +134,7 @@ void UPGStatComponent::Damaged(float Damage)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("GaugeEnd"));
 		OnHitGaugeZero.Broadcast();
-		ResetHitGauge();
+		HitGaugeZeroEffect();
 	}
 	if (CurrentHp <= KINDA_SMALL_NUMBER)
 	{

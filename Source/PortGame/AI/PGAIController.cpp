@@ -6,6 +6,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/BlackboardData.h"
 #include "AI/PGAI.h"
+#include "PortGame/PortGame.h"
 
 APGAIController::APGAIController()
 {
@@ -49,4 +50,16 @@ void APGAIController::OnPossess(APawn* pawn)
 	Super::OnPossess(pawn);
 
 	RunAI();
+}
+
+void APGAIController::StopTree()
+{
+	StopAI();
+
+}
+
+void APGAIController::StartTree()
+{
+	RunAI();
+	SLOG(TEXT("STOPAI"));
 }

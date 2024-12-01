@@ -111,6 +111,10 @@ void APGPlayerCharacter::BeginPlay()
 
 	SetCharacterData(CurrentControlData);
 
+	//юс╫ц╥н
+	StatComponent->SetCurrentRarity(TEXT("Normal"));
+	StatComponent->SetHitGauge(GetTotalStat().HitGauge);
+	StatComponent->SetHp(GetTotalStat().MaxHp);
 
 	FOnTimelineFloat TimelineProgress;
 	TimelineProgress.BindUFunction(this, FName("AimUpdate")); 

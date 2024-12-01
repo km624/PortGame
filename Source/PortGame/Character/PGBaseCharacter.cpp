@@ -5,16 +5,16 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Data/ComboData.h"
-//#include "Animation/AnimMontage.h"
+#include "Animation/AnimMontage.h"
 #include "Component/PGStatComponent.h"
 #include "Component/PGAttackComponent.h"
 #include "PortGame/PortGame.h"
 #include "UI/PGHPBarWidget.h"
 #include "Component/PGWidgetComponent.h"
-//#include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 #include "Physics/PGCollision.h"
 #include "MotionWarpingComponent.h"
+#include "Interface/AIControllerInterface.h"
 
 
 // Sets default values
@@ -115,6 +115,8 @@ void APGBaseCharacter::BeginPlay()
 
 void APGBaseCharacter::AttackToComponent()
 {
+	//그로기면 공격x
+	if (bIsGroggy) return;
 	AttackComponent->AttackToWeapon();
 	
 }
@@ -202,6 +204,15 @@ float APGBaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 void APGBaseCharacter::PlayHitMontage()
 {
+	//GetController()->
+	GetController()->SetIgnoreMoveInput(true);
+	bIsGroggy = true;
+	
+	IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
+	if (AIController)
+	{
+		AIController->StopTree();
+	}
 	//맞는 애니메이션
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->StopAllMontages(0.0f);
@@ -212,9 +223,25 @@ void APGBaseCharacter::PlayHitMontage()
 
 }
 
+void APGBaseCharacter::HitGaugeZeroEffect()
+{
+	
+	FVector BackwardVector = -GetActorForwardVector(); 
+	GetCharacterMovement()->AddImpulse(BackwardVector * 1000.0f, true);
+	
+}
+
 void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
-	//StatComponent->ResetHitGauge();
+	GetController()->SetIgnoreMoveInput(false);
+	bIsGroggy = false;
+
+	IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
+	if (AIController)
+	{
+		AIController->StartTree();
+	}
+	
 }
 
 void APGBaseCharacter::SetDead()

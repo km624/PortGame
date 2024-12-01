@@ -9,7 +9,7 @@
 
 UBTService_AttackRange::UBTService_AttackRange()
 {
-	NodeName = TEXT("CanAttack");
+	NodeName = TEXT("DetectAttackRange");
 	Interval = 0.5f;
 }
 

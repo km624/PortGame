@@ -63,7 +63,7 @@ void ARifle::Attack()
 	Super::Attack();
 	if (OwnerCharacter->GetCurrentIsShooting())
 	{
-		SLOG(TEXT("Fire"));
+		
 		if (!FireTimerHandle.IsValid() && !ReloadTimerHandle.IsValid() && !StopTimerHandle.IsValid()
 			&& CurrentCombo == 0)
 		{
@@ -74,7 +74,7 @@ void ARifle::Attack()
 	}
 	else
 	{
-		SLOG(TEXT("Combo"));
+		
 		if (ReloadTimerHandle.IsValid())
 		{
 			GetWorldTimerManager().ClearTimer(ReloadTimerHandle);

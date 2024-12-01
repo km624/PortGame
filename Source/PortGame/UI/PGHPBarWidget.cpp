@@ -5,11 +5,15 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Interface/PGSetHpbarCharacterInterface.h"
+#include "PortGame/PortGame.h"
 
 UPGHPBarWidget::UPGHPBarWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
 	MaxHp = -1.0f;
 	MaxHitGauge = -1.0f;
+	PreviousHpPercent = -1.0f;
+	PreviousHitGaugePercent = -1.0f;
+
 }
 
 void UPGHPBarWidget::NativeConstruct()
@@ -18,6 +22,7 @@ void UPGHPBarWidget::NativeConstruct()
 	//widget 이름으로 찾기
 	/*HpProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PbHpBar")));
 	ensure(HpProgressBar);*/
+	this->SetVisibility(ESlateVisibility::Hidden);
 
 	IPGSetHpbarCharacterInterface* CharacterWidget = Cast<IPGSetHpbarCharacterInterface>(OwningActor);
 	if (CharacterWidget)
@@ -27,11 +32,22 @@ void UPGHPBarWidget::NativeConstruct()
 	}
 }
 
+void UPGHPBarWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	SmoothingHp(InDeltaTime);
+	SmoothingHitGauge(InDeltaTime);
+}	
+
 void UPGHPBarWidget::SetUpWaidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat, float NewMaxHitGauge)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("SetupWidget"));
+	
 	MaxHp = (Stat + ModifierStat).MaxHp;
-	MaxHitGauge = NewMaxHitGauge;
+	CurrentHp = MaxHp;
+	MaxHitGauge = (Stat + ModifierStat).HitGauge;
+	CurrentHitGauge = MaxHitGauge;
+
 	if (ProgressBar_HpBar)
 	{
 		ProgressBar_HpBar->SetPercent(CurrentHp / MaxHp);
@@ -44,7 +60,7 @@ void UPGHPBarWidget::SetUpWaidget(const FPGCharacterStat& Stat, const FPGCharact
 	if (ProgressBar_HitGauge)
 	{
 
-		ProgressBar_HitGauge->SetPercent(CurrenHitGauge / MaxHitGauge);
+		ProgressBar_HitGauge->SetPercent(CurrentHitGauge / MaxHitGauge);
 
 	}
 
@@ -57,21 +73,22 @@ void UPGHPBarWidget::SetUpWaidget(const FPGCharacterStat& Stat, const FPGCharact
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Textblocks miss"));
 	}
-
+	this->SetVisibility(ESlateVisibility::Visible);
 }
 
 void UPGHPBarWidget::UpdateHpBar(float NewCurrentHp)
 {
-	CurrentHp = NewCurrentHp;
+	//이전 백분율
+	PreviousHpPercent = CurrentHp / MaxHp;
+
+	//CurrentHp = NewCurrentHp;
+
 	ensure(MaxHp > 0.0f);
 	if (ProgressBar_HpBar)
 	{
-		//프로그래스바 설정
-		//이거(UMG 모듈은 기본적으로 설정 안되있음 
-		// Build.cs에서 "UMG" 추가해야함
-
 		
-		ProgressBar_HpBar->SetPercent(CurrentHp / MaxHp);
+		CurrentHp = NewCurrentHp;
+		//ProgressBar_HpBar->SetPercent(CurrentHp / MaxHp);
 
 
 	}
@@ -86,12 +103,31 @@ void UPGHPBarWidget::UpdateHpBar(float NewCurrentHp)
 
 void UPGHPBarWidget::UpdateHitGaugeBar(float NewHitGauge)
 {
-	CurrenHitGauge = NewHitGauge;
+	PreviousHitGaugePercent = CurrentHitGauge / MaxHitGauge;
+	//CurrenHitGauge = NewHitGauge;
 	//ensure(CurrenHitGauge > 0.0f);
 	if (ProgressBar_HitGauge)
 	{
-
-		ProgressBar_HitGauge->SetPercent(CurrenHitGauge / MaxHitGauge);
+		CurrentHitGauge = NewHitGauge;
+		//ProgressBar_HitGauge->SetPercent(CurrenHitGauge / MaxHitGauge);
 
 	}
+}
+
+void UPGHPBarWidget::SmoothingHp(float deltatime)
+{
+	
+	float CurrentHpPercent = CurrentHp / MaxHp;
+	
+	float NewHpPercent = FMath::FInterpTo(PreviousHpPercent, CurrentHpPercent, deltatime, 2.0f);
+	ProgressBar_HpBar->SetPercent(NewHpPercent);
+	PreviousHpPercent = NewHpPercent;
+}
+
+void UPGHPBarWidget::SmoothingHitGauge(float deltatime)
+{
+	float CurrentHitGaugePercent = CurrentHitGauge / MaxHitGauge;
+	float newHitGaugePercent = FMath::FInterpTo(PreviousHitGaugePercent, CurrentHitGaugePercent, deltatime, 2.0f);
+	ProgressBar_HitGauge->SetPercent(newHitGaugePercent);
+	PreviousHitGaugePercent = newHitGaugePercent;
 }

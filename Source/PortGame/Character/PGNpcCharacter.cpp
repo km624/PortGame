@@ -20,9 +20,11 @@ APGNpcCharacter::APGNpcCharacter()
 
 	PatrolRadius = 1000.0f;
 
-	DetectRange = 500.0f;
+	DetectRange = 1000.0f;
 
 	TurnSpeed = 10.0f;
+
+
 
 	Tags.Add(TAG_ENEMY);
 
@@ -39,13 +41,16 @@ void APGNpcCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//юс╫ц
 	StatComponent->SetCurrentRarity(TEXT("NPC"));
+	StatComponent->SetHitGauge(GetTotalStat().HitGauge);
+	StatComponent->SetHp(GetTotalStat().MaxHp);
 
-	/*if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
+	if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
 	{
 		bIsAim = true;
 		
-	}*/
+	}
 }
 
 float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -67,14 +72,13 @@ float APGNpcCharacter::GetPatrolRadius()
 float APGNpcCharacter::GetAIDetectRange()
 {
 	
-
 	if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
 	{
 		UGunWeaponData* gundata = Cast<UGunWeaponData>(AttackComponent->GetWeaponData());
 		if (gundata)
 		{
 			
-			return DetectRange*2;
+			return DetectRange*1.25;
 		}
 	}
 	
@@ -86,12 +90,10 @@ float APGNpcCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
 	if (pawn)
 	{
 		TargetPawn = pawn;
-	}
-	else
-	{
-		bIsAim = false;
-	}
 		
+	}
+	
+
 	if (targetDistance > GetTotalStat().AttackRange * 2.5f)
 	{
 		if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
@@ -100,8 +102,9 @@ float APGNpcCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
 			if (gundata)
 			{
 				bIsShoot = true;
-				//bIsAim = true;
+				bIsAim = true;
 				
+				SLOG(TEXT("ATTackRange: %f   gundRange : %f"), GetTotalStat().AttackRange * 2.5f, gundata->GunStat.traceDistance * 0.75);
 				return gundata->GunStat.traceDistance * 0.75;
 			}
 		}

@@ -143,7 +143,14 @@ protected:
 	UFUNCTION()
 	void PlayHitMontage();
 
+	//뒤로 밀리게
+	virtual void HitGaugeZeroEffect() override;
+
 	void HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
+
+protected:
+	//그로기상태
+	uint8 bIsGroggy : 1;
 
 	UFUNCTION()
 	void SetDead();

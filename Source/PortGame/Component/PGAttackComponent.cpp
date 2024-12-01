@@ -137,6 +137,7 @@ void UPGAttackComponent::AttackHitCheck()
 				}
 				FDamageEvent DamageEvent;
 				Hit.GetActor()->TakeDamage(AttackDamage, DamageEvent, BaseCharacter->GetController(), BaseCharacter);
+				SLOG(TEXT("HIT : %s"), *Hit.GetActor()->GetActorLabel());
 
 			}
 		}

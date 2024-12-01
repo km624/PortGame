@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Interface/AIControllerInterface.h"
 #include "PGAIController.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PORTGAME_API APGAIController : public AAIController
+class PORTGAME_API APGAIController : public AAIController,public IAIControllerInterface
 {
 	GENERATED_BODY()
 
@@ -31,4 +32,8 @@ private:
 	UPROPERTY()
 	TObjectPtr<class UBehaviorTree> BTAsset;
 	
+protected:
+	virtual void StopTree() override;
+
+	virtual void StartTree() override;
 };

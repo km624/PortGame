@@ -69,17 +69,25 @@ public:
 	FORCEINLINE float  GetMaxHitGauge() { return MaxHitGauge; }
 	FORCEINLINE float  GetCurrentHitGauge() { return CurretHitGauge; }
 	
-
-	void ResetHitGauge();
+public:
 
 	void Damaged(float Damage);
-	
-protected:
+
+	//юс╫ц
+//protected:
 	void SetHp(float NewHp);
 
 	void SetHitGauge(float NewHitGauge);
 
 	void SetLevelCharacter(int32 level);
+
+protected:
+
+	void ResetHitGauge();
+
+	void HitGaugeZeroEffect();
+	
+
 	
 protected:
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
@@ -99,6 +107,8 @@ protected:
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float CurretHitGauge;
+
+	FTimerHandle ResetHitGaugeTimer;
 
 	
 

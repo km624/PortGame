@@ -2,7 +2,6 @@
 
 
 #include "AI/BTService_Detect.h"
-#include "DrawDebugHelpers.h"
 #include "AIController.h"
 #include "Interface/PGNPCCharacterInterface.h"
 #include "PGAI.h"
@@ -10,6 +9,7 @@
 #include "Physics/PGCollision.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/OverlapResult.h"
+#include "PortGame/PortGame.h"
 
 
 UBTService_Detect::UBTService_Detect()
@@ -62,14 +62,17 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			APawn* Pawn = Cast<APawn>(OverlapResult.GetActor());
 			if (Pawn && Pawn->GetController()->IsPlayerController())
 			{
-				//블랙보드 Target 값에 감지한 폰을 지정
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn);
+				if (Pawn->ActorHasTag(TAG_PLAYER))
+				{
+					OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn);
 
-				//해당영역들 표시
-				DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
-				DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
-				DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
-				return;
+					//해당영역들 표시
+						DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
+						DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
+						DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
+						return;
+				}
+
 			}
 		}
 	}

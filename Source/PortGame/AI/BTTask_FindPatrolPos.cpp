@@ -54,7 +54,7 @@ EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& O
 		FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
 
 		//서서히 해당 로테이션으로 지정된 속도로 돌아가게
-		ControllingPawn->SetActorRotation(FMath::RInterpTo(ControllingPawn->GetActorRotation(), TargetRot, GetWorld()->GetDeltaSeconds(), 25.0f));
+		ControllingPawn->SetActorRotation(FMath::RInterpTo(ControllingPawn->GetActorRotation(), TargetRot, GetWorld()->GetDeltaSeconds(), 100.0f));
 		return EBTNodeResult::Succeeded;
 	}
 
