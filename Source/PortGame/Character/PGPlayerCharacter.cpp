@@ -562,7 +562,7 @@ void APGPlayerCharacter::OnAvoidEffect()
 		EvadeTimerHandle,
 		[this]() {
 
-			CustomTimeDilation = 1.0f;
+			CustomTimeDilation = 1.3f;
 
 		}, EvadeTime, false
 	);
