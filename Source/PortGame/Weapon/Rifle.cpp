@@ -35,10 +35,7 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 		WeaponStaticComponent->SetStaticMesh(WeaponMesh);
 
 	}
-	/*OwnerCharacter->GetbIshootDelegate().AddUObject(this,
-		&ThisClass::ShootCheck);
-	OwnerCharacter->GetbIsReloadDelegate().AddUObject(this,
-		&ThisClass::Reloading);*/
+	
 	OwnerCharacter->OnbIsShoot.AddUObject(this,
 		&ThisClass::ShootCheck);
 	OwnerCharacter->OnbIsReload.AddUObject(this,
@@ -150,7 +147,7 @@ void ARifle::Reloading()
 		ReloadTimerHandle,
 		[this]() {
 			Currentammo = ammoMaxCount;
-			//UE_LOG(LogTemp, Warning, TEXT("Reloading"));
+			
 			OwnerCharacter->SetbIsReload(false);
 			ReloadTimerHandle.Invalidate();
 		}, reloadingTime, false
@@ -174,7 +171,7 @@ void ARifle::FireWithLineTrace()
 	const FVector Camerastart = OwnerCharacter->GetAimLocation();
 	//카메라 시작지점
 	FVector CameraLoc = OwnerCharacter->GetAimLocation();
-	//const FVector CameraEnd = CameraLoc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() * (traceDistance);
+	
 	const FVector CameraEnd = CameraLoc +OwnerCharacter->GetController()->GetControlRotation().Vector() * (traceDistance);
 	
 	FHitResult hitResult;
@@ -201,25 +198,25 @@ void ARifle::FireWithLineTrace()
 				CameraEnd,
 				ECollisionChannel::ECC_Visibility,
 				collisionParams);
-			// 명중!
+			
 			if (OutHitResult)
 			{
 
-				//FVector ForwardVector = GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector();
 				FVector ForwardVector = OwnerCharacter->GetController()->GetControlRotation().Vector();
 				FVector HitLocationWithOffset = hitResult.Location + (ForwardVector * 50.0f);
 				end = HitLocationWithOffset;
 
-				//UE_LOG(LogTemp, Warning, TEXT("Hit"));
+			
 			}
 			else
 				end = OwnerCharacter->GetController()->GetControlRotation().Vector() * traceDistance;
-			//end = CameraLoc + GetWorld()->GetFirstPlayerController()->GetControlRotation().Vector() * traceDistance;
+			
 
 		}
 	}	
 	else
 	{
+		//이때는 NPC
 		APGNpcCharacter* NPCPlayer = Cast<APGNpcCharacter>(OwnerCharacter);
 		if (NPCPlayer)
 		{
@@ -228,6 +225,11 @@ void ARifle::FireWithLineTrace()
 	}
 
 	const FVector start = WeaponStaticComponent->GetSocketLocation(WeaponSocket);
+
+	//데미지
+	float GundDamage = OwnerCharacter->GetTotalStat().Attack*0.1f;
+	if (OwnerCharacter->ActorHasTag(TAG_ENEMY))
+		GundDamage *= 0.5f;
 	
 	DrawDebugLine(currentWorld, start, end, FColor::Red, false, 1.0f);
 	if (currentWorld)
@@ -238,12 +240,12 @@ void ARifle::FireWithLineTrace()
 			end,
 			CCHANNEL_PGACTION,
 			collisionParams);
-		// 명중!
+		
 		if (OutHitResult)
 		{
 
 			FDamageEvent DamageEvent;
-			hitResult.GetActor()->TakeDamage(5.0f, DamageEvent, OwnerCharacter->GetController(), OwnerCharacter);
+			hitResult.GetActor()->TakeDamage(GundDamage, DamageEvent, OwnerCharacter->GetController(), OwnerCharacter);
 		}
 
 	}

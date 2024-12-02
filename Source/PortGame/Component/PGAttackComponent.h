@@ -78,6 +78,7 @@ protected:
 public:
 	FORCEINLINE bool GetbIsGodMode() { return bIsGodMode; }
 
+	FORCEINLINE void SetbIsGodMode(bool isgod) { bIsGodMode = isgod; }
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = palyerState)
 	uint8 bIsGodMode : 1;

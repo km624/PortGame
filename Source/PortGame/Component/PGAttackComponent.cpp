@@ -55,6 +55,8 @@ void UPGAttackComponent::SetUpWeapon()
 {
 	if (WeaponClass)
 	{
+
+
 		
 		AWeapon* spawnWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClass);
 
@@ -111,9 +113,17 @@ void UPGAttackComponent::AttackHitCheck()
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, GetOwner());
 
 	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
-	const float AttackRange = BaseCharacter->GetTotalStat().AttackRange;
-	const float AttackRadius = BaseCharacter->GetTotalStat().AttackRange;
-	const float AttackDamage = BaseCharacter->GetTotalStat().Attack;
+
+	 float AttackRange = BaseCharacter->GetTotalStat().AttackRange;
+	 float AttackRadius = BaseCharacter->GetTotalStat().AttackRange;
+	 float AttackDamage = BaseCharacter->GetTotalStat().Attack;
+	//ENEMY면 공격력 거리 짧게
+	if(BaseCharacter->ActorHasTag(TAG_ENEMY))
+	{
+		AttackRange *= 0.5f;
+		AttackRadius *= 0.5f;
+		AttackDamage *= 0.25f;
+	}
 
 	const FVector Start = BaseCharacter->GetActorLocation() + BaseCharacter->GetActorForwardVector() * BaseCharacter->GetCapsuleComponent()->GetScaledCapsuleRadius();
 
@@ -130,6 +140,9 @@ void UPGAttackComponent::AttackHitCheck()
 		Params
 	);
 	bool parry=false;
+
+	bool playerDash = false;
+
 	float stoptime = 0.2f;
 	if (HitDetected)
 	{
@@ -162,6 +175,9 @@ void UPGAttackComponent::AttackHitCheck()
 					}
 						
 				}
+
+				
+
 				FDamageEvent DamageEvent;
 				Hit.GetActor()->TakeDamage(AttackDamage, DamageEvent, BaseCharacter->GetController(), BaseCharacter);
 			

@@ -22,6 +22,7 @@
 #include "Component/PGAttackComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/PostProcessComponent.h"
+#include "Animation/AnimMontage.h"
 
 
 
@@ -106,7 +107,27 @@ APGPlayerCharacter::APGPlayerCharacter()
 		TargetSideAction = SideTargeting.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> Dash(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Dash.IA_Dash'"));
+	if (Dash.Object)
+	{
+		DashAction = Dash.Object;
+	}
+	
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> EvadeLeft(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/EvadeLeftMontage.EvadeLeftMontage'"));
+	if (EvadeLeft.Object)
+	{
+		LeftEvadeMontage = EvadeLeft.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> EvadeRight(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/EvadeRightMontage.EvadeRightMontage'"));
+	if (EvadeRight.Object)
+	{
+		RightEvadeMontage =EvadeRight.Object;
+	}
+
 	Tags.Add(TAG_PLAYER);
+
+	
 
 	
 }
@@ -166,6 +187,8 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(TargetAction, ETriggerEvent::Started, this, &APGPlayerCharacter::FindClosestEnemyToComp);
 
 		EnhancedInputComponent->BindAction(TargetSideAction, ETriggerEvent::Started, this, &APGPlayerCharacter::FindSideEnemyToComp);
+
+		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &APGPlayerCharacter::OnDash);
 	
 	}
 	else
@@ -296,7 +319,7 @@ void APGPlayerCharacter::Look(const FInputActionValue& Value)
 
 void APGPlayerCharacter::Attack()
 {
-	if (bIsSlow)return;
+	if (bIsSlow||bIsDash)return;
 
 	if (bIsAim)
 	{
@@ -333,7 +356,7 @@ void APGPlayerCharacter::ReleasedAttack()
 
 void APGPlayerCharacter::PressAim()
 {
-	if (bIsSlow)return;
+	if (bIsSlow || bIsDash)return;
 
 	bIsAim = true;
 	OnbIsAim.Broadcast(bIsAim);
@@ -368,7 +391,7 @@ void APGPlayerCharacter::ReleasedAim()
 
 void APGPlayerCharacter::PressReload()
 {
-	if (bIsSlow) return;
+	if (bIsSlow||bIsDash) return;
 	ReloadToWeapon();
 }
 
@@ -386,7 +409,16 @@ void APGPlayerCharacter::AimUpdate(float deltaTime)
 
 float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (AttackComponent->GetbIsGodMode())return DamageAmount;
+	if (bIsDash)
+	{
+		if (bIsEvade) return DamageAmount;
+
+		OnAvoidEffect();
+		SetEvadeRotation(DamageCauser->GetActorLocation());
+	}
+
+	if (AttackComponent->GetbIsGodMode()) return DamageAmount;
+
 	if (DamageCauser->ActorHasTag(TAG_ENEMY))
 	{
 		StatComponent->Damaged(DamageAmount);
@@ -480,6 +512,103 @@ void APGPlayerCharacter::OnParryPostPorcess(bool effect)
 
 		PostProcessComponent->Settings.bOverride_SceneFringeIntensity = false;
 	}
+}
+
+void APGPlayerCharacter::OnDash()
+{
+	if(bIsDash) return;
+	bIsDash = true;
+	AttackComponent->SetbIsGodMode(true);
+	 OriginalMaxWalkSpeed = GetCharacterMovement()->GetMaxSpeed();
+	 OriginalMaxAcceleration = GetCharacterMovement()->GetMaxAcceleration();
+
+	GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed*2.0f;
+	GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration*3.0f;
+
+	DashVector = GetCharacterMovement()->GetLastInputVector();
+	
+	//GetController()->SetIgnoreMoveInput(true);
+	
+	GetWorld()->GetTimerManager().SetTimer(
+		DashTimerHandle,
+		[this]() {
+			
+			GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed;
+			GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration;
+			//GetController()->SetIgnoreMoveInput(false);
+			GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle); 
+
+			bIsDash = false;
+			AttackComponent->SetbIsGodMode(false);
+
+		}, DashTime, false
+	);
+}
+
+void APGPlayerCharacter::OnAvoidEffect()
+{
+
+	SLOG(TEXT("Avoid"));
+	bIsEvade = true;
+	PlayEvadeMontage();
+	CustomTimeDilation = 0.3f;
+
+	GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
+	GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed;
+	GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration;
+
+
+	GetWorld()->GetTimerManager().SetTimer(
+		EvadeTimerHandle,
+		[this]() {
+
+			CustomTimeDilation = 1.0f;
+
+		}, EvadeTime, false
+	);
+
+}
+
+void APGPlayerCharacter::PlayEvadeMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	// 오른쪽방향
+	if (DashVector.X > 0)
+	{
+		CurrentEvadeMontage = RightEvadeMontage;
+	}
+	else
+	{
+		CurrentEvadeMontage = LeftEvadeMontage;
+	}
+
+	AnimInstance->Montage_Play(CurrentEvadeMontage, 1.0f);
+
+	FOnMontageEnded EndDelegate;
+	EndDelegate.BindUObject(this, &APGPlayerCharacter::EndEvadeMontage);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, CurrentEvadeMontage);
+}
+
+void APGPlayerCharacter::EndEvadeMontage(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	GetWorld()->GetTimerManager().ClearTimer(EvadeTimerHandle);
+	bIsDash = false;
+	bIsEvade = false;
+	AttackComponent->SetbIsGodMode(false);
+}
+
+void APGPlayerCharacter::SetEvadeRotation(FVector TargetVector)
+{
+	FVector CharacterLocation = GetActorLocation();
+
+	// 타겟 방향 벡터를 계산합니다.
+	FVector DirectionToTarget = (TargetVector - CharacterLocation).GetSafeNormal();
+
+	// 타겟 방향으로 회전합니다.
+	FRotator NewRotation = DirectionToTarget.Rotation();
+
+	SetActorRotation(NewRotation);
 }
 
 

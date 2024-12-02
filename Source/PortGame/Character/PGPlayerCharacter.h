@@ -81,6 +81,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction>TargetSideAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction>DashAction;
+
 
 	//매개변수 받기 위해 헤더 인클루드
 	void Move(const struct FInputActionValue& Value);
@@ -175,6 +178,53 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PostEffect")
 	TObjectPtr<class UPostProcessComponent> PostProcessComponent;
+
+	//대시
+protected:
+	void OnDash();
+
+	void OnAvoidEffect();
+
+	void PlayEvadeMontage();
+
+	void EndEvadeMontage(UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	
+	void SetEvadeRotation(FVector TargetVector);
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
+	uint8 bIsDash : 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
+	float DashTime=0.25f;
+
+	FVector DashVector;
+
+	FTimerHandle DashTimerHandle;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
+	float OriginalMaxWalkSpeed;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
+	float OriginalMaxAcceleration;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
+	uint8 bIsEvade : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
+	TObjectPtr<class UAnimMontage> LeftEvadeMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
+	TObjectPtr<class UAnimMontage> RightEvadeMontage;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	TObjectPtr<class UAnimMontage> CurrentEvadeMontage;
+
+
+	FTimerHandle EvadeTimerHandle;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
+	float EvadeTime = 0.5f;
+
 
 	
 };
