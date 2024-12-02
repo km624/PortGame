@@ -192,6 +192,7 @@ void APGBaseCharacter::SetUpHpWidget(UPGUserWidget* InUserWidget)
 
 void APGBaseCharacter::AttackHitCheckToComp()
 {
+	if (bIsGroggy)return;
 	AttackComponent->AttackHitCheck();
 }
 

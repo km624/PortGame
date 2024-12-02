@@ -22,5 +22,7 @@ class PORTGAME_API IAttackHitStopInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	virtual void SetbIsSlowMotion(bool slowmotion) = 0;
 
+	virtual void OnParryPostPorcess(bool effect) = 0;
 };

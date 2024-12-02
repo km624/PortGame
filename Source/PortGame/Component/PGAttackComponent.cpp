@@ -151,6 +151,7 @@ void UPGAttackComponent::AttackHitCheck()
 					{
 						ParryCount++;
 						stoptime = 1.0f;
+						playerCharacter->OnParryPostPorcess(true);
 						AttackHitStop(stoptime, ParrayCameraShakeClass);
 						NPC->NPCAttackHitStop(stoptime);
 					}
@@ -196,15 +197,23 @@ void UPGAttackComponent::AttackHitCheck()
 
 void UPGAttackComponent::AttackHitStop(float time, TSubclassOf<class UCameraShakeBase> camerashake)
 {
+	IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
+	playerCharacter->SetbIsSlowMotion(true);
+
 	GetOwner()->CustomTimeDilation = 0.01f;
 	bIsGodMode = true;
+
 	GetWorld()->GetTimerManager().SetTimer(
 		HitStoptimerHandle,
-		[this]() {
+		[this, playerCharacter]() {
+			playerCharacter->SetbIsSlowMotion(false);
+			playerCharacter->OnParryPostPorcess(false);
 			bIsGodMode = false;
 			GetOwner()->CustomTimeDilation = 1.0f;
 		}, time, false
 	);
+
+	//카메라 쉐이크
 	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
 	IPlayerCameraShakeInterface* playerCamera = Cast<IPlayerCameraShakeInterface>(BaseCharacter->GetController());
 	if (playerCamera)

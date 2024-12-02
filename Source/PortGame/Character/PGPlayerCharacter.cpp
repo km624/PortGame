@@ -20,6 +20,8 @@
 #include "MotionWarpingComponent.h"
 #include "Component/TargetingComponent.h"
 #include "Component/PGAttackComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/PostProcessComponent.h"
 
 
 
@@ -32,7 +34,8 @@ APGPlayerCharacter::APGPlayerCharacter()
 
 	TargetingComponent = CreateDefaultSubobject<UTargetingComponent>(TEXT("Targeting_Comp"));
 	
-	
+	PostProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcess_Comp"));
+	PostProcessComponent->SetupAttachment(RootComponent);
 
 	static ConstructorHelpers::FObjectFinder<UPGCharacterData> CharacterBaseData
 	(TEXT("/Script/PortGame.PGCharacterData'/Game/PortGame/Input/PG_InputBaseData.PG_InputBaseData'"));
@@ -104,6 +107,8 @@ APGPlayerCharacter::APGPlayerCharacter()
 	}
 
 	Tags.Add(TAG_PLAYER);
+
+	
 }
 
 void APGPlayerCharacter::BeginPlay()
@@ -121,7 +126,7 @@ void APGPlayerCharacter::BeginPlay()
 	TimelineProgress.BindUFunction(this, FName("AimUpdate")); 
 	AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
 
-	
+
 }
 
 //인풋 매핑 - 액션에 함수 바인딩
@@ -291,6 +296,8 @@ void APGPlayerCharacter::Look(const FInputActionValue& Value)
 
 void APGPlayerCharacter::Attack()
 {
+	if (bIsSlow)return;
+
 	if (bIsAim)
 	{
 		bIsShoot = true;
@@ -326,14 +333,15 @@ void APGPlayerCharacter::ReleasedAttack()
 
 void APGPlayerCharacter::PressAim()
 {
-	
-		bIsAim = true;
-		OnbIsAim.Broadcast(bIsAim);
+	if (bIsSlow)return;
 
-		SetCharacterData(EControlData::Aim);
-		AimTimeline.PlayFromStart();
+	bIsAim = true;
+	OnbIsAim.Broadcast(bIsAim);
 
-		AimLocation = Camera->GetComponentLocation();
+	SetCharacterData(EControlData::Aim);
+	AimTimeline.PlayFromStart();
+
+	AimLocation = Camera->GetComponentLocation();
 	
 
 }
@@ -360,6 +368,7 @@ void APGPlayerCharacter::ReleasedAim()
 
 void APGPlayerCharacter::PressReload()
 {
+	if (bIsSlow) return;
 	ReloadToWeapon();
 }
 
@@ -444,6 +453,35 @@ void APGPlayerCharacter::SetAttackRotation(float dt)
 
 	SetActorRotation(NewRotation);
 }
+
+void APGPlayerCharacter::SetbIsSlowMotion(bool slowmotion)
+{
+	bIsSlow = slowmotion;
+}
+
+void APGPlayerCharacter::OnParryPostPorcess(bool effect)
+{
+	if (effect)
+	{
+	PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = true;
+	PostProcessComponent->Settings.bOverride_DepthOfFieldFocalDistance = true;
+	PostProcessComponent->Settings.DepthOfFieldFocalDistance =300.0f;
+	PostProcessComponent->Settings.DepthOfFieldSensorWidth = 750.0f;
+
+	PostProcessComponent->Settings.bOverride_SceneFringeIntensity = true;
+	PostProcessComponent->Settings.SceneFringeIntensity = 2.5f;
+	
+	
+	}
+	else
+	{
+		PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = false;
+		PostProcessComponent->Settings.bOverride_DepthOfFieldFocalDistance = false;
+
+		PostProcessComponent->Settings.bOverride_SceneFringeIntensity = false;
+	}
+}
+
 
 
 

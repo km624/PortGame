@@ -119,6 +119,7 @@ protected:
 	UFUNCTION()
 	void AimUpdate(float deltaTime);
 
+	//데미지
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	//HUD
@@ -160,5 +161,20 @@ protected:
 
 	uint8 bIsMoving : 1;
 
+	//공격 슬로우모션중
+protected:
+	virtual void SetbIsSlowMotion(bool slowmotion) override;
 
+protected:
+	uint8 bIsSlow : 1;
+
+	//포스트 프로세스 볼륨
+protected:
+	virtual void OnParryPostPorcess(bool effect) override;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PostEffect")
+	TObjectPtr<class UPostProcessComponent> PostProcessComponent;
+
+	
 };
