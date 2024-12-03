@@ -194,6 +194,7 @@ void APGBaseCharacter::AttackHitCheckToComp()
 {
 	if (bIsGroggy)return;
 	AttackComponent->AttackHitCheck();
+
 }
 
 float APGBaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -222,6 +223,7 @@ void APGBaseCharacter::PlayHitMontage()
 	EndDelegate.BindUObject(this, &APGBaseCharacter::HitMontageEnd);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, HitMontage);
 
+
 }
 
 void APGBaseCharacter::HitGaugeZeroEffect()
@@ -241,6 +243,9 @@ void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperl
 	if (AIController)
 	{
 		AIController->StartTree();
+
+		//юс╫ц
+		CustomTimeDilation = 1.0f;
 	}
 	
 }

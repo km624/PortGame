@@ -187,6 +187,10 @@ protected:
 
 	void PlayEvadeMontage();
 
+	void PlayEvadeCameraShake();
+
+	void  OnEvadePostPorcess(bool effect);
+
 	void EndEvadeMontage(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	
 	void SetEvadeRotation(FVector TargetVector);
@@ -219,15 +223,19 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TObjectPtr<class UAnimMontage> CurrentEvadeMontage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
+	TSubclassOf<class UCameraShakeBase>	EvadeCameraShakeClass;
 
 	FTimerHandle EvadeTimerHandle;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
 	float EvadeTime = 0.5f;
 
-
+	//범위 슬로우
 protected:
 	virtual void OnSlowOVerlapToNPC(float time) override;
 
-	
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Slow")
+	float SlowRadius = 500.0f;
 };

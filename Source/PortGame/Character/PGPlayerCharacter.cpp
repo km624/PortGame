@@ -25,6 +25,7 @@
 #include "Physics/PGCollision.h"
 #include "Engine/OverlapResult.h"
 #include "Interface/NPCParryCheckInterface.h"
+#include "Interface/PlayerCameraShakeInterface.h"
 
 
 
@@ -127,10 +128,13 @@ APGPlayerCharacter::APGPlayerCharacter()
 		RightEvadeMontage =EvadeRight.Object;
 	}
 
-	Tags.Add(TAG_PLAYER);
-
+	static ConstructorHelpers::FClassFinder<UCameraShakeBase> EvadeCameraShake(TEXT("/Script/Engine.Blueprint'/Game/PortGame/Effect/CameraShake/EvadeCameraShake.EvadeCameraShake_C'"));
+	if (EvadeCameraShake.Class)
+	{
+		EvadeCameraShakeClass = EvadeCameraShake.Class;
+	}
 	
-
+	Tags.Add(TAG_PLAYER);
 	
 }
 
@@ -552,12 +556,17 @@ void APGPlayerCharacter::OnAvoidEffect()
 
 	SLOG(TEXT("Avoid"));
 	bIsEvade = true;
+
 	PlayEvadeMontage();
+	PlayEvadeCameraShake();
+	OnEvadePostPorcess(true);
+
 	CustomTimeDilation = 0.3f;
 
 	GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
 	GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed;
 	GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration;
+
 
 	OnSlowOVerlapToNPC(EvadeTime);
 
@@ -565,7 +574,9 @@ void APGPlayerCharacter::OnAvoidEffect()
 		EvadeTimerHandle,
 		[this]() {
 
+			OnEvadePostPorcess(false);
 			CustomTimeDilation = 1.3f;
+			GetWorld()->GetTimerManager().ClearTimer(EvadeTimerHandle);
 
 		}, EvadeTime, false
 	);
@@ -593,6 +604,39 @@ void APGPlayerCharacter::PlayEvadeMontage()
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, CurrentEvadeMontage);
 }
 
+void APGPlayerCharacter::PlayEvadeCameraShake()
+{
+	IPlayerCameraShakeInterface* playerCamera = Cast<IPlayerCameraShakeInterface>(GetController());
+	if (playerCamera)
+	{
+		playerCamera->PlayCameraShake(EvadeCameraShakeClass);
+	}
+
+}
+
+void APGPlayerCharacter::OnEvadePostPorcess(bool effect)
+{
+	if (effect)
+	{
+		PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = true;
+		PostProcessComponent->Settings.bOverride_DepthOfFieldFocalDistance = true;
+		PostProcessComponent->Settings.DepthOfFieldFocalDistance = 300.0f;
+		PostProcessComponent->Settings.DepthOfFieldSensorWidth = 750.0f;
+
+		/*PostProcessComponent->Settings.bOverride_SceneFringeIntensity = true;
+		PostProcessComponent->Settings.SceneFringeIntensity = 2.5f;*/
+
+
+	}
+	else
+	{
+		PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = false;
+		PostProcessComponent->Settings.bOverride_DepthOfFieldFocalDistance = false;
+
+		//PostProcessComponent->Settings.bOverride_SceneFringeIntensity = false;
+	}
+}
+
 void APGPlayerCharacter::EndEvadeMontage(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
 	GetWorld()->GetTimerManager().ClearTimer(EvadeTimerHandle);
@@ -617,7 +661,8 @@ void APGPlayerCharacter::SetEvadeRotation(FVector TargetVector)
 void APGPlayerCharacter::OnSlowOVerlapToNPC(float time)
 {
 	FVector Center = GetActorLocation();
-	float SlowRadius = 500.0f;
+
+	//float SlowRadius = 500.0f;
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(SLowMotion), false, this);
 

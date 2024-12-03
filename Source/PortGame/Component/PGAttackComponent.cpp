@@ -139,9 +139,11 @@ void UPGAttackComponent::AttackHitCheck()
 		FCollisionShape::MakeSphere(AttackRadius),
 		Params
 	);
-	bool parry=false;
+	//패리 카운트
+	bool parry = false;
 
-	bool playerDash = false;
+	
+	//bool parryCheck = false;
 
 	float stoptime = 0.2f;
 	if (HitDetected)
@@ -154,28 +156,31 @@ void UPGAttackComponent::AttackHitCheck()
 		
 				if (playerCharacter)
 				{
-					
+					bool parryCheck = false;
 					INPCParryCheckInterface* NPC = Cast<INPCParryCheckInterface>(Hit.GetActor());
 					if (NPC)
 					{
-						parry = NPC->GetBisParry();
+						parryCheck = NPC->GetBisParry();
 					}
 
-					if (parry)
-					{
+					if (parryCheck)
+					{	
+						
 						ParryCount++;
 						stoptime = 1.0f;
-						playerCharacter->OnParryPostPorcess(true);
-						AttackHitStop(stoptime, ParrayCameraShakeClass);
+
+						parry = true;
+						/*playerCharacter->OnParryPostPorcess(true);
+						AttackHitStop(stoptime, ParrayCameraShakeClass);*/
 						
 						//NPC->NPCAttackHitStop(stoptime);
 					}
-					else
-					{
-						AttackHitStop(stoptime/0.75f, AttackCameraShakeClass);
-						
-						//NPC->NPCAttackHitStop(stoptime);
-					}
+					//else
+					//{
+					//	//AttackHitStop(stoptime/0.75f, AttackCameraShakeClass);
+					//	
+					//	//NPC->NPCAttackHitStop(stoptime);
+					//}
 						
 				}
 
@@ -183,8 +188,23 @@ void UPGAttackComponent::AttackHitCheck()
 				Hit.GetActor()->TakeDamage(AttackDamage, DamageEvent, BaseCharacter->GetController(), BaseCharacter);
 			}
 		}
-		if(playerCharacter)
+		if (playerCharacter)
+		{
 			playerCharacter->OnSlowOVerlapToNPC(stoptime);
+
+			if (parry)
+			{
+				playerCharacter->OnParryPostPorcess(true);
+				AttackHitStop(stoptime, ParrayCameraShakeClass);
+			}
+			else
+			{
+				AttackHitStop(stoptime / 0.75f, AttackCameraShakeClass);
+			}
+			
+		}
+
+			
 	}
 
 #if ENABLE_DRAW_DEBUG
@@ -214,6 +234,8 @@ void UPGAttackComponent::AttackHitCheck()
 
 void UPGAttackComponent::AttackHitStop(float time, TSubclassOf<class UCameraShakeBase> camerashake)
 {
+	if (HitStoptimerHandle.IsValid())return;
+
 	IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
 	playerCharacter->SetbIsSlowMotion(true);
 
@@ -227,6 +249,7 @@ void UPGAttackComponent::AttackHitStop(float time, TSubclassOf<class UCameraShak
 			playerCharacter->OnParryPostPorcess(false);
 			bIsGodMode = false;
 			GetOwner()->CustomTimeDilation = 1.0f;
+			GetWorld()->GetTimerManager().ClearTimer(HitStoptimerHandle);
 		}, time, false
 	);
 
