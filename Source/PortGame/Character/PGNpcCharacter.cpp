@@ -60,7 +60,7 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	{
 		if (bIsParry)
 		{
-			SLOG(TEXT("SuccesParray"));
+			//SLOG(TEXT("SuccesParray"));
 			StatComponent->HitGaugeDamaged(GetTotalStat().HitGauge);
 			
 		}	
@@ -73,11 +73,17 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 void APGNpcCharacter::NPCAttackHitStop(float time)
 {
+	if (currentSlowtime > time)return;
+	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
+	currentSlowtime = time;
+	float OrginTimeDilation = CustomTimeDilation;
+	SLOG(TEXT("NAme: %s , time: %f , origincustom: %f"),*GetActorLabel(), time,OrginTimeDilation);
 	CustomTimeDilation = 0.01f;
 	GetWorld()->GetTimerManager().SetTimer(
 		NPCHitStoptimerHandle,
-		[this]() {
-			CustomTimeDilation = 1.0f;
+		[this, OrginTimeDilation]() {
+			CustomTimeDilation = OrginTimeDilation;
+			GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
 		}, time, false
 	);
 	

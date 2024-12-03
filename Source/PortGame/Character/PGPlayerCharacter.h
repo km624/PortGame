@@ -226,5 +226,8 @@ protected:
 	float EvadeTime = 0.5f;
 
 
+protected:
+	virtual void OnSlowOVerlapToNPC(float time) override;
+
 	
 };

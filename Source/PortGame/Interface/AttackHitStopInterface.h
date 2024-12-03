@@ -25,4 +25,7 @@ public:
 	virtual void SetbIsSlowMotion(bool slowmotion) = 0;
 
 	virtual void OnParryPostPorcess(bool effect) = 0;
+	
+	virtual void OnSlowOVerlapToNPC(float time) = 0;
+
 };

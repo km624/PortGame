@@ -146,11 +146,12 @@ void UPGAttackComponent::AttackHitCheck()
 	float stoptime = 0.2f;
 	if (HitDetected)
 	{
+		IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
 		for (const FHitResult& Hit : OutHitResults)
 		{
 			if (Hit.GetActor())
 			{
-				IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
+		
 				if (playerCharacter)
 				{
 					
@@ -166,24 +167,24 @@ void UPGAttackComponent::AttackHitCheck()
 						stoptime = 1.0f;
 						playerCharacter->OnParryPostPorcess(true);
 						AttackHitStop(stoptime, ParrayCameraShakeClass);
-						NPC->NPCAttackHitStop(stoptime);
+						
+						//NPC->NPCAttackHitStop(stoptime);
 					}
 					else
 					{
 						AttackHitStop(stoptime/0.75f, AttackCameraShakeClass);
-						NPC->NPCAttackHitStop(stoptime);
+						
+						//NPC->NPCAttackHitStop(stoptime);
 					}
 						
 				}
 
-				
-
 				FDamageEvent DamageEvent;
 				Hit.GetActor()->TakeDamage(AttackDamage, DamageEvent, BaseCharacter->GetController(), BaseCharacter);
-			
-
 			}
 		}
+		if(playerCharacter)
+			playerCharacter->OnSlowOVerlapToNPC(stoptime);
 	}
 
 #if ENABLE_DRAW_DEBUG

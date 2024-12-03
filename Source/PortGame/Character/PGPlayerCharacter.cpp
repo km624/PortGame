@@ -9,7 +9,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-//#include "Engine/LocalPlayer.h"
 #include "PGCharacterData.h"
 #include "Components/TimelineComponent.h"
 #include "UI/PGHudWidget.h"
@@ -23,6 +22,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/PostProcessComponent.h"
 #include "Animation/AnimMontage.h"
+#include "Physics/PGCollision.h"
+#include "Engine/OverlapResult.h"
+#include "Interface/NPCParryCheckInterface.h"
 
 
 
@@ -557,6 +559,7 @@ void APGPlayerCharacter::OnAvoidEffect()
 	GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed;
 	GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration;
 
+	OnSlowOVerlapToNPC(EvadeTime);
 
 	GetWorld()->GetTimerManager().SetTimer(
 		EvadeTimerHandle,
@@ -609,6 +612,38 @@ void APGPlayerCharacter::SetEvadeRotation(FVector TargetVector)
 	FRotator NewRotation = DirectionToTarget.Rotation();
 
 	SetActorRotation(NewRotation);
+}
+
+void APGPlayerCharacter::OnSlowOVerlapToNPC(float time)
+{
+	FVector Center = GetActorLocation();
+	float SlowRadius = 500.0f;
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(SLowMotion), false, this);
+
+	bool bResult = GetWorld()->OverlapMultiByChannel(
+		OverlapResults,
+		Center,
+		FQuat::Identity,
+		CCHANNEL_PGACTION,
+		FCollisionShape::MakeSphere(SlowRadius),
+		CollisionQueryParam
+	);
+
+	if (bResult)
+	{
+		for (auto const& OverlapResult : OverlapResults)
+		{
+
+			INPCParryCheckInterface* NPC = Cast<INPCParryCheckInterface>(OverlapResult.GetActor());
+			if (NPC)
+			{
+				NPC->NPCAttackHitStop(time);
+				DrawDebugSphere(GetWorld(), Center, SlowRadius, 16, FColor::Purple, false, 0.3f);
+
+			}
+		}
+	}
 }
 
 

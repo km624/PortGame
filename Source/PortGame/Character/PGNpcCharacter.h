@@ -26,8 +26,13 @@ protected:
 
 	virtual void NPCAttackHitStop(float time) override;
 
+
 protected:
 	FTimerHandle NPCHitStoptimerHandle;
+
+	float currentSlowtime;
+
+protected:
 
 	virtual float GetPatrolRadius() override;
 
