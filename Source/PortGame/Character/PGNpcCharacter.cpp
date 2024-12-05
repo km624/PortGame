@@ -26,7 +26,7 @@ APGNpcCharacter::APGNpcCharacter()
 
 
 
-	Tags.Add(TAG_ENEMY);
+	Tags.Add(TAG_AI);
 
 	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 
@@ -49,6 +49,34 @@ void APGNpcCharacter::BeginPlay()
 	if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
 	{
 		bIsAim = true;
+		
+	}
+
+	//NPC Ä³¸¯ÅÍ ÆÀ »ö±ò ¼³Á¤
+	FLinearColor teamcolor = (TeamId != 1) ? FLinearColor::Red : FLinearColor::Blue;
+	
+	UMaterialInterface* CurrentMaterial = GetMesh()->GetMaterial(0);
+	if (CurrentMaterial)
+	{
+		
+		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurrentMaterial, this);
+
+		if (DynamicMaterial)
+		{
+			
+			DynamicMaterial->SetVectorParameterValue(TEXT("Tint"), teamcolor);
+
+			
+			GetMesh()->SetMaterial(0, DynamicMaterial);
+			if (GetMesh()->GetMaterial(0) == DynamicMaterial)
+			{
+				UE_LOG(LogTemp, Log, TEXT("Material Applied Successfully"));
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Material Not Applied"));
+			}
+		}
 		
 	}
 }
@@ -74,6 +102,7 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 void APGNpcCharacter::NPCAttackHitStop(float time)
 {
+	if (bIsDead)return;
 	if (currentSlowtime > time)return;
 	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
 	currentSlowtime = time;
@@ -88,6 +117,24 @@ void APGNpcCharacter::NPCAttackHitStop(float time)
 		}, time, false
 	);
 	
+}
+
+void APGNpcCharacter::SetDead()
+{
+	Super::SetDead();
+
+	APGAIController* aiController = Cast<APGAIController>(GetController());
+	
+	//Á×À¸¸é ¸ðµÎ ÃÊ±âÈ­
+	OnAttackFinished.Unbind();
+	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
+	if (aiController)
+	{
+		SLOG(TEXT("AI DEAD"));
+		aiController->BlackBoardReset();
+		aiController->StopAI();
+		aiController->StopMovement();
+	}
 }
 
 float APGNpcCharacter::GetPatrolRadius()

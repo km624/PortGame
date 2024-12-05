@@ -26,7 +26,7 @@ protected:
 
 	virtual void NPCAttackHitStop(float time) override;
 
-
+	virtual void SetDead() override;
 protected:
 	FTimerHandle NPCHitStoptimerHandle;
 

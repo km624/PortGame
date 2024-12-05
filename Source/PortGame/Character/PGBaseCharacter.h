@@ -155,7 +155,7 @@ protected:
 
 
 	UFUNCTION()
-	void SetDead();
+	virtual void SetDead();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")

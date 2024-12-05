@@ -7,6 +7,7 @@
 #include "Character/PGPlayerCharacter.h"
 #include "Character/PGBaseCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "PortGame/PortGame.h"
 
 //#include "Kismet/KismetAnimationLibrary.h"
 
@@ -20,6 +21,7 @@ UPGAnimInstance::UPGAnimInstance()
 void UPGAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
+
 	Owner = Cast<ACharacter>(GetOwningActor());
 	if (Owner)
 	{
@@ -33,6 +35,9 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
+	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(Owner);
+	
+
 	if (Movement)
 	{
 		Velocity = Movement->Velocity;
@@ -44,11 +49,12 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		CharacterDirection = CalculateDirection(Owner->GetVelocity(), Owner->GetActorRotation());
 		//UE_LOG(LogTemp, Warning, TEXT("%f"), GroundSpeed);
 	}
-	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(Owner);
+	//APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(Owner);
 	if (IsValid(BaseCharacter))
 	{
 		bIsAiming = BaseCharacter->GetCurrentIsAiming();
 	}
+
 
 	if (bIsAiming)
 		AimOffsetPitch = BaseCharacter->ReturnAimOffset();
@@ -58,6 +64,11 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (IsValid(BaseCharacter))
 	{
 		bIsReloading = BaseCharacter->GetCurrentIsReloading();
+	}
+
+	if (IsValid(BaseCharacter))
+	{
+		bIsDead = BaseCharacter->GetbIsDead();
 	}
 	
 }

@@ -15,3 +15,4 @@ FString::Printf(TEXT("[LOG] ")) + FString::Printf(_log_, ##__VA_ARGS__),       \
 #define TAG_ENEMY	TEXT("Enemy")
 #define TAG_PLAYER	TEXT("Player")
 #define TAG_NPC		TEXT("NPC")
+#define TAG_AI		TEXT("AI")

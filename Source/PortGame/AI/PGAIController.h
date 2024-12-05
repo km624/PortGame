@@ -22,6 +22,8 @@ public:
 	void RunAI();
 	void StopAI();
 
+	void BlackBoardReset();
+
 protected:
 	virtual void OnPossess(APawn* pawn) override;
 

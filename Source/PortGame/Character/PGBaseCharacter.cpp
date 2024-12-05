@@ -118,8 +118,8 @@ void APGBaseCharacter::BeginPlay()
 
 	SetGenericTeamId(TeamId);
 
-	FGenericTeamId currentteam = GetGenericTeamId();
-	SLOG(TEXT("actor : %s , myteamide : %d"), *GetActorLabel(), currentteam.GetId());
+	/*FGenericTeamId currentteam = GetGenericTeamId();
+	SLOG(TEXT("actor : %s , myteamide : %d"), *GetActorLabel(), currentteam.GetId());*/
 }
 
 void APGBaseCharacter::AttackToComponent()
@@ -215,7 +215,9 @@ float APGBaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 void APGBaseCharacter::PlayHitMontage()
 {
-	//GetController()->
+	if (bIsDead)
+		return;
+	
 	GetController()->SetIgnoreMoveInput(true);
 	bIsGroggy = true;
 	
@@ -237,7 +239,8 @@ void APGBaseCharacter::PlayHitMontage()
 
 void APGBaseCharacter::HitGaugeZeroEffect()
 {
-	
+	if (bIsDead)
+		return;
 	FVector BackwardVector = -GetActorForwardVector(); 
 	GetCharacterMovement()->AddImpulse(BackwardVector * 1000.0f, true);
 	
@@ -245,6 +248,9 @@ void APGBaseCharacter::HitGaugeZeroEffect()
 
 void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
+	if (bIsDead)
+		return;
+
 	GetController()->SetIgnoreMoveInput(false);
 	bIsGroggy = false;
 
@@ -261,18 +267,25 @@ void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperl
 
 void APGBaseCharacter::SetDead()
 {
+	
 	//ÀÌµ¿ ±â´É Á¦ÇÑ
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+
+	bIsDead = true;
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	//ÄÞº¸ µµÁß Á×À» ¼ö ÀÖÀ¸´Ï±î ´Ù¸¥ ¸ùÅ¸ÁÖ ¸ØÃã
 	AnimInstance->StopAllMontages(0.0f);
+
 	AnimInstance->Montage_Play(DeadMontage, 1.0f);
-	bIsDead = true;
+
+	
 	
 	SetActorEnableCollision(false);
 	
 	HpBarWidgetComponent->SetHiddenInGame(true);
+
+	//Destroy();
 }
 
 

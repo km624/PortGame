@@ -133,7 +133,7 @@ void UPGStatComponent::Damaged(float Damage)
 
 	if (CurrentHp <= KINDA_SMALL_NUMBER)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Stat : Dead"));
+		//UE_LOG(LogTemp, Warning, TEXT("Stat : Dead"));
 		OnHpZero.Broadcast();
 	}
 	

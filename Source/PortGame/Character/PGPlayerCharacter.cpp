@@ -427,16 +427,13 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 	}
 
 	if (AttackComponent->GetbIsGodMode()) return DamageAmount;
-	//IGenericTeamAgentInterface* DamageActor = Cast<IGenericTeamAgentInterface>(DamageCauser);
 	
-	/*if (DamageCauser->ActorHasTag(TAG_ENEMY))
-	{
-		StatComponent->Damaged(DamageAmount);
-	}*/
 	if (GetTeamAttitudeTowards(*DamageCauser))
 	{
+		
 		StatComponent->Damaged(DamageAmount);
 	}
+	
 	
 	return DamageAmount;
 }

@@ -85,8 +85,7 @@ void AWeapon::ComboBegin()
 	{
 		playerCharacter->SetbIsAttackRotation(true);
 	}
-	//몽타주 종료될때  ComboActiosnEnd 함수 호출 되게 델리게이트 호출
-	//FOnMontageEnded EndDelegate;
+	
 	EndDelegate.BindUObject(this, &AWeapon::ComboEnd);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
 	CurrentMontageEndDelegate = AnimInstance->Montage_GetEndedDelegate(ComboMontage);

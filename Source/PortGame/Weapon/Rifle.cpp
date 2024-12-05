@@ -228,7 +228,7 @@ void ARifle::FireWithLineTrace()
 
 	//µ¥¹ÌÁö
 	float GundDamage = OwnerCharacter->GetTotalStat().Attack*0.1f;
-	if (OwnerCharacter->ActorHasTag(TAG_ENEMY))
+	if (OwnerCharacter->ActorHasTag(TAG_AI))
 		GundDamage *= 0.5f;
 	
 	DrawDebugLine(currentWorld, start, end, FColor::Red, false, 1.0f);

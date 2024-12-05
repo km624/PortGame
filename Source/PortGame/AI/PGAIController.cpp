@@ -25,6 +25,7 @@ APGAIController::APGAIController()
 
 void APGAIController::RunAI()
 {
+	SLOG(TEXT("RunAi"));
 	UBlackboardComponent* BlackboardComp = Blackboard.Get();
 	if (UseBlackboard(BBAsset, BlackboardComp))
 	{
@@ -45,6 +46,23 @@ void APGAIController::StopAI()
 	}
 }
 
+void APGAIController::BlackBoardReset()
+{
+	UBlackboardComponent* BlackboardComp = Blackboard.Get();
+	if (BlackboardComp->GetValueAsObject(BBKEY_TARGET))
+	{
+		APawn* pawn = Cast<APawn>(BlackboardComp->GetValueAsObject(BBKEY_TARGET));	
+		if (pawn->ActorHasTag(TAG_PLAYER))
+		{
+			uint32 targetCount = BlackboardComp->GetValueAsInt(BBKEY_PLAYERTARGETCOUNT);
+			BlackboardComp->SetValueAsInt(BBKEY_PLAYERTARGETCOUNT, --targetCount);
+		}
+
+		BlackboardComp->SetValueAsObject(BBKEY_TARGET,nullptr);
+	}
+	
+}
+
 void APGAIController::OnPossess(APawn* pawn)
 {
 	Super::OnPossess(pawn);
@@ -60,6 +78,7 @@ void APGAIController::StopTree()
 
 void APGAIController::StartTree()
 {
+	SLOG(TEXT("StartTree"));
 	RunAI();
-	SLOG(TEXT("STOPAI"));
+	
 }

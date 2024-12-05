@@ -11,6 +11,7 @@
 #include "Interface/PlayerCameraShakeInterface.h"
 #include "Physics/PGCollision.h"
 #include "Interface/NPCParryCheckInterface.h"
+#include "GenericTeamAgentInterface.h"
 
 
 UPGAttackComponent::UPGAttackComponent()
@@ -118,7 +119,7 @@ void UPGAttackComponent::AttackHitCheck()
 	 float AttackRadius = BaseCharacter->GetTotalStat().AttackRange;
 	 float AttackDamage = BaseCharacter->GetTotalStat().Attack;
 	//ENEMY면 공격력 거리 짧게
-	if(BaseCharacter->ActorHasTag(TAG_ENEMY))
+	if(BaseCharacter->ActorHasTag(TAG_AI))
 	{
 		AttackRange *= 0.5f;
 		AttackRadius *= 0.5f;
@@ -153,7 +154,14 @@ void UPGAttackComponent::AttackHitCheck()
 		{
 			if (Hit.GetActor())
 			{
-		
+				//다른 팀만 공격 허용
+				IGenericTeamAgentInterface* Team = Cast<IGenericTeamAgentInterface>(BaseCharacter);
+				if (Team)
+				{
+					if (!Team->GetTeamAttitudeTowards(*Hit.GetActor()))
+						continue;
+				}
+
 				if (playerCharacter)
 				{
 					bool parryCheck = false;
@@ -170,17 +178,8 @@ void UPGAttackComponent::AttackHitCheck()
 						stoptime = 1.0f;
 
 						parry = true;
-						/*playerCharacter->OnParryPostPorcess(true);
-						AttackHitStop(stoptime, ParrayCameraShakeClass);*/
 						
-						//NPC->NPCAttackHitStop(stoptime);
 					}
-					//else
-					//{
-					//	//AttackHitStop(stoptime/0.75f, AttackCameraShakeClass);
-					//	
-					//	//NPC->NPCAttackHitStop(stoptime);
-					//}
 						
 				}
 
