@@ -70,11 +70,13 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 				{
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn);
 
+
+
 					//해당영역들 표시
-						DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
-						DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
-						DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
-						return;
+					DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
+					DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
+					DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
+					return;
 				}
 
 			//}
@@ -85,4 +87,13 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
 
 
+}
+
+float UBTService_Detect::TargetToDistance(FVector myloc,FVector targetLoc)
+{
+
+	FVector MyLocation = myloc;
+	FVector TargetLocation = targetLoc;
+	float Distance = FVector::Dist(MyLocation, TargetLocation);
+	return Distance;
 }

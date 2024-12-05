@@ -56,7 +56,8 @@ void APGNpcCharacter::BeginPlay()
 float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 
-	if (DamageCauser->ActorHasTag(TAG_PLAYER))
+	//if (DamageCauser->ActorHasTag(TAG_PLAYER))
+	if (GetTeamAttitudeTowards(*DamageCauser))
 	{
 		if (bIsParry)
 		{

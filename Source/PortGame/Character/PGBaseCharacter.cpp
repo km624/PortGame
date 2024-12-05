@@ -15,6 +15,7 @@
 #include "Physics/PGCollision.h"
 #include "MotionWarpingComponent.h"
 #include "Interface/AIControllerInterface.h"
+#include "PortGame/PortGame.h"
 
 
 // Sets default values
@@ -111,6 +112,14 @@ void APGBaseCharacter::BeginPlay()
 	StatComponent->OnHpZero.AddUObject(this, &ThisClass::SetDead);
 
 	//SetPlayerCharacterType();
+
+
+	//ÆÀ ¼³Á¤
+
+	SetGenericTeamId(TeamId);
+
+	FGenericTeamId currentteam = GetGenericTeamId();
+	SLOG(TEXT("actor : %s , myteamide : %d"), *GetActorLabel(), currentteam.GetId());
 }
 
 void APGBaseCharacter::AttackToComponent()
@@ -265,6 +274,8 @@ void APGBaseCharacter::SetDead()
 	
 	HpBarWidgetComponent->SetHiddenInGame(true);
 }
+
+
 
 
 

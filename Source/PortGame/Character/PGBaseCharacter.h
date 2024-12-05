@@ -7,6 +7,7 @@
 #include "Data/CharacterEnumData.h"
 #include "Interface/PGSetHpbarCharacterInterface.h"
 #include "Interface/PlayerAttackInterface.h"
+#include "GenericTeamAgentInterface.h"
 #include "Struct/PGCharacterStat.h"
 #include "PGBaseCharacter.generated.h"
 
@@ -17,7 +18,7 @@ DECLARE_MULTICAST_DELEGATE(FOnbIsReloadDelegate);
 
 UCLASS()
 class PORTGAME_API APGBaseCharacter : public ACharacter , public IPGSetHpbarCharacterInterface
-	,public IPlayerAttackInterface
+	,public IPlayerAttackInterface ,public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -166,6 +167,20 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MotionWarping, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UMotionWarpingComponent> MotionWarpingComponent;
+
+
+	//ÆÀ ¼¼ÆÃ
+public:
+	FORCEINLINE virtual void SetGenericTeamId(const FGenericTeamId& teamID) override { myteam = teamID; }
+
+	FORCEINLINE virtual FGenericTeamId GetGenericTeamId() const override { return myteam; }
+
+
+protected:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	uint8 TeamId;
+
+	FGenericTeamId myteam;
 
 
 

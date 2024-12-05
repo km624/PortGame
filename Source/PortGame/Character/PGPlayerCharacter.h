@@ -171,7 +171,7 @@ protected:
 protected:
 	uint8 bIsSlow : 1;
 
-	//포스트 프로세스 볼륨
+	//패리 이펙트  - 포스트 프로세스 볼륨
 protected:
 	virtual void OnParryPostPorcess(bool effect) override;
 

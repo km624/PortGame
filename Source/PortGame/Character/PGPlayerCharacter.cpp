@@ -153,7 +153,10 @@ void APGPlayerCharacter::BeginPlay()
 	TimelineProgress.BindUFunction(this, FName("AimUpdate")); 
 	AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
 
+	FGenericTeamId currentteam = GetGenericTeamId();
+	SLOG(TEXT("actor : %s , myteamide : %d"), *GetActorLabel(), currentteam.GetId());
 
+	
 }
 
 //인풋 매핑 - 액션에 함수 바인딩
@@ -424,11 +427,17 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 	}
 
 	if (AttackComponent->GetbIsGodMode()) return DamageAmount;
-
-	if (DamageCauser->ActorHasTag(TAG_ENEMY))
+	//IGenericTeamAgentInterface* DamageActor = Cast<IGenericTeamAgentInterface>(DamageCauser);
+	
+	/*if (DamageCauser->ActorHasTag(TAG_ENEMY))
+	{
+		StatComponent->Damaged(DamageAmount);
+	}*/
+	if (GetTeamAttitudeTowards(*DamageCauser))
 	{
 		StatComponent->Damaged(DamageAmount);
 	}
+	
 	return DamageAmount;
 }
 

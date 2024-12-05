@@ -19,4 +19,6 @@ public:
 
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 	
+private:
+	float TargetToDistance(FVector myloc ,FVector targetLoc);
 };
