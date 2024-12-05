@@ -56,13 +56,17 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
 	if (bResult)
 	{
+		FName TargetTag;
+		TargetTag = ControllingPawn->ActorHasTag(TAG_ENEMY) ? TAG_PLAYER : TAG_ENEMY;
+
 		for (auto const& OverlapResult : OverlapResults)
 		{
 
 			APawn* Pawn = Cast<APawn>(OverlapResult.GetActor());
-			if (Pawn && Pawn->GetController()->IsPlayerController())
-			{
-				if (Pawn->ActorHasTag(TAG_PLAYER))
+			/*if (Pawn && Pawn->GetController()->IsPlayerController())
+			{*/
+			
+				if (Pawn->ActorHasTag(TargetTag))
 				{
 					OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn);
 
@@ -73,7 +77,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 						return;
 				}
 
-			}
+			//}
 		}
 	}
 
