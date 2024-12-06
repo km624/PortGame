@@ -49,6 +49,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = Stat)
 	FPGCharacterStat ModifierStat;
 
+public:
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UNiagaraSystem> NAWeaponEffect;
+
 	
 
 	//기본 공격 ( 콤보)

@@ -16,6 +16,8 @@
 #include "MotionWarpingComponent.h"
 #include "Interface/AIControllerInterface.h"
 #include "PortGame/PortGame.h"
+#include "NiagaraComponent.h"   
+#include "NiagaraSystem.h"  
 
 
 // Sets default values
@@ -101,6 +103,10 @@ APGBaseCharacter::APGBaseCharacter()
 		DeadMontage = MONTAGE_DEAD.Object;
 	}
 
+	//나이아가라
+	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
+	NiagaraComponent->SetupAttachment(RootComponent);
+
 }
 
 void APGBaseCharacter::BeginPlay()
@@ -112,6 +118,7 @@ void APGBaseCharacter::BeginPlay()
 	StatComponent->OnHpZero.AddUObject(this, &ThisClass::SetDead);
 
 	//SetPlayerCharacterType();
+	NiagaraComponent->OnSystemFinished.AddDynamic(this, &APGBaseCharacter::OnNiagaraSystemFinished);
 
 
 	//팀 설정
@@ -286,6 +293,24 @@ void APGBaseCharacter::SetDead()
 	HpBarWidgetComponent->SetHiddenInGame(true);
 
 	//Destroy();
+}
+
+void APGBaseCharacter::StartNiagaraEffect()
+{
+	if (NAWeaponEffect)
+	{
+		NiagaraComponent->SetAsset(NAWeaponEffect);
+		NiagaraComponent->Activate();  
+		SLOG(TEXT("NiagiaraON"));
+		// 시스템이 완료되었을 때 호출될 델리게이트 바인딩
+		
+	}
+}
+
+void APGBaseCharacter::OnNiagaraSystemFinished(UNiagaraComponent* FinishedComponent)
+{
+	SLOG(TEXT("NiagaraDone"));
+	FinishedComponent->Deactivate();
 }
 
 

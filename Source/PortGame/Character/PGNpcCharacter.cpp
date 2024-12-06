@@ -217,6 +217,7 @@ float APGNpcCharacter::AITurnSpeed()
 
 void APGNpcCharacter::OnParryStart()
 {
+	StartNiagaraEffect();
 	
 	bIsParry = true;
 	CustomTimeDilation = 0.3f;
@@ -226,7 +227,7 @@ void APGNpcCharacter::OnParryStart()
 
 void APGNpcCharacter::OnParryEnd()
 {
-
+	OnNiagaraSystemFinished(NiagaraComponent);
 	bIsParry = false;
 	CustomTimeDilation = 1.0f;
 }

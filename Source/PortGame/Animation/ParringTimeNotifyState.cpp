@@ -3,6 +3,7 @@
 
 #include "Animation/ParringTimeNotifyState.h"
 #include "Interface/NPCParryCheckInterface.h"
+#include "PortGame/PortGame.h"
 
 void UParringTimeNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, float TotalDuration, const FAnimNotifyEventReference& EventReference)
 {
@@ -13,6 +14,7 @@ void UParringTimeNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAni
 		INPCParryCheckInterface* NPC = Cast<INPCParryCheckInterface>(MeshComp->GetOwner());
 		if(NPC)
 			NPC->OnParryStart();
+		SLOG(TEXT("duration %f"), TotalDuration);
 	}
 }
 

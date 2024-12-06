@@ -175,7 +175,6 @@ public:
 
 	FORCEINLINE virtual FGenericTeamId GetGenericTeamId() const override { return myteam; }
 
-
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	uint8 TeamId;
@@ -183,5 +182,17 @@ protected:
 	FGenericTeamId myteam;
 
 
+protected:
+	void StartNiagaraEffect();
+
+	UFUNCTION()
+	void OnNiagaraSystemFinished(class UNiagaraComponent* FinishedComponent);
+
+protected:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UNiagaraComponent> NiagaraComponent;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UNiagaraSystem> NAWeaponEffect;
 
 };
