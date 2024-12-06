@@ -295,22 +295,24 @@ void APGBaseCharacter::SetDead()
 	//Destroy();
 }
 
-void APGBaseCharacter::StartNiagaraEffect()
+void APGBaseCharacter::StartNiagaraEffect(UNiagaraSystem* niagara ,FVector TargetLocation)
 {
-	if (NAWeaponEffect)
+	if (niagara)
 	{
-		NiagaraComponent->SetAsset(NAWeaponEffect);
+		SLOG(TEXT("STARTNiagara"));
+		NiagaraComponent->SetAsset(niagara);
+		NiagaraComponent->SetWorldLocation(TargetLocation);
+
 		NiagaraComponent->Activate();  
-		SLOG(TEXT("NiagiaraON"));
-		// 시스템이 완료되었을 때 호출될 델리게이트 바인딩
-		
+		NiagaraComponent->OnSystemFinished.AddDynamic(this, &APGBaseCharacter::OnNiagaraSystemFinished);
 	}
 }
 
 void APGBaseCharacter::OnNiagaraSystemFinished(UNiagaraComponent* FinishedComponent)
 {
-	SLOG(TEXT("NiagaraDone"));
+	SLOG(TEXT("NiagaraEND"));
 	FinishedComponent->Deactivate();
+	
 }
 
 

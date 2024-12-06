@@ -336,8 +336,6 @@ void APGPlayerCharacter::Attack()
 	}
 
 	AttackToComponent();
-	StartNiagaraEffect();
-	
 	
 }
 

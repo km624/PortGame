@@ -49,8 +49,13 @@ public:
 	UPROPERTY(EditAnywhere, Category = Stat)
 	FPGCharacterStat ModifierStat;
 
+	//나이아가라 이펙트 (hit 이펙트)
 public:
-	UPROPERTY(EditAnywhere)
+	FORCEINLINE class UNiagaraSystem* GetWeaponEffect() { return NAWeaponEffect; }
+	
+protected:
+
+	UPROPERTY(EditAnywhere,Category = Effect)
 	TObjectPtr<class UNiagaraSystem> NAWeaponEffect;
 
 	

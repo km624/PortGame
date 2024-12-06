@@ -30,6 +30,7 @@ void AWeapon::OnInitializeWeapon(APGBaseCharacter* BaseCharacter,UWeaponData* we
 		ModifierStat = weaponData->ModifierStat;
 		ComboMontage = weaponData->ComboMontage;
 		ComboData = weaponData->ComboData;
+		NAWeaponEffect = weaponData->NAWeaponEffect;
 	}
 
 	SLOG(TEXT("WeaponAttachment"));

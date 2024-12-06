@@ -10,6 +10,8 @@
 #include "Struct/PGGunStat.h"
 #include "Data/GunWeaponData.h"
 #include "Component/PGAttackComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
 
 
 APGNpcCharacter::APGNpcCharacter()
@@ -34,6 +36,12 @@ APGNpcCharacter::APGNpcCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
 	
 	bUseControllerRotationYaw = true;
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> parryEffect(TEXT("/Script/Niagara.NiagaraSystem'/Game/PortGame/Effect/Niagara/NA_ParryState.NA_ParryState'"));
+	if (parryEffect.Object)
+	{
+		NAParryEffect = parryEffect.Object;
+	}
 
 }
 
@@ -128,6 +136,8 @@ void APGNpcCharacter::SetDead()
 	//죽으면 모두 초기화
 	OnAttackFinished.Unbind();
 	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
+	if(NiagaraComponent)
 	if (aiController)
 	{
 		SLOG(TEXT("AI DEAD"));
@@ -215,19 +225,19 @@ float APGNpcCharacter::AITurnSpeed()
 	return TurnSpeed;
 }
 
-void APGNpcCharacter::OnParryStart()
+void APGNpcCharacter::OnParryStart(float time)
 {
-	StartNiagaraEffect();
-	
+	NAParryStart();
 	bIsParry = true;
 	CustomTimeDilation = 0.3f;
-	
+	float ActorTime = time / CustomTimeDilation;
+	GetWorld()->GetTimerManager().SetTimer(NAScaleTimerHandle, [this, ActorTime]() { NAParryUpdateScale(ActorTime); }, 0.01f, true);
 		
 }
 
 void APGNpcCharacter::OnParryEnd()
 {
-	OnNiagaraSystemFinished(NiagaraComponent);
+	
 	bIsParry = false;
 	CustomTimeDilation = 1.0f;
 }
@@ -236,6 +246,42 @@ bool APGNpcCharacter::GetBisParry() const
 {
 	return bIsParry;
 }
+
+void APGNpcCharacter::NAParryStart()
+{
+	if (NAParryEffect)
+	{
+		NiagaraComponent->SetAsset(NAParryEffect);
+		//NiagaraComponent->SetWorldLocation(GetActorForwardVector());
+		NiagaraComponent->SetWorldScale3D(FVector(1.5f));
+		NiagaraComponent->Activate();
+	}
+
+}
+
+void APGNpcCharacter::NAParryUpdateScale(float time)
+{
+	static float ElapsedTime = 0.0f;
+
+	ElapsedTime += 0.01f; // Update 간격에 맞춰 누적 시간 증가
+
+	// 스케일 계산
+	float Alpha = FMath::Clamp(ElapsedTime / time, 0.0f, 1.0f);
+	FVector NewScale = FMath::Lerp(FVector(1.5f), FVector(0.5f), Alpha);
+
+	// 새로운 스케일 적용
+	NiagaraComponent->SetWorldScale3D(NewScale);
+
+	// 종료 조건
+	if (ElapsedTime >= time)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
+		ElapsedTime = 0.0f; // 리셋
+		NiagaraComponent->Deactivate();
+	}
+}
+
+
 
 
 

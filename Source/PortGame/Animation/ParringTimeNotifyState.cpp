@@ -13,7 +13,7 @@ void UParringTimeNotifyState::NotifyBegin(USkeletalMeshComponent* MeshComp, UAni
 	{
 		INPCParryCheckInterface* NPC = Cast<INPCParryCheckInterface>(MeshComp->GetOwner());
 		if(NPC)
-			NPC->OnParryStart();
+			NPC->OnParryStart(TotalDuration);
 		SLOG(TEXT("duration %f"), TotalDuration);
 	}
 }

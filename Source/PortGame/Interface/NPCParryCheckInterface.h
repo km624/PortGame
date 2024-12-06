@@ -23,7 +23,7 @@ class PORTGAME_API INPCParryCheckInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	
-	virtual void OnParryStart() = 0;
+	virtual void OnParryStart(float time) = 0;
 	virtual void OnParryEnd() = 0;
 	virtual void NPCAttackHitStop(float time) = 0;
 

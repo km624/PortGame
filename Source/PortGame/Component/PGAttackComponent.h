@@ -61,10 +61,14 @@ protected:
 public:
 	void AttackHitCheck();
 
-	//공격 살짝 멈추기 (플레이어만 해당)
+	//플레이어만 해당
+	
 protected:
+	//공격 살짝 멈추기 (플레이어만 해당)
 	void AttackHitStop(float time, TSubclassOf<class UCameraShakeBase> camerashake);
 
+	//공격 이펙트
+	void AttackEffect(FVector targetLocation);
 protected:
 	FTimerHandle HitStoptimerHandle;
 	

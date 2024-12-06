@@ -73,15 +73,26 @@ protected:
 
 	//패리 시스템
 protected:
-	virtual void OnParryStart() override;
+	virtual void OnParryStart(float time) override;
 
 	virtual void OnParryEnd() override;
 
 	virtual bool GetBisParry() const override;
+	
+	void NAParryStart();
+
+	void NAParryUpdateScale(float time);
+	
+	
 
 protected:
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Parry")
 	uint8 bIsParry : 1;
+
+	UPROPERTY(VisibleAnywhere, Category = "Parry")
+	TObjectPtr<class UNiagaraSystem> NAParryEffect;
+
+	FTimerHandle NAScaleTimerHandle;
 
 
 };

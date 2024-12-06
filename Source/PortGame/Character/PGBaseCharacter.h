@@ -182,8 +182,9 @@ protected:
 	FGenericTeamId myteam;
 
 
-protected:
-	void StartNiagaraEffect();
+	//나이아가라 이펙트 재생 (공통)
+public:
+	void StartNiagaraEffect(class UNiagaraSystem* niagara, FVector TargetLocation);
 
 	UFUNCTION()
 	void OnNiagaraSystemFinished(class UNiagaraComponent* FinishedComponent);
@@ -192,7 +193,6 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UNiagaraComponent> NiagaraComponent;
 
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<class UNiagaraSystem> NAWeaponEffect;
+	
 
 };

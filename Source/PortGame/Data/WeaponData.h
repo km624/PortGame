@@ -30,6 +30,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = Weapon)
 	FPGCharacterStat ModifierStat;
 
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combo, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> ComboMontage;
@@ -37,6 +38,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combo, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UComboData> ComboData;
 	//몽타주 섹션이름
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Effect)
+	TObjectPtr<class UNiagaraSystem> NAWeaponEffect;
 
 
 	
