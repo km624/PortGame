@@ -37,6 +37,9 @@ APGNpcCharacter::APGNpcCharacter()
 	
 	bUseControllerRotationYaw = true;
 
+	ParryNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ParryEffectComp"));
+	ParryNiagaraComponent->SetupAttachment(RootComponent);
+
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> parryEffect(TEXT("/Script/Niagara.NiagaraSystem'/Game/PortGame/Effect/Niagara/NA_ParryState.NA_ParryState'"));
 	if (parryEffect.Object)
 	{
@@ -97,8 +100,10 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	{
 		if (bIsParry)
 		{
-			//SLOG(TEXT("SuccesParray"));
+			
 			StatComponent->HitGaugeDamaged(GetTotalStat().HitGauge);
+
+			NAParryUpdateEnd();
 			
 		}	
 		else
@@ -134,10 +139,13 @@ void APGNpcCharacter::SetDead()
 	APGAIController* aiController = Cast<APGAIController>(GetController());
 	
 	//죽으면 모두 초기화
-	OnAttackFinished.Unbind();
+	//OnAttackFinished.Unbind();
 	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
+
+	NAParryUpdateEnd();
 	GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
-	if(NiagaraComponent)
+	
+
 	if (aiController)
 	{
 		SLOG(TEXT("AI DEAD"));
@@ -227,6 +235,9 @@ float APGNpcCharacter::AITurnSpeed()
 
 void APGNpcCharacter::OnParryStart(float time)
 {
+	if (!TargetPawn->ActorHasTag(TAG_PLAYER)) return;
+	
+	SLOG(TEXT("ParryStart"));
 	NAParryStart();
 	bIsParry = true;
 	CustomTimeDilation = 0.3f;
@@ -240,6 +251,7 @@ void APGNpcCharacter::OnParryEnd()
 	
 	bIsParry = false;
 	CustomTimeDilation = 1.0f;
+	NAParryUpdateEnd();
 }
 
 bool APGNpcCharacter::GetBisParry() const
@@ -249,36 +261,50 @@ bool APGNpcCharacter::GetBisParry() const
 
 void APGNpcCharacter::NAParryStart()
 {
+	
 	if (NAParryEffect)
 	{
-		NiagaraComponent->SetAsset(NAParryEffect);
+		ParryNiagaraComponent->SetAsset(NAParryEffect);
 		//NiagaraComponent->SetWorldLocation(GetActorForwardVector());
-		NiagaraComponent->SetWorldScale3D(FVector(1.5f));
-		NiagaraComponent->Activate();
+		if (TargetPawn)
+		{
+			FVector Direction = TargetPawn->GetActorLocation() - GetActorLocation();
+			Direction.Z = 0; 
+			FRotator NewRotation = Direction.Rotation();
+
+			ParryNiagaraComponent->SetWorldRotation(NewRotation);
+		}
+		ParryNiagaraComponent->SetWorldScale3D(FVector(1.0f));
+		ParryNiagaraComponent->Activate();
 	}
 
 }
 
 void APGNpcCharacter::NAParryUpdateScale(float time)
 {
-	static float ElapsedTime = 0.0f;
-
+	
 	ElapsedTime += 0.01f; // Update 간격에 맞춰 누적 시간 증가
 
 	// 스케일 계산
 	float Alpha = FMath::Clamp(ElapsedTime / time, 0.0f, 1.0f);
-	FVector NewScale = FMath::Lerp(FVector(1.5f), FVector(0.5f), Alpha);
+	FVector NewScale = FMath::Lerp(FVector(1.0f), FVector(0.0f), Alpha);
 
 	// 새로운 스케일 적용
-	NiagaraComponent->SetWorldScale3D(NewScale);
+	ParryNiagaraComponent->SetWorldScale3D(NewScale);
 
 	// 종료 조건
 	if (ElapsedTime >= time)
 	{
-		GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
-		ElapsedTime = 0.0f; // 리셋
-		NiagaraComponent->Deactivate();
+		NAParryUpdateEnd();
 	}
+}
+
+void APGNpcCharacter::NAParryUpdateEnd()
+{
+	GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
+	ElapsedTime = 0.0f; // 리셋
+	
+	ParryNiagaraComponent->Deactivate();
 }
 
 

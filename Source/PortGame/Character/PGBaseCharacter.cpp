@@ -18,6 +18,7 @@
 #include "PortGame/PortGame.h"
 #include "NiagaraComponent.h"   
 #include "NiagaraSystem.h"  
+#include "NiagaraFunctionLibrary.h"
 
 
 // Sets default values
@@ -104,8 +105,9 @@ APGBaseCharacter::APGBaseCharacter()
 	}
 
 	//나이아가라
-	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
-	NiagaraComponent->SetupAttachment(RootComponent);
+
+	BaseNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BaseNiagaraComp"));
+	BaseNiagaraComponent->SetupAttachment(RootComponent);
 
 }
 
@@ -117,8 +119,8 @@ void APGBaseCharacter::BeginPlay()
 
 	StatComponent->OnHpZero.AddUObject(this, &ThisClass::SetDead);
 
-	//SetPlayerCharacterType();
-	NiagaraComponent->OnSystemFinished.AddDynamic(this, &APGBaseCharacter::OnNiagaraSystemFinished);
+	//나이아가라 바인딩
+	BaseNiagaraComponent->OnSystemFinished.AddDynamic(this, &APGBaseCharacter::OnNiagaraSystemFinished);
 
 
 	//팀 설정
@@ -235,7 +237,7 @@ void APGBaseCharacter::PlayHitMontage()
 	}
 	//맞는 애니메이션
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->StopAllMontages(0.0f);
+	//AnimInstance->StopAllMontages(0.0f);
 	AnimInstance->Montage_Play(HitMontage, 1.0f);
 	FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &APGBaseCharacter::HitMontageEnd);
@@ -286,7 +288,7 @@ void APGBaseCharacter::SetDead()
 
 	AnimInstance->Montage_Play(DeadMontage, 1.0f);
 
-	
+	OnNiagaraSystemFinished(BaseNiagaraComponent);
 	
 	SetActorEnableCollision(false);
 	
@@ -300,11 +302,11 @@ void APGBaseCharacter::StartNiagaraEffect(UNiagaraSystem* niagara ,FVector Targe
 	if (niagara)
 	{
 		SLOG(TEXT("STARTNiagara"));
-		NiagaraComponent->SetAsset(niagara);
-		NiagaraComponent->SetWorldLocation(TargetLocation);
-
-		NiagaraComponent->Activate();  
-		NiagaraComponent->OnSystemFinished.AddDynamic(this, &APGBaseCharacter::OnNiagaraSystemFinished);
+		BaseNiagaraComponent->SetAsset(niagara);
+		BaseNiagaraComponent->SetWorldLocation(TargetLocation);
+		BaseNiagaraComponent->Activate();
+		
+		
 	}
 }
 

@@ -180,8 +180,8 @@ void UPGAttackComponent::AttackHitCheck()
 						parry = true;
 						
 					}
-					FVector targetforward = Hit.GetActor()->GetActorForwardVector() *10.0f;
-					AttackEffect(targetforward);
+					FVector targetforward = Hit.GetActor()->GetActorLocation() + Hit.GetActor()->GetActorForwardVector() *10.0f;
+					AttackEffect(Hit.GetActor(),targetforward);
 						
 				}
 
@@ -263,9 +263,9 @@ void UPGAttackComponent::AttackHitStop(float time, TSubclassOf<class UCameraShak
 	}
 }
 
-void UPGAttackComponent::AttackEffect(FVector targetLocation)
+void UPGAttackComponent::AttackEffect(AActor* target , FVector targetLocation)
 {
-	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
+	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(target);
 	BaseCharacter->StartNiagaraEffect(Weapon->GetWeaponEffect(), targetLocation);
 }
 

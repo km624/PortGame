@@ -83,16 +83,21 @@ protected:
 
 	void NAParryUpdateScale(float time);
 	
-	
+	void NAParryUpdateEnd();
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Parry")
 	uint8 bIsParry : 1;
 
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UNiagaraComponent> ParryNiagaraComponent;
+
 	UPROPERTY(VisibleAnywhere, Category = "Parry")
 	TObjectPtr<class UNiagaraSystem> NAParryEffect;
 
 	FTimerHandle NAScaleTimerHandle;
+
+	float ElapsedTime = 0.0f;
 
 
 };

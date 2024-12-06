@@ -56,7 +56,7 @@ public:
 protected:
 
 	UPROPERTY(EditAnywhere,Category = Effect)
-	TObjectPtr<class UNiagaraSystem> NAWeaponEffect;
+	class UNiagaraSystem* NAWeaponEffect;
 
 	
 

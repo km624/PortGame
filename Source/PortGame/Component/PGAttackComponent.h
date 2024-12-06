@@ -68,7 +68,7 @@ protected:
 	void AttackHitStop(float time, TSubclassOf<class UCameraShakeBase> camerashake);
 
 	//공격 이펙트
-	void AttackEffect(FVector targetLocation);
+	void AttackEffect(AActor* target,FVector targetLocation);
 protected:
 	FTimerHandle HitStoptimerHandle;
 	

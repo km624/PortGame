@@ -191,7 +191,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UNiagaraComponent> NiagaraComponent;
+	TObjectPtr<class UNiagaraComponent> BaseNiagaraComponent;
 
 	
 
