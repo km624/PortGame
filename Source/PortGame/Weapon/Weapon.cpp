@@ -9,7 +9,8 @@
 #include "PortGame/PortGame.h"
 #include "Data/WeaponData.h"
 #include "Character/PGPlayerCharacter.h"
-#include "Interface/PGNPCCharacterInterface.h"
+#include "Interface/PGAICharacterInterface.h"
+
 
 AWeapon::AWeapon()
 {
@@ -169,7 +170,7 @@ void AWeapon::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 
 void AWeapon::NotifyComboActionEnd()
 {
-	IPGNPCCharacterInterface* NPCEnd = Cast<IPGNPCCharacterInterface>(OwnerCharacter);
+	IPGAICharacterInterface* NPCEnd = Cast<IPGAICharacterInterface>(OwnerCharacter);
 	if (NPCEnd)
 	{
 		NPCEnd->NotifyComboEnd();

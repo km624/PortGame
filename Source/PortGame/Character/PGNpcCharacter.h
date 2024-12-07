@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/PGBaseCharacter.h"
-#include "Interface/PGNPCCharacterInterface.h"
+//#include "Character/PGBaseCharacter.h"
+//#include "Interface/PGNPCCharacterInterface.h"
+#include "Character/PGAIBaseCharacter.h"
 #include "Interface/NPCParryCheckInterface.h"
 #include "PGNpcCharacter.generated.h"
 
@@ -12,7 +13,7 @@
  * 
  */
 UCLASS()
-class PORTGAME_API APGNpcCharacter : public APGBaseCharacter ,public IPGNPCCharacterInterface , public INPCParryCheckInterface
+class PORTGAME_API APGNpcCharacter : public APGAIBaseCharacter , public INPCParryCheckInterface
 {
 	GENERATED_BODY()
 	
@@ -32,44 +33,44 @@ protected:
 
 	float currentSlowtime;
 
-protected:
-
-	virtual float GetPatrolRadius() override;
-
-	virtual float GetAIDetectRange() override;
-
-	virtual float GetAIAttackRange(float targetDistance, APawn* pawn) override;
-
-	virtual void AttackByAI() override;
-
-	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
-
-	virtual void NotifyComboEnd() override;
-
-	virtual float AITurnSpeed() override;
-
-
-	
-
-protected:
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float PatrolRadius;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float DetectRange;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TurnSpeed;
-
-
-
-	FAICharacterAttackFinished OnAttackFinished;
-
-public:
-	FORCEINLINE APawn* GetTargetPawn() {return TargetPawn;}
-
-protected:
-	TObjectPtr<APawn> TargetPawn;
+//protected:
+//
+//	virtual float GetPatrolRadius() override;
+//
+//	virtual float GetAIDetectRange() override;
+//
+//	virtual float GetAIAttackRange(float targetDistance, APawn* pawn) override;
+//
+//	virtual void AttackByAI() override;
+//
+//	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
+//
+//	virtual void NotifyComboEnd() override;
+//
+//	virtual float AITurnSpeed() override;
+//
+//
+//	
+//
+//protected:
+//	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+//	float PatrolRadius;
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+//	float DetectRange;
+//
+//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+//	float TurnSpeed;
+//
+//
+//
+//	FAICharacterAttackFinished OnAttackFinished;
+//
+//public:
+//	FORCEINLINE APawn* GetTargetPawn() {return TargetPawn;}
+//
+//protected:
+//	TObjectPtr<APawn> TargetPawn;
 
 	//패리 시스템
 protected:

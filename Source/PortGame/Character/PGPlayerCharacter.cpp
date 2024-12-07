@@ -736,37 +736,6 @@ void APGPlayerCharacter::DeletePlayerTargetPawn(APawn* enemy)
 	}
 }
 
-float APGPlayerCharacter::GetPatrolRadius()
-{
-	return 0.0f;
-}
-
-float APGPlayerCharacter::GetAIDetectRange()
-{
-	return 0.0f;
-}
-
-float APGPlayerCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
-{
-	return 0.0f;
-}
-
-void APGPlayerCharacter::AttackByAI()
-{
-}
-
-void APGPlayerCharacter::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
-{
-}
-
-void APGPlayerCharacter::NotifyComboEnd()
-{
-}
-
-float APGPlayerCharacter::AITurnSpeed()
-{
-	return 0.0f;
-}
 
 
 

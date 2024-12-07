@@ -4,7 +4,8 @@
 #include "AI/BTTask_Attack.h"
 #include "PGAI.h"
 #include "AIController.h"
-#include "Interface/PGNPCCharacterInterface.h"
+//#include "Interface/PGNPCCharacterInterface.h"
+#include "Interface/PGAICharacterInterface.h"
 #include "PortGame/PortGame.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -26,7 +27,7 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	}
 
 
-	IPGNPCCharacterInterface* AIPawn = Cast<IPGNPCCharacterInterface>(ControllingPawn);
+	IPGAICharacterInterface* AIPawn = Cast<IPGAICharacterInterface>(ControllingPawn);
 	if (nullptr == AIPawn)
 	{
 		return EBTNodeResult::Failed;

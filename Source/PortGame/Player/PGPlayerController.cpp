@@ -9,6 +9,9 @@
 
 #include "Component/PGWidgetComponent.h"
 
+#include "AIController.h"
+#include "PortGame/PortGame.h"
+
 APGPlayerController::APGPlayerController()
 {
 	static ConstructorHelpers::FClassFinder<UPGHudWidget> ABHUDWidgetRef(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/PortGame/UI/BP_HudWidget.BP_HudWidget_C'"));
@@ -38,7 +41,10 @@ void APGPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 
-	
+	if (aPawn->GetController()->IsA<AAIController>())
+	{
+		SLOG(TEXT("hasAIConTroller"));
+	}
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(aPawn);
 	if (playerCharacter)
 	{

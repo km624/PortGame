@@ -56,8 +56,6 @@ void UPGAttackComponent::SetUpWeapon()
 {
 	if (WeaponClass)
 	{
-
-
 		
 		AWeapon* spawnWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClass);
 

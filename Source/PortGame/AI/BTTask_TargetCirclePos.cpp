@@ -6,7 +6,8 @@
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Interface/PGNPCCharacterInterface.h"
+//#include "Interface/PGNPCCharacterInterface.h"
+#include "Interface/PGAICharacterInterface.h"
 #include "Math/UnrealMathUtility.h"
 #include "DrawDebugHelpers.h"
 
@@ -39,7 +40,7 @@ EBTNodeResult::Type UBTTask_TargetCirclePos::ExecuteTask(UBehaviorTreeComponent&
 		return EBTNodeResult::Failed;
 	}
 
-	IPGNPCCharacterInterface* AIPawn = Cast<IPGNPCCharacterInterface>(ControllingPawn);
+	IPGAICharacterInterface* AIPawn = Cast<IPGAICharacterInterface>(ControllingPawn);
 	if (AIPawn == NULL)
 	{
 		return EBTNodeResult::Failed;

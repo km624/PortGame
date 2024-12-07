@@ -22,7 +22,6 @@ public:
 private:
 	float TargetToDistance(FVector myloc ,FVector targetLoc);
 
-protected:
-	UPROPERTY(Category = Service, EditAnywhere, meta = (ClampMin = "1"))
+
 	
 };

@@ -7,7 +7,7 @@
 #include "BehaviorTree/BlackboardData.h"
 #include "AI/PGAI.h"
 #include "PortGame/PortGame.h"
-#include "Interface/PGAICharacterInterface.h"
+#include "Interface/AITargetPlayerInterface.h"
 
 APGAIController::APGAIController()
 {
@@ -56,7 +56,7 @@ void APGAIController::BlackBoardReset()
 		if (pawn->ActorHasTag(TAG_PLAYER))
 		{
 			
-			IPGAICharacterInterface* player = Cast<IPGAICharacterInterface>(pawn);
+			IAITargetPlayerInterface* player = Cast<IAITargetPlayerInterface>(pawn);
 			player->DeletePlayerTargetPawn(GetPawn());
 			/*uint32 targetCount = BlackboardComp->GetValueAsInt(BBKEY_PLAYERTARGETCOUNT);
 			BlackboardComp->SetValueAsInt(BBKEY_PLAYERTARGETCOUNT, --targetCount);*/

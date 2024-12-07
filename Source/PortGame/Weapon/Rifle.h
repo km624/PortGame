@@ -59,6 +59,8 @@ protected:
 	FTimerHandle ReloadTimerHandle;
 	FTimerHandle StopTimerHandle;
 
+	float GunDamage;
+
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)

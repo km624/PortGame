@@ -1,19 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/BTDecorator_TargetCircleDistance.h"
+#include "AI/BTDecorator_WhoTarget.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 //#include "Interface/PGNPCCharacterInterface.h"
 #include "Interface/PGAICharacterInterface.h"
 #include "PGAI.h"
+#include "PortGame/PortGame.h"
 
-UBTDecorator_TargetCircleDistance::UBTDecorator_TargetCircleDistance()
+UBTDecorator_WhoTarget::UBTDecorator_WhoTarget()
 {
-	NodeName = TEXT("TargetCircleDistance");
+	NodeName = TEXT("IsATargetPlayer");
 }
 
-bool UBTDecorator_TargetCircleDistance::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
+bool UBTDecorator_WhoTarget::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	bool bResult = Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
 
@@ -38,8 +39,11 @@ bool UBTDecorator_TargetCircleDistance::CalculateRawConditionValue(UBehaviorTree
 	}
 
 	//NPC의 타겟과 나의 거리를 가져옴
-	float DistanceToTarget = ControllingPawn->GetDistanceTo(Target);
-	
-	
-	return bResult;
+	if (Target->ActorHasTag(TAG_PLAYER))
+	{
+		return true;
+	}
+
+
+	return false;
 }

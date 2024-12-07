@@ -3,7 +3,8 @@
 
 #include "AI/BTService_Detect.h"
 #include "AIController.h"
-#include "Interface/PGNPCCharacterInterface.h"
+//#include "Interface/PGNPCCharacterInterface.h"
+#include "Interface/PGAICharacterInterface.h"
 #include "PGAI.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Physics/PGCollision.h"
@@ -11,7 +12,7 @@
 #include "Engine/OverlapResult.h"
 #include "PortGame/PortGame.h"
 #include "GenericTeamAgentInterface.h"
-#include "Interface/PGAICharacterInterface.h"
+#include "Interface/AITargetPlayerInterface.h"
 
 
 UBTService_Detect::UBTService_Detect()
@@ -36,7 +37,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		return;
 	}
 
-	IPGNPCCharacterInterface* AIPawn = Cast<IPGNPCCharacterInterface>(ControllingPawn);
+	IPGAICharacterInterface* AIPawn = Cast<IPGAICharacterInterface>(ControllingPawn);
 	if (AIPawn == NULL)
 	{
 		return;
@@ -74,7 +75,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 				{
 
 					APawn* TargetPawn = Cast<APawn>(TargetActor);
-					IPGAICharacterInterface* player = Cast<IPGAICharacterInterface>(TargetPawn);
+					IAITargetPlayerInterface* player = Cast<IAITargetPlayerInterface>(TargetPawn);
 
 					if (player->CanPlayerTarget(ControllingPawn))
 					{
@@ -128,7 +129,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	{
 		if (TargetPlayer->ActorHasTag(TAG_PLAYER))
 		{
-			IPGAICharacterInterface* player = Cast<IPGAICharacterInterface>(TargetPlayer);
+			IAITargetPlayerInterface* player = Cast<IAITargetPlayerInterface>(TargetPlayer);
 			player->DeletePlayerTargetPawn(ControllingPawn);
 		}
 	}

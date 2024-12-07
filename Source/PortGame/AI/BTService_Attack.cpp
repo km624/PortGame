@@ -3,7 +3,8 @@
 
 #include "AI/BTService_Attack.h"
 #include "AIController.h"
-#include "Interface/PGNPCCharacterInterface.h"
+//#include "Interface/PGNPCCharacterInterface.h"
+#include "Interface/PGAICharacterInterface.h"
 #include "PGAI.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -31,7 +32,7 @@ void UBTService_Attack::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		return;
 	}
 
-	IPGNPCCharacterInterface* AIPawn = Cast<IPGNPCCharacterInterface>(ControllingPawn);
+	IPGAICharacterInterface* AIPawn = Cast<IPGAICharacterInterface>(ControllingPawn);
 	if (AIPawn == NULL)
 	{
 		return;

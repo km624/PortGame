@@ -37,9 +37,5 @@ public:
 
 	virtual float AITurnSpeed() = 0;
 
-	virtual bool CanPlayerTarget(APawn* enemy) = 0;
-
-	virtual void SetPlayerTargetPawn(APawn* enemy) = 0;
-
-	virtual void DeletePlayerTargetPawn(APawn* enemy) = 0;
+	
 };

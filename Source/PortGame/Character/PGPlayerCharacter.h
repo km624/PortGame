@@ -3,11 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/PGBaseCharacter.h"
+#include "Character/PGAIBaseCharacter.h"
+//#include "Character/PGBaseCharacter.h"
 #include "Components/TimelineComponent.h"
 #include "Interface/PGHudWidgetInterface.h"
 #include "Interface/AttackHitStopInterface.h"
-#include "Interface/PGAICharacterInterface.h"
+#include "Interface/AITargetPlayerInterface.h"
 #include "PGPlayerCharacter.generated.h"
 
 /**
@@ -23,8 +24,8 @@ enum class EControlData : uint8
 };
 
 UCLASS()
-class PORTGAME_API APGPlayerCharacter : public APGBaseCharacter,public IPGHudWidgetInterface ,public IAttackHitStopInterface
-	, public IPGAICharacterInterface
+class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface
+	, public IAITargetPlayerInterface
 {
 	GENERATED_BODY()
 public:
@@ -258,21 +259,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 MaxTargets = 3;
 
-	//임시 생성
-
-protected:
-	virtual float GetPatrolRadius() override;
-
-	virtual float  GetAIDetectRange()override;
-
-	virtual float GetAIAttackRange(float targetDistance, APawn* pawn) override;
-
-	virtual void AttackByAI() override;
-
-	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
-
-	virtual void NotifyComboEnd() override;
-
-	virtual float AITurnSpeed() override;
-
+	
 };

@@ -94,6 +94,12 @@ void ARifle::SetUpGunStat()
 	reloadingTime = GunStat.reloadingTime;
 	ShootInterval = GunStat.ShootInterval;
 	traceDistance = GunStat.traceDistance;
+
+	//근접의 4분의1 데미지
+	GunDamage = OwnerCharacter->GetTotalStat().Attack * 0.25f;
+	//AI는 거기서 더 4분의
+	if (OwnerCharacter->ActorHasTag(TAG_AI))
+		GunDamage *= 0.25f;
 }
 
 void ARifle::ShootCheck(bool bIsShoot)
@@ -226,10 +232,9 @@ void ARifle::FireWithLineTrace()
 
 	const FVector start = WeaponStaticComponent->GetSocketLocation(WeaponSocket);
 
-	//데미지
-	float GundDamage = OwnerCharacter->GetTotalStat().Attack*0.1f;
-	if (OwnerCharacter->ActorHasTag(TAG_AI))
-		GundDamage *= 0.5f;
+	
+	//float GundDamage = OwnerCharacter->GetTotalStat().Attack*0.1f;
+	
 	
 	DrawDebugLine(currentWorld, start, end, FColor::Red, false, 1.0f);
 	if (currentWorld)
@@ -245,7 +250,7 @@ void ARifle::FireWithLineTrace()
 		{
 
 			FDamageEvent DamageEvent;
-			hitResult.GetActor()->TakeDamage(GundDamage, DamageEvent, OwnerCharacter->GetController(), OwnerCharacter);
+			hitResult.GetActor()->TakeDamage(GunDamage, DamageEvent, OwnerCharacter->GetController(), OwnerCharacter);
 		}
 
 	}

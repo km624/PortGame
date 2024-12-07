@@ -7,24 +7,24 @@
 #include "Component/PGStatComponent.h"
 #include "Physics/PGCollision.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Struct/PGGunStat.h"
-#include "Data/GunWeaponData.h"
-#include "Component/PGAttackComponent.h"
+//#include "Struct/PGGunStat.h"
+//#include "Data/GunWeaponData.h"
+//#include "Component/PGAttackComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
 
 
 APGNpcCharacter::APGNpcCharacter()
 {
-	AIControllerClass = APGAIController::StaticClass();
+	/*AIControllerClass = APGAIController::StaticClass();
 
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;*/
 
-	PatrolRadius = 1000.0f;
+	/*PatrolRadius = 1000.0f;
 
 	DetectRange = 1000.0f;
 
-	TurnSpeed = 10.0f;
+	TurnSpeed = 10.0f;*/
 
 	Tags.Add(TAG_AI);
 
@@ -145,81 +145,81 @@ void APGNpcCharacter::SetDead()
 	}
 }
 
-float APGNpcCharacter::GetPatrolRadius()
-{
-
-	return PatrolRadius;
-}
-
-float APGNpcCharacter::GetAIDetectRange()
-{
-	
-	if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
-	{
-		UGunWeaponData* gundata = Cast<UGunWeaponData>(AttackComponent->GetWeaponData());
-		if (gundata)
-		{
-			
-			return DetectRange*1.25;
-		}
-	}
-	
-	return DetectRange;
-}
-
-float APGNpcCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
-{
-	if (pawn)
-	{
-		TargetPawn = pawn;
-		
-	}
-	if (targetDistance > GetTotalStat().AttackRange * 2.5f)
-	{
-		if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
-		{
-			UGunWeaponData* gundata = Cast<UGunWeaponData>(AttackComponent->GetWeaponData());
-			if (gundata)
-			{
-				bIsShoot = true;
-				bIsAim = true;
-				
-				
-				return gundata->GunStat.traceDistance * 0.75;
-			}
-		}
-	}
-
-	bIsShoot = false;
-	bIsAim = false;
-	
-
-	return GetTotalStat().AttackRange*2;
-}
-
-void APGNpcCharacter::AttackByAI()
-{
-	
-	AttackToComponent();
-	
-	bIsShoot = false;
-	OnbIsShoot.Broadcast(bIsShoot);
-}
-
-void APGNpcCharacter::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
-{
-	OnAttackFinished = InOnAttackFinished;
-}
-
-void APGNpcCharacter::NotifyComboEnd()
-{
-	OnAttackFinished.ExecuteIfBound();
-}
-
-float APGNpcCharacter::AITurnSpeed()
-{
-	return TurnSpeed;
-}
+//float APGNpcCharacter::GetPatrolRadius()
+//{
+//
+//	return PatrolRadius;
+//}
+//
+//float APGNpcCharacter::GetAIDetectRange()
+//{
+//	
+//	if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
+//	{
+//		UGunWeaponData* gundata = Cast<UGunWeaponData>(AttackComponent->GetWeaponData());
+//		if (gundata)
+//		{
+//			
+//			return DetectRange*1.25;
+//		}
+//	}
+//	
+//	return DetectRange;
+//}
+//
+//float APGNpcCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
+//{
+//	if (pawn)
+//	{
+//		TargetPawn = pawn;
+//		
+//	}
+//	if (targetDistance > GetTotalStat().AttackRange * 2.5f)
+//	{
+//		if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
+//		{
+//			UGunWeaponData* gundata = Cast<UGunWeaponData>(AttackComponent->GetWeaponData());
+//			if (gundata)
+//			{
+//				bIsShoot = true;
+//				bIsAim = true;
+//				
+//				
+//				return gundata->GunStat.traceDistance * 0.75;
+//			}
+//		}
+//	}
+//
+//	bIsShoot = false;
+//	bIsAim = false;
+//	
+//
+//	return GetTotalStat().AttackRange*2;
+//}
+//
+//void APGNpcCharacter::AttackByAI()
+//{
+//	
+//	AttackToComponent();
+//	
+//	bIsShoot = false;
+//	OnbIsShoot.Broadcast(bIsShoot);
+//}
+//
+//void APGNpcCharacter::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
+//{
+//	OnAttackFinished = InOnAttackFinished;
+//}
+//
+//void APGNpcCharacter::NotifyComboEnd()
+//{
+//	OnAttackFinished.ExecuteIfBound();
+//}
+//
+//float APGNpcCharacter::AITurnSpeed()
+//{
+//	return TurnSpeed;
+//}
 
 void APGNpcCharacter::OnParryStart(float time)
 {
