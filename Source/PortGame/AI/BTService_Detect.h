@@ -24,5 +24,5 @@ private:
 
 protected:
 	UPROPERTY(Category = Service, EditAnywhere, meta = (ClampMin = "1"))
-	uint8 CanTargetPlayerCount =3;
+	
 };
