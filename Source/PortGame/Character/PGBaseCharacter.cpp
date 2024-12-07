@@ -316,6 +316,11 @@ void APGBaseCharacter::OnNiagaraSystemFinished(UNiagaraComponent* FinishedCompon
 	
 }
 
+void APGBaseCharacter::SkillToComponent()
+{
+	AttackComponent->SkillAttack();
+}
+
 
 
 

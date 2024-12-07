@@ -51,6 +51,12 @@ APGPlayerCharacter::APGPlayerCharacter()
 	if (CharacterAimData.Object)
 		ControlDataManager.Add(EControlData::Aim, CharacterAimData.Object);
 	
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> DashMon(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/DashMontage.DashMontage'"));
+	if (DashMon.Object)
+	{
+		DashMontage = DashMon.Object;
+	}
+
 	CurrentControlData = EControlData::Base;
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -133,6 +139,12 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		EvadeCameraShakeClass = EvadeCameraShake.Class;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> Skill(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Skill.IA_Skill'"));
+	if (Skill.Object)
+	{
+		SkillAction = Skill.Object;
+	}
 	
 	Tags.Add(TAG_PLAYER);
 	
@@ -156,6 +168,7 @@ void APGPlayerCharacter::BeginPlay()
 	FGenericTeamId currentteam = GetGenericTeamId();
 	SLOG(TEXT("actor : %s , myteamide : %d"), *GetActorLabel(), currentteam.GetId());
 
+	
 	
 }
 
@@ -198,6 +211,8 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(TargetSideAction, ETriggerEvent::Started, this, &APGPlayerCharacter::FindSideEnemyToComp);
 
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &APGPlayerCharacter::OnDash);
+
+		EnhancedInputComponent->BindAction(SkillAction, ETriggerEvent::Started, this, &APGPlayerCharacter::InputSkill);
 	
 	}
 	else
@@ -541,6 +556,9 @@ void APGPlayerCharacter::OnDash()
 	GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration*3.0f;
 
 	DashVector = GetCharacterMovement()->GetLastInputVector();
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(DashMontage, 1.0f);
 	
 	//GetController()->SetIgnoreMoveInput(true);
 	
@@ -721,7 +739,7 @@ void APGPlayerCharacter::SetPlayerTargetPawn(APawn* enemy)
 	if (!TargetMePawns.Contains(enemy))
 	{
 		TargetMePawns.Add(enemy);
-		SLOG(TEXT("Add Target %s"), *enemy->GetActorLabel());
+		//SLOG(TEXT("Add Target %s"), *enemy->GetActorLabel());
 	}
 
 
@@ -732,8 +750,16 @@ void APGPlayerCharacter::DeletePlayerTargetPawn(APawn* enemy)
 	if (TargetMePawns.Contains(enemy))
 	{
 		TargetMePawns.Remove(enemy);
-		SLOG(TEXT("Delete Target %s"), *enemy->GetActorLabel());
+		//SLOG(TEXT("Delete Target %s"), *enemy->GetActorLabel());
 	}
+}
+
+void APGPlayerCharacter::InputSkill()
+{
+	if (bIsSlow || bIsDash)return;
+
+	SkillToComponent();
+	
 }
 
 

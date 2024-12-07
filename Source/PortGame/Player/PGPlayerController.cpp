@@ -9,7 +9,7 @@
 
 #include "Component/PGWidgetComponent.h"
 
-#include "AIController.h"
+
 #include "PortGame/PortGame.h"
 
 APGPlayerController::APGPlayerController()
@@ -41,9 +41,9 @@ void APGPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 
-	if (aPawn->GetController()->IsA<AAIController>())
+	if (aPawn->GetController())
 	{
-		SLOG(TEXT("hasAIConTroller"));
+		SLOG(TEXT("Controller :%s "), *aPawn->GetController()->GetActorLabel());
 	}
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(aPawn);
 	if (playerCharacter)

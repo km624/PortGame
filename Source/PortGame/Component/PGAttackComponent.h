@@ -80,6 +80,7 @@ protected:
 	TSubclassOf<class UCameraShakeBase>	ParrayCameraShakeClass;
 
 public:
+	UFUNCTION()
 	FORCEINLINE bool GetbIsGodMode() { return bIsGodMode; }
 
 	FORCEINLINE void SetbIsGodMode(bool isgod) { bIsGodMode = isgod; }
@@ -87,9 +88,22 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = palyerState)
 	uint8 bIsGodMode : 1;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = palyerState)
-	int32 ParryCount = 0;
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = palyerState)
+	int32 ParryCount = 0;*/
 	
+
+public:
+	void SetSkill();
+
+	void SkillAttack();
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	TSubclassOf<class USkillBase> SkillClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	TObjectPtr<class USkillBase> Skill;
 
 		
 };

@@ -12,6 +12,7 @@
 #include "Physics/PGCollision.h"
 #include "Interface/NPCParryCheckInterface.h"
 #include "GenericTeamAgentInterface.h"
+#include "Skill/SkillBase.h"
 
 
 UPGAttackComponent::UPGAttackComponent()
@@ -38,6 +39,8 @@ void UPGAttackComponent::InitializeComponent()
 	SetWeaponClass();
 
 	SetUpWeapon();
+
+	SetSkill();
 }
 
 void UPGAttackComponent::BeginPlay()
@@ -113,13 +116,21 @@ void UPGAttackComponent::AttackHitCheck()
 
 	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
 
-	 float AttackRange = BaseCharacter->GetTotalStat().AttackRange;
+	 //float AttackRange = BaseCharacter->GetTotalStat().AttackRange;
+	float AttackRange = 50.0f;
 	 float AttackRadius = BaseCharacter->GetTotalStat().AttackRange;
 	 float AttackDamage = BaseCharacter->GetTotalStat().Attack;
+
+	 if (Skill && Skill->GetbIsSkill())
+	 {
+		 AttackRadius *= 1.5f;
+		 AttackDamage *= 1.5f;
+	 }
+
 	//ENEMY면 공격력 거리 짧게
 	if(BaseCharacter->ActorHasTag(TAG_AI))
 	{
-		AttackRange *= 0.5f;
+		//AttackRange *= 0.5f;
 		AttackRadius *= 0.5f;
 		AttackDamage *= 0.25f;
 	}
@@ -172,7 +183,7 @@ void UPGAttackComponent::AttackHitCheck()
 					if (parryCheck)
 					{	
 						
-						ParryCount++;
+						//ParryCount++;
 						stoptime = 1.0f;
 
 						parry = true;
@@ -209,7 +220,7 @@ void UPGAttackComponent::AttackHitCheck()
 #if ENABLE_DRAW_DEBUG
 
 	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
-	float CapsuleHalfHeight = AttackRange * 0.5f;
+	float CapsuleHalfHeight = AttackRadius * 0.5f;
 	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
 
 	FVector TraceVec = BaseCharacter->GetActorForwardVector() * AttackRange;
@@ -266,6 +277,31 @@ void UPGAttackComponent::AttackEffect(AActor* target , FVector targetLocation)
 	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(target);
 	BaseCharacter->StartNiagaraEffect(Weapon->GetWeaponEffect(), targetLocation);
 }
+
+void UPGAttackComponent::SetSkill()
+{
+	if (SkillClass)
+	{
+		Skill = NewObject<USkillBase>(this, SkillClass);
+
+		if (Skill)
+		{
+			APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
+			Skill->SetSkillSetting(BaseCharacter);
+
+			Skill->OnbIsSkill.AddUObject(this, &ThisClass::SetbIsGodMode);
+		}
+	}
+}
+
+void UPGAttackComponent::SkillAttack()
+{
+	if (Skill)
+	{
+		Skill->OnSkill();
+	}
+}
+
 
 
 

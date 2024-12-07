@@ -194,6 +194,10 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UNiagaraComponent> BaseNiagaraComponent;
 
+	//Skill 입력 컴포넌트로
+protected:
+	void SkillToComponent();
+
 	
 
 };

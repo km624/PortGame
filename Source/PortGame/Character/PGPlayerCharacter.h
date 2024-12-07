@@ -14,7 +14,6 @@
 /**
  * 
  */
-
 UENUM()
 enum class EControlData : uint8
 {
@@ -22,7 +21,6 @@ enum class EControlData : uint8
 	Aim
 
 };
-
 UCLASS()
 class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface
 	, public IAITargetPlayerInterface
@@ -86,6 +84,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction>DashAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction>SkillAction;
+
 
 
 	//매개변수 받기 위해 헤더 인클루드
@@ -184,7 +186,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PostEffect")
 	TObjectPtr<class UPostProcessComponent> PostProcessComponent;
 
-	//대시
+	//대시 , 회피
 protected:
 	void OnDash();
 
@@ -236,6 +238,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
 	float EvadeTime = 0.5f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
+	TObjectPtr<class UAnimMontage> DashMontage;
+
 	//범위 슬로우
 protected:
 	virtual void OnSlowOVerlapToNPC(float time) override;
@@ -259,5 +264,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 MaxTargets = 3;
 
+
+	//스킬 입력
+protected:
+	void InputSkill();
 	
 };

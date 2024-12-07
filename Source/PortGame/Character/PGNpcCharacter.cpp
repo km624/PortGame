@@ -229,7 +229,7 @@ void APGNpcCharacter::OnParryStart(float time)
 
 	if (RandomParry()==false) return;
 
-	//SLOG(TEXT("ParryStart"));
+	
 	NAParryStart();
 	bIsParry = true;
 	CustomTimeDilation = 0.3f;
@@ -282,7 +282,7 @@ void APGNpcCharacter::NAParryStart()
 
 void APGNpcCharacter::NAParryUpdateScale(float time)
 {
-	
+	if(bIsGroggy)NAParryUpdateEnd();
 	ElapsedTime += 0.01f; // Update 간격에 맞춰 누적 시간 증가
 
 	// 스케일 계산
