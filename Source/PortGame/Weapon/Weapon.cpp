@@ -33,7 +33,7 @@ void AWeapon::OnInitializeWeapon(APGBaseCharacter* BaseCharacter,UWeaponData* we
 		NAWeaponEffect = weaponData->NAWeaponEffect;
 	}
 
-	SLOG(TEXT("WeaponAttachment"));
+	//SLOG(TEXT("WeaponAttachment"));
 }
 
 

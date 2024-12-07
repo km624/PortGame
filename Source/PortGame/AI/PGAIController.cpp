@@ -7,6 +7,7 @@
 #include "BehaviorTree/BlackboardData.h"
 #include "AI/PGAI.h"
 #include "PortGame/PortGame.h"
+#include "Interface/PGAICharacterInterface.h"
 
 APGAIController::APGAIController()
 {
@@ -25,7 +26,7 @@ APGAIController::APGAIController()
 
 void APGAIController::RunAI()
 {
-	SLOG(TEXT("RunAi"));
+	//SLOG(TEXT("RunAi"));
 	UBlackboardComponent* BlackboardComp = Blackboard.Get();
 	if (UseBlackboard(BBAsset, BlackboardComp))
 	{
@@ -54,8 +55,11 @@ void APGAIController::BlackBoardReset()
 		APawn* pawn = Cast<APawn>(BlackboardComp->GetValueAsObject(BBKEY_TARGET));	
 		if (pawn->ActorHasTag(TAG_PLAYER))
 		{
-			uint32 targetCount = BlackboardComp->GetValueAsInt(BBKEY_PLAYERTARGETCOUNT);
-			BlackboardComp->SetValueAsInt(BBKEY_PLAYERTARGETCOUNT, --targetCount);
+			
+			IPGAICharacterInterface* player = Cast<IPGAICharacterInterface>(pawn);
+			player->DeletePlayerTargetPawn(GetPawn());
+			/*uint32 targetCount = BlackboardComp->GetValueAsInt(BBKEY_PLAYERTARGETCOUNT);
+			BlackboardComp->SetValueAsInt(BBKEY_PLAYERTARGETCOUNT, --targetCount);*/
 		}
 
 		BlackboardComp->SetValueAsObject(BBKEY_TARGET,nullptr);
@@ -78,7 +82,7 @@ void APGAIController::StopTree()
 
 void APGAIController::StartTree()
 {
-	SLOG(TEXT("StartTree"));
+	//SLOG(TEXT("StartTree"));
 	RunAI();
 	
 }

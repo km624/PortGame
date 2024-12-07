@@ -476,13 +476,18 @@ void APGPlayerCharacter::SetMotionWarpingLocation(FVector targetPos)
 	{
 		if (TargetingComponent->CharcterTargetDistance() > 300.0f)
 		{
-			MotionWarpingComponent->RemoveWarpTarget(TEXT("Target"));
+			ResetMotionWarping();
 			return;
 		}
 
 	}
 	MotionWarpingComponent->AddOrUpdateWarpTargetFromLocation(TEXT("Target"), targetPos);
 	
+}
+
+void APGPlayerCharacter::ResetMotionWarping()
+{
+	MotionWarpingComponent->RemoveWarpTarget(TEXT("Target"));
 }
 
 void APGPlayerCharacter::SetAttackRotation(float dt)
@@ -558,7 +563,7 @@ void APGPlayerCharacter::OnDash()
 void APGPlayerCharacter::OnAvoidEffect()
 {
 
-	SLOG(TEXT("Avoid"));
+	//SLOG(TEXT("Avoid"));
 	bIsEvade = true;
 
 	PlayEvadeMontage();
@@ -693,6 +698,74 @@ void APGPlayerCharacter::OnSlowOVerlapToNPC(float time)
 			}
 		}
 	}
+}
+
+bool APGPlayerCharacter::CanPlayerTarget(APawn* enemy)
+{
+	if (TargetMePawns.Num()>= MaxTargets)
+	{
+		if (TargetMePawns.Contains(enemy))
+			return true;
+		else
+			return false;
+	}
+	else
+		return true;
+
+	
+	
+}
+
+void APGPlayerCharacter::SetPlayerTargetPawn(APawn* enemy)
+{
+	if (!TargetMePawns.Contains(enemy))
+	{
+		TargetMePawns.Add(enemy);
+		SLOG(TEXT("Add Target %s"), *enemy->GetActorLabel());
+	}
+
+
+}
+
+void APGPlayerCharacter::DeletePlayerTargetPawn(APawn* enemy)
+{
+	if (TargetMePawns.Contains(enemy))
+	{
+		TargetMePawns.Remove(enemy);
+		SLOG(TEXT("Delete Target %s"), *enemy->GetActorLabel());
+	}
+}
+
+float APGPlayerCharacter::GetPatrolRadius()
+{
+	return 0.0f;
+}
+
+float APGPlayerCharacter::GetAIDetectRange()
+{
+	return 0.0f;
+}
+
+float APGPlayerCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
+{
+	return 0.0f;
+}
+
+void APGPlayerCharacter::AttackByAI()
+{
+}
+
+void APGPlayerCharacter::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
+{
+}
+
+void APGPlayerCharacter::NotifyComboEnd()
+{
+}
+
+float APGPlayerCharacter::AITurnSpeed()
+{
+	return 0.0f;
 }
 
 

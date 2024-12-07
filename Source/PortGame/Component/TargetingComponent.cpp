@@ -7,6 +7,7 @@
 #include "Character/PGPlayerCharacter.h"
 #include "Character/PGBaseCharacter.h"
 #include "Physics/PGCollision.h"
+#include "GenericTeamAgentInterface.h"
 
 
 
@@ -91,6 +92,15 @@ void UTargetingComponent::SetSideTargetLock(float direction)
 	
 }
 
+void UTargetingComponent::ResetTargeting()
+{
+	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(GetOwner());
+	TargetActor = NULL;
+	bIsTargetLock = false;
+	AllTargetActor.Empty();
+	playerCharacter->ResetMotionWarping();
+}
+
 AActor* UTargetingComponent::FindClosestEnemy()
 {
 	
@@ -144,7 +154,10 @@ AActor* UTargetingComponent::FindClosestEnemy()
 			
 			if (Actor)
 			{
-				if (Actor && Actor->ActorHasTag(TEXT("Enemy")))
+				APGBaseCharacter* targetbase = Cast<APGBaseCharacter>(Actor);
+				if (targetbase->GetbIsDead()) continue;
+				IGenericTeamAgentInterface* enemy = Cast<IGenericTeamAgentInterface>(Actor);
+				if (Actor && enemy->GetTeamAttitudeTowards(*GetOwner()))
 				{
 
 					FVector TargetLocation = Actor->GetActorLocation(); // 타겟 위치 가져오기
@@ -159,18 +172,22 @@ AActor* UTargetingComponent::FindClosestEnemy()
 			}
 
 		}
-
-		TargetDistances.Sort();
-		AllTargetActor.Empty();
-		for (const FTargetDistance& TargetDist : TargetDistances)
+		if (TargetDistances.Num() > 0)
 		{
-			AllTargetActor.Add(TargetDist.Target);
-			SLOG(TEXT("Targeting : %s"), *TargetDist.Target->GetActorLabel());
+			TargetDistances.Sort();
+			AllTargetActor.Empty();
+			for (const FTargetDistance& TargetDist : TargetDistances)
+			{
+				AllTargetActor.Add(TargetDist.Target);
+				//SLOG(TEXT("Targeting : %s"), *TargetDist.Target->GetActorLabel());
+			}
+			//TargetActor = AllTargetActor[0];
+			//bIsTargetLock = true;
+
+			ClosestEnemy = AllTargetActor[0];
 		}
-		//TargetActor = AllTargetActor[0];
-		//bIsTargetLock = true;
-		
-		ClosestEnemy = AllTargetActor[0];
+		else
+			AllTargetActor.Empty();
 	}
 	else
 	{
@@ -247,8 +264,7 @@ void UTargetingComponent::TargetLockOn(float dt)
 		AllTargetActor.RemoveAt(0);
 		if (AllTargetActor.Num() <= 0)
 		{
-			TargetActor = NULL;
-			bIsTargetLock = false;
+			ResetTargeting();
 			return;
 		}
 		TargetActor = AllTargetActor[0];
@@ -256,9 +272,7 @@ void UTargetingComponent::TargetLockOn(float dt)
 	
 	if (CharcterTargetDistance() > SearchDistance||playerCharacter->GetCurrentIsAiming())
 	{
-		TargetActor = NULL;
-		bIsTargetLock = false;
-		AllTargetActor.Empty();
+		ResetTargeting();
 		return;
 	}
 

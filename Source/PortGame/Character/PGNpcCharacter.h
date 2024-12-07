@@ -75,6 +75,8 @@ protected:
 protected:
 	virtual void OnParryStart(float time) override;
 
+	bool RandomParry();
+
 	virtual void OnParryEnd() override;
 
 	virtual bool GetBisParry() const override;
@@ -88,6 +90,9 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "Parry")
 	uint8 bIsParry : 1;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Parry", meta =(ClampMin = "0.0", ClampMax = "100.0"))
+	float ParryPercent = 30.0f;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UNiagaraComponent> ParryNiagaraComponent;

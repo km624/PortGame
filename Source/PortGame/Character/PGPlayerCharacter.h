@@ -7,6 +7,7 @@
 #include "Components/TimelineComponent.h"
 #include "Interface/PGHudWidgetInterface.h"
 #include "Interface/AttackHitStopInterface.h"
+#include "Interface/PGAICharacterInterface.h"
 #include "PGPlayerCharacter.generated.h"
 
 /**
@@ -23,6 +24,7 @@ enum class EControlData : uint8
 
 UCLASS()
 class PORTGAME_API APGPlayerCharacter : public APGBaseCharacter,public IPGHudWidgetInterface ,public IAttackHitStopInterface
+	, public IPGAICharacterInterface
 {
 	GENERATED_BODY()
 public:
@@ -147,6 +149,8 @@ public:
 
 	void SetMotionWarpingLocation(FVector targetPos);
 
+	void ResetMotionWarping();
+
 
 	//공격중 회전구현
 public:
@@ -238,4 +242,37 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Slow")
 	float SlowRadius = 500.0f;
+
+
+public:
+	virtual bool CanPlayerTarget(APawn* enemy) override;
+
+	virtual void SetPlayerTargetPawn(APawn* enemy) override;
+
+	virtual void DeletePlayerTargetPawn(APawn* enemy)override;
+
+protected:
+	UPROPERTY(VisibleAnywhere)
+	TArray<TWeakObjectPtr<APawn>> TargetMePawns;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 MaxTargets = 3;
+
+	//임시 생성
+
+protected:
+	virtual float GetPatrolRadius() override;
+
+	virtual float  GetAIDetectRange()override;
+
+	virtual float GetAIAttackRange(float targetDistance, APawn* pawn) override;
+
+	virtual void AttackByAI() override;
+
+	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
+
+	virtual void NotifyComboEnd() override;
+
+	virtual float AITurnSpeed() override;
+
 };

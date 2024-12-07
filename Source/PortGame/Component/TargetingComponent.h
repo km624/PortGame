@@ -51,6 +51,8 @@ public:
 
 protected:
 
+	void ResetTargeting();
+
 	AActor* FindClosestEnemy();
 
 	AActor* FindSideClosetEnemy(const TArray<AActor*>& Actors, const FVector& DirectionLocation, const FVector& Origin, const FVector& Direction);

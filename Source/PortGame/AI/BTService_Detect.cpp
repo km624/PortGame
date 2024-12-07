@@ -11,6 +11,7 @@
 #include "Engine/OverlapResult.h"
 #include "PortGame/PortGame.h"
 #include "GenericTeamAgentInterface.h"
+#include "Interface/PGAICharacterInterface.h"
 
 
 UBTService_Detect::UBTService_Detect()
@@ -40,15 +41,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	{
 		return;
 	}
-
-	//이미 플레이어를 타겟 했다면
-	AActor* TargetPlayer = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_TARGET));
-	if (TargetPlayer)
-	{
-		if (TargetPlayer->ActorHasTag(TAG_PLAYER))
-			return;
-	}
-
+	
 	float DetectRadius = AIPawn->GetAIDetectRange();
 
 	TArray<FOverlapResult> OverlapResults;
@@ -69,32 +62,36 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		float MinTargetDistance = FLT_MAX;
 		AActor* TargetActor = NULL;
 		IGenericTeamAgentInterface* MypawnTeam = Cast<IGenericTeamAgentInterface>(ControllingPawn);
-		int32 TargetingCount = OwnerComp.GetBlackboardComponent()->GetValueAsInt(BBKEY_PLAYERTARGETCOUNT);
+		//int32 TargetingCount = OwnerComp.GetBlackboardComponent()->GetValueAsInt(BBKEY_PLAYERTARGETCOUNT);
 
 		for (auto const& OverlapResult : OverlapResults)
 		{
 			// 다른 팀
 			if (MypawnTeam->GetTeamAttitudeTowards(*OverlapResult.GetActor()))
 			{
-				//플레이어 타깃 카운트가 [ ] 이하라면
-				if (TargetingCount < CanTargetPlayerCount)
+				TargetActor = OverlapResult.GetActor();
+				if (OverlapResult.GetActor()->ActorHasTag(TAG_PLAYER))
 				{
-					if (OverlapResult.GetActor()->ActorHasTag(TAG_PLAYER))
-					{
-						TargetActor = OverlapResult.GetActor();
-						
-						APawn* Pawn = Cast<APawn>(TargetActor);
 
-						OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn);
-						TargetingCount++;
-						OwnerComp.GetBlackboardComponent()->SetValueAsInt(BBKEY_PLAYERTARGETCOUNT,TargetingCount);
+					APawn* TargetPawn = Cast<APawn>(TargetActor);
+					IPGAICharacterInterface* player = Cast<IPGAICharacterInterface>(TargetPawn);
+
+					if (player->CanPlayerTarget(ControllingPawn))
+					{
+						player->SetPlayerTargetPawn(ControllingPawn);
+						OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, TargetPawn);
 
 						DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Purple, false, 0.2f);
-						DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
-						DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
+						DrawDebugPoint(World, TargetPawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
+						DrawDebugLine(World, ControllingPawn->GetActorLocation(), TargetPawn->GetActorLocation(), FColor::Green, false, 0.27f);
 						return;
 					}
+					
+					/*TargetingCount++;
+					OwnerComp.GetBlackboardComponent()->SetValueAsInt(BBKEY_PLAYERTARGETCOUNT, TargetingCount);*/
+		
 				}
+				
 
 				// 거리별로 타겟팅
 				float TargetDistnace = TargetToDistance(ControllingPawn->GetActorLocation(), OverlapResult.GetActor()->GetActorLocation());
@@ -107,6 +104,9 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			}
 		
 		}
+
+		//제일 거리가 적을 애를 타겟팅 
+		// ( 플레이어 관여하는 액터랑 상관없이 몇명이든 아무나)
 		if (TargetActor)
 		{
 			
@@ -119,6 +119,18 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			return;
 		}
 		
+	}
+	
+	//감지가 되지 않았을때
+	//만약 플레이어를 감지하고 있었다가 감지 못하면
+	AActor* TargetPlayer = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_TARGET));
+	if (TargetPlayer)
+	{
+		if (TargetPlayer->ActorHasTag(TAG_PLAYER))
+		{
+			IPGAICharacterInterface* player = Cast<IPGAICharacterInterface>(TargetPlayer);
+			player->DeletePlayerTargetPawn(ControllingPawn);
+		}
 	}
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);

@@ -25,11 +25,5 @@ public:
 	UPROPERTY(EditAnywhere, Category = Name)
 	uint8 MaxComboCount;
 
-	//프레임 기준 재생 속도 지정
-	UPROPERTY(EditAnywhere, Category = Name)
-	float FrameRate;
-
-	UPROPERTY(EditAnywhere, Category = ComboData)
-	TArray<float> EffectiveFrameCount;
 	
 };

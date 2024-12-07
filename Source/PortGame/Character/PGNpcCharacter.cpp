@@ -26,12 +26,9 @@ APGNpcCharacter::APGNpcCharacter()
 
 	TurnSpeed = 10.0f;
 
-
-
 	Tags.Add(TAG_AI);
 
 	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
-
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
 	
@@ -79,14 +76,7 @@ void APGNpcCharacter::BeginPlay()
 
 			
 			GetMesh()->SetMaterial(0, DynamicMaterial);
-			if (GetMesh()->GetMaterial(0) == DynamicMaterial)
-			{
-				UE_LOG(LogTemp, Log, TEXT("Material Applied Successfully"));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Material Not Applied"));
-			}
+		
 		}
 		
 	}
@@ -120,7 +110,7 @@ void APGNpcCharacter::NPCAttackHitStop(float time)
 	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
 	currentSlowtime = time;
 	float OrginTimeDilation = CustomTimeDilation;
-	SLOG(TEXT("NAme: %s , time: %f , origincustom: %f"),*GetActorLabel(), time,OrginTimeDilation);
+	//SLOG(TEXT("NAme: %s , time: %f , origincustom: %f"),*GetActorLabel(), time,OrginTimeDilation);
 	CustomTimeDilation = 0.01f;
 	GetWorld()->GetTimerManager().SetTimer(
 		NPCHitStoptimerHandle,
@@ -184,8 +174,6 @@ float APGNpcCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
 		TargetPawn = pawn;
 		
 	}
-	
-
 	if (targetDistance > GetTotalStat().AttackRange * 2.5f)
 	{
 		if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
@@ -236,14 +224,26 @@ float APGNpcCharacter::AITurnSpeed()
 void APGNpcCharacter::OnParryStart(float time)
 {
 	if (!TargetPawn->ActorHasTag(TAG_PLAYER)) return;
-	
-	SLOG(TEXT("ParryStart"));
+
+	if (bIsGroggy)return;
+
+	if (RandomParry()==false) return;
+
+	//SLOG(TEXT("ParryStart"));
 	NAParryStart();
 	bIsParry = true;
 	CustomTimeDilation = 0.3f;
 	float ActorTime = time / CustomTimeDilation;
 	GetWorld()->GetTimerManager().SetTimer(NAScaleTimerHandle, [this, ActorTime]() { NAParryUpdateScale(ActorTime); }, 0.01f, true);
 		
+}
+
+bool APGNpcCharacter::RandomParry()
+{
+	float RandomValue = FMath::FRand()*100.0f;
+	if (ParryPercent > RandomValue)
+		return true;
+	return false;
 }
 
 void APGNpcCharacter::OnParryEnd()

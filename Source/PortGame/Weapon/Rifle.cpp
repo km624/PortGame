@@ -120,7 +120,7 @@ void ARifle::StartFire()
 void ARifle::StopFire()
 {
 	if (StopTimerHandle.IsValid())return;
-	UE_LOG(LogTemp, Warning, TEXT("Stop"));
+	//UE_LOG(LogTemp, Warning, TEXT("Stop"));
 	if (FireTimerHandle.IsValid())
 	{
 
@@ -161,10 +161,10 @@ void ARifle::FireWithLineTrace()
 	{
 		StopFire();
 		Reloading();
-		UE_LOG(LogTemp, Warning, TEXT("NoArmo"));
+		//UE_LOG(LogTemp, Warning, TEXT("NoArmo"));
 		return;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Time : %lf"), GetWorld()->GetTimeSeconds());
+	//UE_LOG(LogTemp, Warning, TEXT("Time : %lf"), GetWorld()->GetTimeSeconds());
 	Currentammo--;
 	
 
@@ -251,7 +251,7 @@ void ARifle::FireWithLineTrace()
 	}
 	StartGaunRecoil();
 	
-	UE_LOG(LogTemp, Warning, TEXT("%d"), Currentammo);
+	//UE_LOG(LogTemp, Warning, TEXT("%d"), Currentammo);
 
 
 }

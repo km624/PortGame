@@ -127,8 +127,7 @@ void APGBaseCharacter::BeginPlay()
 
 	SetGenericTeamId(TeamId);
 
-	/*FGenericTeamId currentteam = GetGenericTeamId();
-	SLOG(TEXT("actor : %s , myteamide : %d"), *GetActorLabel(), currentteam.GetId());*/
+	
 }
 
 void APGBaseCharacter::AttackToComponent()
@@ -301,7 +300,7 @@ void APGBaseCharacter::StartNiagaraEffect(UNiagaraSystem* niagara ,FVector Targe
 {
 	if (niagara)
 	{
-		SLOG(TEXT("STARTNiagara"));
+		//SLOG(TEXT("STARTNiagara"));
 		BaseNiagaraComponent->SetAsset(niagara);
 		BaseNiagaraComponent->SetWorldLocation(TargetLocation);
 		BaseNiagaraComponent->Activate();
@@ -312,7 +311,7 @@ void APGBaseCharacter::StartNiagaraEffect(UNiagaraSystem* niagara ,FVector Targe
 
 void APGBaseCharacter::OnNiagaraSystemFinished(UNiagaraComponent* FinishedComponent)
 {
-	SLOG(TEXT("NiagaraEND"));
+	//SLOG(TEXT("NiagaraEND"));
 	FinishedComponent->Deactivate();
 	
 }

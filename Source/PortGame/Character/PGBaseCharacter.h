@@ -175,6 +175,7 @@ public:
 
 	FORCEINLINE virtual FGenericTeamId GetGenericTeamId() const override { return myteam; }
 
+
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	uint8 TeamId;
