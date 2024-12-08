@@ -33,6 +33,7 @@ public:
 
 	FORCEINLINE class UWeaponData* GetWeaponData() { return WeaponData; }
 
+
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UWeaponData> WeaponData;
@@ -97,6 +98,8 @@ public:
 
 	void SkillAttack();
 
+	void WeaponHide(bool visible);
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
@@ -106,4 +109,5 @@ protected:
 	TObjectPtr<class USkillBase> Skill;
 
 		
+
 };

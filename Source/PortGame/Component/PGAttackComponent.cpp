@@ -13,6 +13,7 @@
 #include "Interface/NPCParryCheckInterface.h"
 #include "GenericTeamAgentInterface.h"
 #include "Skill/SkillBase.h"
+#include "Skill/SkillBlueArchive.h"
 
 
 UPGAttackComponent::UPGAttackComponent()
@@ -74,6 +75,8 @@ void UPGAttackComponent::SetUpWeapon()
 		BaseCharacter->SetUpModifierStat(spawnWeapon->ModifierStat);
 
 		OnNextCombo.AddUObject(Weapon, &AWeapon::SetHasNextCombo);
+
+		
 	}
 
 
@@ -124,7 +127,7 @@ void UPGAttackComponent::AttackHitCheck()
 	 if (Skill && Skill->GetbIsSkill())
 	 {
 		 AttackRadius *= 1.5f;
-		 AttackDamage *= 1.5f;
+		 AttackDamage *= 3.0f;
 	 }
 
 	//ENEMY면 공격력 거리 짧게
@@ -290,6 +293,13 @@ void UPGAttackComponent::SetSkill()
 			Skill->SetSkillSetting(BaseCharacter);
 
 			Skill->OnbIsSkill.AddUObject(this, &ThisClass::SetbIsGodMode);
+			
+			//블루아카이브 스킬 한정
+			USkillBlueArchive* bluearchiveSkill = Cast<USkillBlueArchive>(Skill);
+			if (bluearchiveSkill)
+			{
+				Skill->OnbIsSkill.AddUObject(this, &ThisClass::WeaponHide);
+			}
 		}
 	}
 }
@@ -300,6 +310,11 @@ void UPGAttackComponent::SkillAttack()
 	{
 		Skill->OnSkill();
 	}
+}
+
+void UPGAttackComponent::WeaponHide(bool visible)
+{
+	Weapon->SetActorHiddenInGame(visible);
 }
 
 

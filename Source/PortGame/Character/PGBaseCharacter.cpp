@@ -218,6 +218,8 @@ float APGBaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	HitImpulseVector = -GetActorForwardVector() * 1000.0f;
+
 	return DamageAmount;
 }
 
@@ -249,8 +251,8 @@ void APGBaseCharacter::HitGaugeZeroEffect()
 {
 	if (bIsDead)
 		return;
-	FVector BackwardVector = -GetActorForwardVector(); 
-	GetCharacterMovement()->AddImpulse(BackwardVector * 1000.0f, true);
+	
+	GetCharacterMovement()->AddImpulse(HitImpulseVector , true);
 	
 }
 
@@ -320,6 +322,9 @@ void APGBaseCharacter::SkillToComponent()
 {
 	AttackComponent->SkillAttack();
 }
+
+
+
 
 
 

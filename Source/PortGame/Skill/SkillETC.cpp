@@ -56,6 +56,7 @@ void USkillETC::EndPlaySkillETCMontage(UAnimMontage* TargetMontage, bool IsPrope
 	{
 		playerCharacter->SetbIsAttackRotation(false);
 	}
+	SLOG(TEXT("END"));
 	EndSkill();
 }
 

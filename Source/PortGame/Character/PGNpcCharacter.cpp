@@ -84,10 +84,12 @@ void APGNpcCharacter::BeginPlay()
 
 float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-
-	//if (DamageCauser->ActorHasTag(TAG_PLAYER))
-	if (GetTeamAttitudeTowards(*DamageCauser))
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	//적팀일시
+	if (GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
 	{
+		//패리중일때
 		if (bIsParry)
 		{
 			
@@ -98,6 +100,24 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 		}	
 		else
 			StatComponent->Damaged(DamageAmount);
+	}
+
+	//수류탄에 맞았을시
+	if (DamageCauser->ActorHasTag(TAG_GRENADE))
+	{
+
+		FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
+		Direction.Normalize();
+		HitImpulseVector = Direction * 750.0f + (FVector(0, 0, 1) * 100.0f);
+
+		if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
+		{
+			StatComponent->Damaged(DamageAmount);
+		}
+		else
+		{
+			StatComponent->Damaged(DamageAmount*0.3f);
+		}
 	}
 
 	return DamageAmount;
@@ -220,6 +240,15 @@ void APGNpcCharacter::SetDead()
 //{
 //	return TurnSpeed;
 //}
+
+void APGNpcCharacter::PlayHitMontage()
+{
+	Super::PlayHitMontage();
+
+	NAParryUpdateEnd();
+	GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
+
+}
 
 void APGNpcCharacter::OnParryStart(float time)
 {

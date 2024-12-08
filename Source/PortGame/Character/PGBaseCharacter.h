@@ -142,7 +142,7 @@ protected:
 	//피격 애니메이션
 protected:
 	UFUNCTION()
-	void PlayHitMontage();
+	virtual void PlayHitMontage();
 
 	//뒤로 밀리게
 	virtual void HitGaugeZeroEffect() override;
@@ -152,6 +152,8 @@ protected:
 protected:
 	//그로기상태
 	uint8 bIsGroggy : 1;
+
+	FVector HitImpulseVector;
 
 
 	UFUNCTION()

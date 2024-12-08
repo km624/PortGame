@@ -431,6 +431,9 @@ void APGPlayerCharacter::AimUpdate(float deltaTime)
 
 float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	//대쉬 중
 	if (bIsDash)
 	{
 		if (bIsEvade) return DamageAmount;
@@ -438,13 +441,32 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 		OnAvoidEffect();
 		SetEvadeRotation(DamageCauser->GetActorLocation());
 	}
-
+	//무적
 	if (AttackComponent->GetbIsGodMode()) return DamageAmount;
 	
-	if (GetTeamAttitudeTowards(*DamageCauser))
+	//적팀 한테 데미지
+	if (GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
 	{
 		
 		StatComponent->Damaged(DamageAmount);
+	}
+
+	//수류탄에 맞았을시
+	if (DamageCauser->ActorHasTag(TAG_GRENADE) )
+	{
+
+		FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
+		Direction.Normalize();
+		HitImpulseVector = Direction * 750.0f + (FVector(0, 0, 1) * 100.0f);
+
+		if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
+		{
+			StatComponent->Damaged(DamageAmount);
+		}
+		else
+		{
+			StatComponent->Damaged(DamageAmount * 0.3f);
+		}
 	}
 	
 	

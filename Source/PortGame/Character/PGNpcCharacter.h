@@ -33,44 +33,10 @@ protected:
 
 	float currentSlowtime;
 
-//protected:
-//
-//	virtual float GetPatrolRadius() override;
-//
-//	virtual float GetAIDetectRange() override;
-//
-//	virtual float GetAIAttackRange(float targetDistance, APawn* pawn) override;
-//
-//	virtual void AttackByAI() override;
-//
-//	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
-//
-//	virtual void NotifyComboEnd() override;
-//
-//	virtual float AITurnSpeed() override;
-//
-//
-//	
-//
-//protected:
-//	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-//	float PatrolRadius;
-//
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-//	float DetectRange;
-//
-//	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-//	float TurnSpeed;
-//
-//
-//
-//	FAICharacterAttackFinished OnAttackFinished;
-//
-//public:
-//	FORCEINLINE APawn* GetTargetPawn() {return TargetPawn;}
-//
-//protected:
-//	TObjectPtr<APawn> TargetPawn;
+
+protected:
+	virtual void PlayHitMontage() override;
+
 
 	//패리 시스템
 protected:
