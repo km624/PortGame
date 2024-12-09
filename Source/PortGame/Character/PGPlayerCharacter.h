@@ -270,5 +270,8 @@ protected:
 	void InputSkill();
 
 	virtual void SetbIsNikkeSkill(bool skill) override;
+
+	//니케 한정
+	void StopDefenceNikke();
 	
 };

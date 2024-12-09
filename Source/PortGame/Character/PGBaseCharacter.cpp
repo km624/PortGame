@@ -37,7 +37,7 @@ APGBaseCharacter::APGBaseCharacter()
 	//가속력
 	//원래값 2048
 	GetCharacterMovement()->MaxAcceleration = 1500.0f;
-
+	
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;

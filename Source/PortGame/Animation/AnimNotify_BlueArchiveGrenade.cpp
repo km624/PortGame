@@ -4,9 +4,9 @@
 #include "Animation/AnimNotify_BlueArchiveGrenade.h"
 #include "Skill/BlueGrenade.h"
 
-void UAnimNotify_BlueArchiveGrenade::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void UAnimNotify_BlueArchiveGrenade::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
-	Super::Notify(MeshComp, Animation);
+	Super::Notify(MeshComp, Animation, EventReference);
 
     if (MeshComp && MeshComp->GetOwner())
     {

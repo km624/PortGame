@@ -180,8 +180,8 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
 		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		/*EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);*/
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APGPlayerCharacter::Move);
@@ -213,6 +213,8 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &APGPlayerCharacter::OnDash);
 
 		EnhancedInputComponent->BindAction(SkillAction, ETriggerEvent::Started, this, &APGPlayerCharacter::InputSkill);
+
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APGPlayerCharacter::StopDefenceNikke);
 	
 	}
 	else
@@ -807,6 +809,13 @@ void APGPlayerCharacter::SetbIsNikkeSkill(bool skill)
 		
 		SetCharacterData(EControlData::Base);
 	}
+
+	SLOG(TEXT("Nikke Skill : %d"), bIsNikkeSkill);
+}
+
+void APGPlayerCharacter::StopDefenceNikke()
+{
+	SetbIsNikkeSkill(false);
 }
 
 

@@ -22,7 +22,6 @@ public:
 
 protected:
 
-	void OnbIsCrouch(bool crouching);
 
 	virtual void EndSkill() override;
 
@@ -31,7 +30,9 @@ protected:
 	
 	float SkillWallTime = 20.0f;
 
-	bool IsCrouching;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Nikke")
+	TSubclassOf<class ANikkeWall> NikkeWallClass;
+
 
 	
 };
