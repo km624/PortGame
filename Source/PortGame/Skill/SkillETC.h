@@ -31,7 +31,7 @@ protected:
 
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ETC)
 	TObjectPtr<class UAnimMontage> SkillETCMontage;
 
 	FOnMontageEnded EndDelegate;

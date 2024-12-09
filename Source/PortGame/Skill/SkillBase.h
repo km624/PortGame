@@ -28,6 +28,8 @@ public:
 public:
 	FOnbIsSkillDelegate OnbIsSkill;
 
+	FORCEINLINE float GetSkillCooltime() { return SkillCooltime; }
+
 protected:
 	void SetTimer();
 

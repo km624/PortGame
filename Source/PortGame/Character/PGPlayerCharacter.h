@@ -268,5 +268,7 @@ protected:
 	//스킬 입력
 protected:
 	void InputSkill();
+
+	virtual void SetbIsNikkeSkill(bool skill) override;
 	
 };

@@ -282,8 +282,17 @@ void APGPlayerCharacter::SetCharacterData(EControlData DataName)
 	SpringArm->bInheritYaw = NewCharacterData->bInheritYaw;
 	SpringArm->bInheritRoll = NewCharacterData->bInheritRoll;
 	SpringArm->bDoCollisionTest = NewCharacterData->bDoCollisionTest;
-	
-	SpringArm->SetRelativeTransform(NewCharacterData->transform);
+	if (!bIsNikkeSkill)
+		SpringArm->SetRelativeTransform(NewCharacterData->transform);
+	else
+	{
+		FTransform nikkeTargetArm = NewCharacterData->transform;
+		FVector currentLocation = nikkeTargetArm.GetLocation();
+		currentLocation.Z = -10.0f;
+		nikkeTargetArm.SetLocation(currentLocation);
+		SpringArm->SetRelativeTransform(nikkeTargetArm);
+	}
+		
 
 }
 
@@ -782,6 +791,22 @@ void APGPlayerCharacter::InputSkill()
 
 	SkillToComponent();
 	
+}
+
+void APGPlayerCharacter::SetbIsNikkeSkill(bool skill)
+{
+	Super::SetbIsNikkeSkill(skill);
+
+	if (skill)
+	{
+		
+		SetCharacterData(EControlData::Base);
+	}
+	else
+	{
+		
+		SetCharacterData(EControlData::Base);
+	}
 }
 
 

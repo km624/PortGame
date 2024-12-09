@@ -323,6 +323,19 @@ void APGBaseCharacter::SkillToComponent()
 	AttackComponent->SkillAttack();
 }
 
+void APGBaseCharacter::SetbIsNikkeSkill(bool skill)
+{
+	if (skill)
+	{
+		GetCharacterMovement()->DisableMovement();
+	}
+	else
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	}
+	bIsNikkeSkill = skill;
+}
+
 
 
 

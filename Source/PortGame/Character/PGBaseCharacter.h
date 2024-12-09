@@ -200,6 +200,11 @@ protected:
 protected:
 	void SkillToComponent();
 
-	
+public:
+	virtual void SetbIsNikkeSkill(bool skill);
+	FORCEINLINE bool GetbIsNikkeSkill() { return bIsNikkeSkill; }
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
+	uint8 bIsNikkeSkill : 1;
 
 };

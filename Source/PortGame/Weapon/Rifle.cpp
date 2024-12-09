@@ -215,7 +215,7 @@ void ARifle::FireWithLineTrace()
 			
 			}
 			else
-				end = OwnerCharacter->GetController()->GetControlRotation().Vector() * traceDistance;
+				end = CameraEnd;
 			
 
 		}

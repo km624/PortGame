@@ -70,6 +70,10 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		bIsDead = BaseCharacter->GetbIsDead();
 	}
+	if (IsValid(BaseCharacter))
+	{
+		bIsNikkeSkill = BaseCharacter->GetbIsNikkeSkill();
+	}
 	
 }
 

@@ -72,6 +72,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	uint8 bIsDead : 1;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = NikkeSkill)
+	uint8 bIsNikkeSkill : 1;
+
 	
 	
 
