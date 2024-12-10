@@ -17,6 +17,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnHitGaugeChangedDelegate, float /*CurrentH
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnCharacterLevelChangedDelegate, float /*Level*/);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnUltiSkillGaugeChangedDelegate, float /*CurrentUltiSkillGauge*/);
+
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnStatChangedDelegate, const FPGCharacterStat& /*BaseStat*/ , const FPGCharacterStat& /*Modifier*/,const float/*maxHutGauge*/);
 
 
@@ -47,6 +49,7 @@ public:
 	FOnStatChangedDelegate OnStatChanged;
 	FOnHitGaugeZeroDelegate OnHitGaugeZero;
 	FOnHitGaugeChangedDelegate OnHitGaugeChanged;
+	FOnUltiSkillGaugeChangedDelegate OnUltiSkillGaugechanged;
 
 	void SetCurrentRarity(FName rarity);
 
@@ -69,11 +72,17 @@ public:
 	FORCEINLINE float  GetMaxHitGauge() { return MaxHitGauge; }
 	FORCEINLINE float  GetCurrentHitGauge() { return CurretHitGauge; }
 	
+	FORCEINLINE float  GetCurrentUltiSkillGauge() { return CurrentUltiSkillGauge; }
+	FORCEINLINE float  GetAddUltiSkillGauge() { return AddUltiSkillGauge; }
+	
 public:
 
 	void Damaged(float Damage);
 	
 	void HitGaugeDamaged(float Damage);
+
+	void AddUlitSkillGauge(float AddUltigauge);
+
 
 	//юс╫ц
 //protected:
@@ -112,6 +121,14 @@ protected:
 
 	FTimerHandle ResetHitGaugeTimer;
 
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
+	float CurrentUltiSkillGauge;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
+	float AddUltiSkillGauge = 10.0f;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Stat)
+	float MaxUltiSkillGauge = 100.0f;
 	
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta= (AllowPrivateAccess="true"))

@@ -4,6 +4,7 @@
 #include "Component/PGStatComponent.h"
 #include "Interface/PlayerAttackInterface.h"
 #include "TimerManager.h"
+#include "PortGame/PortGame.h"
 
 
 UPGStatComponent::UPGStatComponent()
@@ -40,11 +41,11 @@ void UPGStatComponent::InitializeComponent()
 
 	SetCurrentRarity(CurrentCharacterRarity);
 
-	//SetMaxHitGauge(GetTotalStat().HitGauge);
 	SetHp(GetTotalStat().MaxHp);
 
 	SetHitGauge(GetTotalStat().HitGauge);
 
+	CurrentUltiSkillGauge = 0.0f;
 }
 
 void UPGStatComponent::SetCurrentRarity(FName rarity)
@@ -87,7 +88,6 @@ void UPGStatComponent::SetHitGauge(float NewHitGauge)
 }
 
 
-
 void UPGStatComponent::SetLevelCharacter(int32 level)
 {
 
@@ -116,19 +116,9 @@ void UPGStatComponent::Damaged(float Damage)
 
 	const float PrevHp = CurrentHp;
 	const float ActualDamage = FMath::Clamp<float>(Damage, 0, Damage);
-	//const float PrevHitGauge = CurretHitGauge;
-	
-	
 
 	SetHp(PrevHp - ActualDamage);
-	//SetHitGauge(PrevHitGauge - ActualDamage);
-
-	//if (CurretHitGauge <= KINDA_SMALL_NUMBER)
-	//{
-	//	//UE_LOG(LogTemp, Warning, TEXT("GaugeEnd"));
-	//	OnHitGaugeZero.Broadcast();
-	//	HitGaugeZeroEffect();
-	//}
+	
 	HitGaugeDamaged(Damage);
 
 	if (CurrentHp <= KINDA_SMALL_NUMBER)
@@ -161,6 +151,23 @@ void UPGStatComponent::HitGaugeDamaged(float Damage)
 		HitGaugeZeroEffect();
 	}
 }
+
+void UPGStatComponent::AddUlitSkillGauge(float AddUltigauge)
+{
+	const float PrevSkillGauge = CurrentUltiSkillGauge;
+	const float ActualAddSkillGauge = FMath::Clamp<float>(AddUltigauge, 0, AddUltigauge);
+
+	CurrentUltiSkillGauge = PrevSkillGauge + ActualAddSkillGauge;
+
+	if (CurrentUltiSkillGauge >= MaxUltiSkillGauge)
+	{
+		CurrentUltiSkillGauge = MaxUltiSkillGauge;
+	}
+	OnUltiSkillGaugechanged.Broadcast(CurrentUltiSkillGauge);
+	SLOG(TEXT("CurrentUltiSkillGauge %f"), CurrentUltiSkillGauge);
+
+}
+
 
 
 
