@@ -360,6 +360,11 @@ void APGPlayerCharacter::Attack()
 	{
 		bIsShoot = true;
 	}
+	else
+	{
+		if (bIsNikkeSkill)
+			StopDefenceNikke();
+	}
 
 	AttackToComponent();
 	
@@ -418,6 +423,12 @@ void APGPlayerCharacter::ReleasedAim()
 		OnbIsShoot.Broadcast(bIsShoot);
 		SetCharacterData(EControlData::Base);
 		AimTimeline.Reverse();
+
+		if (bIsNikkeSkill)
+		{
+			FRotator BackRotation = GetActorRotation() + FRotator(0, 120.0f, 0);
+			SetActorRotation(BackRotation);
+		}
 	
 
 }

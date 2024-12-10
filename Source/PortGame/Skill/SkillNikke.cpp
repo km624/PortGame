@@ -4,6 +4,7 @@
 #include "Skill/SkillNikke.h"
 #include "Character/PGBaseCharacter.h"
 #include "Skill/NikkeWall.h"
+#include "Character/PGPlayerCharacter.h"
 
 USkillNikke::USkillNikke()
 {
@@ -12,6 +13,12 @@ USkillNikke::USkillNikke()
     {
         NikkeWallClass = SkillClass.Class;
     }
+    static ConstructorHelpers::FObjectFinder<UAnimMontage>SkillMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Skill/Nikke/NikkeSkillPhoneMontage.NikkeSkillPhoneMontage'"));
+    if (SkillMontage.Object)
+    {
+        SkillNikkeMontage = SkillMontage.Object;
+    }
+
 	SkillCooltime = 10.0f;
 }
 
@@ -21,11 +28,35 @@ void USkillNikke::OnSkill()
 
 	Super::OnSkill();
 	
-    // 수류탄 클래스 확인
+
+    GetWorld()->GetTimerManager().SetTimer(SpawnWallTimerHandle,this,&ThisClass::SpawnNikkeWaill,SpawnDelayTime , false);
+    PlaySkillNikkeMontage();
+
+}
+
+void USkillNikke::PlaySkillNikkeMontage()
+{
+    UAnimInstance* AnimInstance = ownercharacter->GetMesh()->GetAnimInstance();
+
+   
+    AnimInstance->Montage_Play(SkillNikkeMontage, 1.0f);
+
+    APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(ownercharacter);
+    if (playerCharacter)
+    {
+        playerCharacter->SetbIsAttackRotation(true);
+    }
+
+    EndDelegate.BindUObject(this, &USkillNikke::EndPSkillNikkeMontage);
+    AnimInstance->Montage_SetEndDelegate(EndDelegate, SkillNikkeMontage);
+}
+
+void USkillNikke::SpawnNikkeWaill()
+{
     if (NikkeWallClass)
     {
-        FVector SpawnLocation = ownercharacter->GetActorLocation() + ownercharacter->GetActorForwardVector() * 150.0f + 
-            ownercharacter->GetActorUpVector()*750.0f;
+        FVector SpawnLocation = ownercharacter->GetActorLocation() + ownercharacter->GetActorForwardVector() * 150.0f +
+            ownercharacter->GetActorUpVector() * 750.0f;
 
         FRotator SpawnRotation = ownercharacter->GetActorRotation();
         ANikkeWall* nikkewall = Cast<ANikkeWall>(GetWorld()->SpawnActorDeferred<ANikkeWall>(
@@ -37,15 +68,26 @@ void USkillNikke::OnSkill()
 
         if (nikkewall)
         {
-            nikkewall->SetUpNikkeWall(ownercharacter, 10.0f);
+            nikkewall->SetUpNikkeWall(ownercharacter, SkillWallTime);
 
             // 액터를 월드에 스폰
             nikkewall->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
         }
     }
 
-    EndSkill();
+}
 
+void USkillNikke::EndPSkillNikkeMontage(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+    GetWorld()->GetTimerManager().ClearTimer(SpawnWallTimerHandle);
+
+    APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(ownercharacter);
+    if (playerCharacter)
+    {
+        playerCharacter->SetbIsAttackRotation(false);
+    }
+
+    EndSkill();
 }
 
 

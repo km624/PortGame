@@ -78,7 +78,7 @@ void ANikkeWall::SetUpNikkeWall(APGBaseCharacter* character, float time)
 
 void ANikkeWall::SetLifeTimer()
 {
-	
+	SLOG(TEXT("SETLife"));
 	GetWorld()->GetTimerManager().SetTimer(
 		LifeTimeTimerHandle,
 		[this]() {
@@ -113,6 +113,8 @@ void ANikkeWall::OnBoxLand(UPrimitiveComponent* HitComponent, AActor* OtherActor
 		PawnBlockComponent->SetActive(false);
 
 		SetLifeTimer();
+
+		BoxComponent->OnComponentHit.RemoveDynamic(this, &ANikkeWall::OnBoxLand);
 		////  ÀÌÆåÆ® »ý¼º
 		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint);
 	}
@@ -123,7 +125,7 @@ void ANikkeWall::OnOverBacklapBegin(UPrimitiveComponent* OverlappedComponent, AA
 	if (OtherActor != Skillcharacter) return;
 	
 	if (!Skillcharacter) return;
-	FRotator BackRotation = GetActorRotation() + FRotator(0, 90.0f, 0);
+	FRotator BackRotation = GetActorRotation() + FRotator(0, 120.0f, 0);
 	FVector BackLocation = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + 70.0f) - (GetActorForwardVector() * 55.0f);
 	SetCharcter(BackLocation, BackRotation);
 }
@@ -134,7 +136,7 @@ void ANikkeWall::OnOverFrontlapBegin(UPrimitiveComponent* OverlappedComponent, A
 
 	if (!Skillcharacter) return;
 
-	FRotator frontRotation = GetActorRotation() + FRotator(0, -90.0f, 0);
+	FRotator frontRotation = GetActorRotation() + FRotator(0, -120.0f, 0);
 	FVector frontLocation = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z+70.0f) + (GetActorForwardVector() * 55.0f);
 
 	SetCharcter(frontLocation, frontRotation);
