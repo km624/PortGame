@@ -22,8 +22,8 @@ ANikkeWall::ANikkeWall()
 	RootComponent = BoxComponent;
 
 	BoxComponent->SetCollisionProfileName(TEXT("BlockAllDynamic"));
-	BoxComponent->SetSimulatePhysics(true);
-	BoxComponent->SetAllMassScale(100.0f);
+	/*BoxComponent->SetSimulatePhysics(true);
+	BoxComponent->SetAllMassScale(100.0f);*/
 
 	PawnBlockComponent->SetupAttachment(RootComponent);
 
@@ -60,6 +60,11 @@ ANikkeWall::ANikkeWall()
 void ANikkeWall::BeginPlay()
 {
 	Super::BeginPlay();
+
+	BoxComponent->SetSimulatePhysics(true);
+	BoxComponent->SetAllMassScale(100.0f);
+
+
 	BoxComponent->OnComponentHit.AddDynamic(this, &ANikkeWall::OnBoxLand);
 	BackTrigger->OnComponentBeginOverlap.AddDynamic(this, &ANikkeWall::OnOverBacklapBegin);
 	FrontTrigger->OnComponentBeginOverlap.AddDynamic(this, &ANikkeWall::OnOverFrontlapBegin);

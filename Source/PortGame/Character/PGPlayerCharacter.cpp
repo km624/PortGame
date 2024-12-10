@@ -14,7 +14,7 @@
 #include "UI/PGHudWidget.h"
 #include "Component/PGStatComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Kismet/KismetMathLibrary.h"
+//#include "Kismet/KismetMathLibrary.h"
 #include "PortGame/PortGame.h"
 #include "MotionWarpingComponent.h"
 #include "Component/TargetingComponent.h"
@@ -172,7 +172,7 @@ void APGPlayerCharacter::BeginPlay()
 	AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
 
 	FGenericTeamId currentteam = GetGenericTeamId();
-	SLOG(TEXT("actor : %s , myteamide : %d"), *GetActorLabel(), currentteam.GetId());
+	SLOG(TEXT("actor : %s , myteamide : %d"), *GetActorNameOrLabel(), currentteam.GetId());
 
 	
 	

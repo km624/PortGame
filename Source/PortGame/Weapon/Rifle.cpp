@@ -230,7 +230,8 @@ void ARifle::FireWithLineTrace()
 	GunDamage = OwnerCharacter->GetTotalStat().Attack * 0.2f;
 	if (OwnerCharacter->GetbIsNikkeSkill())
 		GunDamage *= 3.0f;
-	//AI는 거기서 더 4분의
+
+	//AI는 거기서 더 4분의 데미지
 	if (OwnerCharacter->ActorHasTag(TAG_AI))
 		GunDamage *= 0.25f;
 	

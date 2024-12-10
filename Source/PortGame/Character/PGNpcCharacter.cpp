@@ -63,7 +63,27 @@ void APGNpcCharacter::BeginPlay()
 	//NPC Ä³¸¯ÅÍ ÆÀ »ö±ò ¼³Á¤
 	FLinearColor teamcolor = (TeamId != 1) ? FLinearColor::Red : FLinearColor::Blue;
 	
-	UMaterialInterface* CurrentMaterial = GetMesh()->GetMaterial(0);
+	if (!HasAnyFlags(RF_ClassDefaultObject))
+	{
+		UMaterialInterface* CurrentMaterial = GetMesh()->GetMaterial(0);
+		if (CurrentMaterial)
+		{
+
+			UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurrentMaterial, this);
+
+			if (DynamicMaterial)
+			{
+
+				DynamicMaterial->SetVectorParameterValue(TEXT("Tint"), teamcolor);
+
+
+				GetMesh()->SetMaterial(0, DynamicMaterial);
+
+			}
+
+		}
+	}
+	/*UMaterialInterface* CurrentMaterial = GetMesh()->GetMaterial(0);
 	if (CurrentMaterial)
 	{
 		
@@ -79,7 +99,7 @@ void APGNpcCharacter::BeginPlay()
 		
 		}
 		
-	}
+	}*/
 }
 
 float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -257,7 +277,6 @@ void APGNpcCharacter::OnParryStart(float time)
 
 	if (RandomParry()==false) return;
 
-	
 	NAParryStart();
 	bIsParry = true;
 	CustomTimeDilation = 0.3f;

@@ -79,6 +79,10 @@ void AWeapon::ComboBegin()
 	CurrentCombo = 1;
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	ComboPlayTime = OwnerCharacter->GetTotalStat().AttackSpeed;
+	
+	//Ai면 공격 속도 낮추기
+	if (OwnerCharacter->ActorHasTag(TAG_AI))
+		ComboPlayTime *= 0.8f;
 
 	AnimInstance->Montage_Play(ComboMontage, ComboPlayTime);
 	//플레이어 캐릭터만 값 받아서 돌리기

@@ -4,34 +4,84 @@
 #include "Animation/AnimNotify_BlueArchiveGrenade.h"
 #include "Skill/BlueGrenade.h"
 
-void UAnimNotify_BlueArchiveGrenade::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation)
+void UAnimNotify_BlueArchiveGrenade::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
-    Super::Notify(MeshComp, Animation);
+    //Super::Notify(MeshComp, Animation, EventReference);
 
-    if (MeshComp && MeshComp->GetOwner())
+    //if (MeshComp && MeshComp->GetOwner())
+    //{
+    //    AActor* Owner = MeshComp->GetOwner();
+
+    //    // 수류탄 클래스 확인
+    //    if (GrenadeClass)
+    //    {
+    //        FVector SpawnLocation = MeshComp->GetSocketLocation(FName("weaponRifleSocket")) + MeshComp->GetOwner()->GetActorForwardVector()*25.0f;
+    //        
+    //        FRotator SpawnRotation = MeshComp->GetOwner()->GetActorRotation() + FRotator(30.0f, 0.0f, 0.0f);
+    //        ABlueGrenade* Grenade = Cast<ABlueGrenade>(GetWorld()->SpawnActorDeferred<ABlueGrenade>(
+    //            GrenadeClass,
+    //            FTransform(SpawnRotation, SpawnLocation),
+    //            MeshComp->GetOwner(),
+    //           nullptr
+    //            ));
+
+    //        if (Grenade)
+    //        {
+    //            Grenade->SetSkillOwnerCharacter(MeshComp->GetOwner());
+
+    //            // 액터를 월드에 스폰
+    //            Grenade->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+    //        }
+    //    }
+    //}
+    Super::Notify(MeshComp, Animation, EventReference);
+
+    if (!MeshComp || !MeshComp->GetOwner())
     {
-        AActor* Owner = MeshComp->GetOwner();
+        UE_LOG(LogTemp, Warning, TEXT("Invalid MeshComp or Owner in Notify"));
+        return;
+    }
 
-        // 수류탄 클래스 확인
-        if (GrenadeClass)
-        {
-            FVector SpawnLocation = MeshComp->GetSocketLocation(FName("weaponRifleSocket")) + MeshComp->GetOwner()->GetActorForwardVector()*25.0f;
-            
-            FRotator SpawnRotation = MeshComp->GetOwner()->GetActorRotation() + FRotator(30.0f, 0.0f, 0.0f);
-            ABlueGrenade* Grenade = Cast<ABlueGrenade>(GetWorld()->SpawnActorDeferred<ABlueGrenade>(
-                GrenadeClass,
-                FTransform(SpawnRotation, SpawnLocation),
-                MeshComp->GetOwner(),
-               nullptr
-                ));
+    // 프리뷰 모드 확인
+    if (MeshComp->GetWorld() && MeshComp->GetWorld()->WorldType == EWorldType::EditorPreview)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Skipping grenade spawn in Preview Mode"));
+        return;
+    }
 
-            if (Grenade)
-            {
-                Grenade->SetSkillOwnerCharacter(MeshComp->GetOwner());
+    AActor* Owner = MeshComp->GetOwner();
+    if (!Owner || !GrenadeClass)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("Invalid Owner or GrenadeClass in Notify"));
+        return;
+    }
 
-                // 액터를 월드에 스폰
-                Grenade->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
-            }
-        }
+    UWorld* World = MeshComp->GetWorld();
+    if (!World)
+    {
+        UE_LOG(LogTemp, Error, TEXT("World is invalid!"));
+        return;
+    }
+
+    // Calculate spawn transform
+    FVector SpawnLocation = MeshComp->GetSocketLocation(FName("weaponRifleSocket")) + Owner->GetActorForwardVector() * 25.0f;
+    FRotator SpawnRotation = Owner->GetActorRotation() + FRotator(30.0f, 0.0f, 0.0f);
+
+    // Spawn the grenade
+    ABlueGrenade* Grenade = Cast<ABlueGrenade>(World->SpawnActorDeferred<ABlueGrenade>(
+        GrenadeClass,
+        FTransform(SpawnRotation, SpawnLocation),
+        Owner,
+        nullptr
+    ));
+
+    if (Grenade)
+    {
+        Grenade->SetSkillOwnerCharacter(Owner);
+        Grenade->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+    }
+    else
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to spawn grenade!"));
     }
 }

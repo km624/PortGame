@@ -99,5 +99,4 @@ EBTNodeResult::Type UBTTask_TargetCirclePos::ExecuteTask(UBehaviorTreeComponent&
 	return EBTNodeResult::Succeeded;
 
 
-	return EBTNodeResult::Failed;
 }

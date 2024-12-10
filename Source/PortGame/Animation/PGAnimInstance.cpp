@@ -6,7 +6,7 @@
 //#include "GameFramework/Character.h"
 #include "Character/PGPlayerCharacter.h"
 #include "Character/PGBaseCharacter.h"
-#include "Kismet/KismetMathLibrary.h"
+//#include "Kismet/KismetMathLibrary.h"
 #include "PortGame/PortGame.h"
 
 //#include "Kismet/KismetAnimationLibrary.h"
@@ -46,10 +46,11 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		// 떨어지는거는 이동모드의 faling모드인지만 체크하면 됨
 		bIsFalling = Movement->IsFalling();
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
+
 		CharacterDirection = CalculateDirection(Owner->GetVelocity(), Owner->GetActorRotation());
-		//UE_LOG(LogTemp, Warning, TEXT("%f"), GroundSpeed);
+		
 	}
-	//APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(Owner);
+	
 	if (IsValid(BaseCharacter))
 	{
 		bIsAiming = BaseCharacter->GetCurrentIsAiming();

@@ -2,7 +2,7 @@
 
 
 #include "Component/TargetingComponent.h"
-#include "Kismet/KismetMathLibrary.h"
+//#include "Kismet/KismetMathLibrary.h"
 #include "PortGame/PortGame.h"
 #include "Character/PGPlayerCharacter.h"
 #include "Character/PGBaseCharacter.h"
@@ -279,7 +279,9 @@ void UTargetingComponent::TargetLockOn(float dt)
 
 	playerCharacter->SetMotionWarpingLocation(TargetActor->GetActorLocation());
 
-	FRotator newRotator = UKismetMathLibrary::FindLookAtRotation(playerCharacter->GetActorLocation(), TargetActor->GetActorLocation());
+	//FRotator newRotator = UKismetMathLibrary::FindLookAtRotation(playerCharacter->GetActorLocation(), TargetActor->GetActorLocation());
+	FVector Direction = (TargetActor->GetActorLocation() - playerCharacter->GetActorLocation()).GetSafeNormal(); // 방향 벡터 계산 및 정규화
+	FRotator newRotator = Direction.Rotation();
 
 	FRotator newnewRotator = FMath::RInterpTo(playerCharacter->GetControlRotation(), newRotator, dt, 3.0f);
 	playerCharacter->GetController()->SetControlRotation(newnewRotator);

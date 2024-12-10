@@ -43,7 +43,7 @@ void APGPlayerController::OnPossess(APawn* aPawn)
 
 	if (aPawn->GetController())
 	{
-		SLOG(TEXT("Controller :%s "), *aPawn->GetController()->GetActorLabel());
+		SLOG(TEXT("Controller :%s "), *aPawn->GetController()->GetActorNameOrLabel());
 	}
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(aPawn);
 	if (playerCharacter)
