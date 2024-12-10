@@ -14,6 +14,7 @@
 #include "GenericTeamAgentInterface.h"
 #include "Skill/SkillBase.h"
 #include "Skill/SkillBlueArchive.h"
+#include "GameFramework/PlayerController.h"
 
 
 UPGAttackComponent::UPGAttackComponent()
@@ -199,6 +200,8 @@ void UPGAttackComponent::AttackHitCheck()
 
 				FDamageEvent DamageEvent;
 				Hit.GetActor()->TakeDamage(AttackDamage, DamageEvent, BaseCharacter->GetController(), BaseCharacter);
+
+				BaseCharacter->AddUltiSkillGaugeToComp(AttackDamage);
 			}
 		}
 		if (playerCharacter)
@@ -207,7 +210,9 @@ void UPGAttackComponent::AttackHitCheck()
 
 			if (parry)
 			{
-				playerCharacter->OnParryPostPorcess(true);
+				//юс╫ц
+				if(BaseCharacter->GetController()->IsA<APlayerController>())
+					playerCharacter->OnParryPostPorcess(true);
 				AttackHitStop(stoptime, ParrayCameraShakeClass);
 			}
 			else

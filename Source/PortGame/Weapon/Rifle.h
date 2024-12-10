@@ -59,6 +59,7 @@ protected:
 	FTimerHandle ReloadTimerHandle;
 	FTimerHandle StopTimerHandle;
 
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	float GunDamage;
 
 

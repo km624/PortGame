@@ -155,7 +155,7 @@ void UPGStatComponent::HitGaugeDamaged(float Damage)
 void UPGStatComponent::AddUlitSkillGauge(float AddUltigauge)
 {
 	const float PrevSkillGauge = CurrentUltiSkillGauge;
-	const float ActualAddSkillGauge = FMath::Clamp<float>(AddUltigauge, 0, AddUltigauge);
+	const float ActualAddSkillGauge = FMath::Clamp<float>(AddUltigauge, 0, AddUltigauge) / addPrecentUlitSkillGuage;
 
 	CurrentUltiSkillGauge = PrevSkillGauge + ActualAddSkillGauge;
 
@@ -166,6 +166,12 @@ void UPGStatComponent::AddUlitSkillGauge(float AddUltigauge)
 	OnUltiSkillGaugechanged.Broadcast(CurrentUltiSkillGauge);
 	SLOG(TEXT("CurrentUltiSkillGauge %f"), CurrentUltiSkillGauge);
 
+}
+
+void UPGStatComponent::ResetUlitSkillGauge()
+{
+	CurrentUltiSkillGauge = 0.0f;
+	OnUltiSkillGaugechanged.Broadcast(CurrentUltiSkillGauge);
 }
 
 

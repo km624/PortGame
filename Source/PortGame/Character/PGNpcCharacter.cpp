@@ -126,16 +126,15 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 void APGNpcCharacter::NPCAttackHitStop(float time)
 {
 	if (bIsDead)return;
-	if (currentSlowtime > time)return;
+	if (currentSlowtime >= time)return;
 	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
 	currentSlowtime = time;
-	float OrginTimeDilation = CustomTimeDilation;
-	//SLOG(TEXT("NAme: %s , time: %f , origincustom: %f"),*GetActorLabel(), time,OrginTimeDilation);
+	
 	CustomTimeDilation = 0.01f;
 	GetWorld()->GetTimerManager().SetTimer(
 		NPCHitStoptimerHandle,
-		[this, OrginTimeDilation]() {
-			CustomTimeDilation = OrginTimeDilation;
+		[this]() {
+			CustomTimeDilation = 1.0f;
 			GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
 		}, time, false
 	);

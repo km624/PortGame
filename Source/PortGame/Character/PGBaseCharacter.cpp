@@ -183,6 +183,11 @@ void APGBaseCharacter::SetUpModifierStat(FPGCharacterStat ModiferStat)
 	StatComponent->SetModifierStat(ModiferStat);
 }
 
+void APGBaseCharacter::AddUltiSkillGaugeToComp(float addUlitSkill)
+{
+	StatComponent->AddUlitSkillGauge(addUlitSkill);
+}
+
 
 void APGBaseCharacter::HiddenWidget()
 {
@@ -328,12 +333,24 @@ void APGBaseCharacter::SetbIsNikkeSkill(bool skill)
 	if (skill)
 	{
 		GetCharacterMovement()->DisableMovement();
+		AttackComponent->SetbIsGodMode(true);
 	}
 	else
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		AttackComponent->SetbIsGodMode(false);
 	}
 	bIsNikkeSkill = skill;
+}
+
+void APGBaseCharacter::UltimateSkillToComponent()
+{
+	if (StatComponent->GetCurrentUltiSkillGauge() >= StatComponent->GetMaxUltiSkillGauge())
+	{
+		SLOG(TEXT("ULTI!!!!!!"));
+		
+	}
+	
 }
 
 

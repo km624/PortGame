@@ -57,9 +57,6 @@ public:
 	//에임 중일때 앵니메이션
 	float ReturnAimOffset();
 
-	/*FORCEINLINE FOnbIshootDelegate& GetbIshootDelegate() { return OnbIsShoot; }
-
-	FORCEINLINE FOnbIsReloadDelegate& GetbIsReloadDelegate() { return OnbIsReload; }*/
 
 	FORCEINLINE FVector GetAimLocation() {return AimLocation;}
 
@@ -100,6 +97,8 @@ public:
 	void SetUpBaseStat(FName baseStat);
 
 	void SetUpModifierStat(FPGCharacterStat ModiferStat);
+
+	void AddUltiSkillGaugeToComp(float addUlitSkill);
 
 	FORCEINLINE bool GetbIsDead() { return bIsDead; }
 protected:
@@ -200,11 +199,16 @@ protected:
 protected:
 	void SkillToComponent();
 
+	//니케 스킬 한정
 public:
 	virtual void SetbIsNikkeSkill(bool skill);
 	FORCEINLINE bool GetbIsNikkeSkill() { return bIsNikkeSkill; }
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Skill")
 	uint8 bIsNikkeSkill : 1;
+
+	//궁극기
+protected:
+	void UltimateSkillToComponent();
 
 };

@@ -88,6 +88,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction>SkillAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction>UltiSkillAction;
+
 
 
 	//매개변수 받기 위해 헤더 인클루드
@@ -274,4 +277,8 @@ protected:
 	//니케 한정
 	void StopDefenceNikke();
 	
+	//궁극기
+protected:
+	void OnUltimateSkill();
+
 };

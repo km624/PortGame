@@ -145,6 +145,12 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		SkillAction = Skill.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> Ulti(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_UltiSkill.IA_UltiSkill'"));
+	if (Ulti.Object)
+	{
+		UltiSkillAction = Ulti.Object;
+	}
 	
 	Tags.Add(TAG_PLAYER);
 	
@@ -215,6 +221,8 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(SkillAction, ETriggerEvent::Started, this, &APGPlayerCharacter::InputSkill);
 
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APGPlayerCharacter::StopDefenceNikke);
+
+		EnhancedInputComponent->BindAction(UltiSkillAction, ETriggerEvent::Started, this, &APGPlayerCharacter::OnUltimateSkill);
 	
 	}
 	else
@@ -827,6 +835,11 @@ void APGPlayerCharacter::SetbIsNikkeSkill(bool skill)
 void APGPlayerCharacter::StopDefenceNikke()
 {
 	SetbIsNikkeSkill(false);
+}
+
+void APGPlayerCharacter::OnUltimateSkill()
+{
+	UltimateSkillToComponent();
 }
 
 

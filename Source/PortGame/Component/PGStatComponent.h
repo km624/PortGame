@@ -72,8 +72,9 @@ public:
 	FORCEINLINE float  GetMaxHitGauge() { return MaxHitGauge; }
 	FORCEINLINE float  GetCurrentHitGauge() { return CurretHitGauge; }
 	
+	FORCEINLINE float  GetMaxUltiSkillGauge() { return MaxUltiSkillGauge; }
 	FORCEINLINE float  GetCurrentUltiSkillGauge() { return CurrentUltiSkillGauge; }
-	FORCEINLINE float  GetAddUltiSkillGauge() { return AddUltiSkillGauge; }
+	
 	
 public:
 
@@ -82,6 +83,8 @@ public:
 	void HitGaugeDamaged(float Damage);
 
 	void AddUlitSkillGauge(float AddUltigauge);
+
+	void ResetUlitSkillGauge();
 
 
 	//юс╫ц
@@ -123,9 +126,8 @@ protected:
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float CurrentUltiSkillGauge;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
-	float AddUltiSkillGauge = 10.0f;
+	float addPrecentUlitSkillGuage = 10.0f;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Stat)
 	float MaxUltiSkillGauge = 100.0f;

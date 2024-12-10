@@ -115,6 +115,8 @@ void ANikkeWall::OnBoxLand(UPrimitiveComponent* HitComponent, AActor* OtherActor
 		SetLifeTimer();
 
 		BoxComponent->OnComponentHit.RemoveDynamic(this, &ANikkeWall::OnBoxLand);
+
+		BoxComponent->SetSimulatePhysics(false);
 		////  ÀÌÆåÆ® »ý¼º
 		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint);
 	}
@@ -153,6 +155,7 @@ void ANikkeWall::SetCharcter(FVector setlocation, FRotator setrotation)
 {
 	
 	bInCharacter = true;
+
 	Skillcharacter->SetbIsNikkeSkill(bInCharacter);
 	Skillcharacter->SetActorLocation(setlocation);
 	Skillcharacter->SetActorRotation(setrotation);
