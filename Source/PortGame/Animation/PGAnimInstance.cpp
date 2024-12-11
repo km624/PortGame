@@ -47,8 +47,10 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsFalling = Movement->IsFalling();
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
 
-		CharacterDirection = CalculateDirection(Owner->GetVelocity(), Owner->GetActorRotation());
-		
+		//CharacterDirection = CalculateDirection(Owner->GetVelocity(), Owner->GetActorRotation());
+		CharacterDirection = CalculateDirectionAlternative(Owner->GetVelocity(), Owner->GetActorRotation());
+
+	
 	}
 	
 	if (IsValid(BaseCharacter))
@@ -76,5 +78,26 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsNikkeSkill = BaseCharacter->GetbIsNikkeSkill();
 	}
 	
+}
+
+float UPGAnimInstance::CalculateDirectionAlternative(const FVector& newVelocity, const FRotator& ActorRotation)
+{
+	if (newVelocity.IsNearlyZero())
+	{
+		return 0.0f; // 속도가 없으면 방향은 0
+	}
+
+	// 속도를 정규화하여 방향 계산
+	FVector ForwardVector = ActorRotation.Vector(); // 배우의 Forward 벡터
+	FVector RightVector = FVector::CrossProduct(FVector::UpVector, ForwardVector); // 배우의 Right 벡터
+
+	// 속도와 로컬 축 간의 Dot Product 계산
+	float ForwardDot = FVector::DotProduct(ForwardVector, newVelocity.GetSafeNormal());
+	float RightDot = FVector::DotProduct(RightVector, newVelocity.GetSafeNormal());
+
+	// 방향 계산 (아크탄젠트를 이용)
+	float Angle = FMath::RadiansToDegrees(FMath::Atan2(RightDot, ForwardDot));
+
+	return Angle;
 }
 

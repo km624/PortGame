@@ -15,6 +15,7 @@
 #include "Skill/SkillBase.h"
 #include "Skill/SkillBlueArchive.h"
 #include "GameFramework/PlayerController.h"
+#include "Skill/UltiSkill.h"
 
 
 UPGAttackComponent::UPGAttackComponent()
@@ -43,6 +44,8 @@ void UPGAttackComponent::InitializeComponent()
 	SetUpWeapon();
 
 	SetSkill();
+
+	SetUltiSkill();
 }
 
 void UPGAttackComponent::BeginPlay()
@@ -211,8 +214,8 @@ void UPGAttackComponent::AttackHitCheck()
 			if (parry)
 			{
 				//юс╫ц
-				if(BaseCharacter->GetController()->IsA<APlayerController>())
-					playerCharacter->OnParryPostPorcess(true);
+				//if(BaseCharacter->GetController()->IsA<APlayerController>())
+				playerCharacter->OnParryPostPorcess(true);
 				AttackHitStop(stoptime, ParrayCameraShakeClass);
 			}
 			else
@@ -320,6 +323,31 @@ void UPGAttackComponent::SkillAttack()
 void UPGAttackComponent::WeaponHide(bool visible)
 {
 	Weapon->SetActorHiddenInGame(visible);
+}
+
+void UPGAttackComponent::SetUltiSkill()
+{
+	if (UltiSkillClass)
+	{
+		UltiSkill = NewObject<UUltiSkill>(this, UltiSkillClass);
+
+		if (UltiSkill)
+		{
+			APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
+			UltiSkill->SetSkillSetting(BaseCharacter);
+
+			UltiSkill->OnbIsSkill.AddUObject(this, &ThisClass::SetbIsGodMode);
+
+		}
+	}
+}
+
+void UPGAttackComponent::UltiSkillAttack()
+{
+	if (UltiSkill)
+	{
+		UltiSkill->OnSkill();
+	}
 }
 
 

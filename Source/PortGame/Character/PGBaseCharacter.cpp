@@ -347,8 +347,10 @@ void APGBaseCharacter::UltimateSkillToComponent()
 {
 	if (StatComponent->GetCurrentUltiSkillGauge() >= StatComponent->GetMaxUltiSkillGauge())
 	{
-		SLOG(TEXT("ULTI!!!!!!"));
+
+		AttackComponent->UltiSkillAttack();
 		
+		StatComponent->ResetUlitSkillGauge();
 	}
 	
 }

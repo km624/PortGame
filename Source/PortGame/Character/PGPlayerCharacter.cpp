@@ -20,7 +20,7 @@
 #include "Component/TargetingComponent.h"
 #include "Component/PGAttackComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Components/PostProcessComponent.h"
+//#include "Components/PostProcessComponent.h"
 #include "Animation/AnimMontage.h"
 #include "Physics/PGCollision.h"
 #include "Engine/OverlapResult.h"
@@ -38,8 +38,8 @@ APGPlayerCharacter::APGPlayerCharacter()
 
 	TargetingComponent = CreateDefaultSubobject<UTargetingComponent>(TEXT("Targeting_Comp"));
 	
-	PostProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcess_Comp"));
-	PostProcessComponent->SetupAttachment(RootComponent);
+	//PostProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcess_Comp"));
+	//PostProcessComponent->SetupAttachment(RootComponent);
 
 	static ConstructorHelpers::FObjectFinder<UPGCharacterData> CharacterBaseData
 	(TEXT("/Script/PortGame.PGCharacterData'/Game/PortGame/Input/PG_InputBaseData.PG_InputBaseData'"));
@@ -284,8 +284,11 @@ void APGPlayerCharacter::SetCharacterData(EControlData DataName)
 	GetCharacterMovement()->AirControl = NewCharacterData->AirControl;
 
 	//스프링 암
-	
-	SpringArm->TargetArmLength = NewCharacterData->TargetArmLength;
+	if (!bIsNikkeSkill)
+		SpringArm->TargetArmLength = NewCharacterData->TargetArmLength;
+	else
+		SpringArm->TargetArmLength = 300.0f;
+
 	SpringArm->SetRelativeRotation(NewCharacterData->RelativeRotation);
 	SpringArm->bUsePawnControlRotation = NewCharacterData->bUsePawnControlRotation;
 	SpringArm->bInheritPitch = NewCharacterData->bInheritPitch;
@@ -577,28 +580,42 @@ void APGPlayerCharacter::OnParryPostPorcess(bool effect)
 {
 	if (effect)
 	{
-	PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = true;
+	/*PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = true;
 	PostProcessComponent->Settings.bOverride_DepthOfFieldFocalDistance = true;
 	PostProcessComponent->Settings.DepthOfFieldFocalDistance =300.0f;
-	PostProcessComponent->Settings.DepthOfFieldSensorWidth = 750.0f;
+	PostProcessComponent->Settings.DepthOfFieldSensorWidth = 750.0f;*/
 
-	PostProcessComponent->Settings.bOverride_SceneFringeIntensity = true;
-	PostProcessComponent->Settings.SceneFringeIntensity = 2.5f;
+	/*PostProcessComponent->Settings.bOverride_SceneFringeIntensity = true;
+	PostProcessComponent->Settings.SceneFringeIntensity = 2.5f;*/
 	
-	
+	Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
+	Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
+	Camera->PostProcessSettings.DepthOfFieldFocalDistance = 300.0f;
+	Camera->PostProcessSettings.DepthOfFieldSensorWidth = 750.0f;
+
+	Camera->PostProcessSettings.bOverride_SceneFringeIntensity = true;
+	Camera->PostProcessSettings.SceneFringeIntensity = 2.5f;
+
+
 	}
 	else
 	{
-		PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = false;
+		/*PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = false;
 		PostProcessComponent->Settings.bOverride_DepthOfFieldFocalDistance = false;
 
-		PostProcessComponent->Settings.bOverride_SceneFringeIntensity = false;
+		PostProcessComponent->Settings.bOverride_SceneFringeIntensity = false;*/
+
+		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = false;
+		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = false;
+
+		Camera->PostProcessSettings.bOverride_SceneFringeIntensity = false; 
 	}
 }
 
 void APGPlayerCharacter::OnDash()
 {
-	if(bIsDash) return;
+	if(DashCooltimeTimerHandle.IsValid()) return;
+	SLOG(TEXT("Dash"));
 	bIsDash = true;
 	AttackComponent->SetbIsGodMode(true);
 	 OriginalMaxWalkSpeed = GetCharacterMovement()->GetMaxSpeed();
@@ -627,6 +644,16 @@ void APGPlayerCharacter::OnDash()
 			AttackComponent->SetbIsGodMode(false);
 
 		}, DashTime, false
+	);
+
+	//대쉬 쿨타임
+	GetWorld()->GetTimerManager().SetTimer(
+		DashCooltimeTimerHandle,
+		[this]() {
+
+			GetWorld()->GetTimerManager().ClearTimer(DashCooltimeTimerHandle);
+
+		}, DashColltime, false
 	);
 }
 
@@ -697,20 +724,25 @@ void APGPlayerCharacter::OnEvadePostPorcess(bool effect)
 {
 	if (effect)
 	{
-		PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = true;
+		/*PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = true;
 		PostProcessComponent->Settings.bOverride_DepthOfFieldFocalDistance = true;
 		PostProcessComponent->Settings.DepthOfFieldFocalDistance = 300.0f;
-		PostProcessComponent->Settings.DepthOfFieldSensorWidth = 750.0f;
+		PostProcessComponent->Settings.DepthOfFieldSensorWidth = 750.0f;*/
 
 		/*PostProcessComponent->Settings.bOverride_SceneFringeIntensity = true;
 		PostProcessComponent->Settings.SceneFringeIntensity = 2.5f;*/
+
+		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
+		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
+		Camera->PostProcessSettings.DepthOfFieldFocalDistance = 300.0f;
+		Camera->PostProcessSettings.DepthOfFieldSensorWidth = 750.0f;
 
 
 	}
 	else
 	{
-		PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = false;
-		PostProcessComponent->Settings.bOverride_DepthOfFieldFocalDistance = false;
+		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = false;
+		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = false;
 
 		//PostProcessComponent->Settings.bOverride_SceneFringeIntensity = false;
 	}

@@ -213,9 +213,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
 	float DashTime=0.25f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
+	float DashColltime = 0.8f;
+
 	FVector DashVector;
 
 	FTimerHandle DashTimerHandle;
+
+	FTimerHandle DashCooltimeTimerHandle;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
 	float OriginalMaxWalkSpeed;

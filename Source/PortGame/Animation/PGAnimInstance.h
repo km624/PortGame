@@ -22,6 +22,8 @@ protected:
 	//계속 호출
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+	float CalculateDirectionAlternative(const FVector& Velocity, const FRotator& ActorRotation);
+
 	//캐릭터 정보 담는 객체
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
 	TObjectPtr<class ACharacter> Owner;

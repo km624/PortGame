@@ -108,6 +108,19 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	TObjectPtr<class USkillBase> Skill;
 
+public:
+	void SetUltiSkill();
+
+	void UltiSkillAttack();
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UltiSkill")
+	TSubclassOf<class UUltiSkill> UltiSkillClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UltiSkill")
+	TObjectPtr<class UUltiSkill> UltiSkill;
+
 		
 
 };

@@ -45,7 +45,7 @@ void UPGStatComponent::InitializeComponent()
 
 	SetHitGauge(GetTotalStat().HitGauge);
 
-	CurrentUltiSkillGauge = 0.0f;
+	CurrentUltiSkillGauge = 100.0f;
 }
 
 void UPGStatComponent::SetCurrentRarity(FName rarity)
