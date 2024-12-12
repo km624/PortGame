@@ -30,11 +30,13 @@ void USkillBase::OnSkill()
 void USkillBase::SetTimer()
 {
 	bCanSkill = false;
+	OnbCanSkill.Broadcast(bCanSkill);
 	GetWorld()->GetTimerManager().SetTimer(
 		CooldownTimerHandle,
 		[this]() {
 			SLOG(TEXT("CanSkill"));
 			bCanSkill = true;
+			OnbCanSkill.Broadcast(bCanSkill);
 		}, SkillCooltime, false
 	);
 

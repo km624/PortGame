@@ -27,6 +27,8 @@ protected:
 
 	virtual void EndSkill() override;
 
+	
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BlueArchive)

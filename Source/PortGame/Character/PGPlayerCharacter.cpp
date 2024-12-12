@@ -26,6 +26,11 @@
 #include "Engine/OverlapResult.h"
 #include "Interface/NPCParryCheckInterface.h"
 #include "Interface/PlayerCameraShakeInterface.h"
+#include "LevelSequenceActor.h"
+#include "LevelSequence.h"
+#include "LevelSequencePlayer.h"
+#include "Skill/SkillBase.h"
+
 
 
 
@@ -511,15 +516,20 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 {
 	if (hudWidget)
 	{
-		hudWidget->SetUpWaidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat(), StatComponent->GetMaxHitGauge());
-		//UE_LOG(LogTemp, Warning, TEXT("hudwidget %f"), StatComponent->GetCurrentHp());
+		hudWidget->SetUpWidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat());
+		hudWidget->SetupUltiSkillWidget(StatComponent->GetCurrentUltiSkillGauge());
+		hudWidget->SetupSkillWidget(AttackComponent->GetSkill()->GetSkillCooltime());
 		hudWidget->UpdateHpBar(StatComponent->GetCurrentHp());
 		hudWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
+		
+		//hudWidget->execUpdateUltiSkillGaugeBar(Currenthit)
 
 		//델리게이트 바인딩
-		StatComponent->OnStatChanged.AddUObject(hudWidget, &UPGHudWidget::SetUpWaidget);
+		StatComponent->OnStatChanged.AddUObject(hudWidget, &UPGHudWidget::SetUpWidget);
 		StatComponent->OnHpChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateHpBar);
 		StatComponent->OnHitGaugeChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateHitGaugeBar);
+		StatComponent->OnUltiSkillGaugechanged.AddUObject(hudWidget, &UPGHudWidget::UpdateUltiSkillGaugeBar);
+		AttackComponent->GetSkill()->OnbCanSkill.AddUObject(hudWidget, &UPGHudWidget::StartSkillCoolTime);
 
 		OnbIsAim.AddUObject(hudWidget, &UPGHudWidget::CorssHairEnable);
 	}
@@ -580,13 +590,6 @@ void APGPlayerCharacter::OnParryPostPorcess(bool effect)
 {
 	if (effect)
 	{
-	/*PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = true;
-	PostProcessComponent->Settings.bOverride_DepthOfFieldFocalDistance = true;
-	PostProcessComponent->Settings.DepthOfFieldFocalDistance =300.0f;
-	PostProcessComponent->Settings.DepthOfFieldSensorWidth = 750.0f;*/
-
-	/*PostProcessComponent->Settings.bOverride_SceneFringeIntensity = true;
-	PostProcessComponent->Settings.SceneFringeIntensity = 2.5f;*/
 	
 	Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
 	Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
@@ -600,11 +603,7 @@ void APGPlayerCharacter::OnParryPostPorcess(bool effect)
 	}
 	else
 	{
-		/*PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = false;
-		PostProcessComponent->Settings.bOverride_DepthOfFieldFocalDistance = false;
-
-		PostProcessComponent->Settings.bOverride_SceneFringeIntensity = false;*/
-
+		
 		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = false;
 		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = false;
 
@@ -724,13 +723,7 @@ void APGPlayerCharacter::OnEvadePostPorcess(bool effect)
 {
 	if (effect)
 	{
-		/*PostProcessComponent->Settings.bOverride_DepthOfFieldSensorWidth = true;
-		PostProcessComponent->Settings.bOverride_DepthOfFieldFocalDistance = true;
-		PostProcessComponent->Settings.DepthOfFieldFocalDistance = 300.0f;
-		PostProcessComponent->Settings.DepthOfFieldSensorWidth = 750.0f;*/
-
-		/*PostProcessComponent->Settings.bOverride_SceneFringeIntensity = true;
-		PostProcessComponent->Settings.SceneFringeIntensity = 2.5f;*/
+		
 
 		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
 		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
@@ -744,7 +737,6 @@ void APGPlayerCharacter::OnEvadePostPorcess(bool effect)
 		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = false;
 		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = false;
 
-		//PostProcessComponent->Settings.bOverride_SceneFringeIntensity = false;
 	}
 }
 
@@ -872,6 +864,53 @@ void APGPlayerCharacter::StopDefenceNikke()
 void APGPlayerCharacter::OnUltimateSkill()
 {
 	UltimateSkillToComponent();
+	//StartCinematic();
+}
+
+void APGPlayerCharacter::StartCinematic()
+{
+	// 레벨 시퀀서 액터 생성
+	LevelSequenceActor = GetWorld()->SpawnActor<ALevelSequenceActor>(LevelSequenceActorClass, GetActorLocation(), GetActorRotation());
+
+	if (LevelSequenceActor)
+	{
+		// 레벨 시퀀스 설정
+		if (LevelSequence)
+		{
+			LevelSequenceActor->SetSequence(LevelSequence);
+
+			// 컷씬 재생
+			if (LevelSequenceActor->SequencePlayer)
+			{
+				//const FMovieSceneObjectBindingID id = LevelSequenceActor->FindNamedBinding(TEXT("BlueArchive"));
+				FMovieSceneObjectBindingID id = LevelSequence->FindBindingByTag(TEXT("Character"));
+				if (id.IsValid())
+				{
+					SLOG(TEXT("YES"));
+					LevelSequenceActor->SetBinding(id, { this });
+					
+
+				}
+
+				LevelSequenceActor->SequencePlayer->Play();
+
+				// 시퀀스 종료 이벤트 바인딩
+				LevelSequenceActor->SequencePlayer->OnFinished.AddDynamic(this, &APGPlayerCharacter::OnLevelSequenceFinished);
+			}
+		}
+	}
+}
+
+void APGPlayerCharacter::OnLevelSequenceFinished()
+{
+	
+	// LevelSequenceActor 삭제
+	if (LevelSequenceActor)
+	{
+		LevelSequenceActor->Destroy();
+	}
+
+
 }
 
 

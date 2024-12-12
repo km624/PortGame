@@ -20,11 +20,21 @@ public:
 
 public:
 	UFUNCTION()
-	void SetUpWaidget(const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat, float MaxHitGauge);
+	void SetUpWidget(const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat);
+	UFUNCTION()
+	void SetupUltiSkillWidget(const float currentGague);
+
+	UFUNCTION()
+	void SetupSkillWidget(float cooltime);
 	//ABHPBar의 Update와 동일한 함수
 	UFUNCTION()
 	void UpdateHpBar(float NewCurrentHp);
+	UFUNCTION()
 	void UpdateHitGaugeBar(float NewHitGauge);
+	UFUNCTION()
+	void UpdateUltiSkillGaugeBar(float newUltiGauge);
+	UFUNCTION()
+	void StartSkillCoolTime(bool start);
 
 	UFUNCTION()
 	void CorssHairEnable(bool bIsaim);
@@ -42,6 +52,11 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UImage> Image_CrossHair;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGUltiSkillGaugeWidget> BP_UltiSkillGauge;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class USkillWidget> BP_SkillWidget;
 	//UPROPERTY()
 	//TObjectPtr<class UABCharacterStatWidget> CharacterStat;
 	

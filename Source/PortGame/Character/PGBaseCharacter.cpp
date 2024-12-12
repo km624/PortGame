@@ -81,7 +81,7 @@ APGBaseCharacter::APGBaseCharacter()
 		HpBarWidgetComponent->SetWidgetClass(HpBarWidgetClass.Class);
 		HpBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 		// 위젯 크기 여기서 지정 ( 가느다란 크기)s
-		HpBarWidgetComponent->SetDrawSize(FVector2D(200.0f, 40.0f));
+		HpBarWidgetComponent->SetDrawSize(FVector2D(150.0f, 30.0f));
 
 		HpBarWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
@@ -199,14 +199,14 @@ void APGBaseCharacter::SetUpHpWidget(UPGUserWidget* InUserWidget)
 	UPGHPBarWidget* HpBarWidget = Cast<UPGHPBarWidget>(InUserWidget);
 	if (HpBarWidget)
 	{
-		HpBarWidget->SetUpWaidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat(),StatComponent->GetMaxHitGauge());
+		HpBarWidget->SetUpWidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat());
 		HpBarWidget->UpdateHpBar(StatComponent->GetCurrentHp());
 		HpBarWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
 
 		//위젯 영역
 		StatComponent->OnHpChanged.AddUObject(HpBarWidget, &UPGHPBarWidget::UpdateHpBar);
 		StatComponent->OnHitGaugeChanged.AddUObject(HpBarWidget, &UPGHPBarWidget::UpdateHitGaugeBar);
-		StatComponent->OnStatChanged.AddUObject(HpBarWidget, &UPGHPBarWidget::SetUpWaidget);
+		StatComponent->OnStatChanged.AddUObject(HpBarWidget, &UPGHPBarWidget::SetUpWidget);
 
 	}
 	

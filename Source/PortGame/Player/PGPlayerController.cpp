@@ -41,6 +41,8 @@ void APGPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 
+	SetViewTarget(GetPawn());
+
 	if (aPawn->GetController())
 	{
 		SLOG(TEXT("Controller :%s "), *aPawn->GetController()->GetActorNameOrLabel());

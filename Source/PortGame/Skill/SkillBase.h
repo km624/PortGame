@@ -10,6 +10,8 @@
  * 
  */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnbIsSkillDelegate, bool /*bIsSkill*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnbCanSkillDelegate, bool/*bcanSkill*/);
+
 UCLASS()
 class PORTGAME_API USkillBase : public UObject
 {
@@ -27,6 +29,7 @@ public:
 
 public:
 	FOnbIsSkillDelegate OnbIsSkill;
+	FOnbCanSkillDelegate OnbCanSkill;
 
 	FORCEINLINE float GetSkillCooltime() { return SkillCooltime; }
 

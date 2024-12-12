@@ -28,7 +28,7 @@ protected:
 
 public:
 
-	void SetUpWaidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat, float NewMaxHitGauge);
+	void SetUpWidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat);
 
 	UFUNCTION()
 	void UpdateHpBar(float NewCurrentHp);

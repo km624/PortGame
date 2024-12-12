@@ -93,6 +93,7 @@ protected:
 	int32 ParryCount = 0;*/
 	
 
+	//Ä³¸¯ÅÍ ½ºÅ³
 public:
 	void SetSkill();
 
@@ -102,12 +103,23 @@ public:
 
 protected:
 
+	void FirstSkillEffect();
+
+public:
+	FORCEINLINE class USkillBase* GetSkill() { return Skill; }
+
+protected:
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	TSubclassOf<class USkillBase> SkillClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	TObjectPtr<class USkillBase> Skill;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	float FirstSkillSlowTime = 1.5f;
+
+	//±Ã±Ø±â
 public:
 	void SetUltiSkill();
 

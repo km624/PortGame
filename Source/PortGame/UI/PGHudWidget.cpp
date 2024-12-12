@@ -5,15 +5,27 @@
 #include "Interface/PGHudWidgetInterface.h"
 #include "UI/PGHPBarWidget.h"
 #include "Components/Image.h"
+#include "UI/PGUltiSkillGaugeWidget.h"
+#include "UI/SkillWidget.h"
 
 UPGHudWidget::UPGHudWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-
+	
 }
 
-void UPGHudWidget::SetUpWaidget(const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat, float MaxHitGauge)
+void UPGHudWidget::SetUpWidget(const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat)
 {
-	BP_HpBar->SetUpWaidget(BaseStat, ModifierStat,MaxHitGauge);
+	BP_HpBar->SetUpWidget(BaseStat, ModifierStat);
+}
+
+void UPGHudWidget::SetupUltiSkillWidget(const float currentGague)
+{
+	BP_UltiSkillGauge->SetUpWidget(currentGague);
+}
+
+void UPGHudWidget::SetupSkillWidget(float cooltime)
+{
+	BP_SkillWidget->SetUpWidget(cooltime);
 }
 
 void UPGHudWidget::UpdateHpBar(float NewCurrentHp)
@@ -24,6 +36,16 @@ void UPGHudWidget::UpdateHpBar(float NewCurrentHp)
 void UPGHudWidget::UpdateHitGaugeBar(float NewHitGauge)
 {
 	BP_HpBar->UpdateHitGaugeBar(NewHitGauge);
+}
+
+void UPGHudWidget::UpdateUltiSkillGaugeBar(float newUltiGauge)
+{
+	BP_UltiSkillGauge->UpdateUltiSkillGauge(newUltiGauge);
+}
+
+void UPGHudWidget::StartSkillCoolTime(bool start)
+{
+	BP_SkillWidget->StartSkillCooltime(start);
 }
 
 void UPGHudWidget::CorssHairEnable(bool bIsaim)
@@ -40,9 +62,7 @@ void UPGHudWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	////위젯에 있는 hp바
-	//HpBar = Cast<UABHpBarWidget>(GetWidgetFromName(TEXT("WidgetHpBar")));
-	//ensure(HpBar);
+	
 	IPGHudWidgetInterface* HUDPawn = Cast<IPGHudWidgetInterface>(GetOwningPlayerPawn());
 	if (HUDPawn)
 	{

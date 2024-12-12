@@ -11,7 +11,7 @@ public class PortGame : ModuleRules
         PublicIncludePaths.AddRange(new string[] { "PortGame" });
 
         PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" , "MotionWarping",
-			"AnimGraphRuntime","UMG","NavigationSystem","AIModule","GameplayTasks" ,"Niagara" });
+			"AnimGraphRuntime","UMG","NavigationSystem","AIModule","GameplayTasks" ,"Niagara","MovieScene" , "LevelSequence"});
 
        
     }

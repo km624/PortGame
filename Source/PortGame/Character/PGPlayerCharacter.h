@@ -286,4 +286,30 @@ protected:
 protected:
 	void OnUltimateSkill();
 
+	//궁극기 컷신
+
+public:
+	// 컷씬 시작 함수
+	UFUNCTION(BlueprintCallable, Category = "Cinematic")
+	void StartCinematic();
+
+protected:
+	UFUNCTION()
+	void OnLevelSequenceFinished();
+	
+
+
+protected:
+	// 레벨 시퀀서 액터 클래스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cinematic")
+	TSubclassOf<class ALevelSequenceActor> LevelSequenceActorClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Cinematic")
+	TObjectPtr<class ALevelSequenceActor> LevelSequenceActor;
+	// 레벨 시퀀스 인스턴스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cinematic")
+	TObjectPtr<class ULevelSequence> LevelSequence;
+
+	
+
 };

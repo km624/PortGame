@@ -19,9 +19,7 @@ UPGHPBarWidget::UPGHPBarWidget(const FObjectInitializer& ObjectInitializer):Supe
 void UPGHPBarWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	//widget 이름으로 찾기
-	/*HpProgressBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("PbHpBar")));
-	ensure(HpProgressBar);*/
+	
 	this->SetVisibility(ESlateVisibility::Hidden);
 
 	IPGSetHpbarCharacterInterface* CharacterWidget = Cast<IPGSetHpbarCharacterInterface>(OwningActor);
@@ -40,7 +38,7 @@ void UPGHPBarWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	SmoothingHitGauge(InDeltaTime);
 }	
 
-void UPGHPBarWidget::SetUpWaidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat, float NewMaxHitGauge)
+void UPGHPBarWidget::SetUpWidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat)
 {
 	
 	MaxHp = (Stat + ModifierStat).MaxHp;

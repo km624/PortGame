@@ -134,7 +134,7 @@ void UPGAttackComponent::AttackHitCheck()
 		 AttackDamage *= 3.0f;
 	 }
 
-	//ENEMY면 공격력 거리 짧게
+	//AI 면 공격력 거리 짧게
 	if(BaseCharacter->ActorHasTag(TAG_AI))
 	{
 		//AttackRange *= 0.5f;
@@ -316,6 +316,7 @@ void UPGAttackComponent::SkillAttack()
 {
 	if (Skill)
 	{
+		FirstSkillEffect();
 		Skill->OnSkill();
 	}
 }
@@ -323,6 +324,13 @@ void UPGAttackComponent::SkillAttack()
 void UPGAttackComponent::WeaponHide(bool visible)
 {
 	Weapon->SetActorHiddenInGame(visible);
+}
+
+void UPGAttackComponent::FirstSkillEffect()
+{
+	IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
+	if (playerCharacter)
+		playerCharacter->OnSlowOVerlapToNPC(FirstSkillSlowTime);
 }
 
 void UPGAttackComponent::SetUltiSkill()
@@ -346,6 +354,7 @@ void UPGAttackComponent::UltiSkillAttack()
 {
 	if (UltiSkill)
 	{
+		FirstSkillEffect();
 		UltiSkill->OnSkill();
 	}
 }

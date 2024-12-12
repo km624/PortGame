@@ -19,10 +19,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnCharacterLevelChangedDelegate, float /*Le
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUltiSkillGaugeChangedDelegate, float /*CurrentUltiSkillGauge*/);
 
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnStatChangedDelegate, const FPGCharacterStat& /*BaseStat*/ , const FPGCharacterStat& /*Modifier*/,const float/*maxHutGauge*/);
-
-
-
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnStatChangedDelegate, const FPGCharacterStat& /*BaseStat*/ , const FPGCharacterStat& /*Modifier*/);
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -37,7 +34,7 @@ public:
 	UPGStatComponent();
 
 
-
+	//DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnStatChangedDelegate, const FPGCharacterStat& /*BaseStat*/ , const FPGCharacterStat& /*Modifier*/,const float/*maxHutGauge*/);
 protected:
 	virtual void InitializeComponent() override;
 
@@ -55,10 +52,10 @@ public:
 
 	FORCEINLINE void SetBaseStat(FName rarity) 
 	{
-		BaseStat = AllStat[rarity];  OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat(), GetMaxHitGauge());
+		BaseStat = AllStat[rarity];  OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat());
 	}
 	FORCEINLINE void SetModifierStat(const FPGCharacterStat& InModifierStat)
-		{ ModifierStat = InModifierStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat(), GetMaxHitGauge()); }
+		{ ModifierStat = InModifierStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat()); }
 
 	FORCEINLINE const FPGCharacterStat& GetBaseStat() const { return BaseStat; }
 	FORCEINLINE const FPGCharacterStat& GetModifierStat() const { return ModifierStat; }

@@ -5,6 +5,10 @@
 #include "Animation/AnimMontage.h"
 #include "Character/PGPlayerCharacter.h"
 #include "PortGame/PortGame.h"
+#include "LevelSequenceActor.h"
+#include "LevelSequencePlayer.h"
+#include "Kismet/GameplayStatics.h"
+#include "Character/PGPlayerCharacter.h"
 
 UUltiSkill::UUltiSkill()
 {
@@ -22,6 +26,11 @@ void UUltiSkill::OnSkill()
 {
 	Super::OnSkill();
 
+	APGPlayerCharacter* player = Cast<APGPlayerCharacter>(ownercharacter);
+	if (player)
+	{
+		player->StartCinematic();
+	}
 
 	PlayUltiSkillMontage();
 }
@@ -57,3 +66,5 @@ void UUltiSkill::EndSkill()
 {
 	Super::EndSkill();
 }
+
+
