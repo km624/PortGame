@@ -30,6 +30,7 @@
 #include "LevelSequence.h"
 #include "LevelSequencePlayer.h"
 #include "Skill/SkillBase.h"
+#include "Player/PGPlayerController.h"
 
 
 
@@ -69,6 +70,11 @@ APGPlayerCharacter::APGPlayerCharacter()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+	Camera->SetActive(true);
+
+	CutSceneCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("CutSceneCamera"));
+	CutSceneCamera->SetupAttachment(RootComponent);
+	CutSceneCamera->SetActive(false);
 
 	static ConstructorHelpers::FObjectFinder<UInputAction> Jump(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Jump.IA_Jump'"));
 	if (Jump.Object)
@@ -381,7 +387,7 @@ void APGPlayerCharacter::Attack()
 		if (bIsNikkeSkill)
 			StopDefenceNikke();
 	}
-
+	
 	AttackToComponent();
 	
 }
@@ -614,7 +620,8 @@ void APGPlayerCharacter::OnParryPostPorcess(bool effect)
 void APGPlayerCharacter::OnDash()
 {
 	if(DashCooltimeTimerHandle.IsValid()) return;
-	SLOG(TEXT("Dash"));
+	if (bIsUltiSkill)return;
+	
 	bIsDash = true;
 	AttackComponent->SetbIsGodMode(true);
 	 OriginalMaxWalkSpeed = GetCharacterMovement()->GetMaxSpeed();
@@ -844,16 +851,15 @@ void APGPlayerCharacter::SetbIsNikkeSkill(bool skill)
 
 	if (skill)
 	{
-		
+
 		SetCharacterData(EControlData::Base);
 	}
 	else
 	{
-		
+
 		SetCharacterData(EControlData::Base);
 	}
 
-	SLOG(TEXT("Nikke Skill : %d"), bIsNikkeSkill);
 }
 
 void APGPlayerCharacter::StopDefenceNikke()
@@ -864,54 +870,37 @@ void APGPlayerCharacter::StopDefenceNikke()
 void APGPlayerCharacter::OnUltimateSkill()
 {
 	UltimateSkillToComponent();
-	//StartCinematic();
 }
 
-void APGPlayerCharacter::StartCinematic()
+ULevelSequence* APGPlayerCharacter::GetLevelSequence()
 {
-	// 레벨 시퀀서 액터 생성
-	LevelSequenceActor = GetWorld()->SpawnActor<ALevelSequenceActor>(LevelSequenceActorClass, GetActorLocation(), GetActorRotation());
-
-	if (LevelSequenceActor)
-	{
-		// 레벨 시퀀스 설정
-		if (LevelSequence)
-		{
-			LevelSequenceActor->SetSequence(LevelSequence);
-
-			// 컷씬 재생
-			if (LevelSequenceActor->SequencePlayer)
-			{
-				//const FMovieSceneObjectBindingID id = LevelSequenceActor->FindNamedBinding(TEXT("BlueArchive"));
-				FMovieSceneObjectBindingID id = LevelSequence->FindBindingByTag(TEXT("Character"));
-				if (id.IsValid())
-				{
-					SLOG(TEXT("YES"));
-					LevelSequenceActor->SetBinding(id, { this });
-					
-
-				}
-
-				LevelSequenceActor->SequencePlayer->Play();
-
-				// 시퀀스 종료 이벤트 바인딩
-				LevelSequenceActor->SequencePlayer->OnFinished.AddDynamic(this, &APGPlayerCharacter::OnLevelSequenceFinished);
-			}
-		}
-	}
+	return LevelSequence;
 }
 
-void APGPlayerCharacter::OnLevelSequenceFinished()
+void APGPlayerCharacter::ChangeViewTarget(bool bstart)
 {
 	
-	// LevelSequenceActor 삭제
-	if (LevelSequenceActor)
+	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
+	if (playerController)
 	{
-		LevelSequenceActor->Destroy();
+		if (bstart)
+		{
+			playerController->SetViewTargetWithBlend(this, 0.5f); 
+			Camera->SetActive(false);
+			CutSceneCamera->SetActive(true);
+		}
+		else
+		{
+			playerController->SetViewTargetWithBlend(this, 0.5f);
+			Camera->SetActive(true);
+			CutSceneCamera->SetActive(false);
+		}
 	}
-
-
+	
 }
+
+
+
 
 
 

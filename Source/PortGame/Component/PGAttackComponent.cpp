@@ -16,6 +16,8 @@
 #include "Skill/SkillBlueArchive.h"
 #include "GameFramework/PlayerController.h"
 #include "Skill/UltiSkill.h"
+#include "Character/PGPlayerCharacter.h"
+#include "LevelSequence.h"
 
 
 UPGAttackComponent::UPGAttackComponent()
@@ -123,15 +125,23 @@ void UPGAttackComponent::AttackHitCheck()
 
 	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
 
-	 //float AttackRange = BaseCharacter->GetTotalStat().AttackRange;
+	
 	float AttackRange = 50.0f;
 	 float AttackRadius = BaseCharacter->GetTotalStat().AttackRange;
 	 float AttackDamage = BaseCharacter->GetTotalStat().Attack;
 
+	 //½ºÅ³
 	 if (Skill && Skill->GetbIsSkill())
 	 {
 		 AttackRadius *= 1.5f;
 		 AttackDamage *= 3.0f;
+	 }
+
+	 //±Ã±Ø±â
+	 if (UltiSkill && UltiSkill->GetbIsSkill())
+	 {
+		 AttackRadius *= 1.5f;
+		 AttackDamage *= 6.0f;
 	 }
 
 	//AI ¸é °ø°Ý·Â °Å¸® Âª°Ô
@@ -316,7 +326,7 @@ void UPGAttackComponent::SkillAttack()
 {
 	if (Skill)
 	{
-		FirstSkillEffect();
+		
 		Skill->OnSkill();
 	}
 }
@@ -324,13 +334,6 @@ void UPGAttackComponent::SkillAttack()
 void UPGAttackComponent::WeaponHide(bool visible)
 {
 	Weapon->SetActorHiddenInGame(visible);
-}
-
-void UPGAttackComponent::FirstSkillEffect()
-{
-	IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
-	if (playerCharacter)
-		playerCharacter->OnSlowOVerlapToNPC(FirstSkillSlowTime);
 }
 
 void UPGAttackComponent::SetUltiSkill()
@@ -345,7 +348,13 @@ void UPGAttackComponent::SetUltiSkill()
 			UltiSkill->SetSkillSetting(BaseCharacter);
 
 			UltiSkill->OnbIsSkill.AddUObject(this, &ThisClass::SetbIsGodMode);
-
+			UltiSkill->OnbIsSkill.AddUObject(BaseCharacter, &APGBaseCharacter::SetbIsUltiSkill);
+			APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(BaseCharacter);
+			if (playerCharacter)
+			{
+				UltiSkill->UltiSkillSequenceSet(playerCharacter->GetLevelSequence());
+				UltiSkill->OnBIsCutscened.AddUObject(playerCharacter, &APGPlayerCharacter::ChangeViewTarget);
+			}
 		}
 	}
 }
@@ -354,9 +363,16 @@ void UPGAttackComponent::UltiSkillAttack()
 {
 	if (UltiSkill)
 	{
-		FirstSkillEffect();
+		FirstUltiSkillEffect();
 		UltiSkill->OnSkill();
 	}
+}
+
+void UPGAttackComponent::FirstUltiSkillEffect()
+{
+	IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
+	if (playerCharacter)
+		playerCharacter->OnSlowOVerlapToNPC(FirstSkillSlowTime);
 }
 
 

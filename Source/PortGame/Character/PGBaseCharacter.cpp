@@ -134,6 +134,10 @@ void APGBaseCharacter::AttackToComponent()
 {
 	//그로기면 공격x
 	if (bIsGroggy) return;
+
+	if (bIsUltiSkill)return;
+	
+	
 	AttackComponent->AttackToWeapon();
 	
 }
@@ -275,7 +279,7 @@ void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperl
 		AIController->StartTree();
 
 		//임시
-		CustomTimeDilation = 1.0f;
+		//CustomTimeDilation = 1.0f;
 	}
 	
 }
@@ -325,6 +329,7 @@ void APGBaseCharacter::OnNiagaraSystemFinished(UNiagaraComponent* FinishedCompon
 
 void APGBaseCharacter::SkillToComponent()
 {
+	if (bIsUltiSkill)return;
 	AttackComponent->SkillAttack();
 }
 
@@ -349,10 +354,34 @@ void APGBaseCharacter::UltimateSkillToComponent()
 	{
 
 		AttackComponent->UltiSkillAttack();
-		
 		StatComponent->ResetUlitSkillGauge();
 	}
 	
+}
+
+void APGBaseCharacter::SetbIsUltiSkill(bool bisulti)
+{
+
+	bIsUltiSkill = bisulti;
+	if (!bIsUltiSkill)
+	{
+		GetController()->SetIgnoreMoveInput(false);
+		IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
+		if (AIController)
+		{
+			AIController->StartTree();
+		}
+	}
+	else
+	{
+		GetController()->SetIgnoreMoveInput(true);
+		IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
+		if (AIController)
+		{
+			AIController->StopTree();
+		}
+
+	}
 }
 
 

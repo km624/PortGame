@@ -283,33 +283,25 @@ protected:
 	void StopDefenceNikke();
 	
 	//±Ã±Ø±â
+	//±Ã±Ø±â ÄÆ½ÅÁß ÀÌµ¿Á¦ÇÑ
 protected:
 	void OnUltimateSkill();
 
-	//±Ã±Ø±â ÄÆ½Å
-
 public:
-	// ÄÆ¾À ½ÃÀÛ ÇÔ¼ö
-	UFUNCTION(BlueprintCallable, Category = "Cinematic")
-	void StartCinematic();
+	class ULevelSequence* GetLevelSequence();
 
-protected:
 	UFUNCTION()
-	void OnLevelSequenceFinished();
-	
-
-
+	void ChangeViewTarget(bool bstart);
 protected:
-	// ·¹º§ ½ÃÄö¼­ ¾×ÅÍ Å¬·¡½º
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cinematic")
-	TSubclassOf<class ALevelSequenceActor> LevelSequenceActorClass;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Cinematic")
-	TObjectPtr<class ALevelSequenceActor> LevelSequenceActor;
-	// ·¹º§ ½ÃÄö½º ÀÎ½ºÅÏ½º
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cinematic")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UltiSkill")
 	TObjectPtr<class ULevelSequence> LevelSequence;
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UCameraComponent> CutSceneCamera;
+
+
 	
+
 
 };

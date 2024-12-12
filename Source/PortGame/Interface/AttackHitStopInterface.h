@@ -28,4 +28,6 @@ public:
 	
 	virtual void OnSlowOVerlapToNPC(float time) = 0;
 
+	
+
 };

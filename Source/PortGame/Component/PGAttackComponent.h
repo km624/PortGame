@@ -101,9 +101,6 @@ public:
 
 	void WeaponHide(bool visible);
 
-protected:
-
-	void FirstSkillEffect();
 
 public:
 	FORCEINLINE class USkillBase* GetSkill() { return Skill; }
@@ -116,14 +113,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	TObjectPtr<class USkillBase> Skill;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
-	float FirstSkillSlowTime = 1.5f;
-
 	//±Ã±Ø±â
 public:
 	void SetUltiSkill();
 
 	void UltiSkillAttack();
+
+	void FirstUltiSkillEffect();
 
 protected:
 
@@ -132,6 +128,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UltiSkill")
 	TObjectPtr<class UUltiSkill> UltiSkill;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
+	float FirstSkillSlowTime = 3.0f;
 
 		
 

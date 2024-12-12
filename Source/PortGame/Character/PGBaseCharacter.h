@@ -145,7 +145,8 @@ protected:
 
 	//µÚ·Î ¹Ð¸®°Ô
 	virtual void HitGaugeZeroEffect() override;
-
+	
+	UFUNCTION()
 	void HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 
 protected:
@@ -210,5 +211,12 @@ protected:
 	//±Ã±Ø±â
 protected:
 	void UltimateSkillToComponent();
+
+public:
+	UFUNCTION()
+	virtual void SetbIsUltiSkill(bool bisulti);
+protected:
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	uint8 bIsUltiSkill : 1;
 
 };
