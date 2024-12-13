@@ -38,6 +38,7 @@ void UPGGunWidget::SetUpGunWidget(int32 maxammo)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("progress miss"));
 	}
+	PreviousAmmoPercent = static_cast<float>(CurrentAmmo) / static_cast<float>(MaxAmmo);
 
 	this->SetVisibility(ESlateVisibility::Collapsed);
 }

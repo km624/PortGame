@@ -15,6 +15,7 @@
 #include "Interface/AttackHitStopInterface.h"
 #include "Character/PGNpcCharacter.h"
 
+
 ARifle::ARifle()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -39,7 +40,7 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 	OwnerCharacter->OnbIsShoot.AddUObject(this,
 		&ThisClass::ShootCheck);
 	OwnerCharacter->OnbIsReload.AddUObject(this,
-		&ThisClass::Reloading);
+		&ThisClass::StartReloading);
 
 	if (weaponData)
 	{
@@ -48,8 +49,9 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 		GunStat = gunWeaponData->GunStat;
 		ReloadMontage = gunWeaponData->ReloadMontage;
 		CameraShakeClass = gunWeaponData->CameraShakeClass;
-		
 		SetUpGunStat();
+
+		ReloadMontageTime = ReloadMontage->GetPlayLength()/reloadingTime - 0.3f;
 	}
 	Currentammo = ammoMaxCount;
 
@@ -121,7 +123,7 @@ void ARifle::StartFire()
 void ARifle::StopFire()
 {
 	if (StopTimerHandle.IsValid())return;
-	//UE_LOG(LogTemp, Warning, TEXT("Stop"));
+	
 	if (FireTimerHandle.IsValid())
 	{
 
@@ -137,23 +139,36 @@ void ARifle::StopFire()
 
 }
 
-void ARifle::Reloading()
+void ARifle::StartReloading()
 {
 	if (ReloadTimerHandle.IsValid())return;
-	SLOG(TEXT("RELOADING"));
-	OwnerCharacter->SetbIsReload(true);
+	
+	bIsGunReloaded = true;
+	OwnerCharacter->SetbIsReload(bIsGunReloaded);
+	OnbIsGunReload.Broadcast(bIsGunReloaded);
+
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(ReloadMontage, 1.0f);
+	AnimInstance->Montage_Play(ReloadMontage, reloadingTime);
+
+	
 	GetWorld()->GetTimerManager().SetTimer(
 		ReloadTimerHandle,
-		[this]() {
-			Currentammo = ammoMaxCount;
-			OnAmmoChanged.Broadcast(Currentammo);
-			OwnerCharacter->SetbIsReload(false);
-			ReloadTimerHandle.Invalidate();
-		}, reloadingTime, false
+		this,&ThisClass::EndReloading 
+		, ReloadMontageTime, false
 	);
 }
+
+void ARifle::EndReloading()
+{
+	
+	Currentammo = ammoMaxCount;
+	OnAmmoChanged.Broadcast(Currentammo);
+	bIsGunReloaded = false;
+	OwnerCharacter->SetbIsReload(bIsGunReloaded);
+	OnbIsGunReload.Broadcast(bIsGunReloaded);
+	ReloadTimerHandle.Invalidate();
+}
+
 
 void ARifle::FireWithLineTrace()
 {
@@ -161,11 +176,11 @@ void ARifle::FireWithLineTrace()
 	if (Currentammo <= 0)
 	{
 		StopFire();
-		Reloading();
-		//UE_LOG(LogTemp, Warning, TEXT("NoArmo"));
+		StartReloading();
+		
 		return;
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("Time : %lf"), GetWorld()->GetTimeSeconds());
+	
 	Currentammo--;
 	OnAmmoChanged.Broadcast(Currentammo);
 
@@ -256,9 +271,7 @@ void ARifle::FireWithLineTrace()
 	}
 	StartGaunRecoil();
 	
-	//UE_LOG(LogTemp, Warning, TEXT("%d"), Currentammo);
-
-
+	
 }
 
 void ARifle::StartGaunRecoil()

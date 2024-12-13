@@ -540,7 +540,10 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 			hudWidget->SetupGunWidget(rifle->GetammoMaxCount());
 			rifle->OnAmmoChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateGunAmmo);
 
-			OnbIsAim.AddUObject(hudWidget, &UPGHudWidget::SetGunWidgetEnalbe);
+			hudWidget->SetupReloadWidget(rifle->GetReloadMotagetime());
+			rifle->OnbIsGunReload.AddUObject(hudWidget, &UPGHudWidget::StartReload);
+
+			OnbIsAim.AddUObject(hudWidget, &UPGHudWidget::SetGunWidgetEnable);
 		}
 		
 	}

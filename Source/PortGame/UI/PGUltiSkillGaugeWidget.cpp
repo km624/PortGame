@@ -36,7 +36,7 @@ void UPGUltiSkillGaugeWidget::SetUpWidget(float currentUlti)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("progress miss"));
 	}
-
+	PreviousUltiPercent = CurrentUltiSkillGauge / MaxUltiSkillGauge;
 	
 	this->SetVisibility(ESlateVisibility::Visible);
 }

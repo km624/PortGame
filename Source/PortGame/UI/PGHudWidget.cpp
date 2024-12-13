@@ -9,6 +9,7 @@
 #include "UI/SkillWidget.h"
 #include "UI/PGDashWidget.h"
 #include "UI/PGGunWidget.h"
+#include "UI/PGReloadWidget.h"
 
 UPGHudWidget::UPGHudWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -38,6 +39,11 @@ void UPGHudWidget::SetupDashWidget(float dashtisme)
 void UPGHudWidget::SetupGunWidget(int32 maxammo)
 {
 	BP_GunWidget->SetUpGunWidget(maxammo);
+}
+
+void UPGHudWidget::SetupReloadWidget(float reloadtime)
+{
+	BP_ReloadWidget->SetUpReloadWidget(reloadtime);
 }
 
 void UPGHudWidget::UpdateHpBar(float NewCurrentHp)
@@ -70,10 +76,27 @@ void UPGHudWidget::UpdateGunAmmo(int32 Newammo)
 	BP_GunWidget->UpdateGunAmmo(Newammo);
 }
 
-void UPGHudWidget::SetGunWidgetEnalbe(bool bIsaim)
+void UPGHudWidget::StartReload(bool reload)
 {
+	BP_ReloadWidget->StartReloadtime(reload);
+	if (reload)
+	{
+		Image_CrossHair->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	else
+	{
+		if(bIsAim)
+			Image_CrossHair->SetVisibility(ESlateVisibility::Visible);
+	}
+	
+}
+
+void UPGHudWidget::SetGunWidgetEnable(bool bIsaim)
+{
+	bIsAim = bIsaim;
 	if (bIsaim)
 	{
+		
 		Image_CrossHair->SetVisibility(ESlateVisibility::Visible);
 		BP_GunWidget->SetVisibility(ESlateVisibility::Visible);
 	}
@@ -82,10 +105,10 @@ void UPGHudWidget::SetGunWidgetEnalbe(bool bIsaim)
 		Image_CrossHair->SetVisibility(ESlateVisibility::Hidden);
 		BP_GunWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
-		
-
 	
 }
+
+
 
 void UPGHudWidget::NativeConstruct()
 {

@@ -17,11 +17,7 @@ void USkillWidget::NativeConstruct()
 	this->SetVisibility(ESlateVisibility::Hidden);
 }
 
-void USkillWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
 
-}
 
 void USkillWidget::SetUpWidget(float maxcooltime)
 {

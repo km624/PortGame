@@ -21,7 +21,7 @@ protected:
 
 	virtual void NativeConstruct() override;
 
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	
 
 public:
 	void SetUpWidget(float maxcooltime);
@@ -31,11 +31,6 @@ public:
 
 protected:
 	void UpdateSkillCooltime();
-
-protected:
-
-	float PreviouscooltimePercent;
-
 
 protected:
 	UPROPERTY(meta = (BindWidget))

@@ -33,6 +33,9 @@ public:
 	UFUNCTION()
 	void SetupGunWidget(int32 maxammo);
 
+	UFUNCTION()
+	void SetupReloadWidget(float reloadtime);
+
 	//ABHPBar의 Update와 동일한 함수
 	UFUNCTION()
 	void UpdateHpBar(float NewCurrentHp);
@@ -50,11 +53,17 @@ public:
 	void UpdateGunAmmo(int32 Newammo);
 
 	UFUNCTION()
-	void SetGunWidgetEnalbe(bool bIsaim);
+	void StartReload(bool reload);
+
+	UFUNCTION()
+	void SetGunWidgetEnable(bool bIsaim);
+
 
 protected:
 	virtual void NativeConstruct() override;
 
+protected:
+	bool bIsAim;
 
 
 	//초기화 함수에서 초기화하기
@@ -76,6 +85,11 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPGGunWidget> BP_GunWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGReloadWidget> BP_ReloadWidget;
+
+
 	//UPROPERTY()
 	//TObjectPtr<class UABCharacterStatWidget> CharacterStat;
 	
