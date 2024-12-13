@@ -31,11 +31,7 @@
 #include "LevelSequencePlayer.h"
 #include "Skill/SkillBase.h"
 #include "Player/PGPlayerController.h"
-
-
-
-
-
+#include "Weapon/Rifle.h"
 
 
 APGPlayerCharacter::APGPlayerCharacter()
@@ -528,9 +524,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		hudWidget->SetupDashWidget(DashColltime);
 		hudWidget->UpdateHpBar(StatComponent->GetCurrentHp());
 		hudWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
-		
-		//hudWidget->execUpdateUltiSkillGaugeBar(Currenthit)
-
+	
 		//델리게이트 바인딩
 		StatComponent->OnStatChanged.AddUObject(hudWidget, &UPGHudWidget::SetUpWidget);
 		StatComponent->OnHpChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateHpBar);
@@ -539,7 +533,16 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		AttackComponent->GetSkill()->OnbCanSkill.AddUObject(hudWidget, &UPGHudWidget::StartSkillCoolTime);
 		OndashDelegate.AddUObject(hudWidget, &UPGHudWidget::StartDash);
 
-		OnbIsAim.AddUObject(hudWidget, &UPGHudWidget::CorssHairEnable);
+		//총이 있을때만
+		ARifle* rifle = Cast<ARifle>(AttackComponent->GetWeapon());
+		if (rifle)
+		{
+			hudWidget->SetupGunWidget(rifle->GetammoMaxCount());
+			rifle->OnAmmoChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateGunAmmo);
+
+			OnbIsAim.AddUObject(hudWidget, &UPGHudWidget::SetGunWidgetEnalbe);
+		}
+		
 	}
 }
 
@@ -825,7 +828,7 @@ void APGPlayerCharacter::SetPlayerTargetPawn(APawn* enemy)
 	if (!TargetMePawns.Contains(enemy))
 	{
 		TargetMePawns.Add(enemy);
-		//SLOG(TEXT("Add Target %s"), *enemy->GetActorLabel());
+		
 	}
 
 
@@ -836,7 +839,7 @@ void APGPlayerCharacter::DeletePlayerTargetPawn(APawn* enemy)
 	if (TargetMePawns.Contains(enemy))
 	{
 		TargetMePawns.Remove(enemy);
-		//SLOG(TEXT("Delete Target %s"), *enemy->GetActorLabel());
+		
 	}
 }
 

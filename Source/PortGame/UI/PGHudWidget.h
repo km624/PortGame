@@ -30,6 +30,9 @@ public:
 	UFUNCTION()
 	void SetupDashWidget(float dashtime);
 
+	UFUNCTION()
+	void SetupGunWidget(int32 maxammo);
+
 	//ABHPBar의 Update와 동일한 함수
 	UFUNCTION()
 	void UpdateHpBar(float NewCurrentHp);
@@ -39,12 +42,15 @@ public:
 	void UpdateUltiSkillGaugeBar(float newUltiGauge);
 	UFUNCTION()
 	void StartSkillCoolTime(bool start);
-	
+
 	UFUNCTION()
 	void StartDash();
 
 	UFUNCTION()
-	void CorssHairEnable(bool bIsaim);
+	void UpdateGunAmmo(int32 Newammo);
+
+	UFUNCTION()
+	void SetGunWidgetEnalbe(bool bIsaim);
 
 protected:
 	virtual void NativeConstruct() override;
@@ -67,6 +73,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPGDashWidget> BP_DashWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGGunWidget> BP_GunWidget;
 	//UPROPERTY()
 	//TObjectPtr<class UABCharacterStatWidget> CharacterStat;
 	

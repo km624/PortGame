@@ -164,8 +164,7 @@ void UPGStatComponent::AddUlitSkillGauge(float AddUltigauge)
 		CurrentUltiSkillGauge = MaxUltiSkillGauge;
 	}
 	OnUltiSkillGaugechanged.Broadcast(CurrentUltiSkillGauge);
-	//SLOG(TEXT("CurrentUltiSkillGauge %f"), CurrentUltiSkillGauge);
-
+	
 }
 
 void UPGStatComponent::ResetUlitSkillGauge()

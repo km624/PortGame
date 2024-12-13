@@ -58,9 +58,9 @@ void UPGUltiSkillGaugeWidget::UpdateUltiSkillGauge(float Newgauge)
 
 void UPGUltiSkillGaugeWidget::SmoothingGauge(float deltatime)
 {
-	float CurrentHitGaugePercent = CurrentUltiSkillGauge / MaxUltiSkillGauge;
-	float newHitGaugePercent = FMath::FInterpTo(PreviousUltiPercent, CurrentHitGaugePercent, deltatime, 3.0f);
-	ProgressBar_UltiSkillGauge->SetPercent(newHitGaugePercent);
-	PreviousUltiPercent = newHitGaugePercent;
+	float CurrentultiGaugePercent = CurrentUltiSkillGauge / MaxUltiSkillGauge;
+	float newultiskillGaugePercent = FMath::FInterpTo(PreviousUltiPercent, CurrentultiGaugePercent, deltatime, 3.0f);
+	ProgressBar_UltiSkillGauge->SetPercent(newultiskillGaugePercent);
+	PreviousUltiPercent = newultiskillGaugePercent;
 
 }

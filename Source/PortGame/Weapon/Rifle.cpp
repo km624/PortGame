@@ -148,7 +148,7 @@ void ARifle::Reloading()
 		ReloadTimerHandle,
 		[this]() {
 			Currentammo = ammoMaxCount;
-			
+			OnAmmoChanged.Broadcast(Currentammo);
 			OwnerCharacter->SetbIsReload(false);
 			ReloadTimerHandle.Invalidate();
 		}, reloadingTime, false
@@ -167,7 +167,7 @@ void ARifle::FireWithLineTrace()
 	}
 	//UE_LOG(LogTemp, Warning, TEXT("Time : %lf"), GetWorld()->GetTimeSeconds());
 	Currentammo--;
-	
+	OnAmmoChanged.Broadcast(Currentammo);
 
 	const FVector Camerastart = OwnerCharacter->GetAimLocation();
 	//카메라 시작지점

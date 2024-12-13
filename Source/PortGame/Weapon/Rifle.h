@@ -10,6 +10,7 @@
 /**
  * 
  */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnAmmoChanged, int32 /*CurrentAmmo*/);
 UCLASS()
 class PORTGAME_API ARifle : public AWeapon
 {
@@ -42,7 +43,10 @@ protected:
 
 	void FireWithLineTrace();
 
-	
+public:
+	FOnAmmoChanged OnAmmoChanged;
+
+	FORCEINLINE int32 GetammoMaxCount() { return ammoMaxCount; }
 
 		//ÃÑ ¹ß»ç ±¸Çö
 protected:
