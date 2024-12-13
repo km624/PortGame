@@ -416,7 +416,7 @@ void APGPlayerCharacter::ReleasedAttack()
 
 void APGPlayerCharacter::PressAim()
 {
-	if (bIsSlow || bIsDash)return;
+	if (bIsSlow || bIsDash|| bIsUltiSkill)return;
 
 	bIsAim = true;
 	OnbIsAim.Broadcast(bIsAim);
@@ -457,7 +457,7 @@ void APGPlayerCharacter::ReleasedAim()
 
 void APGPlayerCharacter::PressReload()
 {
-	if (bIsSlow||bIsDash) return;
+	if (bIsSlow||bIsDash||bIsUltiSkill) return;
 	ReloadToWeapon();
 }
 
@@ -525,6 +525,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		hudWidget->SetUpWidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat());
 		hudWidget->SetupUltiSkillWidget(StatComponent->GetCurrentUltiSkillGauge());
 		hudWidget->SetupSkillWidget(AttackComponent->GetSkill()->GetSkillCooltime());
+		hudWidget->SetupDashWidget(DashColltime);
 		hudWidget->UpdateHpBar(StatComponent->GetCurrentHp());
 		hudWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
 		
@@ -536,6 +537,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		StatComponent->OnHitGaugeChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateHitGaugeBar);
 		StatComponent->OnUltiSkillGaugechanged.AddUObject(hudWidget, &UPGHudWidget::UpdateUltiSkillGaugeBar);
 		AttackComponent->GetSkill()->OnbCanSkill.AddUObject(hudWidget, &UPGHudWidget::StartSkillCoolTime);
+		OndashDelegate.AddUObject(hudWidget, &UPGHudWidget::StartDash);
 
 		OnbIsAim.AddUObject(hudWidget, &UPGHudWidget::CorssHairEnable);
 	}
@@ -621,7 +623,8 @@ void APGPlayerCharacter::OnDash()
 {
 	if(DashCooltimeTimerHandle.IsValid()) return;
 	if (bIsUltiSkill)return;
-	
+
+	OndashDelegate.Broadcast();
 	bIsDash = true;
 	AttackComponent->SetbIsGodMode(true);
 	 OriginalMaxWalkSpeed = GetCharacterMovement()->GetMaxSpeed();

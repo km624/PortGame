@@ -26,6 +26,10 @@ public:
 
 	UFUNCTION()
 	void SetupSkillWidget(float cooltime);
+
+	UFUNCTION()
+	void SetupDashWidget(float dashtime);
+
 	//ABHPBar의 Update와 동일한 함수
 	UFUNCTION()
 	void UpdateHpBar(float NewCurrentHp);
@@ -35,6 +39,9 @@ public:
 	void UpdateUltiSkillGaugeBar(float newUltiGauge);
 	UFUNCTION()
 	void StartSkillCoolTime(bool start);
+	
+	UFUNCTION()
+	void StartDash();
 
 	UFUNCTION()
 	void CorssHairEnable(bool bIsaim);
@@ -57,6 +64,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class USkillWidget> BP_SkillWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGDashWidget> BP_DashWidget;
 	//UPROPERTY()
 	//TObjectPtr<class UABCharacterStatWidget> CharacterStat;
 	

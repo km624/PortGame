@@ -7,6 +7,7 @@
 #include "Components/Image.h"
 #include "UI/PGUltiSkillGaugeWidget.h"
 #include "UI/SkillWidget.h"
+#include "UI/PGDashWidget.h"
 
 UPGHudWidget::UPGHudWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -28,6 +29,11 @@ void UPGHudWidget::SetupSkillWidget(float cooltime)
 	BP_SkillWidget->SetUpWidget(cooltime);
 }
 
+void UPGHudWidget::SetupDashWidget(float dashtisme)
+{
+	BP_DashWidget->SetUpWidget(dashtisme);
+}
+
 void UPGHudWidget::UpdateHpBar(float NewCurrentHp)
 {
 	BP_HpBar->UpdateHpBar(NewCurrentHp);
@@ -46,6 +52,11 @@ void UPGHudWidget::UpdateUltiSkillGaugeBar(float newUltiGauge)
 void UPGHudWidget::StartSkillCoolTime(bool start)
 {
 	BP_SkillWidget->StartSkillCooltime(start);
+}
+
+void UPGHudWidget::StartDash()
+{
+	BP_DashWidget->OnDash();
 }
 
 void UPGHudWidget::CorssHairEnable(bool bIsaim)

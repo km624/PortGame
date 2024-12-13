@@ -14,6 +14,7 @@
 /**
  * 
  */
+DECLARE_MULTICAST_DELEGATE(FOnDashDelegate);
 UENUM()
 enum class EControlData : uint8
 {
@@ -190,6 +191,9 @@ protected:
 	TObjectPtr<class UPostProcessComponent> PostProcessComponent;
 
 	//대시 , 회피
+
+public:
+	FOnDashDelegate OndashDelegate;
 protected:
 	void OnDash();
 
