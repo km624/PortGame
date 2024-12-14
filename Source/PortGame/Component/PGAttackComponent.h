@@ -25,6 +25,8 @@ protected:
 	
 
 public:
+	void SetupAttackData(class UBaseCharacterDataAsset* attackdata);
+
 	void SetWeaponClass();
 
 	void SetUpWeapon();

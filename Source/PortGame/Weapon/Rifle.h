@@ -68,6 +68,8 @@ protected:
 
 	float traceDistance;
 
+	uint8 bIsPistol : 1;
+
 	FTimerHandle FireTimerHandle;
 	FTimerHandle ReloadTimerHandle;
 	FTimerHandle StopTimerHandle;
@@ -79,6 +81,7 @@ protected:
 
 	bool bIsGunReloaded;
 
+	FName FireLocation = TEXT("FireLocation");
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
@@ -90,12 +93,18 @@ protected:
 
 	//ÃÑ±â¹Ýµ¿
 protected:
-	void StartGaunRecoil();
+	void StartGunEffect();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CamreShake)
 	TSubclassOf<class UCameraShakeBase> CameraShakeClass;
 
+protected:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UNiagaraComponent> GunNiagaraComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Effect)
+	TObjectPtr<class UNiagaraSystem> NAGunEffect;
 	
 
 

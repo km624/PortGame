@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Struct/PGCharacterStat.h"
+#include "Portgame/Portgame.h"
 #include "PGStatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
@@ -48,6 +49,8 @@ public:
 	FOnHitGaugeChangedDelegate OnHitGaugeChanged;
 	FOnUltiSkillGaugeChangedDelegate OnUltiSkillGaugechanged;
 
+	
+
 	void SetCurrentRarity(FName rarity);
 
 	FORCEINLINE void SetBaseStat(FName rarity) 
@@ -55,7 +58,9 @@ public:
 		BaseStat = AllStat[rarity];  OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat());
 	}
 	FORCEINLINE void SetModifierStat(const FPGCharacterStat& InModifierStat)
-		{ ModifierStat = InModifierStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat()); }
+	{
+		ModifierStat = InModifierStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat()); SLOG(TEXT("ModfierSet"));
+	}
 
 	FORCEINLINE const FPGCharacterStat& GetBaseStat() const { return BaseStat; }
 	FORCEINLINE const FPGCharacterStat& GetModifierStat() const { return ModifierStat; }
@@ -65,8 +70,7 @@ public:
 	
 	FORCEINLINE float  GetCurrentHp() { return CurrentHp; }
 
-	FORCEINLINE void SetMaxHitGauge(float NewMaxHitGuage) { MaxHitGauge = NewMaxHitGuage; }
-	FORCEINLINE float  GetMaxHitGauge() { return MaxHitGauge; }
+	
 	FORCEINLINE float  GetCurrentHitGauge() { return CurretHitGauge; }
 	
 	FORCEINLINE float  GetMaxUltiSkillGauge() { return MaxUltiSkillGauge; }
@@ -113,8 +117,6 @@ protected:
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float EXP;
 
-	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
-	float MaxHitGauge;
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float CurretHitGauge;

@@ -18,6 +18,9 @@
 #include "Skill/UltiSkill.h"
 #include "Character/PGPlayerCharacter.h"
 #include "LevelSequence.h"
+#include "Data/CharacterEnumData.h"
+#include "NiagaraSystem.h" 
+#include "Data/BaseCharacterDataAsset.h"
 
 
 UPGAttackComponent::UPGAttackComponent()
@@ -41,21 +44,32 @@ void UPGAttackComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 	
-	SetWeaponClass();
+	/*SetWeaponClass();
 
 	SetUpWeapon();
 
 	SetSkill();
 
-	SetUltiSkill();
+	SetUltiSkill();*/
 
-	//SLOG(TEXT("Attack : AttackInitai end"));
 }
 
 void UPGAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+void UPGAttackComponent::SetupAttackData(UBaseCharacterDataAsset* attackdata)
+{
+	WeaponData = attackdata->WeaponData;
+	SkillClass = attackdata->SkillClass;
+	UltiSkillClass = attackdata->UltiSkillClass;
+	
+	SetWeaponClass();
+	SetUpWeapon();
+	SetSkill();
+	SetUltiSkill();
 }
 
 void UPGAttackComponent::SetWeaponClass()
@@ -72,7 +86,7 @@ void UPGAttackComponent::SetUpWeapon()
 		AWeapon* spawnWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClass);
 
 		Weapon = spawnWeapon;
-		//SLOG(TEXT("spawnWeapon"));
+		
 		APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
 
 
@@ -84,9 +98,7 @@ void UPGAttackComponent::SetUpWeapon()
 
 		OnNextCombo.AddUObject(Weapon, &AWeapon::SetHasNextCombo);
 
-		
 	}
-
 
 }
 
@@ -129,27 +141,35 @@ void UPGAttackComponent::AttackHitCheck()
 
 	
 	float AttackRange = 50.0f;
-	 float AttackRadius = BaseCharacter->GetTotalStat().AttackRange;
-	 float AttackDamage = BaseCharacter->GetTotalStat().Attack;
+	float AttackRadius = BaseCharacter->GetTotalStat().AttackRange;
+	float AttackDamage = BaseCharacter->GetTotalStat().Attack;
+	if (BaseCharacter->GetPlayerCharacterType() == EPlayerCharacterType::BlueArchive)
+	{
+		AttackDamage *= 0.7f;
+	}
+	else if (BaseCharacter->GetPlayerCharacterType() == EPlayerCharacterType::Nikke)
+	{
+		AttackDamage *= 0.5f;
+	}
+	
 
 	 //½ºÅ³
 	 if (Skill && Skill->GetbIsSkill())
 	 {
 		 AttackRadius *= 1.5f;
-		 AttackDamage *= 3.0f;
+		 AttackDamage = BaseCharacter->GetTotalStat().Attack* 3.0f;
 	 }
 
 	 //±Ã±Ø±â
 	 if (UltiSkill && UltiSkill->GetbIsSkill())
 	 {
 		 AttackRadius *= 1.5f;
-		 AttackDamage *= 6.0f;
+		 AttackDamage =BaseCharacter->GetTotalStat().Attack* 6.0f;
 	 }
 
 	//AI ¸é °ø°Ý·Â °Å¸® Âª°Ô
 	if(BaseCharacter->ActorHasTag(TAG_AI))
 	{
-		//AttackRange *= 0.5f;
 		AttackRadius *= 0.5f;
 		AttackDamage *= 0.25f;
 	}

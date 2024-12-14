@@ -3,4 +3,6 @@
 
 #include "Struct/PGGunStat.h"
 
-
+FPGGunStat::FPGGunStat()
+{
+}

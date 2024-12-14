@@ -39,11 +39,11 @@ void UPGStatComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	SetCurrentRarity(CurrentCharacterRarity);
+	/*SetCurrentRarity(CurrentCharacterRarity);
 
 	SetHp(GetTotalStat().MaxHp);
 
-	SetHitGauge(GetTotalStat().HitGauge);
+	SetHitGauge(GetTotalStat().HitGauge);*/
 
 	CurrentUltiSkillGauge = 100.0f;
 }
@@ -54,6 +54,12 @@ void UPGStatComponent::SetCurrentRarity(FName rarity)
 	{
 		CurrentCharacterRarity = rarity;
 		SetBaseStat(CurrentCharacterRarity);
+
+		SetHp(GetTotalStat().MaxHp);
+
+		SetHitGauge(GetTotalStat().HitGauge);
+
+		SLOG(TEXT("StatSet End"));
 	}
 }
 

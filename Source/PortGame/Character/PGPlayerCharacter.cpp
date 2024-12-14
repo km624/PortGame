@@ -14,13 +14,11 @@
 #include "UI/PGHudWidget.h"
 #include "Component/PGStatComponent.h"
 #include "Components/CapsuleComponent.h"
-//#include "Kismet/KismetMathLibrary.h"
 #include "PortGame/PortGame.h"
 #include "MotionWarpingComponent.h"
 #include "Component/TargetingComponent.h"
 #include "Component/PGAttackComponent.h"
 #include "Kismet/GameplayStatics.h"
-//#include "Components/PostProcessComponent.h"
 #include "Animation/AnimMontage.h"
 #include "Physics/PGCollision.h"
 #include "Engine/OverlapResult.h"
@@ -32,6 +30,7 @@
 #include "Skill/SkillBase.h"
 #include "Player/PGPlayerController.h"
 #include "Weapon/Rifle.h"
+#include "Data/PlayerCharacterDataAsset.h"
 
 
 APGPlayerCharacter::APGPlayerCharacter()
@@ -39,7 +38,7 @@ APGPlayerCharacter::APGPlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	TargetingComponent = CreateDefaultSubobject<UTargetingComponent>(TEXT("Targeting_Comp"));
-	
+
 	static ConstructorHelpers::FObjectFinder<UPGCharacterData> CharacterBaseData
 	(TEXT("/Script/PortGame.PGCharacterData'/Game/PortGame/Input/PG_InputBaseData.PG_InputBaseData'"));
 	if (CharacterBaseData.Object)
@@ -49,7 +48,12 @@ APGPlayerCharacter::APGPlayerCharacter()
 	(TEXT("/Script/PortGame.PGCharacterData'/Game/PortGame/Input/PG_InputAimData.PG_InputAimData'"));
 	if (CharacterAimData.Object)
 		ControlDataManager.Add(EControlData::Aim, CharacterAimData.Object);
-	
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> aimCurve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Weapon/AimCurve.AimCurve'"));
+	if (aimCurve.Object)
+	{
+		AimCurve = aimCurve.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> DashMon(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/DashMontage.DashMontage'"));
 	if (DashMon.Object)
 	{
@@ -81,13 +85,13 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		JumpAction = Jump.Object;
 	}
-	
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> Move(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Move.IA_Move'"));
 	if (Move.Object)
 	{
 		MoveAction = Move.Object;
 	}
-	
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> Look(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Look.IA_Look'"));
 	if (Look.Object)
 	{
@@ -114,7 +118,7 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		ReloadAction = Reload.Object;
 	}
-	
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> Targeting(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Targetaing.IA_Targetaing'"));
 	if (Targeting.Object)
 	{
@@ -132,7 +136,7 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		DashAction = Dash.Object;
 	}
-	
+
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> EvadeLeft(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/EvadeLeftMontage.EvadeLeftMontage'"));
 	if (EvadeLeft.Object)
 	{
@@ -142,7 +146,7 @@ APGPlayerCharacter::APGPlayerCharacter()
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> EvadeRight(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/EvadeRightMontage.EvadeRightMontage'"));
 	if (EvadeRight.Object)
 	{
-		RightEvadeMontage =EvadeRight.Object;
+		RightEvadeMontage = EvadeRight.Object;
 	}
 
 	static ConstructorHelpers::FClassFinder<UCameraShakeBase> EvadeCameraShake(TEXT("/Script/Engine.Blueprint'/Game/PortGame/Effect/CameraShake/EvadeCameraShake.EvadeCameraShake_C'"));
@@ -178,37 +182,33 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		ThreeChangeCharacterAction = ThreeC.Object;
 	}
-	
+
 	Tags.Add(TAG_PLAYER);
 
-	
+
 }
 
 void APGPlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-	
-	CreateHudWidget();
+	if(baseCharacterData)
+		CreateHudWidget();
 }
 
 void APGPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//CreateHudWidget();
 
-	
 	SetCharacterData(CurrentControlData);
-
 	//임시로
-	StatComponent->SetCurrentRarity(TEXT("Normal"));
+	/*StatComponent->SetCurrentRarity(TEXT("Normal"));
 	StatComponent->SetHitGauge(GetTotalStat().HitGauge);
-	StatComponent->SetHp(GetTotalStat().MaxHp);
-
-
+	StatComponent->SetHp(GetTotalStat().MaxHp);*/
 
 	FOnTimelineFloat TimelineProgress;
-	TimelineProgress.BindUFunction(this, FName("AimUpdate")); 
+	TimelineProgress.BindUFunction(this, FName("AimUpdate"));
 	AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
 
 	FGenericTeamId currentteam = GetGenericTeamId();
@@ -233,10 +233,10 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &APGPlayerCharacter::Look);
-		
+
 		//Attack
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &APGPlayerCharacter::Attack);
-		if(CharacterType ==EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
+		if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
 			EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Ongoing, this, &APGPlayerCharacter::OnGoingAttack);
 		EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Completed, this, &APGPlayerCharacter::ReleasedAttack);
 		//Aiming
@@ -265,7 +265,7 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(OneChangeCharacterAction, ETriggerEvent::Started, this, &APGPlayerCharacter::OneChangePlayerCharacter);
 		EnhancedInputComponent->BindAction(TwoChangeCharacterAction, ETriggerEvent::Started, this, &APGPlayerCharacter::TwoChangePlayerCharacter);
 		EnhancedInputComponent->BindAction(ThreeChangeCharacterAction, ETriggerEvent::Started, this, &APGPlayerCharacter::ThreeChangePlayerCharacter);
-	
+
 	}
 	else
 	{
@@ -285,10 +285,21 @@ void APGPlayerCharacter::Tick(float DeltaTime)
 	}
 	else
 	{
-		if (bIsAttackRotation&& bIsMoving)
+		if (bIsAttackRotation && bIsMoving)
 			SetAttackRotation(DeltaTime);
 
 	}
+
+}
+
+void APGPlayerCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterdata)
+{
+	UPlayerCharacterDataAsset* palyerdata = Cast<UPlayerCharacterDataAsset>(characterdata);
+
+	LevelSequence = palyerdata->LevelSequence;
+
+	Super::SetupCharacterData(characterdata);
+
 	
 }
 
@@ -346,7 +357,7 @@ void APGPlayerCharacter::SetCharacterData(EControlData DataName)
 		nikkeTargetArm.SetLocation(currentLocation);
 		SpringArm->SetRelativeTransform(nikkeTargetArm);
 	}
-		
+
 
 }
 
@@ -371,16 +382,16 @@ void APGPlayerCharacter::Move(const FInputActionValue& Value)
 		// add movement 
 		AddMovementInput(ForwardDirection, MovementVector.X);
 		AddMovementInput(RightDirection, MovementVector.Y);
-		
+
 		bIsMoving = true;
 
 		if (!TargetingComponent->GetbIsTargetLock())
 		{
 			FVector CurrentLocation = GetActorLocation();
 			FVector MovementDirection = (ForwardDirection * MovementVector.X) + (RightDirection * MovementVector.Y);
-			AttackVector = MovementDirection;	
+			AttackVector = MovementDirection;
 		}
-		
+
 	}
 }
 
@@ -398,7 +409,7 @@ void APGPlayerCharacter::Look(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		
+
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
@@ -406,7 +417,7 @@ void APGPlayerCharacter::Look(const FInputActionValue& Value)
 
 void APGPlayerCharacter::Attack()
 {
-	if (bIsSlow||bIsDash)return;
+	if (bIsSlow || bIsDash)return;
 
 	if (bIsAim)
 	{
@@ -417,16 +428,16 @@ void APGPlayerCharacter::Attack()
 		if (bIsNikkeSkill)
 			StopDefenceNikke();
 	}
-	
+
 	AttackToComponent();
-	
+
 }
 
 void APGPlayerCharacter::OnGoingAttack()
 {
 	if (bIsAim)
 	{
-		
+
 		OnbIsShoot.Broadcast(bIsShoot);
 	}
 }
@@ -436,9 +447,9 @@ void APGPlayerCharacter::ReleasedAttack()
 	if (bIsAim)
 	{
 		bIsShoot = false;
-		
+
 		OnbIsShoot.Broadcast(bIsShoot);
-		
+
 	}
 
 }
@@ -446,7 +457,7 @@ void APGPlayerCharacter::ReleasedAttack()
 
 void APGPlayerCharacter::PressAim()
 {
-	if (bIsSlow || bIsDash|| bIsUltiSkill)return;
+	if (bIsSlow || bIsDash || bIsUltiSkill)return;
 
 	bIsAim = true;
 	OnbIsAim.Broadcast(bIsAim);
@@ -455,39 +466,39 @@ void APGPlayerCharacter::PressAim()
 	AimTimeline.PlayFromStart();
 
 	AimLocation = Camera->GetComponentLocation();
-	
+
 
 }
 
 void APGPlayerCharacter::OnGoingAim()
 {
-	
-		AimLocation = Camera->GetComponentLocation();
+
+	AimLocation = Camera->GetComponentLocation();
 }
 
 void APGPlayerCharacter::ReleasedAim()
 {
-	
-		bIsAim = false;
-		OnbIsAim.Broadcast(bIsAim);
 
-		bIsShoot = false;
-		OnbIsShoot.Broadcast(bIsShoot);
-		SetCharacterData(EControlData::Base);
-		AimTimeline.Reverse();
+	bIsAim = false;
+	OnbIsAim.Broadcast(bIsAim);
 
-		if (bIsNikkeSkill)
-		{
-			FRotator BackRotation = GetActorRotation() + FRotator(0, 120.0f, 0);
-			SetActorRotation(BackRotation);
-		}
-	
+	bIsShoot = false;
+	OnbIsShoot.Broadcast(bIsShoot);
+	SetCharacterData(EControlData::Base);
+	AimTimeline.Reverse();
+
+	if (bIsNikkeSkill)
+	{
+		FRotator BackRotation = GetActorRotation() + FRotator(0, 120.0f, 0);
+		SetActorRotation(BackRotation);
+	}
+
 
 }
 
 void APGPlayerCharacter::PressReload()
 {
-	if (bIsSlow||bIsDash||bIsUltiSkill) return;
+	if (bIsSlow || bIsDash || bIsUltiSkill) return;
 	ReloadToWeapon();
 }
 
@@ -495,12 +506,12 @@ void APGPlayerCharacter::PressReload()
 
 void APGPlayerCharacter::AimUpdate(float deltaTime)
 {
-	
+
 	float AimX = FMath::Lerp(0, 150, deltaTime);
 	float AimY = FMath::Lerp(0, 50, deltaTime);
 
 	Camera->SetRelativeLocation(FVector(AimX, AimY, 0.0f));
-	
+
 }
 
 float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -517,16 +528,16 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 	}
 	//무적
 	if (AttackComponent->GetbIsGodMode()) return DamageAmount;
-	
+
 	//적팀 한테 데미지
 	if (GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
 	{
-		
+
 		StatComponent->Damaged(DamageAmount);
 	}
 
 	//수류탄에 맞았을시
-	if (DamageCauser->ActorHasTag(TAG_GRENADE) )
+	if (DamageCauser->ActorHasTag(TAG_GRENADE))
 	{
 
 		FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
@@ -542,15 +553,15 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 			StatComponent->Damaged(DamageAmount * 0.3f);
 		}
 	}
-	
-	
+
+
 	return DamageAmount;
 }
 
 
 void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 {
-	SLOG(TEXT("%s : Setup"),*GetActorNameOrLabel());
+	SLOG(TEXT("%s : Setup"), *GetActorNameOrLabel());
 	if (hudWidget)
 	{
 		hudWidget->SetUpWidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat());
@@ -559,7 +570,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		hudWidget->SetupDashWidget(DashColltime);
 		hudWidget->UpdateHpBar(StatComponent->GetCurrentHp());
 		hudWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
-	
+
 		//델리게이트 바인딩
 		StatComponent->OnStatChanged.AddUObject(hudWidget, &UPGHudWidget::SetUpWidget);
 		StatComponent->OnHpChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateHpBar);
@@ -580,7 +591,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 
 			OnbIsAim.AddUObject(hudWidget, &UPGHudWidget::SetGunWidgetEnable);
 		}
-		
+
 	}
 }
 
@@ -591,11 +602,11 @@ void APGPlayerCharacter::FindClosestEnemyToComp()
 
 void APGPlayerCharacter::FindSideEnemyToComp(const FInputActionValue& Value)
 {
-	
+
 	float direction = Value.Get<float>();
 	TargetingComponent->SetSideTargetLock(direction);
-	
-	
+
+
 }
 
 
@@ -611,7 +622,7 @@ void APGPlayerCharacter::SetMotionWarpingLocation(FVector targetPos)
 
 	}
 	MotionWarpingComponent->AddOrUpdateWarpTargetFromLocation(TEXT("Target"), targetPos);
-	
+
 }
 
 void APGPlayerCharacter::ResetMotionWarping()
@@ -639,56 +650,56 @@ void APGPlayerCharacter::OnParryPostPorcess(bool effect)
 {
 	if (effect)
 	{
-	
-	Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
-	Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
-	Camera->PostProcessSettings.DepthOfFieldFocalDistance = 300.0f;
-	Camera->PostProcessSettings.DepthOfFieldSensorWidth = 750.0f;
 
-	Camera->PostProcessSettings.bOverride_SceneFringeIntensity = true;
-	Camera->PostProcessSettings.SceneFringeIntensity = 2.5f;
+		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
+		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
+		Camera->PostProcessSettings.DepthOfFieldFocalDistance = 300.0f;
+		Camera->PostProcessSettings.DepthOfFieldSensorWidth = 750.0f;
+
+		Camera->PostProcessSettings.bOverride_SceneFringeIntensity = true;
+		Camera->PostProcessSettings.SceneFringeIntensity = 2.5f;
 
 
 	}
 	else
 	{
-		
+
 		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = false;
 		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = false;
 
-		Camera->PostProcessSettings.bOverride_SceneFringeIntensity = false; 
+		Camera->PostProcessSettings.bOverride_SceneFringeIntensity = false;
 	}
 }
 
 void APGPlayerCharacter::OnDash()
 {
-	if(DashCooltimeTimerHandle.IsValid()) return;
+	if (DashCooltimeTimerHandle.IsValid()) return;
 	if (bIsUltiSkill)return;
 
 	OndashDelegate.Broadcast();
 	bIsDash = true;
 	AttackComponent->SetbIsGodMode(true);
-	 OriginalMaxWalkSpeed = GetCharacterMovement()->GetMaxSpeed();
-	 OriginalMaxAcceleration = GetCharacterMovement()->GetMaxAcceleration();
+	OriginalMaxWalkSpeed = GetCharacterMovement()->GetMaxSpeed();
+	OriginalMaxAcceleration = GetCharacterMovement()->GetMaxAcceleration();
 
-	GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed*2.0f;
-	GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration*3.0f;
+	GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed * 2.0f;
+	GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration * 3.0f;
 
 	DashVector = GetCharacterMovement()->GetLastInputVector();
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(DashMontage, 1.0f);
-	
+
 	//GetController()->SetIgnoreMoveInput(true);
-	
+
 	GetWorld()->GetTimerManager().SetTimer(
 		DashTimerHandle,
 		[this]() {
-			
+
 			GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed;
 			GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration;
 			//GetController()->SetIgnoreMoveInput(false);
-			GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle); 
+			GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
 
 			bIsDash = false;
 			AttackComponent->SetbIsGodMode(false);
@@ -774,7 +785,7 @@ void APGPlayerCharacter::OnEvadePostPorcess(bool effect)
 {
 	if (effect)
 	{
-		
+
 
 		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
 		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
@@ -847,7 +858,7 @@ void APGPlayerCharacter::OnSlowOVerlapToNPC(float time)
 
 bool APGPlayerCharacter::CanPlayerTarget(APawn* enemy)
 {
-	if (TargetMePawns.Num()>= MaxTargets)
+	if (TargetMePawns.Num() >= MaxTargets)
 	{
 		if (TargetMePawns.Contains(enemy))
 			return true;
@@ -857,8 +868,8 @@ bool APGPlayerCharacter::CanPlayerTarget(APawn* enemy)
 	else
 		return true;
 
-	
-	
+
+
 }
 
 void APGPlayerCharacter::SetPlayerTargetPawn(APawn* enemy)
@@ -866,7 +877,7 @@ void APGPlayerCharacter::SetPlayerTargetPawn(APawn* enemy)
 	if (!TargetMePawns.Contains(enemy))
 	{
 		TargetMePawns.Add(enemy);
-		
+
 	}
 
 
@@ -877,7 +888,7 @@ void APGPlayerCharacter::DeletePlayerTargetPawn(APawn* enemy)
 	if (TargetMePawns.Contains(enemy))
 	{
 		TargetMePawns.Remove(enemy);
-		
+
 	}
 }
 
@@ -886,7 +897,7 @@ void APGPlayerCharacter::InputSkill()
 	if (bIsSlow || bIsDash)return;
 
 	SkillToComponent();
-	
+
 }
 
 void APGPlayerCharacter::SetbIsNikkeSkill(bool skill)
@@ -924,33 +935,34 @@ ULevelSequence* APGPlayerCharacter::GetLevelSequence()
 void APGPlayerCharacter::ChangeViewTarget(bool bstart)
 {
 
-	
+
 	if (bstart)
 	{
-			
+
 		Camera->SetActive(false);
 		CutSceneCamera->SetActive(true);
 	}
 	else
 	{
-			
+
 		Camera->SetActive(true);
 		CutSceneCamera->SetActive(false);
 	}
 }
-	
+
 
 
 void APGPlayerCharacter::CreateHudWidget()
 {
+	SLOG(TEXT("PLayerCharacter : CreateWidget"));
 	PGHudWidget = CreateWidget<UPGHudWidget>(GetWorld(), PGHudWidgetClass);
 	if (PGHudWidget)
 	{
-		
+
 		PGHudWidget->SetOwingCharcter(this);
 		SetUpHudWidget(PGHudWidget);
 
-		
+
 	}
 }
 
@@ -959,7 +971,7 @@ void APGPlayerCharacter::HudWidgetAddviewport()
 	if (PGHudWidget)
 		PGHudWidget->AddToViewport();
 
-	SLOG(TEXT("%s: Addtoviewport"),*GetActorNameOrLabel());
+	SLOG(TEXT("%s: Addtoviewport"), *GetActorNameOrLabel());
 }
 
 void APGPlayerCharacter::RemoveHudWidget()
@@ -990,7 +1002,7 @@ void APGPlayerCharacter::ThreeChangePlayerCharacter()
 void APGPlayerCharacter::CheckandChangePlayerCharacter(int8 num)
 {
 	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
-	if(playerController)
+	if (playerController)
 		playerController->ChangedCharacterPossess(num);
 }
 

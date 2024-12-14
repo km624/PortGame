@@ -27,9 +27,13 @@ public:
 	APGBaseCharacter();
 
 protected:
+	virtual void PostInitializeComponents() override;
+
 	virtual void BeginPlay() override;
 
 protected:
+	virtual void SetupCharacterData(class UBaseCharacterDataAsset* characterdata);
+
 	void AttackToComponent();
 
 protected:
@@ -37,13 +41,18 @@ protected:
 
 	virtual void ComboCheckEndToComp() override;
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterData")
+	TObjectPtr<class UBaseCharacterDataAsset> baseCharacterData;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CharacterType" ,Meta = (AllowPrivateAccess = "true"))
 	EPlayerCharacterType CharacterType;
+	
 
 	//에임 관해서
-
 public:
-	FORCEINLINE void SetPlayerCharacterType(EPlayerCharacterType newType) { CharacterType = newType; }
+	
+	FORCEINLINE EPlayerCharacterType GetPlayerCharacterType() { return CharacterType; }
 
 	FORCEINLINE bool GetCurrentIsAiming() const { return bIsAim; }
 

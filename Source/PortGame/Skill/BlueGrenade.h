@@ -40,9 +40,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UProjectileMovementComponent* ProjectileMovement;
 
-	
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	class URadialForceComponent* RadialForce;*/
+
 
 protected:
 
@@ -55,18 +53,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Grenade")
 	float GrenadeDamageAdd = 5.0f;
 
-//protected:
-//	void StartNiagaraEffect();
-//
-//	UFUNCTION()
-//	void OnNiagaraSystemFinished(class UNiagaraComponent* FinishedComponent);
-//
-//protected:
-//	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category = "Naiagary")
-//	TObjectPtr<class UNiagaraComponent> NiagaraComponent;
-//
-//	UPROPERTY(VisibleAnywhere, Category = "Naiagary")
-//	TObjectPtr<class UNiagaraSystem> NAGrenadeEffect;
 
 public:
 	// 파티클 시작

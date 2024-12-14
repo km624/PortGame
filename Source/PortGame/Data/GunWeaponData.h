@@ -27,4 +27,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 	TSubclassOf<class UCameraShakeBase> CameraShakeClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Effect)
+	TObjectPtr<class UNiagaraSystem> NAGunEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GunStat)
+	uint8 bIsPistol : 1;
 };

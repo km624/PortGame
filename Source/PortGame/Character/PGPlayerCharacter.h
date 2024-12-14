@@ -20,13 +20,12 @@ enum class EControlData : uint8
 {
 	Base,
 	Aim
-
 };
 UCLASS()
-class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface
-	, public IAITargetPlayerInterface
+class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface, public IAITargetPlayerInterface
 {
 	GENERATED_BODY()
+
 public:
 
 	APGPlayerCharacter();
@@ -42,7 +41,7 @@ protected:
 
 	virtual void Tick(float DeltaTime) override;
 
-
+	virtual void SetupCharacterData(class UBaseCharacterDataAsset* characterdata) override;
 
 	void SetCharacterData(EControlData DataName);
 
@@ -195,9 +194,6 @@ protected:
 protected:
 	virtual void OnParryPostPorcess(bool effect) override;
 
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PostEffect")
-	TObjectPtr<class UPostProcessComponent> PostProcessComponent;
 
 	//대시 , 회피
 

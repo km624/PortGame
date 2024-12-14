@@ -10,6 +10,7 @@
 #include "Data/WeaponData.h"
 #include "Character/PGPlayerCharacter.h"
 #include "Interface/PGAICharacterInterface.h"
+#include "Data/CharacterEnumData.h"
 
 
 AWeapon::AWeapon()
@@ -55,6 +56,8 @@ void AWeapon::BeginPlay()
 void AWeapon::SetHasNextCombo(bool nextcombo)
 {
 	HasNextComboCommand = nextcombo;
+	if (OwnerCharacter->GetPlayerCharacterType() == EPlayerCharacterType::Nikke) return;
+
 	if (HasNextComboCommand)
 	{
 		ComboCheck();

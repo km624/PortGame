@@ -3,3 +3,6 @@
 
 #include "Struct/PGCharacterStat.h"
 
+FPGCharacterStat::FPGCharacterStat()
+{
+}

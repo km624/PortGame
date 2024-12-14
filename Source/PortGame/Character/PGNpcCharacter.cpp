@@ -36,6 +36,7 @@ APGNpcCharacter::APGNpcCharacter()
 
 	ParryNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ParryEffectComp"));
 	ParryNiagaraComponent->SetupAttachment(RootComponent);
+	ParryNiagaraComponent->bAutoActivate = false;
 
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> parryEffect(TEXT("/Script/Niagara.NiagaraSystem'/Game/PortGame/Effect/Niagara/NA_ParryState.NA_ParryState'"));
 	if (parryEffect.Object)
@@ -50,9 +51,9 @@ void APGNpcCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	//юс╫ц
-	StatComponent->SetCurrentRarity(TEXT("NPC"));
+	/*StatComponent->SetCurrentRarity(TEXT("NPC"));
 	StatComponent->SetHitGauge(GetTotalStat().HitGauge);
-	StatComponent->SetHp(GetTotalStat().MaxHp);
+	StatComponent->SetHp(GetTotalStat().MaxHp);*/
 
 	if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
 	{
@@ -83,23 +84,7 @@ void APGNpcCharacter::BeginPlay()
 
 		}
 	}
-	/*UMaterialInterface* CurrentMaterial = GetMesh()->GetMaterial(0);
-	if (CurrentMaterial)
-	{
-		
-		UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurrentMaterial, this);
-
-		if (DynamicMaterial)
-		{
-			
-			DynamicMaterial->SetVectorParameterValue(TEXT("Tint"), teamcolor);
-
-			
-			GetMesh()->SetMaterial(0, DynamicMaterial);
-		
-		}
-		
-	}*/
+	
 }
 
 float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)

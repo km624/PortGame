@@ -19,6 +19,7 @@
 #include "NiagaraComponent.h"   
 #include "NiagaraSystem.h"  
 #include "NiagaraFunctionLibrary.h"
+#include "Data/BaseCharacterDataAsset.h"
 
 
 
@@ -38,7 +39,7 @@ APGBaseCharacter::APGBaseCharacter()
 	//가속력
 	//원래값 2048
 	GetCharacterMovement()->MaxAcceleration = 1500.0f;
-	
+
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
@@ -54,10 +55,10 @@ APGBaseCharacter::APGBaseCharacter()
 
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Skeletal(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
-	if (Skeletal.Object)
+	/*if (Skeletal.Object)
 	{
 		GetMesh()->SetSkeletalMesh(Skeletal.Object);
-	}
+	}*/
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstance(TEXT("/Script/Engine.AnimBlueprint'/Game/PortGame/Animation/ABP_Animation.ABP_Animation_C'"));
 	if (AnimInstance.Class)
@@ -90,7 +91,7 @@ APGBaseCharacter::APGBaseCharacter()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("WidgetClassFail"));
 	}
-	
+
 	//hitMontage
 	static ConstructorHelpers::FObjectFinder<class UAnimMontage>
 		MONTAGE_HIT(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/HitMontage.HitMontage'"));
@@ -109,12 +110,22 @@ APGBaseCharacter::APGBaseCharacter()
 
 	BaseNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BaseNiagaraComp"));
 	BaseNiagaraComponent->SetupAttachment(RootComponent);
+	BaseNiagaraComponent->bAutoActivate = false;
 
+}
+
+void APGBaseCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if (baseCharacterData)
+		SetupCharacterData(baseCharacterData);
 }
 
 void APGBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+
 
 	StatComponent->OnHitGaugeZero.AddUObject(this, &ThisClass::PlayHitMontage);
 
@@ -128,7 +139,23 @@ void APGBaseCharacter::BeginPlay()
 
 	SetGenericTeamId(TeamId);
 
-	
+
+}
+
+void APGBaseCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterdata)
+{
+
+	CharacterType = characterdata->Charactertype;
+	CharacterTypeEffect = characterdata->CharacterTypeEffect;
+	GetMesh()->SetSkeletalMesh(characterdata->SkeletalMesh);
+
+	AttackComponent->SetupAttackData(characterdata);
+
+	StatComponent->SetCurrentRarity(characterdata->Rarity);
+
+	SLOG(TEXT("BaseCharacterr : SetupCharacterEnd"));
+
+
 }
 
 void APGBaseCharacter::AttackToComponent()
@@ -137,10 +164,10 @@ void APGBaseCharacter::AttackToComponent()
 	if (bIsGroggy) return;
 
 	if (bIsUltiSkill)return;
-	
-	
+
+
 	AttackComponent->AttackToWeapon();
-	
+
 }
 
 void APGBaseCharacter::ComboCheckStartToComp()
@@ -162,8 +189,8 @@ float APGBaseCharacter::ReturnAimOffset()
 	rtemp.Normalize();
 	float Direction = rtemp.Pitch;
 	AimOffset = FMath::Clamp(Direction, -55.0f, 55.0f);
-	
-	
+
+
 	return AimOffset;
 }
 
@@ -215,7 +242,7 @@ void APGBaseCharacter::SetUpHpWidget(UPGUserWidget* InUserWidget)
 		StatComponent->OnStatChanged.AddUObject(HpBarWidget, &UPGHPBarWidget::SetUpWidget);
 
 	}
-	
+
 }
 
 void APGBaseCharacter::AttackHitCheckToComp()
@@ -244,7 +271,7 @@ void APGBaseCharacter::PlayHitMontage()
 
 	GetController()->SetIgnoreMoveInput(true);
 	bIsGroggy = true;
-	
+
 	IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
 	if (AIController)
 	{
@@ -265,9 +292,9 @@ void APGBaseCharacter::HitGaugeZeroEffect()
 {
 	if (bIsDead)
 		return;
-	
-	GetCharacterMovement()->AddImpulse(HitImpulseVector , true);
-	
+
+	GetCharacterMovement()->AddImpulse(HitImpulseVector, true);
+
 }
 
 void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
@@ -289,12 +316,12 @@ void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperl
 		//임시
 		//CustomTimeDilation = 1.0f;
 	}
-	
+
 }
 
 void APGBaseCharacter::SetDead()
 {
-	
+
 	//이동 기능 제한
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
@@ -307,15 +334,15 @@ void APGBaseCharacter::SetDead()
 	AnimInstance->Montage_Play(DeadMontage, 1.0f);
 
 	OnNiagaraSystemFinished(BaseNiagaraComponent);
-	
+
 	SetActorEnableCollision(false);
-	
+
 	HpBarWidgetComponent->SetHiddenInGame(true);
 
 	//Destroy();
 }
 
-void APGBaseCharacter::StartNiagaraEffect(UNiagaraSystem* niagara ,FVector TargetLocation)
+void APGBaseCharacter::StartNiagaraEffect(UNiagaraSystem* niagara, FVector TargetLocation)
 {
 	if (niagara)
 	{
@@ -323,8 +350,8 @@ void APGBaseCharacter::StartNiagaraEffect(UNiagaraSystem* niagara ,FVector Targe
 		BaseNiagaraComponent->SetAsset(niagara);
 		BaseNiagaraComponent->SetWorldLocation(TargetLocation);
 		BaseNiagaraComponent->Activate();
-		
-		
+
+
 	}
 }
 
@@ -332,7 +359,7 @@ void APGBaseCharacter::OnNiagaraSystemFinished(UNiagaraComponent* FinishedCompon
 {
 	//SLOG(TEXT("NiagaraEND"));
 	FinishedComponent->Deactivate();
-	
+
 }
 
 void APGBaseCharacter::SkillToComponent()
@@ -369,7 +396,7 @@ void APGBaseCharacter::UltimateSkillToComponent()
 		}
 		StatComponent->ResetUlitSkillGauge();
 	}
-	
+
 }
 
 void APGBaseCharacter::SetbIsUltiSkill(bool bisulti)
@@ -389,7 +416,7 @@ void APGBaseCharacter::SetbIsUltiSkill(bool bisulti)
 	}
 	else
 	{
-		
+
 		GetController()->SetIgnoreMoveInput(true);
 		IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
 		if (AIController)

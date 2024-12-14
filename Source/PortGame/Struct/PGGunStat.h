@@ -16,6 +16,9 @@ struct FPGGunStat : public FTableRowBase
 	GENERATED_BODY()
 
 public:
+	FPGGunStat();
+
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GunStat)
 	int32 ammoMaxCount;
 

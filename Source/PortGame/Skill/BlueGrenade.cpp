@@ -6,7 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-//#include "PhysicsEngine/RadialForceComponent.h"
+
 #include "Character/PGBaseCharacter.h"
 #include "GenericTeamAgentInterface.h"
 #include "Engine/DamageEvents.h"
@@ -14,8 +14,7 @@
 #include "DrawDebugHelpers.h"
 #include "Engine/OverlapResult.h"
 #include "PortGame/PortGame.h"
-//#include "NiagaraComponent.h"   
-//#include "NiagaraSystem.h"  
+
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
 
@@ -58,6 +57,7 @@ ABlueGrenade::ABlueGrenade()
     // 파티클 시스템 
     ParticleComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleComponent"));
     ParticleComponent->SetupAttachment(RootComponent);
+    ParticleComponent->bAutoActivate = false;
 
     static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("/Script/Engine.ParticleSystem'/Game/PortGame/Skill/BlueArchive/P_ky_ThunderBallHit.P_ky_ThunderBallHit'"));
     if (ParticleAsset.Succeeded())
@@ -81,7 +81,7 @@ void ABlueGrenade::BeginPlay()
         GrenadeTimerHandle,this,
         &ThisClass::PangBomb, GrenadeTime, false
     );
-    //NiagaraComponent->OnSystemFinished.AddDynamic(this, &ABlueGrenade::OnNiagaraSystemFinished);
+    ParticleComponent->SetTemplate(ParticleSystem);
    
     ParticleComponent->OnSystemFinished.AddDynamic(this, &ABlueGrenade::OnParticleSystemFinished);
    
@@ -91,8 +91,7 @@ void ABlueGrenade::BeginPlay()
 void ABlueGrenade::SetSkillOwnerCharacter(AActor* ownercharacter)
 {
     SkillOwnerCharacter = ownercharacter;
-    //FVector LaunchDirection = SkillOwnerCharacter->GetActorRotation().Vector();
-    //ProjectileMovement->Velocity = SkillOwnerCharacter->GetActorForwardVector() * ProjectileMovement->InitialSpeed;
+   
 }
 
 void ABlueGrenade::PangBomb()
@@ -121,30 +120,11 @@ void ABlueGrenade::PangBomb()
 
 }
 
-//void ABlueGrenade::StartNiagaraEffect()
-//{
-//    if (NAGrenadeEffect)
-//    {
-//        //SLOG(TEXT("STARTNiagara"));
-//        NiagaraComponent->SetAsset(NAGrenadeEffect);
-//        NiagaraComponent->SetWorldRotation(FRotator::ZeroRotator);
-//        NiagaraComponent->Activate();
-//
-//
-//    }
-//}
-//
-//void ABlueGrenade::OnNiagaraSystemFinished(UNiagaraComponent* FinishedComponent)
-//{
-//    FinishedComponent->Deactivate();
-//}
-
-
 void ABlueGrenade::PlayParticle()
 {
     if (ParticleComponent)
     {
-        ParticleComponent->SetTemplate(ParticleSystem);
+        //ParticleComponent->SetTemplate(ParticleSystem);
         ParticleComponent->SetWorldRotation(FRotator::ZeroRotator);
        
         ParticleComponent->Activate(); 
