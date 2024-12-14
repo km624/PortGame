@@ -29,6 +29,8 @@ public:
 	UFUNCTION()
 	void UpdateUltiSkillGauge(float Newgauge);
 
+	void CheckUltiSkillActive();
+
 protected:
 	void SmoothingGauge(float deltatime);
 
@@ -41,11 +43,14 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UProgressBar> ProgressBar_UltiSkillGauge;
 
+	UPROPERTY( meta = (BindWidget))
+	TObjectPtr<class UImage> Image_Active; 
 	UPROPERTY()
 	float MaxUltiSkillGauge=100.0f;
 
 	//14°­ ÇöÀç hp
 	UPROPERTY()
 	float CurrentUltiSkillGauge;
-	
+
+
 };

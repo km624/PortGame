@@ -3,6 +3,7 @@
 
 #include "UI/SkillWidget.h"
 #include "Components/ProgressBar.h"
+#include "Components/Image.h"
 
 USkillWidget::USkillWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
@@ -44,6 +45,10 @@ void USkillWidget::StartSkillCooltime(bool start)
 	{
 		Currentcooltime = 0.0f;
 		GetWorld()->GetTimerManager().SetTimer(SkillCooltimeTimerHandle, this, &USkillWidget::UpdateSkillCooltime, 0.01f, true);
+		if (Image_Active)
+			Image_Active->SetVisibility(ESlateVisibility::Collapsed);
+		
+		
 	}
 	else
 	{
@@ -53,6 +58,8 @@ void USkillWidget::StartSkillCooltime(bool start)
 		{
 			ProgressBar_Skill->SetPercent(Skillcooltime / Currentcooltime);
 		}
+		if (Image_Active)
+			Image_Active->SetVisibility(ESlateVisibility::Visible);
 
 	}
 	
@@ -61,7 +68,7 @@ void USkillWidget::StartSkillCooltime(bool start)
 
 void USkillWidget::UpdateSkillCooltime()
 {
-	const float Duration = Skillcooltime; 
+	const float Duration = Skillcooltime;
 	const float DeltaTime = 0.01f;
 	const float Increment = DeltaTime / Duration;
 
@@ -74,5 +81,10 @@ void USkillWidget::UpdateSkillCooltime()
 	if (Currentcooltime >= 1.0f)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(SkillCooltimeTimerHandle);
+		if (Image_Active)
+		{
+			Image_Active->SetVisibility(ESlateVisibility::Visible);
+		}
 	}
 }
+

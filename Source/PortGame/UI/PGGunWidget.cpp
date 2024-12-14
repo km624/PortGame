@@ -47,7 +47,6 @@ void UPGGunWidget::UpdateGunAmmo(int32 currentammo)
 {
 	PreviousAmmoPercent = static_cast<float>(CurrentAmmo) / static_cast<float>(MaxAmmo);
 
-	SLOG(TEXT("currentammo : %d"), currentammo);
 	if (RadialSlider_GunAmmo)
 	{
 		CurrentAmmo = currentammo;

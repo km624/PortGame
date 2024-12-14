@@ -80,7 +80,9 @@ void ARifle::Attack()
 			UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 			
 			AnimInstance->StopAllMontages(0.0f);
-			OwnerCharacter->SetbIsReload(false);
+			bIsGunReloaded = false;
+			OwnerCharacter->SetbIsReload(bIsGunReloaded);
+			OnbIsGunReload.Broadcast(false);
 		}
 		ComboStart();
 		
@@ -101,7 +103,7 @@ void ARifle::SetUpGunStat()
 
 void ARifle::ShootCheck(bool bIsShoot)
 {
-	if (bIsShoot)
+	if (bIsShoot&&!bIsGunReloaded)
 		Attack();
 	else
 		StopFire();

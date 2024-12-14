@@ -83,7 +83,7 @@ void ANikkeWall::SetUpNikkeWall(APGBaseCharacter* character, float time)
 
 void ANikkeWall::SetLifeTimer()
 {
-	SLOG(TEXT("SETLife"));
+	
 	GetWorld()->GetTimerManager().SetTimer(
 		LifeTimeTimerHandle,
 		[this]() {

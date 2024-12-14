@@ -3,6 +3,8 @@
 
 #include "UI/PGUltiSkillGaugeWidget.h"
 #include "Components/ProgressBar.h"
+#include "Components/Image.h"
+
 
 UPGUltiSkillGaugeWidget::UPGUltiSkillGaugeWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
@@ -27,7 +29,7 @@ void UPGUltiSkillGaugeWidget::SetUpWidget(float currentUlti)
 {
 	
 	CurrentUltiSkillGauge = currentUlti;
-	
+
 	if (ProgressBar_UltiSkillGauge)
 	{
 		ProgressBar_UltiSkillGauge->SetPercent(CurrentUltiSkillGauge / MaxUltiSkillGauge);
@@ -36,7 +38,10 @@ void UPGUltiSkillGaugeWidget::SetUpWidget(float currentUlti)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("progress miss"));
 	}
+
 	PreviousUltiPercent = CurrentUltiSkillGauge / MaxUltiSkillGauge;
+
+	CheckUltiSkillActive();
 	
 	this->SetVisibility(ESlateVisibility::Visible);
 }
@@ -51,9 +56,20 @@ void UPGUltiSkillGaugeWidget::UpdateUltiSkillGauge(float Newgauge)
 
 		CurrentUltiSkillGauge = Newgauge;
 
-
 	}
 
+	CheckUltiSkillActive();
+}
+
+void UPGUltiSkillGaugeWidget::CheckUltiSkillActive()
+{
+	if (Image_Active)
+	{
+		if (CurrentUltiSkillGauge >= MaxUltiSkillGauge)
+			Image_Active->SetVisibility(ESlateVisibility::Visible);
+		else
+			Image_Active->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UPGUltiSkillGaugeWidget::SmoothingGauge(float deltatime)

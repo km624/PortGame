@@ -214,7 +214,7 @@ void UPGAttackComponent::AttackHitCheck()
 				FDamageEvent DamageEvent;
 				Hit.GetActor()->TakeDamage(AttackDamage, DamageEvent, BaseCharacter->GetController(), BaseCharacter);
 
-				BaseCharacter->AddUltiSkillGaugeToComp(AttackDamage);
+				BaseCharacter->AddUltiSkillGaugeToComp(BaseCharacter->GetTotalStat().Attack);
 			}
 		}
 		if (playerCharacter)

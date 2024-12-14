@@ -162,6 +162,7 @@ float APGBaseCharacter::ReturnAimOffset()
 	float Direction = rtemp.Pitch;
 	AimOffset = FMath::Clamp(Direction, -55.0f, 55.0f);
 	
+	
 	return AimOffset;
 }
 

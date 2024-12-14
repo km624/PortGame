@@ -32,9 +32,13 @@ public:
 protected:
 	void UpdateSkillCooltime();
 
+	
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UProgressBar> ProgressBar_Skill;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UImage> Image_Active;
 
 	UPROPERTY()
 	float Skillcooltime;
