@@ -10,9 +10,9 @@ UPGDashWidget::UPGDashWidget(const FObjectInitializer& ObjectInitializer):Super(
 {
 }
 
-void UPGDashWidget::NativeConstruct()
+void UPGDashWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 	this->SetVisibility(ESlateVisibility::Collapsed);
 }
 
@@ -48,7 +48,7 @@ void UPGDashWidget::OnDash()
 	GetWorld()->GetTimerManager().SetTimer(
 		VisibleHandle,
 		[this]() {
-			SLOG(TEXT("FadeOut"));
+			
 			PlayAnimation(Anim_FadeOut, 0.0f, 1);
 			GetWorld()->GetTimerManager().ClearTimer(VisibleHandle);
 		}, VisibleTime, false

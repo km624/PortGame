@@ -48,6 +48,8 @@ void UPGAttackComponent::InitializeComponent()
 	SetSkill();
 
 	SetUltiSkill();
+
+	//SLOG(TEXT("Attack : AttackInitai end"));
 }
 
 void UPGAttackComponent::BeginPlay()

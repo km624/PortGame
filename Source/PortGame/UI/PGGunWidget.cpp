@@ -12,10 +12,10 @@ UPGGunWidget::UPGGunWidget(const FObjectInitializer& ObjectInitializer):Super(Ob
 	PreviousAmmoPercent = -1.0f;
 }
 
-void UPGGunWidget::NativeConstruct()
+void UPGGunWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
-	
+	Super::NativeOnInitialized();
+	this->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 void UPGGunWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

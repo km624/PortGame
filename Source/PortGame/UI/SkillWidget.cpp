@@ -11,9 +11,9 @@ USkillWidget::USkillWidget(const FObjectInitializer& ObjectInitializer):Super(Ob
 	Currentcooltime = -1.0f;
 }
 
-void USkillWidget::NativeConstruct()
+void USkillWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 
 	this->SetVisibility(ESlateVisibility::Hidden);
 }

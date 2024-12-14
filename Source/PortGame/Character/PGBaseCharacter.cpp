@@ -21,6 +21,7 @@
 #include "NiagaraFunctionLibrary.h"
 
 
+
 // Sets default values
 APGBaseCharacter::APGBaseCharacter()
 {
@@ -237,7 +238,10 @@ void APGBaseCharacter::PlayHitMontage()
 {
 	if (bIsDead)
 		return;
-	
+
+	if (GetController() == NULL)
+		return;
+
 	GetController()->SetIgnoreMoveInput(true);
 	bIsGroggy = true;
 	
@@ -269,6 +273,9 @@ void APGBaseCharacter::HitGaugeZeroEffect()
 void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
 	if (bIsDead)
+		return;
+
+	if (GetController() == NULL)
 		return;
 
 	GetController()->SetIgnoreMoveInput(false);
@@ -362,11 +369,13 @@ void APGBaseCharacter::UltimateSkillToComponent()
 
 void APGBaseCharacter::SetbIsUltiSkill(bool bisulti)
 {
-
 	bIsUltiSkill = bisulti;
+	if (GetController() == NULL)
+		return;
 	if (!bIsUltiSkill)
 	{
-		GetController()->SetIgnoreMoveInput(false);
+
+			GetController()->SetIgnoreMoveInput(false);
 		IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
 		if (AIController)
 		{
@@ -375,7 +384,8 @@ void APGBaseCharacter::SetbIsUltiSkill(bool bisulti)
 	}
 	else
 	{
-		GetController()->SetIgnoreMoveInput(true);
+		
+	
 		IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
 		if (AIController)
 		{

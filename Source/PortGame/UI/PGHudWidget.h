@@ -19,6 +19,12 @@ public:
 	UPGHudWidget(const FObjectInitializer& ObjectInitializer);
 
 public:
+	void SetOwingCharcter(class AActor* owningCharacter);
+
+protected:
+	TObjectPtr<AActor> OwningCharacter;
+
+public:
 	UFUNCTION()
 	void SetUpWidget(const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat);
 	UFUNCTION()
@@ -60,7 +66,10 @@ public:
 
 
 protected:
+	
+
 	virtual void NativeConstruct() override;
+
 
 protected:
 	bool bIsAim;

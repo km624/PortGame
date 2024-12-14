@@ -11,7 +11,7 @@ UPGReloadWidget::UPGReloadWidget(const FObjectInitializer& ObjectInitializer):Su
 
 }
 
-void UPGReloadWidget::NativeConstruct()
+void UPGReloadWidget::NativeOnInitialized()
 {
 	Super::NativeConstruct();
 

@@ -16,9 +16,10 @@ UPGHPBarWidget::UPGHPBarWidget(const FObjectInitializer& ObjectInitializer):Supe
 
 }
 
-void UPGHPBarWidget::NativeConstruct()
+
+void UPGHPBarWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 	
 	this->SetVisibility(ESlateVisibility::Hidden);
 

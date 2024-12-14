@@ -34,6 +34,8 @@ public:
 	
 
 protected:
+	virtual void PostInitializeComponents() override;
+
 	virtual void BeginPlay() override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -91,6 +93,13 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction>UltiSkillAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction>OneChangeCharacterAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction>TwoChangeCharacterAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction>ThreeChangeCharacterAction;
 
 
 
@@ -305,7 +314,30 @@ protected:
 	TObjectPtr<class UCameraComponent> CutSceneCamera;
 
 
-	
+	//테스트 위젯보관
+protected:
+	void CreateHudWidget();
 
+public:
+	void HudWidgetAddviewport();
+
+	void RemoveHudWidget();
+
+protected:
+	//HUD의 클래스 정보
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HUD)
+	TSubclassOf<class UPGHudWidget> PGHudWidgetClass;
+
+	//생성할 위젯을 담을 위젯 포인트 보관하는 변수
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
+	TObjectPtr<class UPGHudWidget> PGHudWidget;
+		
+
+protected:
+	void OneChangePlayerCharacter();
+	void TwoChangePlayerCharacter();
+	void ThreeChangePlayerCharacter();
+
+	void CheckandChangePlayerCharacter(int8 num);
 
 };

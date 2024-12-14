@@ -40,9 +40,6 @@ APGPlayerCharacter::APGPlayerCharacter()
 
 	TargetingComponent = CreateDefaultSubobject<UTargetingComponent>(TEXT("Targeting_Comp"));
 	
-	//PostProcessComponent = CreateDefaultSubobject<UPostProcessComponent>(TEXT("PostProcess_Comp"));
-	//PostProcessComponent->SetupAttachment(RootComponent);
-
 	static ConstructorHelpers::FObjectFinder<UPGCharacterData> CharacterBaseData
 	(TEXT("/Script/PortGame.PGCharacterData'/Game/PortGame/Input/PG_InputBaseData.PG_InputBaseData'"));
 	if (CharacterBaseData.Object)
@@ -57,6 +54,13 @@ APGPlayerCharacter::APGPlayerCharacter()
 	if (DashMon.Object)
 	{
 		DashMontage = DashMon.Object;
+	}
+
+	//Hud위젯
+	static ConstructorHelpers::FClassFinder<UPGHudWidget> ABHUDWidgetRef(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/PortGame/UI/BP_HudWidget.BP_HudWidget_C'"));
+	if (ABHUDWidgetRef.Class)
+	{
+		PGHudWidgetClass = ABHUDWidgetRef.Class;
 	}
 
 	CurrentControlData = EControlData::Base;
@@ -158,15 +162,42 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		UltiSkillAction = Ulti.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> OneC(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_OneChangeCharacter.IA_OneChangeCharacter'"));
+	if (OneC.Object)
+	{
+		OneChangeCharacterAction = OneC.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> TwoC(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_TwoChangeCharacter.IA_TwoChangeCharacter'"));
+	if (TwoC.Object)
+	{
+		TwoChangeCharacterAction = TwoC.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UInputAction> ThreeC(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_ThreeChangeCharacter.IA_ThreeChangeCharacter'"));
+	if (ThreeC.Object)
+	{
+		ThreeChangeCharacterAction = ThreeC.Object;
+	}
 	
 	Tags.Add(TAG_PLAYER);
+
 	
+}
+
+void APGPlayerCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	
+	CreateHudWidget();
 }
 
 void APGPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+
+	
 	SetCharacterData(CurrentControlData);
 
 	//임시로
@@ -174,15 +205,15 @@ void APGPlayerCharacter::BeginPlay()
 	StatComponent->SetHitGauge(GetTotalStat().HitGauge);
 	StatComponent->SetHp(GetTotalStat().MaxHp);
 
+
+
 	FOnTimelineFloat TimelineProgress;
 	TimelineProgress.BindUFunction(this, FName("AimUpdate")); 
 	AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
 
 	FGenericTeamId currentteam = GetGenericTeamId();
-	SLOG(TEXT("actor : %s , myteamide : %d"), *GetActorNameOrLabel(), currentteam.GetId());
+	//SLOG(TEXT("actor : %s , myteamide : %d"), *GetActorNameOrLabel(), currentteam.GetId());
 
-	
-	
 }
 
 //인풋 매핑 - 액션에 함수 바인딩
@@ -230,6 +261,10 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APGPlayerCharacter::StopDefenceNikke);
 
 		EnhancedInputComponent->BindAction(UltiSkillAction, ETriggerEvent::Started, this, &APGPlayerCharacter::OnUltimateSkill);
+
+		EnhancedInputComponent->BindAction(OneChangeCharacterAction, ETriggerEvent::Started, this, &APGPlayerCharacter::OneChangePlayerCharacter);
+		EnhancedInputComponent->BindAction(TwoChangeCharacterAction, ETriggerEvent::Started, this, &APGPlayerCharacter::TwoChangePlayerCharacter);
+		EnhancedInputComponent->BindAction(ThreeChangeCharacterAction, ETriggerEvent::Started, this, &APGPlayerCharacter::ThreeChangePlayerCharacter);
 	
 	}
 	else
@@ -254,7 +289,6 @@ void APGPlayerCharacter::Tick(float DeltaTime)
 			SetAttackRotation(DeltaTime);
 
 	}
-	
 	
 }
 
@@ -516,6 +550,7 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 
 void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 {
+	SLOG(TEXT("%s : Setup"),*GetActorNameOrLabel());
 	if (hudWidget)
 	{
 		hudWidget->SetUpWidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat());
@@ -554,7 +589,7 @@ void APGPlayerCharacter::FindClosestEnemyToComp()
 	TargetingComponent->SetTargetLock();
 }
 
-void APGPlayerCharacter::FindSideEnemyToComp(const struct FInputActionValue& Value)
+void APGPlayerCharacter::FindSideEnemyToComp(const FInputActionValue& Value)
 {
 	
 	float direction = Value.Get<float>();
@@ -888,25 +923,77 @@ ULevelSequence* APGPlayerCharacter::GetLevelSequence()
 
 void APGPlayerCharacter::ChangeViewTarget(bool bstart)
 {
+
 	
-	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
-	if (playerController)
+	if (bstart)
 	{
-		if (bstart)
-		{
-			playerController->SetViewTargetWithBlend(this, 0.5f); 
-			Camera->SetActive(false);
-			CutSceneCamera->SetActive(true);
-		}
-		else
-		{
-			playerController->SetViewTargetWithBlend(this, 0.5f);
-			Camera->SetActive(true);
-			CutSceneCamera->SetActive(false);
-		}
+			
+		Camera->SetActive(false);
+		CutSceneCamera->SetActive(true);
 	}
-	
+	else
+	{
+			
+		Camera->SetActive(true);
+		CutSceneCamera->SetActive(false);
+	}
 }
+	
+
+
+void APGPlayerCharacter::CreateHudWidget()
+{
+	PGHudWidget = CreateWidget<UPGHudWidget>(GetWorld(), PGHudWidgetClass);
+	if (PGHudWidget)
+	{
+		
+		PGHudWidget->SetOwingCharcter(this);
+		SetUpHudWidget(PGHudWidget);
+
+		
+	}
+}
+
+void APGPlayerCharacter::HudWidgetAddviewport()
+{
+	if (PGHudWidget)
+		PGHudWidget->AddToViewport();
+
+	SLOG(TEXT("%s: Addtoviewport"),*GetActorNameOrLabel());
+}
+
+void APGPlayerCharacter::RemoveHudWidget()
+{
+	if (PGHudWidget)
+		PGHudWidget->RemoveFromViewport();
+	SLOG(TEXT("%s: REmoveviewport"), *GetActorNameOrLabel());
+}
+
+void APGPlayerCharacter::OneChangePlayerCharacter()
+{
+	int8 num = 0;
+	CheckandChangePlayerCharacter(num);
+}
+
+void APGPlayerCharacter::TwoChangePlayerCharacter()
+{
+	int8 num = 1;
+	CheckandChangePlayerCharacter(num);
+}
+
+void APGPlayerCharacter::ThreeChangePlayerCharacter()
+{
+	int8 num = 2;
+	CheckandChangePlayerCharacter(num);
+}
+
+void APGPlayerCharacter::CheckandChangePlayerCharacter(int8 num)
+{
+	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
+	if(playerController)
+		playerController->ChangedCharacterPossess(num);
+}
+
 
 
 

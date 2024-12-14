@@ -10,10 +10,18 @@
 #include "UI/PGDashWidget.h"
 #include "UI/PGGunWidget.h"
 #include "UI/PGReloadWidget.h"
+#include "PortGame/PortGame.h"
+
 
 UPGHudWidget::UPGHudWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	
+}
+
+void UPGHudWidget::SetOwingCharcter(AActor* owningCharacter)
+{
+	
+	OwningCharacter = owningCharacter;
 }
 
 void UPGHudWidget::SetUpWidget(const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat)
@@ -110,16 +118,20 @@ void UPGHudWidget::SetGunWidgetEnable(bool bIsaim)
 
 
 
+
+
 void UPGHudWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	
-	IPGHudWidgetInterface* HUDPawn = Cast<IPGHudWidgetInterface>(GetOwningPlayerPawn());
-	if (HUDPawn)
-	{
-		HUDPawn->SetUpHudWidget(this);
-	}
+	////SLOG(TEXT("HUD : NativeConstruct"));
+	//IPGHudWidgetInterface* HUDPawn = Cast<IPGHudWidgetInterface>(OwningCharacter);
+	//SLOG(TEXT("%s : SetUpHudWidget"), *OwningCharacter->GetActorNameOrLabel());
+	//if (HUDPawn)
+	//{
+	//	
+	//	HUDPawn->SetUpHudWidget(this);
+	//}
 
 
 }

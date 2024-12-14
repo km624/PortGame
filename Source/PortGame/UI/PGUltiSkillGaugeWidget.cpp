@@ -12,9 +12,9 @@ UPGUltiSkillGaugeWidget::UPGUltiSkillGaugeWidget(const FObjectInitializer& Objec
 	PreviousUltiPercent = -1.0f;
 }
 
-void UPGUltiSkillGaugeWidget::NativeConstruct()
+void UPGUltiSkillGaugeWidget::NativeOnInitialized()
 {
-	Super::NativeConstruct();
+	Super::NativeOnInitialized();
 	this->SetVisibility(ESlateVisibility::Hidden);
 }
 
