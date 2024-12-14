@@ -362,6 +362,11 @@ void APGBaseCharacter::UltimateSkillToComponent()
 	{
 
 		AttackComponent->UltiSkillAttack();
+		if (CharacterTypeEffect)
+		{
+			FVector effectlocation = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z - 95.0f);
+			StartNiagaraEffect(CharacterTypeEffect, effectlocation);
+		}
 		StatComponent->ResetUlitSkillGauge();
 	}
 	
@@ -375,7 +380,7 @@ void APGBaseCharacter::SetbIsUltiSkill(bool bisulti)
 	if (!bIsUltiSkill)
 	{
 
-			GetController()->SetIgnoreMoveInput(false);
+		GetController()->SetIgnoreMoveInput(false);
 		IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
 		if (AIController)
 		{
@@ -385,7 +390,7 @@ void APGBaseCharacter::SetbIsUltiSkill(bool bisulti)
 	else
 	{
 		
-	
+		GetController()->SetIgnoreMoveInput(true);
 		IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
 		if (AIController)
 		{

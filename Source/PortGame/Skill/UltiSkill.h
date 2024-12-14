@@ -69,5 +69,5 @@ protected:
 	FTimerHandle FirstUltiSkillTimerHandle;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float UltiDealy = 0.5f;
+	float UltiDealy = 1.0f;
 };

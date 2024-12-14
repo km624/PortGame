@@ -23,12 +23,6 @@ void UPGHPBarWidget::NativeOnInitialized()
 	
 	this->SetVisibility(ESlateVisibility::Hidden);
 
-	IPGSetHpbarCharacterInterface* CharacterWidget = Cast<IPGSetHpbarCharacterInterface>(OwningActor);
-	if (CharacterWidget)
-	{
-		//액터의 함수 실행
-		CharacterWidget->SetUpHpWidget(this);
-	}
 }
 
 void UPGHPBarWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

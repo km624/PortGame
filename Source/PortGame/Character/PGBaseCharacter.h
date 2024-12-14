@@ -219,4 +219,7 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	uint8 bIsUltiSkill : 1;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite ,Category = Effect)
+	TObjectPtr<class  UNiagaraSystem> CharacterTypeEffect;
+
 };

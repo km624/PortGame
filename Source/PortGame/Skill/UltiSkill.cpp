@@ -39,7 +39,7 @@ void UUltiSkill::OnSkill()
 {
 	bIsSkill = true;
 	OnbIsSkill.Broadcast(true);
-
+	
 	GetWorld()->GetTimerManager().SetTimer(
 		FirstUltiSkillTimerHandle,
 		[this]() {

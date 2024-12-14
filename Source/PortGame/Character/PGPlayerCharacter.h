@@ -312,7 +312,7 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> CutSceneCamera;
-
+	
 
 	//테스트 위젯보관
 protected:
