@@ -256,15 +256,15 @@ void ARifle::FireWithLineTrace()
 		}
 	}
 
+	if (!bIsRifle)
+		GunDamage = OwnerCharacter->GetTotalStat().Attack* 1.5f;
+	else
+		GunDamage = OwnerCharacter->GetTotalStat().Attack * 0.5f;
 
 	//근접의 5분의1 데미지
-	if (OwnerCharacter->GetPlayerCharacterType() == EPlayerCharacterType::Nikke)
-		GunDamage = OwnerCharacter->GetTotalStat().Attack * 0.5f;
-	else
-		GunDamage = OwnerCharacter->GetTotalStat().Attack * 0.2f;
+	if (OwnerCharacter->GetPlayerCharacterType() == EPlayerCharacterType::BlueArchive)
+		GunDamage *= 0.75f;
 
-	if (!bIsRifle)
-		GunDamage *= 2.5f;
 
 	if (OwnerCharacter->GetbIsNikkeSkill())
 		GunDamage *= 3.0f;
