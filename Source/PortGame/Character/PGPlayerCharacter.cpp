@@ -472,7 +472,7 @@ void APGPlayerCharacter::PressAim()
 
 void APGPlayerCharacter::OnGoingAim()
 {
-
+	OnbIsAim.Broadcast(bIsAim);
 	AimLocation = Camera->GetComponentLocation();
 }
 
@@ -588,6 +588,8 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 
 			hudWidget->SetupReloadWidget(rifle->GetReloadMotagetime());
 			rifle->OnbIsGunReload.AddUObject(hudWidget, &UPGHudWidget::StartReload);
+
+			rifle->OnbInGunRanged.AddUObject(hudWidget, &UPGHudWidget::ChangeCrosshair);
 
 			OnbIsAim.AddUObject(hudWidget, &UPGHudWidget::SetGunWidgetEnable);
 		}

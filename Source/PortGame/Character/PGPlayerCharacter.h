@@ -195,6 +195,7 @@ protected:
 	virtual void OnParryPostPorcess(bool effect) override;
 
 
+
 	//대시 , 회피
 
 public:
@@ -310,7 +311,7 @@ protected:
 	TObjectPtr<class UCameraComponent> CutSceneCamera;
 	
 
-	//테스트 위젯보관
+	//캐릭터별 위젯보관
 protected:
 	void CreateHudWidget();
 
@@ -329,6 +330,7 @@ protected:
 	TObjectPtr<class UPGHudWidget> PGHudWidget;
 		
 
+	//캐릭터 교체 
 protected:
 	void OneChangePlayerCharacter();
 	void TwoChangePlayerCharacter();

@@ -47,7 +47,8 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 		&ThisClass::ShootCheck);
 	OwnerCharacter->OnbIsReload.AddUObject(this,
 		&ThisClass::StartReloading);
-
+	OwnerCharacter->OnbIsAim.AddUObject(this,
+		&ThisClass::InGunRange);
 	
 
 	if (weaponData)
@@ -113,6 +114,50 @@ void ARifle::SetUpGunStat()
 	ShootInterval = GunStat.ShootInterval;
 	traceDistance = GunStat.traceDistance;
 
+}
+
+void ARifle::InGunRange(bool bisaim)
+{
+	if (bisaim == false) return;
+	const FVector Camerastart = OwnerCharacter->GetAimLocation();
+	
+	FVector CameraLoc = OwnerCharacter->GetAimLocation();
+
+	const FVector CameraEnd = CameraLoc + OwnerCharacter->GetController()->GetControlRotation().Vector() * (traceDistance);
+
+	FHitResult hitResult;
+	FCollisionQueryParams collisionParams;
+	TArray <AActor*> ignoreActor;
+	ignoreActor.Add(this);
+	ignoreActor.Add(OwnerCharacter);
+	collisionParams.AddIgnoredActors(ignoreActor);
+
+	const UWorld* currentWorld = GetWorld();
+
+	//DrawDebugLine(currentWorld, Camerastart, CameraEnd, FColor::Yellow, false, 1.0f);
+
+	//플레이어인지 확인
+	IAttackHitStopInterface* Player = Cast<IAttackHitStopInterface>(OwnerCharacter);
+	if (Player)
+	{
+		if (currentWorld)
+		{
+			bool OutHitResult = currentWorld->LineTraceSingleByChannel(
+				hitResult,
+				Camerastart,
+				CameraEnd,
+				ECollisionChannel::ECC_Visibility,
+				collisionParams);
+
+			if (OutHitResult)
+				bInGunRange = true;
+			else
+				bInGunRange = false;
+
+			OnbInGunRanged.Broadcast(bInGunRange);
+
+		}
+	}
 }
 
 void ARifle::ShootCheck(bool bIsShoot)
@@ -288,6 +333,11 @@ void ARifle::FireWithLineTrace()
 		{
 			FDamageEvent DamageEvent;
 			hitResult.GetActor()->TakeDamage(GunDamage, DamageEvent, OwnerCharacter->GetController(), OwnerCharacter);
+
+			APGBaseCharacter* hitTarget = Cast<APGBaseCharacter>(hitResult.GetActor());
+			if(hitTarget)
+				hitTarget->StartNiagaraEffect(NAGunEffect, hitTarget->GetActorLocation());
+
 			OwnerCharacter->AddUltiSkillGaugeToComp(GunDamage);
 		}
 

@@ -12,6 +12,7 @@
  */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnAmmoChanged, int32 /*CurrentAmmo*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnbIsGunReload, bool /*bIsGunReload*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnbInGunRanged, bool /*bIsGunRange*/);
 UCLASS()
 class PORTGAME_API ARifle : public AWeapon
 {
@@ -32,6 +33,8 @@ public:
 protected:
 	void SetUpGunStat();
 
+	void InGunRange(bool bisaim);
+
 	UFUNCTION()
 	void ShootCheck(bool bIsShoot);
 
@@ -51,6 +54,8 @@ public:
 	FOnAmmoChanged OnAmmoChanged;
 
 	FOnbIsGunReload OnbIsGunReload;
+
+	FOnbInGunRanged OnbInGunRanged;
 
 	FORCEINLINE int32 GetammoMaxCount() { return ammoMaxCount; }
 
@@ -80,6 +85,8 @@ protected:
 	float ReloadMontageTime;
 
 	bool bIsGunReloaded;
+
+	uint8 bInGunRange : 1;
 
 	FName FireLocation = TEXT("FireLocation");
 

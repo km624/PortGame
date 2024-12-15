@@ -15,7 +15,8 @@
 
 UPGHudWidget::UPGHudWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	
+	OriginTint = FLinearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	RedTint = FLinearColor(1.0f, 0.0f, 0.1f, 0.5f);
 }
 
 void UPGHudWidget::SetOwingCharcter(AActor* owningCharacter)
@@ -115,6 +116,20 @@ void UPGHudWidget::SetGunWidgetEnable(bool bIsaim)
 		BP_GunWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 	
+}
+
+void UPGHudWidget::ChangeCrosshair(bool bInRange)
+{
+	if (bInRange)
+	{
+		SLOG(TEXT("InRAnge"));
+		Image_CrossHair->SetColorAndOpacity(OriginTint);
+	}
+	else
+	{
+		SLOG(TEXT("NotttAnge"));
+		Image_CrossHair->SetColorAndOpacity(RedTint);
+	}
 }
 
 

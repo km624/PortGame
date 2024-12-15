@@ -64,6 +64,9 @@ public:
 	UFUNCTION()
 	void SetGunWidgetEnable(bool bIsaim);
 
+	UFUNCTION()
+	void ChangeCrosshair(bool bInRange);
+
 
 protected:
 	
@@ -74,6 +77,9 @@ protected:
 protected:
 	bool bIsAim;
 	bool bIsReload;
+
+	FLinearColor OriginTint;
+	FLinearColor RedTint;
 
 
 	//초기화 함수에서 초기화하기
