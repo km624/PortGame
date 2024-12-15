@@ -87,6 +87,7 @@ void UPGHudWidget::UpdateGunAmmo(int32 Newammo)
 void UPGHudWidget::StartReload(bool reload)
 {
 	BP_ReloadWidget->StartReloadtime(reload);
+	bIsReload = reload;
 	if (reload)
 	{
 		Image_CrossHair->SetVisibility(ESlateVisibility::Collapsed);
@@ -104,8 +105,8 @@ void UPGHudWidget::SetGunWidgetEnable(bool bIsaim)
 	bIsAim = bIsaim;
 	if (bIsaim)
 	{
-		
-		Image_CrossHair->SetVisibility(ESlateVisibility::Visible);
+		if(bIsReload==false)
+			Image_CrossHair->SetVisibility(ESlateVisibility::Visible);
 		BP_GunWidget->SetVisibility(ESlateVisibility::Visible);
 	}
 	else

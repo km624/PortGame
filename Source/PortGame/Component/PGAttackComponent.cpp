@@ -74,8 +74,11 @@ void UPGAttackComponent::SetupAttackData(UBaseCharacterDataAsset* attackdata)
 
 void UPGAttackComponent::SetWeaponClass()
 {
-	if(WeaponData)
+	if (WeaponData)
 		WeaponClass = WeaponData->WeaponClass;
+
+	
+		
 }
 
 void UPGAttackComponent::SetUpWeapon()
@@ -88,7 +91,6 @@ void UPGAttackComponent::SetUpWeapon()
 		Weapon = spawnWeapon;
 		
 		APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
-
 
 		spawnWeapon->OnInitializeWeapon(BaseCharacter, WeaponData);
 

@@ -29,6 +29,9 @@ protected:
 	TObjectPtr<class ACharacter> Owner;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
+	TObjectPtr<class APGBaseCharacter> BaseCharacter;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
 	TObjectPtr<class UCharacterMovementComponent> Movement;
 
 	//애니메이션에 필요한 변수들
@@ -64,6 +67,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Aim)
 	uint8 bIsAiming : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Aim)
+	uint8 bIsRifle : 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Aim)
 	float AimOffsetPitch;

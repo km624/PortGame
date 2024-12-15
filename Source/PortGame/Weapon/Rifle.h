@@ -68,7 +68,7 @@ protected:
 
 	float traceDistance;
 
-	uint8 bIsPistol : 1;
+	uint8 bIsRifle : 1;
 
 	FTimerHandle FireTimerHandle;
 	FTimerHandle ReloadTimerHandle;

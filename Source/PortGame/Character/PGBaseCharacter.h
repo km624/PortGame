@@ -69,8 +69,10 @@ public:
 
 	FORCEINLINE FVector GetAimLocation() {return AimLocation;}
 
-	
-	
+	FORCEINLINE bool GetCurrentIsRifle() const { return bIsRifle; }
+
+	FORCEINLINE void SetbIsRilfe(bool isrifle) { bIsRifle = isrifle; }
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	uint8 bIsAim : 1;
@@ -83,6 +85,9 @@ protected:
 
 	UPROPERTY()
 	float AimOffset;
+
+	UPROPERTY()
+	uint8 bIsRifle : 1;
 
 public:
 

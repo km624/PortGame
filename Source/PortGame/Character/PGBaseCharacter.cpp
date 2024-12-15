@@ -23,6 +23,7 @@
 
 
 
+
 // Sets default values
 APGBaseCharacter::APGBaseCharacter()
 {

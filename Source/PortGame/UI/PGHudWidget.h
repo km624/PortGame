@@ -73,6 +73,7 @@ protected:
 
 protected:
 	bool bIsAim;
+	bool bIsReload;
 
 
 	//초기화 함수에서 초기화하기

@@ -48,6 +48,8 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 	OwnerCharacter->OnbIsReload.AddUObject(this,
 		&ThisClass::StartReloading);
 
+	
+
 	if (weaponData)
 	{
 		UGunWeaponData* gunWeaponData = Cast<UGunWeaponData>(weaponData);
@@ -55,7 +57,8 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 		GunStat = gunWeaponData->GunStat;
 		ReloadMontage = gunWeaponData->ReloadMontage;
 		CameraShakeClass = gunWeaponData->CameraShakeClass;
-		bIsPistol = gunWeaponData->bIsPistol;
+		bIsRifle = gunWeaponData->bIsRifle;
+		OwnerCharacter->SetbIsRilfe(bIsRifle);
 		NAGunEffect = gunWeaponData->NAGunEffect;
 
 		GunNiagaraComponent->SetAsset(NAGunEffect);
@@ -259,6 +262,9 @@ void ARifle::FireWithLineTrace()
 		GunDamage = OwnerCharacter->GetTotalStat().Attack * 0.5f;
 	else
 		GunDamage = OwnerCharacter->GetTotalStat().Attack * 0.2f;
+
+	if (!bIsRifle)
+		GunDamage *= 2.5f;
 
 	if (OwnerCharacter->GetbIsNikkeSkill())
 		GunDamage *= 3.0f;

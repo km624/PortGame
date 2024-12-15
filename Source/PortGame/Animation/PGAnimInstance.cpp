@@ -23,6 +23,8 @@ void UPGAnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	Owner = Cast<ACharacter>(GetOwningActor());
+	BaseCharacter = Cast<APGBaseCharacter>(Owner);
+	
 	if (Owner)
 	{
 		Movement = Owner->GetCharacterMovement();
@@ -34,9 +36,6 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 
 	Super::NativeUpdateAnimation(DeltaSeconds);
-
-	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(Owner);
-	
 
 	if (Movement)
 	{
@@ -56,6 +55,10 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (IsValid(BaseCharacter))
 	{
 		bIsAiming = BaseCharacter->GetCurrentIsAiming();
+		bIsReloading = BaseCharacter->GetCurrentIsReloading();
+		bIsDead = BaseCharacter->GetbIsDead();
+		bIsNikkeSkill = BaseCharacter->GetbIsNikkeSkill();
+		bIsRifle = BaseCharacter->GetCurrentIsRifle();
 	}
 
 
@@ -64,7 +67,7 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	else
 		AimOffsetPitch = 0.0f;
 
-	if (IsValid(BaseCharacter))
+	/*if (IsValid(BaseCharacter))
 	{
 		bIsReloading = BaseCharacter->GetCurrentIsReloading();
 	}
@@ -76,7 +79,8 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (IsValid(BaseCharacter))
 	{
 		bIsNikkeSkill = BaseCharacter->GetbIsNikkeSkill();
-	}
+	}*/
+	
 	
 }
 

@@ -32,5 +32,5 @@ public:
 	TObjectPtr<class UNiagaraSystem> NAGunEffect;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GunStat)
-	uint8 bIsPistol : 1;
+	uint8 bIsRifle : 1;
 };
