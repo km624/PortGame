@@ -59,7 +59,7 @@ public:
 	void UpdateGunAmmo(int32 Newammo);
 
 	UFUNCTION()
-	void StartReload(bool reload);
+	void StartReload(bool reload, float reloadtime);
 
 	UFUNCTION()
 	void SetGunWidgetEnable(bool bIsaim);

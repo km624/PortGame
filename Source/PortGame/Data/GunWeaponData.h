@@ -19,8 +19,8 @@ public:
 	UGunWeaponData();
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
-	TObjectPtr<class UAnimMontage> ReloadMontage;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
+	TObjectPtr<class UAnimMontage> ReloadMontage;*/
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Gun)
 	FPGGunStat GunStat;

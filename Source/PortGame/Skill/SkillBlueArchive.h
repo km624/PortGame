@@ -17,6 +17,8 @@ class PORTGAME_API USkillBlueArchive : public USkillBase
 public:
 	USkillBlueArchive();
 
+	virtual void SetSkillSetting(class APGBaseCharacter* owner) override;
+
 public:
 	virtual void OnSkill() override;
 
@@ -31,10 +33,11 @@ protected:
 
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BlueArchive)
-	TObjectPtr<class UAnimMontage> SkillBlueArchiveMontage;
-
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BlueArchive)
+	TObjectPtr<class UAnimMontage> SkillBlueArchiveMontage;*/
 	FOnMontageEnded EndDelegate;
+
+	const static FString SkillMontage;
 
 	
 };

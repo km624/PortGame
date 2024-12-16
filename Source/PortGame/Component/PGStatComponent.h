@@ -59,7 +59,7 @@ public:
 	}
 	FORCEINLINE void SetModifierStat(const FPGCharacterStat& InModifierStat)
 	{
-		ModifierStat = InModifierStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat()); SLOG(TEXT("ModfierSet"));
+		ModifierStat = InModifierStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat());
 	}
 
 	FORCEINLINE const FPGCharacterStat& GetBaseStat() const { return BaseStat; }

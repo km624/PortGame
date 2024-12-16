@@ -59,7 +59,7 @@ void UPGStatComponent::SetCurrentRarity(FName rarity)
 
 		SetHitGauge(GetTotalStat().HitGauge);
 
-		SLOG(TEXT("StatSet End"));
+		
 	}
 }
 

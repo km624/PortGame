@@ -24,6 +24,7 @@ enum class EControlData : uint8
 UCLASS()
 class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface, public IAITargetPlayerInterface
 {
+
 	GENERATED_BODY()
 
 public:
@@ -240,11 +241,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
 	uint8 bIsEvade : 1;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
 	TObjectPtr<class UAnimMontage> LeftEvadeMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
-	TObjectPtr<class UAnimMontage> RightEvadeMontage;
+	TObjectPtr<class UAnimMontage> RightEvadeMontage;*/
+
+	static const FString LeftEvadeMontage;
+	static const FString RightEvadeMontage;
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TObjectPtr<class UAnimMontage> CurrentEvadeMontage;
 
@@ -256,8 +261,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
 	float EvadeTime = 0.5f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
-	TObjectPtr<class UAnimMontage> DashMontage;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
+	TObjectPtr<class UAnimMontage> DashMontage;*/
+	
+	static const FString DashMontage;
 
 	//범위 슬로우
 protected:

@@ -13,19 +13,27 @@
 #include "LevelSequence.h"
 #include "LevelSequencePlayer.h"
 
+const FString UUltiSkill::UltiSkillMontage = TEXT("UltiSkillMontage");
+
 UUltiSkill::UUltiSkill()
 {
 	SkillCooltime = 0.0f;
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage>SkillMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Skill/UltiSkill/UltiSkillMontage.UltiSkillMontage'"));
+	/*static ConstructorHelpers::FObjectFinder<UAnimMontage>SkillMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Skill/UltiSkill/UltiSkillMontage.UltiSkillMontage'"));
 	if (SkillMontage.Object)
 	{
 		UltiSkillMontage = SkillMontage.Object;
-	}
+	}*/
 
 	LevelSequenceActorClass = ALevelSequenceActor::StaticClass();
 
 
+}
+
+void UUltiSkill::SetSkillSetting(APGBaseCharacter* owner)
+{
+	Super::SetSkillSetting(owner);
+	owner->LoadAndPlayMontageByPath(owner->CharacterName, UltiSkillMontage);
 }
 
 void UUltiSkill::UltiSkillSequenceSet(ULevelSequence* newsequence)
@@ -55,7 +63,7 @@ void UUltiSkill::PlayUltiSkillMontage()
 	UAnimInstance* AnimInstance = ownercharacter->GetMesh()->GetAnimInstance();
 
 	
-	AnimInstance->Montage_Play(UltiSkillMontage, 1.0f);
+	AnimInstance->Montage_Play(ownercharacter->AllMontage[UltiSkillMontage], 1.0f);
 
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(ownercharacter);
 	if (playerCharacter)
@@ -64,7 +72,7 @@ void UUltiSkill::PlayUltiSkillMontage()
 	}
 
 	EndDelegate.BindUObject(this, &UUltiSkill::EndUltiSkilleMontage);
-	AnimInstance->Montage_SetEndDelegate(EndDelegate, UltiSkillMontage);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, ownercharacter->AllMontage[UltiSkillMontage]);
 }
 
 void UUltiSkill::EndUltiSkilleMontage(UAnimMontage* TargetMontage, bool IsProperlyEnded)

@@ -10,6 +10,14 @@
 /**
  * 
  */
+UENUM(BlueprintType)
+enum class EComboMontageOptions : uint8
+{
+	SwordComboMontage UMETA(DisplayName = "SwordComboMontage"),
+	RifleComboMontage UMETA(DisplayName = "RifleComboMontage"),
+	PistolComboMontage UMETA(DisplayName = "PistolComboMontage")
+};
+
 UCLASS()
 class PORTGAME_API UWeaponData : public UPrimaryDataAsset
 {
@@ -32,16 +40,39 @@ public:
 
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combo, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UAnimMontage> ComboMontage;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combo, Meta = (AllowPrivateAccess = "true"))
+	//TObjectPtr<class UAnimMontage> ComboMontage;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combo, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UComboData> ComboData;
 	//몽타주 섹션이름
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combo")
+	EComboMontageOptions ComboMontageOption;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "Combo")
+	FString GetComboMontageAsString() const
+	{
+		switch (ComboMontageOption)
+		{
+		case EComboMontageOptions::SwordComboMontage:
+			return TEXT("SwordComboMontage");
+		case EComboMontageOptions::RifleComboMontage:
+			return TEXT("RifleComboMontage");
+		case EComboMontageOptions::PistolComboMontage:
+			return TEXT("PistolComboMontage");
+		default:
+			return TEXT("");
+		}
+	}
+
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Effect)
 	TObjectPtr<class UNiagaraSystem> NAWeaponEffect;
+
+
 
 
 	

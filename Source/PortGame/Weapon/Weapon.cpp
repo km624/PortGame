@@ -30,9 +30,11 @@ void AWeapon::OnInitializeWeapon(APGBaseCharacter* BaseCharacter,UWeaponData* we
 	{
 		WeaponMesh = weaponData->WeaponMesh;
 		ModifierStat = weaponData->ModifierStat;
-		ComboMontage = weaponData->ComboMontage;
+		ComboMontage = weaponData->GetComboMontageAsString();
 		ComboData = weaponData->ComboData;
 		NAWeaponEffect = weaponData->NAWeaponEffect;
+
+		OwnerCharacter->LoadAndPlayMontageByPath(OwnerCharacter->CharacterName, ComboMontage);
 	}
 
 	//SLOG(TEXT("WeaponAttachment"));
@@ -86,8 +88,9 @@ void AWeapon::ComboBegin()
 	//Ai면 공격 속도 낮추기
 	if (OwnerCharacter->ActorHasTag(TAG_AI))
 		ComboPlayTime *= 0.8f;
-
-	AnimInstance->Montage_Play(ComboMontage, ComboPlayTime);
+	
+	AnimInstance->Montage_Play(OwnerCharacter->AllMontage[ComboMontage], ComboPlayTime);
+	
 	//플레이어 캐릭터만 값 받아서 돌리기
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OwnerCharacter);
 	if (playerCharacter)
@@ -96,8 +99,8 @@ void AWeapon::ComboBegin()
 	}
 	
 	EndDelegate.BindUObject(this, &AWeapon::ComboEnd);
-	AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
-	CurrentMontageEndDelegate = AnimInstance->Montage_GetEndedDelegate(ComboMontage);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, OwnerCharacter->AllMontage[ComboMontage]);
+	CurrentMontageEndDelegate = AnimInstance->Montage_GetEndedDelegate(OwnerCharacter->AllMontage[ComboMontage]);
 	
 }
 
@@ -121,13 +124,13 @@ void AWeapon::ComboCheck()
 
 
 		//몽타주 다음 섹션을 연결
-		AnimInstance->Montage_SetNextSection(AnimInstance->Montage_GetCurrentSection(), NextSection, ComboMontage);
+		AnimInstance->Montage_SetNextSection(AnimInstance->Montage_GetCurrentSection(), NextSection, OwnerCharacter->AllMontage[ComboMontage]);
 
 		//SLOG(TEXT("NextSection : %s"), *NextSection.ToString());
 		
 		//몽타주 다음 섹션 재생
-		AnimInstance->Montage_Play(ComboMontage, ComboPlayTime);
-		AnimInstance->Montage_JumpToSection(NextSection, ComboMontage);
+		AnimInstance->Montage_Play(OwnerCharacter->AllMontage[ComboMontage], ComboPlayTime);
+		AnimInstance->Montage_JumpToSection(NextSection, OwnerCharacter->AllMontage[ComboMontage]);
 
 
 		//플레이어 캐릭터만 값 받아서 돌리기
@@ -139,8 +142,8 @@ void AWeapon::ComboCheck()
 
 		//FOnMontageEnded EndDelegate;
 		 EndDelegate.BindUObject(this, &AWeapon::ComboEnd);
-		 AnimInstance->Montage_SetEndDelegate(EndDelegate, ComboMontage);
-		 CurrentMontageEndDelegate = AnimInstance->Montage_GetEndedDelegate(ComboMontage);
+		 AnimInstance->Montage_SetEndDelegate(EndDelegate, OwnerCharacter->AllMontage[ComboMontage]);
+		 CurrentMontageEndDelegate = AnimInstance->Montage_GetEndedDelegate(OwnerCharacter->AllMontage[ComboMontage]);
 
 		
 		if (CurrentCombo == ComboData->MaxComboCount)

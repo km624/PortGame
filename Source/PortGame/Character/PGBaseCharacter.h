@@ -34,6 +34,19 @@ protected:
 protected:
 	virtual void SetupCharacterData(class UBaseCharacterDataAsset* characterdata);
 
+	//½ºÄÌ·¹Åæ º° ¸ùÅ¸ÁÖ °Ë»ö
+public:
+	void LoadAndPlayMontageByPath(const FString& SkeletonName,const FString& MontageName);
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TMap<FString, TObjectPtr<class UAnimMontage>> AllMontage;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	FString CharacterName;
+
+
+protected:
 	void AttackToComponent();
 
 protected:
@@ -174,11 +187,15 @@ protected:
 	virtual void SetDead();
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<class UAnimMontage> HitMontage;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	TObjectPtr<class UAnimMontage> HitMontage;*/
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<class UAnimMontage> DeadMontage;
+	static const FString HitMontage;
+	static const FString DeadMontage;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+	TObjectPtr<class UAnimMontage> DeadMontage;*/
+
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MotionWarping, meta = (AllowPrivateAccess = "true"))

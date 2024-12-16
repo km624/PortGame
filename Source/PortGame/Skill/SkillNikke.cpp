@@ -6,6 +6,8 @@
 #include "Skill/NikkeWall.h"
 #include "Character/PGPlayerCharacter.h"
 
+const FString USkillNikke::SkillMontage = TEXT("NikkeSkillMontage");
+
 USkillNikke::USkillNikke()
 {
     static ConstructorHelpers::FClassFinder<ANikkeWall>SkillClass(TEXT("/Script/Engine.Blueprint'/Game/PortGame/Skill/Nikke/BP_NikkeWall.BP_NikkeWall_C'"));
@@ -13,13 +15,19 @@ USkillNikke::USkillNikke()
     {
         NikkeWallClass = SkillClass.Class;
     }
-    static ConstructorHelpers::FObjectFinder<UAnimMontage>SkillMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Skill/Nikke/NikkeSkillPhoneMontage.NikkeSkillPhoneMontage'"));
+   /* static ConstructorHelpers::FObjectFinder<UAnimMontage>SkillMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Skill/Nikke/NikkeSkillPhoneMontage.NikkeSkillPhoneMontage'"));
     if (SkillMontage.Object)
     {
         SkillNikkeMontage = SkillMontage.Object;
-    }
+    }*/
 
 	SkillCooltime = 10.0f;
+}
+
+void USkillNikke::SetSkillSetting(APGBaseCharacter* owner)
+{
+    Super::SetSkillSetting(owner);
+    owner->LoadAndPlayMontageByPath(owner->CharacterName, SkillMontage);
 }
 
 void USkillNikke::OnSkill()
@@ -39,7 +47,7 @@ void USkillNikke::PlaySkillNikkeMontage()
     UAnimInstance* AnimInstance = ownercharacter->GetMesh()->GetAnimInstance();
 
    
-    AnimInstance->Montage_Play(SkillNikkeMontage, 1.0f);
+    AnimInstance->Montage_Play(ownercharacter->AllMontage[SkillMontage], 1.0f);
 
     APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(ownercharacter);
     if (playerCharacter)
@@ -48,7 +56,7 @@ void USkillNikke::PlaySkillNikkeMontage()
     }
 
     EndDelegate.BindUObject(this, &USkillNikke::EndPSkillNikkeMontage);
-    AnimInstance->Montage_SetEndDelegate(EndDelegate, SkillNikkeMontage);
+    AnimInstance->Montage_SetEndDelegate(EndDelegate, ownercharacter->AllMontage[SkillMontage]);
 }
 
 void USkillNikke::SpawnNikkeWaill()

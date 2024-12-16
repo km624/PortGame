@@ -17,6 +17,7 @@
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
 
+const FString ARifle::ReloadMontage = TEXT("ReloadingMontage");
 
 ARifle::ARifle()
 {
@@ -25,6 +26,8 @@ ARifle::ARifle()
 	GunNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("GunNiagara"));
 	GunNiagaraComponent->SetupAttachment(RootComponent);
 	GunNiagaraComponent->bAutoActivate = false;
+
+
 }
 
 void ARifle::Tick(float DeltaTime)
@@ -54,13 +57,17 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 	if (weaponData)
 	{
 		UGunWeaponData* gunWeaponData = Cast<UGunWeaponData>(weaponData);
+
 		WeaponSocket = gunWeaponData->WeaponSocket;
 		GunStat = gunWeaponData->GunStat;
-		ReloadMontage = gunWeaponData->ReloadMontage;
+		//ReloadMontage = gunWeaponData->ReloadMontage;
 		CameraShakeClass = gunWeaponData->CameraShakeClass;
 		bIsRifle = gunWeaponData->bIsRifle;
 		OwnerCharacter->SetbIsRilfe(bIsRifle);
+
 		NAGunEffect = gunWeaponData->NAGunEffect;
+
+		OwnerCharacter->LoadAndPlayMontageByPath(OwnerCharacter->CharacterName, ReloadMontage);
 
 		GunNiagaraComponent->SetAsset(NAGunEffect);
 		FVector SocketLocation = WeaponStaticComponent->GetSocketLocation(FireLocation);
@@ -68,7 +75,7 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 
 		SetUpGunStat();
 
-		ReloadMontageTime = ReloadMontage->GetPlayLength() / reloadingTime - 0.3f;
+		//ReloadMontageTime = FirstReloadMontage->GetPlayLength() / reloadingTime - 0.3f;
 	}
 	Currentammo = ammoMaxCount;
 
@@ -97,7 +104,7 @@ void ARifle::Attack()
 			AnimInstance->StopAllMontages(0.0f);
 			bIsGunReloaded = false;
 			OwnerCharacter->SetbIsReload(bIsGunReloaded);
-			OnbIsGunReload.Broadcast(false);
+			OnbIsGunReload.Broadcast(false, ReloadMontageTime);
 		}
 		ComboStart();
 
@@ -146,7 +153,7 @@ void ARifle::InGunRange(bool bisaim)
 				hitResult,
 				Camerastart,
 				CameraEnd,
-				ECollisionChannel::ECC_Visibility,
+				CCHANNEL_PGACTION,
 				collisionParams);
 
 			if (OutHitResult)
@@ -204,12 +211,14 @@ void ARifle::StartReloading()
 {
 	if (ReloadTimerHandle.IsValid())return;
 
+	ReloadMontageTime = OwnerCharacter->AllMontage[ReloadMontage]->GetPlayLength() / reloadingTime - 0.3f;
+
 	bIsGunReloaded = true;
 	OwnerCharacter->SetbIsReload(bIsGunReloaded);
-	OnbIsGunReload.Broadcast(bIsGunReloaded);
+	OnbIsGunReload.Broadcast(bIsGunReloaded, ReloadMontageTime);
 
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(ReloadMontage, reloadingTime);
+	AnimInstance->Montage_Play(OwnerCharacter->AllMontage[ReloadMontage], reloadingTime);
 
 
 	GetWorld()->GetTimerManager().SetTimer(
@@ -226,7 +235,7 @@ void ARifle::EndReloading()
 	OnAmmoChanged.Broadcast(Currentammo);
 	bIsGunReloaded = false;
 	OwnerCharacter->SetbIsReload(bIsGunReloaded);
-	OnbIsGunReload.Broadcast(bIsGunReloaded);
+	OnbIsGunReload.Broadcast(bIsGunReloaded, ReloadMontageTime);
 	ReloadTimerHandle.Invalidate();
 }
 
@@ -351,7 +360,7 @@ void ARifle::StartGunEffect()
 {
 	if (NAGunEffect)
 	{
-		SLOG(TEXT("GunEffect"));
+		//SLOG(TEXT("GunEffect"));
 		if (GunNiagaraComponent->IsActive())
 			GunNiagaraComponent->Deactivate();
 		GunNiagaraComponent->Activate();

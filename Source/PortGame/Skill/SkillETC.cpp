@@ -6,16 +6,23 @@
 #include "Character/PGPlayerCharacter.h"
 #include "PortGame/PortGame.h"
 
+const FString USkillETC::SkillMontage = TEXT("ETCSkillMontage");
 
 USkillETC::USkillETC()
 {
-	static ConstructorHelpers::FObjectFinder<UAnimMontage>SkillMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Skill/ETC/ETCSkillMontage.ETCSkillMontage'"));
+	/*static ConstructorHelpers::FObjectFinder<UAnimMontage>SkillMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Skill/ETC/ETCSkillMontage.ETCSkillMontage'"));
 	if (SkillMontage.Object)
 	{
 		SkillETCMontage = SkillMontage.Object;
-	}
+	}*/
 
 	SkillCooltime = 10.0f;
+}
+
+void USkillETC::SetSkillSetting(APGBaseCharacter* owner)
+{
+	Super::SetSkillSetting(owner);
+	owner->LoadAndPlayMontageByPath(owner->CharacterName, SkillMontage);
 }
 
 
@@ -36,7 +43,7 @@ void USkillETC::PlaySkillETCMontage()
 	UAnimInstance* AnimInstance = ownercharacter->GetMesh()->GetAnimInstance();
 	
 	float SkillSpeed = ownercharacter->GetTotalStat().AttackSpeed;
-	AnimInstance->Montage_Play(SkillETCMontage, SkillSpeed);
+	AnimInstance->Montage_Play(ownercharacter->AllMontage[SkillMontage], SkillSpeed);
 	//플레이어 캐릭터만 값 받아서 돌리기
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(ownercharacter);
 	if (playerCharacter)
@@ -45,7 +52,7 @@ void USkillETC::PlaySkillETCMontage()
 	}
 
 	EndDelegate.BindUObject(this, &USkillETC::EndPlaySkillETCMontage);
-	AnimInstance->Montage_SetEndDelegate(EndDelegate, SkillETCMontage);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, ownercharacter->AllMontage[SkillMontage]);
 	
 }
 
@@ -56,7 +63,7 @@ void USkillETC::EndPlaySkillETCMontage(UAnimMontage* TargetMontage, bool IsPrope
 	{
 		playerCharacter->SetbIsAttackRotation(false);
 	}
-	SLOG(TEXT("END"));
+	//SLOG(TEXT("END"));
 	EndSkill();
 }
 

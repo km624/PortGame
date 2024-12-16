@@ -32,6 +32,9 @@
 #include "Weapon/Rifle.h"
 #include "Data/PlayerCharacterDataAsset.h"
 
+const FString APGPlayerCharacter::LeftEvadeMontage = TEXT("LeftEvadeMontage");
+const FString APGPlayerCharacter::RightEvadeMontage = TEXT("RightEvadeMontage");
+const FString APGPlayerCharacter::DashMontage = TEXT("DashMontage");
 
 APGPlayerCharacter::APGPlayerCharacter()
 {
@@ -54,11 +57,11 @@ APGPlayerCharacter::APGPlayerCharacter()
 		AimCurve = aimCurve.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> DashMon(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/DashMontage.DashMontage'"));
+	/*static ConstructorHelpers::FObjectFinder<UAnimMontage> DashMon(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/DashMontage.DashMontage'"));
 	if (DashMon.Object)
 	{
 		DashMontage = DashMon.Object;
-	}
+	}*/
 
 	//Hud위젯
 	static ConstructorHelpers::FClassFinder<UPGHudWidget> ABHUDWidgetRef(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/PortGame/UI/BP_HudWidget.BP_HudWidget_C'"));
@@ -137,17 +140,17 @@ APGPlayerCharacter::APGPlayerCharacter()
 		DashAction = Dash.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> EvadeLeft(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/EvadeLeftMontage.EvadeLeftMontage'"));
-	if (EvadeLeft.Object)
-	{
-		LeftEvadeMontage = EvadeLeft.Object;
-	}
+	//static ConstructorHelpers::FObjectFinder<UAnimMontage> EvadeLeft(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/EvadeLeftMontage.EvadeLeftMontage'"));
+	//if (EvadeLeft.Object)
+	//{
+	//	LeftEvadeMontage = EvadeLeft.Object;
+	//}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> EvadeRight(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/EvadeRightMontage.EvadeRightMontage'"));
-	if (EvadeRight.Object)
-	{
-		RightEvadeMontage = EvadeRight.Object;
-	}
+	//static ConstructorHelpers::FObjectFinder<UAnimMontage> EvadeRight(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/EvadeRightMontage.EvadeRightMontage'"));
+	//if (EvadeRight.Object)
+	//{
+	//	RightEvadeMontage = EvadeRight.Object;
+	//}
 
 	static ConstructorHelpers::FClassFinder<UCameraShakeBase> EvadeCameraShake(TEXT("/Script/Engine.Blueprint'/Game/PortGame/Effect/CameraShake/EvadeCameraShake.EvadeCameraShake_C'"));
 	if (EvadeCameraShake.Class)
@@ -199,7 +202,7 @@ void APGPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//CreateHudWidget();
+	
 
 	SetCharacterData(CurrentControlData);
 	//임시로
@@ -212,7 +215,6 @@ void APGPlayerCharacter::BeginPlay()
 	AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
 
 	FGenericTeamId currentteam = GetGenericTeamId();
-	//SLOG(TEXT("actor : %s , myteamide : %d"), *GetActorNameOrLabel(), currentteam.GetId());
 
 }
 
@@ -297,6 +299,10 @@ void APGPlayerCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterda
 	UPlayerCharacterDataAsset* palyerdata = Cast<UPlayerCharacterDataAsset>(characterdata);
 
 	LevelSequence = palyerdata->LevelSequence;
+
+	LoadAndPlayMontageByPath(characterdata->MeshName, DashMontage);
+	LoadAndPlayMontageByPath(characterdata->MeshName, LeftEvadeMontage);
+	LoadAndPlayMontageByPath(characterdata->MeshName, RightEvadeMontage);
 
 	Super::SetupCharacterData(characterdata);
 
@@ -561,7 +567,7 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 
 void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 {
-	SLOG(TEXT("%s : Setup"), *GetActorNameOrLabel());
+	//SLOG(TEXT("%s : Setup"), *GetActorNameOrLabel());
 	if (hudWidget)
 	{
 		hudWidget->SetUpWidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat());
@@ -586,7 +592,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 			hudWidget->SetupGunWidget(rifle->GetammoMaxCount());
 			rifle->OnAmmoChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateGunAmmo);
 
-			hudWidget->SetupReloadWidget(rifle->GetReloadMotagetime());
+			//shudWidget->SetupReloadWidget(rifle->GetReloadMotagetime());
 			rifle->OnbIsGunReload.AddUObject(hudWidget, &UPGHudWidget::StartReload);
 
 			rifle->OnbInGunRanged.AddUObject(hudWidget, &UPGHudWidget::ChangeCrosshair);
@@ -690,7 +696,7 @@ void APGPlayerCharacter::OnDash()
 	DashVector = GetCharacterMovement()->GetLastInputVector();
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-	AnimInstance->Montage_Play(DashMontage, 1.0f);
+	AnimInstance->Montage_Play(AllMontage[DashMontage], 1.0f);
 
 	//GetController()->SetIgnoreMoveInput(true);
 
@@ -759,11 +765,11 @@ void APGPlayerCharacter::PlayEvadeMontage()
 	// 오른쪽방향
 	if (DashVector.X > 0)
 	{
-		CurrentEvadeMontage = RightEvadeMontage;
+		CurrentEvadeMontage = AllMontage[RightEvadeMontage];
 	}
 	else
 	{
-		CurrentEvadeMontage = LeftEvadeMontage;
+		CurrentEvadeMontage = AllMontage[LeftEvadeMontage];
 	}
 
 	AnimInstance->Montage_Play(CurrentEvadeMontage, 1.0f);
@@ -956,7 +962,7 @@ void APGPlayerCharacter::ChangeViewTarget(bool bstart)
 
 void APGPlayerCharacter::CreateHudWidget()
 {
-	SLOG(TEXT("PLayerCharacter : CreateWidget"));
+	//SLOG(TEXT("PLayerCharacter : CreateWidget"));
 	PGHudWidget = CreateWidget<UPGHudWidget>(GetWorld(), PGHudWidgetClass);
 	if (PGHudWidget)
 	{

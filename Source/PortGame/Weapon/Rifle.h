@@ -11,7 +11,7 @@
  * 
  */
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnAmmoChanged, int32 /*CurrentAmmo*/);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnbIsGunReload, bool /*bIsGunReload*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnbIsGunReload, bool /*bIsGunReload*/,float /*ReloadMontageTime*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnbInGunRanged, bool /*bIsGunRange*/);
 UCLASS()
 class PORTGAME_API ARifle : public AWeapon
@@ -59,8 +59,7 @@ public:
 
 	FORCEINLINE int32 GetammoMaxCount() { return ammoMaxCount; }
 
-	FORCEINLINE float GetReloadMotagetime() {return ReloadMontageTime;}
-
+	
 		//ÃÑ ¹ß»ç ±¸Çö
 protected:
 	int32 ammoMaxCount;
@@ -91,9 +90,8 @@ protected:
 	FName FireLocation = TEXT("FireLocation");
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> ReloadMontage;
-
+	
+	static const FString ReloadMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	FPGGunStat GunStat;

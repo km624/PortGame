@@ -37,10 +37,11 @@ void UPGReloadWidget::SetUpReloadWidget(float reloadtime)
 
 }
 
-void UPGReloadWidget::StartReloadtime(bool start)
+void UPGReloadWidget::StartReloadtime(bool start , float reloadtime)
 {
 	if (start == true)
 	{
+		SetUpReloadWidget(reloadtime);
 		this->SetVisibility(ESlateVisibility::Visible);
 		CurrentTime = 0.0f;
 		GetWorld()->GetTimerManager().SetTimer(ReloadTimeTimerHandle, this, &UPGReloadWidget::UpdateReloadtime, 0.01f, true);

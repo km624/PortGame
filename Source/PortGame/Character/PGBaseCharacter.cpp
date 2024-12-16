@@ -20,8 +20,14 @@
 #include "NiagaraSystem.h"  
 #include "NiagaraFunctionLibrary.h"
 #include "Data/BaseCharacterDataAsset.h"
+#include "Engine/StreamableManager.h"
+#include "UObject/SoftObjectPath.h"
+#include "Engine/AssetManager.h"
 
 
+
+const FString APGBaseCharacter::HitMontage= TEXT("HitMontage");
+const FString APGBaseCharacter::DeadMontage = TEXT("DeadMontage");
 
 
 // Sets default values
@@ -94,18 +100,19 @@ APGBaseCharacter::APGBaseCharacter()
 	}
 
 	//hitMontage
-	static ConstructorHelpers::FObjectFinder<class UAnimMontage>
+	/*static ConstructorHelpers::FObjectFinder<class UAnimMontage>
 		MONTAGE_HIT(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/HitMontage.HitMontage'"));
 	if (MONTAGE_HIT.Object)
 	{
 		HitMontage = MONTAGE_HIT.Object;
-	}
-	static ConstructorHelpers::FObjectFinder<class UAnimMontage>
+	}*/
+
+	/*static ConstructorHelpers::FObjectFinder<class UAnimMontage>
 		MONTAGE_DEAD(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/DeadSMontage.DeadSMontage'"));
 	if (MONTAGE_DEAD.Object)
 	{
 		DeadMontage = MONTAGE_DEAD.Object;
-	}
+	}*/
 
 	//나이아가라
 
@@ -126,7 +133,7 @@ void APGBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	//SLOG(TEXT("StartBeginpaly"));
 
 	StatComponent->OnHitGaugeZero.AddUObject(this, &ThisClass::PlayHitMontage);
 
@@ -149,15 +156,46 @@ void APGBaseCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterdata
 	CharacterType = characterdata->Charactertype;
 	CharacterTypeEffect = characterdata->CharacterTypeEffect;
 	GetMesh()->SetSkeletalMesh(characterdata->SkeletalMesh);
+	
+	CharacterName = characterdata->MeshName;
 
+	LoadAndPlayMontageByPath(CharacterName,HitMontage);
+	LoadAndPlayMontageByPath(CharacterName,DeadMontage);
+	
 	AttackComponent->SetupAttackData(characterdata);
 
 	StatComponent->SetCurrentRarity(characterdata->Rarity);
 
-	SLOG(TEXT("BaseCharacterr : SetupCharacterEnd"));
+	//SLOG(TEXT("BaseCharacterr : SetupCharacterEnd"));
 
 
 }
+
+void APGBaseCharacter::LoadAndPlayMontageByPath(const FString& SkeletonName, const FString& MontageName)
+{
+	FString AssetPath = FString::Printf(TEXT("/Game/PortGame/Character/%s/Animation/Montage/%s.%s"), *SkeletonName, *MontageName, *MontageName);
+	
+	// 소프트 오브젝트 경로 생성
+	FSoftObjectPath MontagePath(AssetPath);
+	
+	// 비동기로 로드
+	FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
+	StreamableManager.RequestAsyncLoad(MontagePath, FStreamableDelegate::CreateLambda([MontagePath,this, MontageName]()
+		{
+			UObject* LoadedObject = MontagePath.ResolveObject();
+			if (UAnimMontage* Montage = Cast<UAnimMontage>(LoadedObject))
+			{
+				AllMontage.Add(MontageName, Montage);
+				//SLOG(TEXT("MontageLoad : %s"), *MontagePath.ToString());
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Failed to load montage: %s"), *MontagePath.ToString());
+			}
+		}));
+}
+
+
 
 void APGBaseCharacter::AttackToComponent()
 {
@@ -281,10 +319,10 @@ void APGBaseCharacter::PlayHitMontage()
 	//맞는 애니메이션
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	//AnimInstance->StopAllMontages(0.0f);
-	AnimInstance->Montage_Play(HitMontage, 1.0f);
+	AnimInstance->Montage_Play(AllMontage[HitMontage], 1.0f);
 	FOnMontageEnded EndDelegate;
 	EndDelegate.BindUObject(this, &APGBaseCharacter::HitMontageEnd);
-	AnimInstance->Montage_SetEndDelegate(EndDelegate, HitMontage);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, AllMontage[HitMontage]);
 
 
 }
@@ -332,7 +370,7 @@ void APGBaseCharacter::SetDead()
 	//콤보 도중 죽을 수 있으니까 다른 몽타주 멈춤
 	AnimInstance->StopAllMontages(0.0f);
 
-	AnimInstance->Montage_Play(DeadMontage, 1.0f);
+	AnimInstance->Montage_Play(AllMontage[DeadMontage], 1.0f);
 
 	OnNiagaraSystemFinished(BaseNiagaraComponent);
 

@@ -26,7 +26,7 @@ public:
 	void SetUpReloadWidget(float reloadtime);
 
 	UFUNCTION()
-	void StartReloadtime(bool start);
+	void StartReloadtime(bool start , float reloadtime);
 
 protected:
 	void UpdateReloadtime();

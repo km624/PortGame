@@ -6,18 +6,26 @@
 #include "Character/PGPlayerCharacter.h"
 #include "PortGame/PortGame.h"
 
+const FString USkillBlueArchive::SkillMontage = TEXT("BlueArchiveSkillMontage");
+
 USkillBlueArchive::USkillBlueArchive()
 {
-	static ConstructorHelpers::FObjectFinder<UAnimMontage>SkillMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Skill/BlueArchive/TosGrenadeUEMontage.TosGrenadeUEMontage'"));
+	/*static ConstructorHelpers::FObjectFinder<UAnimMontage>SkillMontage(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Skill/BlueArchive/TosGrenadeUEMontage.TosGrenadeUEMontage'"));
 	if (SkillMontage.Object)
 	{
 		SkillBlueArchiveMontage = SkillMontage.Object;
-	}
+	}*/
 	
 
 	SkillCooltime = 10.0f;
 
 
+}
+
+void USkillBlueArchive::SetSkillSetting(APGBaseCharacter* owner)
+{
+	Super::SetSkillSetting(owner);
+	owner->LoadAndPlayMontageByPath(owner->CharacterName, SkillMontage);
 }
 
 void USkillBlueArchive::OnSkill()
@@ -35,7 +43,7 @@ void USkillBlueArchive::PlaySkillgrenadeMontage()
 	UAnimInstance* AnimInstance = ownercharacter->GetMesh()->GetAnimInstance();
 
 	float SkillSpeed = ownercharacter->GetTotalStat().AttackSpeed;
-	AnimInstance->Montage_Play(SkillBlueArchiveMontage, SkillSpeed);
+	AnimInstance->Montage_Play(ownercharacter->AllMontage[SkillMontage], SkillSpeed);
 	
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(ownercharacter);
 	if (playerCharacter)
@@ -44,7 +52,7 @@ void USkillBlueArchive::PlaySkillgrenadeMontage()
 	}
 
 	EndDelegate.BindUObject(this, &USkillBlueArchive::EndPSkillgrenadeMontage);
-	AnimInstance->Montage_SetEndDelegate(EndDelegate, SkillBlueArchiveMontage);
+	AnimInstance->Montage_SetEndDelegate(EndDelegate, ownercharacter->AllMontage[SkillMontage]);
 }
 
 void USkillBlueArchive::EndPSkillgrenadeMontage(UAnimMontage* TargetMontage, bool IsProperlyEnded)

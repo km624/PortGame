@@ -19,6 +19,8 @@ public:
 
 	UUltiSkill();
 
+	virtual void SetSkillSetting(class APGBaseCharacter* owner) override;
+
 	void UltiSkillSequenceSet(class ULevelSequence* newsequence);
 
 	virtual void OnSkill() override;
@@ -41,8 +43,8 @@ protected:
 
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BlueArchive)
-	TObjectPtr<class UAnimMontage> UltiSkillMontage;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BlueArchive)
+	TObjectPtr<class UAnimMontage> UltiSkillMontage;*/
 
 	FOnMontageEnded EndDelegate;
 
@@ -70,4 +72,6 @@ protected:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float UltiDealy = 1.0f;
+
+	static const FString UltiSkillMontage;
 };

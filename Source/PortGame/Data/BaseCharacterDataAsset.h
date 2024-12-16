@@ -23,6 +23,9 @@ public:
 	FName Rarity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
+	FString MeshName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 	EPlayerCharacterType Charactertype;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")

@@ -63,8 +63,10 @@ protected:
 	//기본 공격 ( 콤보)
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> ComboMontage;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> ComboMontage;*/
+
+	FString ComboMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Animation, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UComboData> ComboData;

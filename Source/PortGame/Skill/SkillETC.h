@@ -17,6 +17,8 @@ class PORTGAME_API USkillETC : public USkillBase
 public:
 	USkillETC();
 
+	virtual void SetSkillSetting(class APGBaseCharacter* owner) override;
+
 public:
 	virtual void OnSkill() override;
 
@@ -31,11 +33,11 @@ protected:
 
 protected:
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ETC)
-	TObjectPtr<class UAnimMontage> SkillETCMontage;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ETC)
+	TObjectPtr<class UAnimMontage> SkillETCMontage;*/
 
 	FOnMontageEnded EndDelegate;
 
-
+	const static FString SkillMontage;
 
 };

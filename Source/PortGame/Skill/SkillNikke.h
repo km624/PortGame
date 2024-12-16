@@ -17,6 +17,8 @@ class PORTGAME_API USkillNikke : public USkillBase
 public:
 	USkillNikke();
 
+	virtual void SetSkillSetting(class APGBaseCharacter* owner) override;
+
 public:
 	virtual void OnSkill() override;
 
@@ -36,8 +38,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Nikke")
 	TSubclassOf<class ANikkeWall> NikkeWallClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BlueArchive)
-	TObjectPtr<class UAnimMontage> SkillNikkeMontage;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = BlueArchive)
+	TObjectPtr<class UAnimMontage> SkillNikkeMontage;*/
 
 	FOnMontageEnded EndDelegate;
 
@@ -46,4 +48,6 @@ protected:
 
 	FTimerHandle SpawnWallTimerHandle;
 	
+
+	const static FString SkillMontage;
 };

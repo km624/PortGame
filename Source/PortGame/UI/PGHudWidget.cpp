@@ -85,9 +85,9 @@ void UPGHudWidget::UpdateGunAmmo(int32 Newammo)
 	BP_GunWidget->UpdateGunAmmo(Newammo);
 }
 
-void UPGHudWidget::StartReload(bool reload)
+void UPGHudWidget::StartReload(bool reload, float reloadtime)
 {
-	BP_ReloadWidget->StartReloadtime(reload);
+	BP_ReloadWidget->StartReloadtime(reload, reloadtime);
 	bIsReload = reload;
 	if (reload)
 	{
@@ -122,12 +122,12 @@ void UPGHudWidget::ChangeCrosshair(bool bInRange)
 {
 	if (bInRange)
 	{
-		SLOG(TEXT("InRAnge"));
+		
 		Image_CrossHair->SetColorAndOpacity(OriginTint);
 	}
 	else
 	{
-		SLOG(TEXT("NotttAnge"));
+		
 		Image_CrossHair->SetColorAndOpacity(RedTint);
 	}
 }

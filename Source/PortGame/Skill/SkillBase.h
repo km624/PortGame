@@ -21,7 +21,7 @@ class PORTGAME_API USkillBase : public UObject
 public:
 	USkillBase();
 
-	void SetSkillSetting(class APGBaseCharacter* owner);
+	virtual void SetSkillSetting(class APGBaseCharacter* owner);
 
 	virtual void OnSkill();
 
@@ -52,6 +52,7 @@ protected:
 	uint8  bCanSkill:1;
 
 	FTimerHandle CooldownTimerHandle;
+
 
 	
 };
