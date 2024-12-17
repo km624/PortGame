@@ -661,8 +661,8 @@ void APGPlayerCharacter::OnParryPostPorcess(bool effect)
 
 		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
 		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
-		Camera->PostProcessSettings.DepthOfFieldFocalDistance = 300.0f;
-		Camera->PostProcessSettings.DepthOfFieldSensorWidth = 750.0f;
+		Camera->PostProcessSettings.DepthOfFieldFocalDistance = 500.0f;
+		Camera->PostProcessSettings.DepthOfFieldSensorWidth = 2000.0f;;
 
 		Camera->PostProcessSettings.bOverride_SceneFringeIntensity = true;
 		Camera->PostProcessSettings.SceneFringeIntensity = 2.5f;
@@ -797,8 +797,8 @@ void APGPlayerCharacter::OnEvadePostPorcess(bool effect)
 
 		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
 		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
-		Camera->PostProcessSettings.DepthOfFieldFocalDistance = 300.0f;
-		Camera->PostProcessSettings.DepthOfFieldSensorWidth = 750.0f;
+		Camera->PostProcessSettings.DepthOfFieldFocalDistance = 500.0f;
+		Camera->PostProcessSettings.DepthOfFieldSensorWidth = 2000.0f;
 
 
 	}
