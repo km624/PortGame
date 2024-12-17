@@ -513,8 +513,8 @@ void APGPlayerCharacter::PressReload()
 void APGPlayerCharacter::AimUpdate(float deltaTime)
 {
 
-	float AimX = FMath::Lerp(0, 150, deltaTime);
-	float AimY = FMath::Lerp(0, 50, deltaTime);
+	float AimX = FMath::Lerp(0.0f, 150.0f, deltaTime);
+	float AimY = FMath::Lerp(0, 75.0f, deltaTime);
 
 	Camera->SetRelativeLocation(FVector(AimX, AimY, 0.0f));
 

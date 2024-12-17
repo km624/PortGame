@@ -2,6 +2,8 @@
  Unreal Portfolio
 
 
+## 필요 에셋
+Content/PortGame/Character/Rapi/Init/SK_nikke.uasset
 
 
 ## 사용 플러그인

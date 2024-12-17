@@ -65,6 +65,11 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 		bIsRifle = gunWeaponData->bIsRifle;
 		OwnerCharacter->SetbIsRilfe(bIsRifle);
 
+		if (bIsRifle)
+			WeaponSocket = TEXT("weaponRifleSocket");
+		else
+			WeaponSocket = TEXT("weaponPistolSocket");
+
 		NAGunEffect = gunWeaponData->NAGunEffect;
 
 		OwnerCharacter->LoadAndPlayMontageByPath(OwnerCharacter->CharacterName, ReloadMontage);
