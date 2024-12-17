@@ -133,7 +133,7 @@ void ANikkeWall::OnOverBacklapBegin(UPrimitiveComponent* OverlappedComponent, AA
 	
 	if (!Skillcharacter) return;
 	FRotator BackRotation = GetActorRotation() + FRotator(0, 120.0f, 0);
-	FVector BackLocation = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + 70.0f) - (GetActorForwardVector() * 55.0f);
+	FVector BackLocation = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + 70.0f) - (GetActorForwardVector() * 60.0f);
 	SetCharcter(BackLocation, BackRotation);
 }
 
@@ -144,7 +144,7 @@ void ANikkeWall::OnOverFrontlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	if (!Skillcharacter) return;
 
 	FRotator frontRotation = GetActorRotation() + FRotator(0, -120.0f, 0);
-	FVector frontLocation = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z+70.0f) + (GetActorForwardVector() * 55.0f);
+	FVector frontLocation = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z+70.0f) + (GetActorForwardVector() * 60.0f);
 
 	SetCharcter(frontLocation, frontRotation);
 }

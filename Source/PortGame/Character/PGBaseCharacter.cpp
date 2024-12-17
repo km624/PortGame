@@ -61,8 +61,8 @@ APGBaseCharacter::APGBaseCharacter()
 	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_PGCAPSULE);
 
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> Skeletal(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
-	/*if (Skeletal.Object)
+	/*static ConstructorHelpers::FObjectFinder<USkeletalMesh> Skeletal(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
+	if (Skeletal.Object)
 	{
 		GetMesh()->SetSkeletalMesh(Skeletal.Object);
 	}*/
@@ -156,8 +156,9 @@ void APGBaseCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterdata
 	CharacterType = characterdata->Charactertype;
 	CharacterTypeEffect = characterdata->CharacterTypeEffect;
 	GetMesh()->SetSkeletalMesh(characterdata->SkeletalMesh);
-	
-	CharacterName = characterdata->MeshName;
+	GetMesh()->SetAnimInstanceClass(characterdata->AnimInstanceClass);
+
+	CharacterName = characterdata->GetMeshNameAsString();
 
 	LoadAndPlayMontageByPath(CharacterName,HitMontage);
 	LoadAndPlayMontageByPath(CharacterName,DeadMontage);
@@ -186,7 +187,7 @@ void APGBaseCharacter::LoadAndPlayMontageByPath(const FString& SkeletonName, con
 			if (UAnimMontage* Montage = Cast<UAnimMontage>(LoadedObject))
 			{
 				AllMontage.Add(MontageName, Montage);
-				//SLOG(TEXT("MontageLoad : %s"), *MontagePath.ToString());
+				SLOG(TEXT("MontageLoad : %s"), *MontagePath.ToString());
 			}
 			else
 			{

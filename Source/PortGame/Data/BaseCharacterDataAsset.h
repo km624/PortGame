@@ -10,6 +10,17 @@
 /**
  * 
  */
+UENUM(BlueprintType)
+enum class EMeshNameOption : uint8
+{
+	ManneQuin UMETA(DisplayName = "ManneQuin"),
+	Mika UMETA(DisplayName = "Mika"),
+	Rapi UMETA(DisplayName = "Rapi")
+	
+	/*RifleComboMontage UMETA(DisplayName = "RifleComboMontage"),
+	PistolComboMontage UMETA(DisplayName = "PistolComboMontage")*/
+};
+
 UCLASS()
 class PORTGAME_API UBaseCharacterDataAsset : public UPrimaryDataAsset
 {
@@ -20,16 +31,39 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite ,Category = "Character")
+	EMeshNameOption MeshName;
+
+	UFUNCTION(BlueprintCallable, Category = "Combo")
+	FString GetMeshNameAsString() const
+	{
+		switch (MeshName)
+		{
+		case EMeshNameOption::ManneQuin:
+			return TEXT("ManneQuin");
+		case EMeshNameOption::Mika:
+			return TEXT("Mika");
+		case EMeshNameOption::Rapi:
+			return TEXT("Rapi");
+		default:
+			return TEXT("");
+		}
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite ,Category = "Character")
 	FName Rarity;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
-	FString MeshName;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
+	FString MeshName;*/
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 	EPlayerCharacterType Charactertype;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 	TObjectPtr<class USkeletalMesh> SkeletalMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
+	TSubclassOf<class UAnimInstance> AnimInstanceClass;
 	
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 	uint8 TeamId;*/

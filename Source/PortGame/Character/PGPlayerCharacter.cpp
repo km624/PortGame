@@ -296,17 +296,17 @@ void APGPlayerCharacter::Tick(float DeltaTime)
 
 void APGPlayerCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterdata)
 {
+
 	UPlayerCharacterDataAsset* palyerdata = Cast<UPlayerCharacterDataAsset>(characterdata);
 
 	LevelSequence = palyerdata->LevelSequence;
 
-	LoadAndPlayMontageByPath(characterdata->MeshName, DashMontage);
-	LoadAndPlayMontageByPath(characterdata->MeshName, LeftEvadeMontage);
-	LoadAndPlayMontageByPath(characterdata->MeshName, RightEvadeMontage);
-
 	Super::SetupCharacterData(characterdata);
 
 	
+	LoadAndPlayMontageByPath(CharacterName, DashMontage);
+	LoadAndPlayMontageByPath(CharacterName, LeftEvadeMontage);
+	LoadAndPlayMontageByPath(CharacterName, RightEvadeMontage);
 }
 
 void APGPlayerCharacter::SetCharacterData(EControlData DataName)
