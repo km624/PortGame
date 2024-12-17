@@ -15,7 +15,8 @@ enum class EMeshNameOption : uint8
 {
 	ManneQuin UMETA(DisplayName = "ManneQuin"),
 	Mika UMETA(DisplayName = "Mika"),
-	Rapi UMETA(DisplayName = "Rapi")
+	Rapi UMETA(DisplayName = "Rapi"),
+	Rover UMETA(DisplayName = "Rover")
 	
 	/*RifleComboMontage UMETA(DisplayName = "RifleComboMontage"),
 	PistolComboMontage UMETA(DisplayName = "PistolComboMontage")*/
@@ -44,6 +45,8 @@ public:
 			return TEXT("Mika");
 		case EMeshNameOption::Rapi:
 			return TEXT("Rapi");
+		case EMeshNameOption::Rover:
+			return TEXT("Rover");
 		default:
 			return TEXT("");
 		}
