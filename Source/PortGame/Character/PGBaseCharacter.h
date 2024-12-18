@@ -31,6 +31,10 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	//캐릭터 데이터를 장착
+public:
+	void SetCharacterData(class UBaseCharacterDataAsset* characterdata);
+
 protected:
 	virtual void SetupCharacterData(class UBaseCharacterDataAsset* characterdata);
 
@@ -187,15 +191,8 @@ protected:
 	virtual void SetDead();
 
 protected:
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<class UAnimMontage> HitMontage;*/
-
 	static const FString HitMontage;
 	static const FString DeadMontage;
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
-	TObjectPtr<class UAnimMontage> DeadMontage;*/
-
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MotionWarping, meta = (AllowPrivateAccess = "true"))
@@ -204,6 +201,8 @@ protected:
 
 	//팀 세팅
 public:
+	FORCEINLINE void SetteamId(uint8 teamId) { TeamId = teamId; }
+
 	FORCEINLINE virtual void SetGenericTeamId(const FGenericTeamId& teamID) override { myteam = teamID; }
 
 	FORCEINLINE virtual FGenericTeamId GetGenericTeamId() const override { return myteam; }

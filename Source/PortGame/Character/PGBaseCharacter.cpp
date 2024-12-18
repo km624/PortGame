@@ -143,11 +143,14 @@ void APGBaseCharacter::BeginPlay()
 	BaseNiagaraComponent->OnSystemFinished.AddDynamic(this, &APGBaseCharacter::OnNiagaraSystemFinished);
 
 
-	//ÆÀ ¼³Á¤
-
 	SetGenericTeamId(TeamId);
 
 
+}
+
+void APGBaseCharacter::SetCharacterData(UBaseCharacterDataAsset* characterdata)
+{
+	baseCharacterData = characterdata; 
 }
 
 void APGBaseCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterdata)

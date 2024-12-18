@@ -10,9 +10,9 @@
 APGAIBaseCharacter::APGAIBaseCharacter()
 {
 
-	AIControllerClass = APGAIController::StaticClass();
+	//AIControllerClass = APGAIController::StaticClass();
 
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+	AutoPossessAI = EAutoPossessAI::Disabled;
 
 	
 }
