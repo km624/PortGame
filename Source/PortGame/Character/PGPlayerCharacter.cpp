@@ -985,7 +985,8 @@ void APGPlayerCharacter::HudWidgetAddviewport()
 void APGPlayerCharacter::RemoveHudWidget()
 {
 	if (PGHudWidget)
-		PGHudWidget->RemoveFromViewport();
+		PGHudWidget->RemoveFromParent();
+	
 	SLOG(TEXT("%s: REmoveviewport"), *GetActorNameOrLabel());
 }
 

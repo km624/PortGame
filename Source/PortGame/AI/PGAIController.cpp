@@ -8,6 +8,7 @@
 #include "AI/PGAI.h"
 #include "PortGame/PortGame.h"
 #include "Interface/AITargetPlayerInterface.h"
+#include "Field/PGField.h"
 
 APGAIController::APGAIController()
 {
@@ -24,13 +25,24 @@ APGAIController::APGAIController()
 
 }
 
+void APGAIController::SetMyFieldData(APGField* field)
+{
+	UBlackboardComponent* BlackboardComp = Blackboard.Get();
+	if (UseBlackboard(BBAsset, BlackboardComp))
+	{
+		BlackboardComp->SetValueAsObject(BBKEY_MYFIELD, field);
+		BlackboardComp->SetValueAsBool(BBKEY_PROTECTFIELD, true);
+	}
+	
+}
+
 void APGAIController::RunAI()
 {
 	//SLOG(TEXT("RunAi"));
 	UBlackboardComponent* BlackboardComp = Blackboard.Get();
 	if (UseBlackboard(BBAsset, BlackboardComp))
 	{
-		BlackboardComp->SetValueAsVector(BBKEY_CURRENTPOS, GetPawn()->GetActorLocation());
+		//BlackboardComp->SetValueAsVector(BBKEY_CURRENTPOS, GetPawn()->GetActorLocation());
 		//Blackboard->SetValueAsVector(BBKEY_CURRENTPOS, GetPawn()->GetActorLocation());
 
 		bool RunResult = RunBehaviorTree(BTAsset);
@@ -58,8 +70,7 @@ void APGAIController::BlackBoardReset()
 			
 			IAITargetPlayerInterface* player = Cast<IAITargetPlayerInterface>(pawn);
 			player->DeletePlayerTargetPawn(GetPawn());
-			/*uint32 targetCount = BlackboardComp->GetValueAsInt(BBKEY_PLAYERTARGETCOUNT);
-			BlackboardComp->SetValueAsInt(BBKEY_PLAYERTARGETCOUNT, --targetCount);*/
+		
 		}
 
 		BlackboardComp->SetValueAsObject(BBKEY_TARGET,nullptr);

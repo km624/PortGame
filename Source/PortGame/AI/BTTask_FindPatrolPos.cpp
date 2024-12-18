@@ -36,29 +36,55 @@ EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& O
 		return EBTNodeResult::Failed;
 	}
 
-	FVector Origin = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_CURRENTPOS);
-	FNavLocation NextPatrolPos;
+	//FVector Origin = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_CURRENTPOS);
+	FVector Origin = ControllingPawn->GetActorLocation();
+	//FNavLocation NextPatrolPos;
 
-	float PatrolRadius = AIPawn->GetPatrolRadius();
+	//float PatrolRadius = AIPawn->GetPatrolRadius();
 
-
-	if (NavSystem->GetRandomPointInNavigableRadius(Origin, PatrolRadius, NextPatrolPos))
+	AActor* myField = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_MYFIELD));
+	if (myField == NULL)
 	{
-		OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_PATROLPOS, NextPatrolPos.Location);
+		return EBTNodeResult::Failed;
+	}
+	FVector FieldSize = myField->GetActorScale() * 50.0f;
 
-		FVector Turn = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_PATROLPOS);
+	FVector PatrolLocation = FVector(FMath::FRandRange(-FieldSize.X, FieldSize.X), FMath::FRandRange(-FieldSize.Y, FieldSize.Y), 100.0f) + myField-> GetActorLocation();
+	//FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f);
+
+	OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_PATROLPOS, PatrolLocation);
+
+	FVector Turn = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_PATROLPOS);
 		float TurnSpeed = AIPawn->AITurnSpeed();
 
-		//NPC가 바라봐야 한느 회전값을 구함
+		
 		FVector LookVector = Turn - ControllingPawn->GetActorLocation();
 		LookVector.Z = 0.0f;
 		FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
 
-		//서서히 해당 로테이션으로 지정된 속도로 돌아가게
+		
 		ControllingPawn->SetActorRotation(FMath::RInterpTo(ControllingPawn->GetActorRotation(), TargetRot, GetWorld()->GetDeltaSeconds(), 100.0f));
 		return EBTNodeResult::Succeeded;
-	}
+
+	//if (NavSystem->GetRandomPointInNavigableRadius(Origin, PatrolRadius, NextPatrolPos))
+	//{
+	//	OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_PATROLPOS, NextPatrolPos.Location);
+
+	//	FVector Turn = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_PATROLPOS);
+	//	float TurnSpeed = AIPawn->AITurnSpeed();
+
+	//	//NPC가 바라봐야 한느 회전값을 구함
+	//	FVector LookVector = Turn - ControllingPawn->GetActorLocation();
+	//	LookVector.Z = 0.0f;
+	//	FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
+
+	//	//서서히 해당 로테이션으로 지정된 속도로 돌아가게
+	//	ControllingPawn->SetActorRotation(FMath::RInterpTo(ControllingPawn->GetActorRotation(), TargetRot, GetWorld()->GetDeltaSeconds(), 100.0f));
+	//	return EBTNodeResult::Succeeded;
+	//}
 
 
-	return EBTNodeResult::Failed;
+
+
+	//return EBTNodeResult::Failed;
 }

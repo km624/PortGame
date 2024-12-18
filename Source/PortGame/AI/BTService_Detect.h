@@ -22,6 +22,8 @@ public:
 private:
 	float TargetToDistance(FVector myloc ,FVector targetLoc);
 
+	void DeteactDebug(bool field);
+
 
 	
 };

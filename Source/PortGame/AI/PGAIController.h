@@ -19,6 +19,8 @@ public:
 	APGAIController();
 
 public:
+	void SetMyFieldData(class APGField* field);
+
 	void RunAI();
 	void StopAI();
 

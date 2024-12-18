@@ -32,6 +32,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	}
 	FVector Center = ControllingPawn->GetActorLocation();
 	UWorld* World = ControllingPawn->GetWorld();
+
 	if (nullptr == World)
 	{
 		return;
@@ -48,14 +49,40 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(Detect), false, ControllingPawn);
 	
-	bool bResult = World->OverlapMultiByChannel(
-		OverlapResults,
-		Center,
-		FQuat::Identity,
-		CCHANNEL_PGACTION,
-		FCollisionShape::MakeSphere(DetectRadius),
-		CollisionQueryParam
-	);
+	bool protecteField = OwnerComp.GetBlackboardComponent()->GetValueAsBool(BBKEY_PROTECTFIELD);
+
+	bool bResult =false;
+	FVector Detectsize;
+	AActor* myfield =nullptr;
+
+	if (protecteField)
+	{
+		 myfield = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_MYFIELD));
+		if (myfield !=nullptr)
+		{
+			Detectsize = myfield->GetActorScale() * 50.0f;
+			bResult = World->OverlapMultiByChannel(
+				OverlapResults,
+				myfield->GetActorLocation(),
+				FQuat::Identity,
+				CCHANNEL_PGACTION,
+				FCollisionShape::MakeBox(Detectsize),
+				CollisionQueryParam
+			);
+		}
+	
+	}
+	else
+	{
+		 bResult = World->OverlapMultiByChannel(
+			OverlapResults,
+			Center,
+			FQuat::Identity,
+			CCHANNEL_PGACTION,
+			FCollisionShape::MakeSphere(DetectRadius),
+			CollisionQueryParam
+		);
+	}
 
 	if (bResult)
 	{
@@ -81,15 +108,20 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 					{
 						player->SetPlayerTargetPawn(ControllingPawn);
 						OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, TargetPawn);
-
-						DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Purple, false, 0.2f);
-						DrawDebugPoint(World, TargetPawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
-						DrawDebugLine(World, ControllingPawn->GetActorLocation(), TargetPawn->GetActorLocation(), FColor::Green, false, 0.27f);
+						
+						if(protecteField)
+							DrawDebugBox(World, myfield->GetActorLocation(), Detectsize, FColor::Purple, false, 0.2f);
+						else
+						{
+							DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Purple, false, 0.2f);
+							DrawDebugPoint(World, TargetPawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
+							DrawDebugLine(World, ControllingPawn->GetActorLocation(), TargetPawn->GetActorLocation(), FColor::Green, false, 0.27f);
+						}
+					
 						return;
 					}
 					
-					/*TargetingCount++;
-					OwnerComp.GetBlackboardComponent()->SetValueAsInt(BBKEY_PLAYERTARGETCOUNT, TargetingCount);*/
+				
 		
 				}
 				
@@ -113,9 +145,16 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			
 			APawn* Pawn = Cast<APawn>(TargetActor);
 			OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn);
-			DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
-			DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
-			DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
+
+			if (protecteField)
+				DrawDebugBox(World, myfield->GetActorLocation(), Detectsize, FColor::Green, false, 0.2f);
+			else
+			{
+				DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
+				DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
+				DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
+			}
+		
 	
 			return;
 		}
@@ -135,8 +174,15 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	}
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);
-	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
 
+	if (protecteField)
+	{
+		if(myfield!=nullptr)
+			DrawDebugBox(World, myfield->GetActorLocation(), Detectsize, FColor::Yellow, false, 0.2f);
+	}
+	else
+		DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
+	
 
 }
 
@@ -148,3 +194,5 @@ float UBTService_Detect::TargetToDistance(FVector myloc,FVector targetLoc)
 	float Distance = FVector::Dist(MyLocation, TargetLocation);
 	return Distance;
 }
+
+

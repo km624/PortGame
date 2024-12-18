@@ -190,7 +190,7 @@ void APGBaseCharacter::LoadAndPlayMontageByPath(const FString& SkeletonName, con
 			if (UAnimMontage* Montage = Cast<UAnimMontage>(LoadedObject))
 			{
 				AllMontage.Add(MontageName, Montage);
-				SLOG(TEXT("MontageLoad : %s"), *MontagePath.ToString());
+				//SLOG(TEXT("MontageLoad : %s"), *MontagePath.ToString());
 			}
 			else
 			{

@@ -91,7 +91,6 @@ void APGField::OnAISpawn()
 {
 	FVector FieldSize = GetActorScale()*50.0f;
 
-	;
 
 	FVector SpawnLocation = FVector(FMath::FRandRange(-FieldSize.X, FieldSize.X) , FMath::FRandRange(-FieldSize.Y, FieldSize.Y), 100.0f) + GetActorLocation();
 	FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f);
@@ -106,14 +105,31 @@ void APGField::OnAISpawn()
 
 	if (AiCharacter)
 	{
-	
+		AICharacters.Add(AiCharacter);
+
 		AiCharacter->SetCharacterData(AIDatas[0]);
 		AiCharacter->SetteamId(TeamId);
-		SLOG(TEXT("SpawnAi"));
+		
 		AiCharacter->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
 	}
-	else
-		SLOG(TEXT("Faild Spawn ai"));
+	
+	APGAIController* pgAIcontoller = Cast<APGAIController>((GetWorld()->SpawnActorDeferred<APGAIController>(
+		APGAIController::StaticClass(),
+		FTransform(SpawnRotation, SpawnLocation),
+		Owner,
+		nullptr
+	)));
+
+	if (pgAIcontoller)
+	{
+		
+		pgAIcontoller->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+		pgAIcontoller->Possess(AiCharacter);
+		SLOG(TEXT("Possess"));
+		pgAIcontoller->SetMyFieldData(this);
+	}
+
+	
 }
 
 
