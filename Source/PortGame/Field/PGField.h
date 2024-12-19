@@ -22,10 +22,10 @@ protected:
 	void InitializeField();
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Field)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AIFieldData)
 	TObjectPtr<class UStaticMeshComponent> FieldMesh;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Field)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AIFieldData)
 	TObjectPtr<class UBoxComponent> AIField;
 
 	UFUNCTION()
@@ -42,7 +42,10 @@ protected:
 	void SetTeamColor();
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Field")
+	//팀 색상을 동적 변경 위함
+	UMaterialInstanceDynamic* DynamicMaterial;
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
 	uint8 TeamId;
 
 	FGenericTeamId myteam;
@@ -52,13 +55,13 @@ protected:
 	void OnAISpawn();
 
 protected:
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Field")
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "AIFieldData")
 	TArray<TObjectPtr<class APGNpcCharacter>> AICharacters;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Field")
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "AIFieldData")
 	TArray<TObjectPtr<class UBaseCharacterDataAsset>> AIDatas;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
 	int32 SpawnCount;
 
 
@@ -69,12 +72,13 @@ public:
 
 	//필드 게이지
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Field")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
 	float MaxFieldGague = 100.0f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Field")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AIFieldData")
 	float currentFieldGauge;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
 	float FieldDamage= 50.0f;
 
 

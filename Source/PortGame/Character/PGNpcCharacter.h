@@ -22,7 +22,12 @@ public:
 
 	virtual void BeginPlay() override;
 
-	virtual void SetteamId(uint8 teamId) override;
+	void ChangeNpcColor();
+
+protected:
+	//팀 색상을 동적 변경 위함
+	UMaterialInstanceDynamic* DynamicMaterial;
+
 protected:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 

@@ -60,38 +60,36 @@ void APGNpcCharacter::BeginPlay()
 		bIsAim = true;
 		
 	}
-
-
+	//NPC 캐릭터 팀 색깔 설정
+	ChangeNpcColor();
 }
 
-void APGNpcCharacter::SetteamId(uint8 teamId)
+void APGNpcCharacter::ChangeNpcColor()
 {
-	Super::SetteamId(teamId);
+	
+	// 팀 색상 설정
+	FLinearColor TeamColor = (TeamId != 1) ? FLinearColor::Red : FLinearColor::Blue;
 
-	//NPC 캐릭터 팀 색깔 설정
-	FLinearColor teamcolor = (TeamId != 1) ? FLinearColor::Red : FLinearColor::Blue;
-
-	if (!HasAnyFlags(RF_ClassDefaultObject))
+	// 캐릭터의 메쉬에서 현재 머티리얼 가져오기
+	UMaterialInterface* CurrentMaterial = GetMesh()->GetMaterial(0);
+	if (CurrentMaterial)
 	{
-		UMaterialInterface* CurrentMaterial = GetMesh()->GetMaterial(0);
-		if (CurrentMaterial)
+		// 동적 머티리얼이 이미 설정되어 있다면 재사용
+		if (!DynamicMaterial)
 		{
+			DynamicMaterial = UMaterialInstanceDynamic::Create(CurrentMaterial, this);
+			GetMesh()->SetMaterial(0, DynamicMaterial); // 한 번만 설정
+		}
 
-			UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(CurrentMaterial, this);
-
-			if (DynamicMaterial)
-			{
-
-				DynamicMaterial->SetVectorParameterValue(TEXT("Tint"), teamcolor);
-
-
-				GetMesh()->SetMaterial(0, DynamicMaterial);
-
-			}
-
+		// 동적 머티리얼의 파라미터 업데이트
+		if (DynamicMaterial)
+		{
+			DynamicMaterial->SetVectorParameterValue(TEXT("Tint"), TeamColor);
 		}
 	}
 }
+
+
 
 float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {

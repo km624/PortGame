@@ -388,6 +388,7 @@ void APGBaseCharacter::SetDead(int8 teamid)
 void APGBaseCharacter::SetteamId(uint8 teamId)
 {
 	TeamId = teamId;
+	SetGenericTeamId(TeamId);
 }
 
 void APGBaseCharacter::StartNiagaraEffect(UNiagaraSystem* niagara, FVector TargetLocation)

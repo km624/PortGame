@@ -70,29 +70,35 @@ void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 void APGField::SetTeamColor()
 {
 	
+	// 팀 색상 설정
 	if (FieldMesh)
 	{
-		UMaterialInterface* Material = FieldMesh->GetMaterial(0);
-		if (Material)
+		UMaterialInterface* CurrentMaterial = FieldMesh->GetMaterial(0);
+
+		FLinearColor teamcolor;
+		if (TeamId == 1)
+			teamcolor = FLinearColor::Blue;
+		else
+			teamcolor = FLinearColor::Red;
+		
+		if (CurrentMaterial)
 		{
+			// 동적 머티리얼이 이미 설정되어 있다면 재사용
+			if (!DynamicMaterial)
+			{
+				DynamicMaterial = UMaterialInstanceDynamic::Create(CurrentMaterial, this);
+				FieldMesh->SetMaterial(0, DynamicMaterial); 
+			}
 
-			UMaterialInstanceDynamic* DynamicMaterial = UMaterialInstanceDynamic::Create(Material, this);
-			FLinearColor teamcolor;
-			if (TeamId == 1)
-				teamcolor = FLinearColor::Blue;
-			else
-				teamcolor = FLinearColor::Red;
-
+			// 동적 머티리얼의 파라미터 업데이트
 			if (DynamicMaterial)
 			{
-				
 				DynamicMaterial->SetVectorParameterValue(FName("TeamColor"), teamcolor);
-
-				
-				FieldMesh->SetMaterial(0, DynamicMaterial);
 			}
 		}
 	}
+
+	
 }
 
 void APGField::OnAISpawn()
@@ -158,6 +164,7 @@ void APGField::DamageFieldGauge(class APawn* deadpawn, int8 attackteamid)
 
 	if (currentFieldGauge<=0)
 	{
+		ChangedField(attackteamid);
 		SLOG(TEXT("Now %d team"), attackteamid);
 		SLOG(TEXT("FieldGaugeOver"));
 	}
@@ -165,6 +172,15 @@ void APGField::DamageFieldGauge(class APawn* deadpawn, int8 attackteamid)
 
 void APGField::ChangedField(int8 teamid)
 {
+	for (TObjectPtr<APGNpcCharacter>& AICharacter : AICharacters)
+	{
+		if (AICharacter) 
+		{
+			AICharacter->SetteamId(teamid);
+
+			AICharacter->ChangeNpcColor();
+		}
+	}
 }
 
 

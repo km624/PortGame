@@ -43,9 +43,7 @@ void APGAIController::RunAI()
 	UBlackboardComponent* BlackboardComp = Blackboard.Get();
 	if (UseBlackboard(BBAsset, BlackboardComp))
 	{
-		//BlackboardComp->SetValueAsVector(BBKEY_CURRENTPOS, GetPawn()->GetActorLocation());
-		//Blackboard->SetValueAsVector(BBKEY_CURRENTPOS, GetPawn()->GetActorLocation());
-
+		
 		bool RunResult = RunBehaviorTree(BTAsset);
 		ensure(RunResult);
 	}
@@ -69,10 +67,10 @@ void APGAIController::TOMyFieldDead(int8 teamid)
 
 void APGAIController::AIIsDead()
 {
+	StopMovement();
 	BlackBoardReset();
 	StopAI();
-	StopMovement();
-
+	
 }
 
 

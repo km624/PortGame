@@ -60,7 +60,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		 myfield = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_MYFIELD));
 		if (myfield !=nullptr)
 		{
-			Detectsize = myfield->GetActorScale() * 50.0f;
+			Detectsize = myfield->GetActorScale() * 75.0f;
 			bResult = World->OverlapMultiByChannel(
 				OverlapResults,
 				myfield->GetActorLocation(),
