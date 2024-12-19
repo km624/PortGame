@@ -8,7 +8,7 @@
 #include "Portgame/Portgame.h"
 #include "PGStatComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHpZeroDelegate, int8 /*teamid*/);
 
 DECLARE_MULTICAST_DELEGATE(FOnHitGaugeZeroDelegate);
 // Hp º¯°æµÊ
@@ -79,7 +79,7 @@ public:
 	
 public:
 
-	void Damaged(float Damage);
+	void Damaged(float Damage,int8 teamid);
 	
 	void HitGaugeDamaged(float Damage);
 

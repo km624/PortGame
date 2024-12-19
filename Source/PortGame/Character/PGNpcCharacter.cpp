@@ -61,9 +61,16 @@ void APGNpcCharacter::BeginPlay()
 		
 	}
 
+
+}
+
+void APGNpcCharacter::SetteamId(uint8 teamId)
+{
+	Super::SetteamId(teamId);
+
 	//NPC Ä³¸¯ÅÍ ÆÀ »ö±ò ¼³Á¤
 	FLinearColor teamcolor = (TeamId != 1) ? FLinearColor::Red : FLinearColor::Blue;
-	
+
 	if (!HasAnyFlags(RF_ClassDefaultObject))
 	{
 		UMaterialInterface* CurrentMaterial = GetMesh()->GetMaterial(0);
@@ -84,12 +91,14 @@ void APGNpcCharacter::BeginPlay()
 
 		}
 	}
-	
 }
 
 float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	
+	APGBaseCharacter* attackPawn = Cast<APGBaseCharacter>(EventInstigator->GetPawn());
+	
 	
 	//ÀûÆÀÀÏ½Ã
 	if (GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
@@ -104,7 +113,7 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 			
 		}	
 		else
-			StatComponent->Damaged(DamageAmount);
+			StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
 	}
 
 	//¼ö·ùÅº¿¡ ¸Â¾ÒÀ»½Ã
@@ -117,14 +126,14 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 		if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
 		{
-			StatComponent->Damaged(DamageAmount);
+			StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
 		}
 		else
 		{
-			StatComponent->Damaged(DamageAmount*0.3f);
+			StatComponent->Damaged(DamageAmount*0.3f, attackPawn->GetGenericTeamId());
 		}
 	}
-
+	
 	return DamageAmount;
 }
 
@@ -146,9 +155,9 @@ void APGNpcCharacter::NPCAttackHitStop(float time)
 	
 }
 
-void APGNpcCharacter::SetDead()
+void APGNpcCharacter::SetDead(int8 teamid)
 {
-	Super::SetDead();
+	Super::SetDead(teamid);
 
 	APGAIController* aiController = Cast<APGAIController>(GetController());
 	
@@ -160,13 +169,13 @@ void APGNpcCharacter::SetDead()
 	GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
 	
 
-	if (aiController)
+	/*if (aiController)
 	{
 		SLOG(TEXT("AI DEAD"));
 		aiController->BlackBoardReset();
 		aiController->StopAI();
 		aiController->StopMovement();
-	}
+	}*/
 }
 
 //float APGNpcCharacter::GetPatrolRadius()

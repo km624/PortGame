@@ -30,16 +30,24 @@ APGField::APGField()
 void APGField::BeginPlay()
 {
 	Super::BeginPlay();
+
 	AIField->OnComponentBeginOverlap.AddDynamic(this, &APGField::OnOverlapBegin);
 	
-	SetGenericTeamId(TeamId);
-
-	SetTeamColor();
+	InitializeField();
 
 	for(int i = 0; i < SpawnCount ;i++)
 	{
 		OnAISpawn();
 	}
+}
+
+void APGField::InitializeField()
+{
+	currentFieldGauge = MaxFieldGague;
+
+	SetGenericTeamId(TeamId);
+
+	SetTeamColor();
 }
 
 void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
@@ -61,7 +69,7 @@ void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 void APGField::SetTeamColor()
 {
-	SetGenericTeamId(TeamId);
+	
 	if (FieldMesh)
 	{
 		UMaterialInterface* Material = FieldMesh->GetMaterial(0);
@@ -124,12 +132,39 @@ void APGField::OnAISpawn()
 	{
 		
 		pgAIcontoller->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
-		pgAIcontoller->Possess(AiCharacter);
-		SLOG(TEXT("Possess"));
+		//먼저 필드 값을 세팅
 		pgAIcontoller->SetMyFieldData(this);
+		
+		//빙의시 바로 행동트리 시작
+		pgAIcontoller->Possess(AiCharacter);
+		
+		
 	}
 
 	
+}
+
+void APGField::DamageFieldGauge(class APawn* deadpawn, int8 attackteamid)
+{
+
+	currentFieldGauge -= FieldDamage;
+	SLOG(TEXT("FieldDamage"));
+
+	APGNpcCharacter* deadnpc = Cast<APGNpcCharacter>(deadpawn);
+	if (AICharacters.Contains(deadnpc))
+	{
+		AICharacters.Remove(deadnpc);
+	}
+
+	if (currentFieldGauge<=0)
+	{
+		SLOG(TEXT("Now %d team"), attackteamid);
+		SLOG(TEXT("FieldGaugeOver"));
+	}
+}
+
+void APGField::ChangedField(int8 teamid)
+{
 }
 
 

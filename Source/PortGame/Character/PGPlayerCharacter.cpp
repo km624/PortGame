@@ -524,6 +524,8 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
+	APGBaseCharacter* attackPawn = Cast<APGBaseCharacter>(EventInstigator->GetPawn());
+	
 	//대쉬 중
 	if (bIsDash)
 	{
@@ -539,7 +541,7 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 	if (GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
 	{
 
-		StatComponent->Damaged(DamageAmount);
+		StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
 	}
 
 	//수류탄에 맞았을시
@@ -552,15 +554,14 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 
 		if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
 		{
-			StatComponent->Damaged(DamageAmount);
+			StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
 		}
 		else
 		{
-			StatComponent->Damaged(DamageAmount * 0.3f);
+			StatComponent->Damaged(DamageAmount * 0.3f, attackPawn->GetGenericTeamId());
 		}
 	}
-
-
+	
 	return DamageAmount;
 }
 

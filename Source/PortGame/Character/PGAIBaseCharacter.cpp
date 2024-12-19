@@ -6,6 +6,7 @@
 #include "Data/GunWeaponData.h"
 #include "Component/PGAttackComponent.h"
 #include "AI/PGAIController.h"
+#include "PortGame/PortGame.h"
 
 APGAIBaseCharacter::APGAIBaseCharacter()
 {
@@ -96,5 +97,19 @@ void APGAIBaseCharacter::NotifyComboEnd()
 float APGAIBaseCharacter::AITurnSpeed()
 {
 	return TurnSpeed;
+}
+
+void APGAIBaseCharacter::SetDead(int8 teamid)
+{
+	Super::SetDead(teamid);
+
+	APGAIController* aiController = Cast<APGAIController>(GetController());
+	if (aiController)
+	{
+		SLOG(TEXT("AI DEAD"));
+		if (teamid!=0)
+			aiController->TOMyFieldDead(teamid);
+		aiController->AIIsDead();
+	}
 }
 

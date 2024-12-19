@@ -10,6 +10,7 @@
 #include "Interface/AITargetPlayerInterface.h"
 #include "Field/PGField.h"
 
+
 APGAIController::APGAIController()
 {
 	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBoard(TEXT("/Script/AIModule.BlackboardData'/Game/PortGame/AI/BB_PGAICharacter.BB_PGAICharacter'"));
@@ -50,6 +51,31 @@ void APGAIController::RunAI()
 	}
 }
 
+void APGAIController::TOMyFieldDead(int8 teamid)
+{
+	UBlackboardComponent* BlackboardComp = Blackboard.Get();
+	bool protectfield = BlackboardComp->GetValueAsBool(BBKEY_PROTECTFIELD);
+	if (protectfield)
+	{
+		APGField* myfield = Cast<APGField>(BlackboardComp->GetValueAsObject(BBKEY_MYFIELD));
+		if (myfield)
+		{
+			if(GetPawn())
+				myfield->DamageFieldGauge(GetPawn(),teamid);
+		}
+	}
+
+}
+
+void APGAIController::AIIsDead()
+{
+	BlackBoardReset();
+	StopAI();
+	StopMovement();
+
+}
+
+
 void APGAIController::StopAI()
 {
 	UBehaviorTreeComponent* BTComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
@@ -73,7 +99,12 @@ void APGAIController::BlackBoardReset()
 		
 		}
 
-		BlackboardComp->SetValueAsObject(BBKEY_TARGET,nullptr);
+		//BlackboardComp->SetValueAsObject(BBKEY_TARGET,nullptr);
+		BlackboardComp->ClearValue(BBKEY_PROTECTFIELD);
+		BlackboardComp->ClearValue(BBKEY_MYFIELD);
+		BlackboardComp->ClearValue(BBKEY_TARGET);
+		
+
 	}
 	
 }

@@ -188,7 +188,7 @@ protected:
 
 
 	UFUNCTION()
-	virtual void SetDead();
+	virtual void SetDead(int8 teamid);
 
 protected:
 	static const FString HitMontage;
@@ -201,7 +201,7 @@ protected:
 
 	//ÆÀ ¼¼ÆÃ
 public:
-	FORCEINLINE void SetteamId(uint8 teamId) { TeamId = teamId; }
+	virtual void SetteamId(uint8 teamId);
 
 	FORCEINLINE virtual void SetGenericTeamId(const FGenericTeamId& teamID) override { myteam = teamID; }
 

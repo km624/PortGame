@@ -22,12 +22,13 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void SetteamId(uint8 teamId) override;
 protected:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	virtual void NPCAttackHitStop(float time) override;
 
-	virtual void SetDead() override;
+	virtual void SetDead(int8 teamid) override;
 protected:
 	FTimerHandle NPCHitStoptimerHandle;
 

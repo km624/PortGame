@@ -60,5 +60,9 @@ public:
 
 protected:
 	TObjectPtr<APawn> TargetPawn;
+
+	//죽었을때 오버라이드
+protected:
+	virtual void SetDead(int8 teamid) override;
 	
 };

@@ -19,6 +19,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void InitializeField();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Field)
@@ -41,7 +42,7 @@ protected:
 	void SetTeamColor();
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Field")
 	uint8 TeamId;
 
 	FGenericTeamId myteam;
@@ -50,19 +51,31 @@ protected:
 protected:
 	void OnAISpawn();
 
-
-
 protected:
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Field")
 	TArray<TObjectPtr<class APGNpcCharacter>> AICharacters;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Field")
 	TArray<TObjectPtr<class UBaseCharacterDataAsset>> AIDatas;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 SpawnCount;
 
 
+public:
+	void DamageFieldGauge(class APawn* deadpawn,int8 attackteamid);
+
+	void ChangedField(int8 teamid);
+
+	//필드 게이지
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Field")
+	float MaxFieldGague = 100.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Field")
+	float currentFieldGauge;
+
+	float FieldDamage= 50.0f;
 
 
 };

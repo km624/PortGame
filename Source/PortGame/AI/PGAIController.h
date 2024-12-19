@@ -19,9 +19,17 @@ public:
 	APGAIController();
 
 public:
+
 	void SetMyFieldData(class APGField* field);
 
 	void RunAI();
+
+	void TOMyFieldDead(int8 teamid);
+
+	void AIIsDead();
+
+public:
+	
 	void StopAI();
 
 	void BlackBoardReset();

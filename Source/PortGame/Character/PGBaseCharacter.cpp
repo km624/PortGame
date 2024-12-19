@@ -362,7 +362,7 @@ void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperl
 
 }
 
-void APGBaseCharacter::SetDead()
+void APGBaseCharacter::SetDead(int8 teamid)
 {
 
 	//이동 기능 제한
@@ -383,6 +383,11 @@ void APGBaseCharacter::SetDead()
 	HpBarWidgetComponent->SetHiddenInGame(true);
 
 	//Destroy();
+}
+
+void APGBaseCharacter::SetteamId(uint8 teamId)
+{
+	TeamId = teamId;
 }
 
 void APGBaseCharacter::StartNiagaraEffect(UNiagaraSystem* niagara, FVector TargetLocation)

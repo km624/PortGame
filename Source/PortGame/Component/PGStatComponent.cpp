@@ -7,6 +7,7 @@
 #include "PortGame/PortGame.h"
 
 
+
 UPGStatComponent::UPGStatComponent()
 {
 	//const UDataTable* DataTable;
@@ -115,7 +116,7 @@ void UPGStatComponent::HitGaugeZeroEffect()
 	ResetHitGauge();
 }
 
-void UPGStatComponent::Damaged(float Damage)
+void UPGStatComponent::Damaged(float Damage, int8 teamid)
 {
 
 	GetWorld()->GetTimerManager().ClearTimer(ResetHitGaugeTimer);
@@ -129,8 +130,8 @@ void UPGStatComponent::Damaged(float Damage)
 
 	if (CurrentHp <= KINDA_SMALL_NUMBER)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Stat : Dead"));
-		OnHpZero.Broadcast();
+			OnHpZero.Broadcast(teamid);
+		
 	}
 	
 }
