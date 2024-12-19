@@ -11,6 +11,7 @@
 #include "UI/PGGunWidget.h"
 #include "UI/PGReloadWidget.h"
 #include "PortGame/PortGame.h"
+#include "UI/PGFieldUserWidget.h"
 
 
 UPGHudWidget::UPGHudWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -130,6 +131,21 @@ void UPGHudWidget::ChangeCrosshair(bool bInRange)
 		
 		Image_CrossHair->SetColorAndOpacity(RedTint);
 	}
+}
+
+void UPGHudWidget::SetupFieldGauge(uint8 teamid, float maxgauge, float currentgauge)
+{
+	BP_FieldGauge->SetUpWidget(teamid, maxgauge, currentgauge);
+}
+
+void UPGHudWidget::UpdateFieldGague(float newGauge)
+{
+	BP_FieldGauge->UpdateFieldGauge(newGauge);
+}
+
+void UPGHudWidget::CollapsedFieldGauge()
+{
+	BP_FieldGauge->SetVisibility(ESlateVisibility::Collapsed);
 }
 
 

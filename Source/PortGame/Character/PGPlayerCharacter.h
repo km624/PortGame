@@ -327,6 +327,7 @@ public:
 
 	void RemoveHudWidget();
 
+	FORCEINLINE class UPGHudWidget* GetPlayerHudWidget() { return PGHudWidget; }
 protected:
 	//HUD의 클래스 정보
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HUD)
@@ -335,7 +336,9 @@ protected:
 	//생성할 위젯을 담을 위젯 포인트 보관하는 변수
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
 	TObjectPtr<class UPGHudWidget> PGHudWidget;
-		
+	
+	//FieldGauge hud
+
 
 	//캐릭터 교체 
 protected:

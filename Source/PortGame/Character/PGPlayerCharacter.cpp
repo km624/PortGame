@@ -57,12 +57,6 @@ APGPlayerCharacter::APGPlayerCharacter()
 		AimCurve = aimCurve.Object;
 	}
 
-	/*static ConstructorHelpers::FObjectFinder<UAnimMontage> DashMon(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/DashMontage.DashMontage'"));
-	if (DashMon.Object)
-	{
-		DashMontage = DashMon.Object;
-	}*/
-
 	//Hud위젯
 	static ConstructorHelpers::FClassFinder<UPGHudWidget> ABHUDWidgetRef(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/PortGame/UI/BP_HudWidget.BP_HudWidget_C'"));
 	if (ABHUDWidgetRef.Class)
@@ -140,18 +134,6 @@ APGPlayerCharacter::APGPlayerCharacter()
 		DashAction = Dash.Object;
 	}
 
-	//static ConstructorHelpers::FObjectFinder<UAnimMontage> EvadeLeft(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/EvadeLeftMontage.EvadeLeftMontage'"));
-	//if (EvadeLeft.Object)
-	//{
-	//	LeftEvadeMontage = EvadeLeft.Object;
-	//}
-
-	//static ConstructorHelpers::FObjectFinder<UAnimMontage> EvadeRight(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/EvadeRightMontage.EvadeRightMontage'"));
-	//if (EvadeRight.Object)
-	//{
-	//	RightEvadeMontage = EvadeRight.Object;
-	//}
-
 	static ConstructorHelpers::FClassFinder<UCameraShakeBase> EvadeCameraShake(TEXT("/Script/Engine.Blueprint'/Game/PortGame/Effect/CameraShake/EvadeCameraShake.EvadeCameraShake_C'"));
 	if (EvadeCameraShake.Class)
 	{
@@ -205,10 +187,7 @@ void APGPlayerCharacter::BeginPlay()
 	
 
 	SetCharacterData(CurrentControlData);
-	//임시로
-	/*StatComponent->SetCurrentRarity(TEXT("Normal"));
-	StatComponent->SetHitGauge(GetTotalStat().HitGauge);
-	StatComponent->SetHp(GetTotalStat().MaxHp);*/
+	
 
 	FOnTimelineFloat TimelineProgress;
 	TimelineProgress.BindUFunction(this, FName("AimUpdate"));
@@ -225,10 +204,7 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	// 인풋 매핑이 있다면
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
-		// Jumping
-		/*EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);*/
-
+		
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APGPlayerCharacter::Move);
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APGPlayerCharacter::SetNoneMove);
@@ -990,6 +966,7 @@ void APGPlayerCharacter::RemoveHudWidget()
 	
 	SLOG(TEXT("%s: REmoveviewport"), *GetActorNameOrLabel());
 }
+
 
 void APGPlayerCharacter::OneChangePlayerCharacter()
 {

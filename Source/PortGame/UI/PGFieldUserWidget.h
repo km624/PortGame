@@ -27,7 +27,7 @@ public:
 
 	void SetUpWidget(uint8 teamid,float maxgauge,float currentgauge);
 
-
+	void ChangeColor(uint8 teamid);
 	UFUNCTION()
 	void UpdateFieldGauge(float Newgauge);
 
@@ -47,15 +47,13 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UProgressBar> ProgressBar_FieldGauge;
 
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UImage> Image_Active;
 	
 	UPROPERTY()
 	float MaxFieldGauge;
 
 	//14°­ ÇöÀç hp
 	UPROPERTY()
-	float CurrentFieelGauge;
+	float CurrentFieldGauge;
 
 	
 };

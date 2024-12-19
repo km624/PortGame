@@ -68,6 +68,14 @@ public:
 	void ChangeCrosshair(bool bInRange);
 
 
+public:
+	UFUNCTION()
+	void SetupFieldGauge(uint8 teamid, float maxgauge, float currentgauge);
+	UFUNCTION()
+	void UpdateFieldGague(float newGauge);
+	UFUNCTION()
+	void CollapsedFieldGauge();
+
 protected:
 	
 
@@ -104,6 +112,9 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPGReloadWidget> BP_ReloadWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGFieldUserWidget> BP_FieldGauge;
 
 
 	//UPROPERTY()

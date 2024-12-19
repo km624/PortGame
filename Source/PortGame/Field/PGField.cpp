@@ -8,6 +8,8 @@
 #include "AI/PGAIController.h"
 #include "Components/StaticMeshComponent.h"
 #include "PortGame/PortGame.h"
+#include "Character/PGPlayerCharacter.h"
+#include "UI/PGHudWidget.h"
 
 
 // Sets default values
@@ -32,8 +34,9 @@ void APGField::BeginPlay()
 	Super::BeginPlay();
 
 	AIField->OnComponentBeginOverlap.AddDynamic(this, &APGField::OnOverlapBegin);
+	AIField->OnComponentEndOverlap.AddDynamic(this, &APGField::OnOverlapEnd);
 	
-	InitializeField();
+	InitializeField(TeamId);
 
 	for(int i = 0; i < SpawnCount ;i++)
 	{
@@ -41,11 +44,11 @@ void APGField::BeginPlay()
 	}
 }
 
-void APGField::InitializeField()
+void APGField::InitializeField(uint8 teamid)
 {
 	currentFieldGauge = MaxFieldGague;
 
-	SetGenericTeamId(TeamId);
+	SetGenericTeamId(teamid);
 
 	SetTeamColor();
 }
@@ -54,15 +57,44 @@ void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 {
 	if (OtherActor)
 	{
-		IGenericTeamAgentInterface* otherteam = Cast<IGenericTeamAgentInterface>(OtherActor);
-		if (otherteam)
+	
+		APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OtherActor);
+		if (playerCharacter)
 		{
-			if (otherteam->GetTeamAttitudeTowards(*this))
+			if (!PlayerCharacters.Contains(playerCharacter))
 			{
-				SLOG(TEXT("NotMyTeam"));
+				PlayerCharacters.Add(playerCharacter);
+				
+				if (playerCharacter->GetPlayerHudWidget())
+				{
+					
+					playerCharacter->GetPlayerHudWidget()->SetupFieldGauge(TeamId, MaxFieldGague, currentFieldGauge);
+				}
 			}
-			else
-				SLOG(TEXT("MyTeam"));
+
+		}
+	}
+
+}
+	
+
+
+void APGField::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor)
+	{
+		
+		APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OtherActor);
+		if (playerCharacter)
+		{
+			if (PlayerCharacters.Contains(playerCharacter))
+			{
+				
+				playerCharacter->GetPlayerHudWidget()->CollapsedFieldGauge();
+				PlayerCharacters.Remove(playerCharacter);
+
+			}
+
 		}
 	}
 }
@@ -152,9 +184,18 @@ void APGField::OnAISpawn()
 
 void APGField::DamageFieldGauge(class APawn* deadpawn, int8 attackteamid)
 {
-
 	currentFieldGauge -= FieldDamage;
-	SLOG(TEXT("FieldDamage"));
+	
+	if (PlayerCharacters.Num() > 0)
+	{
+		for (TObjectPtr<APGPlayerCharacter>& palyerCharacter : PlayerCharacters)
+		{
+			if (palyerCharacter)
+			{
+				palyerCharacter->GetPlayerHudWidget()->UpdateFieldGague(currentFieldGauge);
+			}
+		}
+	}
 
 	APGNpcCharacter* deadnpc = Cast<APGNpcCharacter>(deadpawn);
 	if (AICharacters.Contains(deadnpc))
@@ -162,25 +203,44 @@ void APGField::DamageFieldGauge(class APawn* deadpawn, int8 attackteamid)
 		AICharacters.Remove(deadnpc);
 	}
 
+
 	if (currentFieldGauge<=0)
 	{
+
 		ChangedField(attackteamid);
-		SLOG(TEXT("Now %d team"), attackteamid);
-		SLOG(TEXT("FieldGaugeOver"));
+		
 	}
 }
 
 void APGField::ChangedField(int8 teamid)
 {
-	for (TObjectPtr<APGNpcCharacter>& AICharacter : AICharacters)
+	if (AICharacters.Num()> 0)
 	{
-		if (AICharacter) 
+		for (TObjectPtr<APGNpcCharacter>& AICharacter : AICharacters)
 		{
-			AICharacter->SetteamId(teamid);
+			if (AICharacter)
+			{
+				AICharacter->SetteamId(teamid);
+				AICharacter->ChangeNpcColor();
 
-			AICharacter->ChangeNpcColor();
+			}
 		}
 	}
+
+	InitializeField(teamid);
+
+	if (PlayerCharacters.Num() > 0)
+	{
+		for (TObjectPtr<APGPlayerCharacter>& palyerCharacter : PlayerCharacters)
+		{
+			if (palyerCharacter)
+			{
+				palyerCharacter->GetPlayerHudWidget()->SetupFieldGauge(TeamId,MaxFieldGague,currentFieldGauge);
+			}
+		}
+	}
+
+
 }
 
 

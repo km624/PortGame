@@ -19,7 +19,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	void InitializeField();
+	void InitializeField(uint8 teamid);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AIFieldData)
@@ -30,8 +30,8 @@ protected:
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);
-
-
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	//Field ÆÀ ¼³Á¤
 public:
 	FORCEINLINE virtual void SetGenericTeamId(const FGenericTeamId& teamID) override { TeamId = teamID; myteam = teamID; }
@@ -64,6 +64,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
 	int32 SpawnCount;
 
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AIFieldData")
+	TArray<TObjectPtr<class APGPlayerCharacter>> PlayerCharacters;
+
 
 public:
 	void DamageFieldGauge(class APawn* deadpawn,int8 attackteamid);
@@ -79,7 +83,7 @@ protected:
 	float currentFieldGauge;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
-	float FieldDamage= 50.0f;
+	float FieldDamage= 25.0f;
 
 
 };
