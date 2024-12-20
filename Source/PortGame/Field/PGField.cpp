@@ -10,6 +10,8 @@
 #include "PortGame/PortGame.h"
 #include "Character/PGPlayerCharacter.h"
 #include "UI/PGHudWidget.h"
+#include "GameLevel/PGGameLevelScriptActor.h"
+
 
 
 // Sets default values
@@ -36,12 +38,25 @@ void APGField::BeginPlay()
 	AIField->OnComponentBeginOverlap.AddDynamic(this, &APGField::OnOverlapBegin);
 	AIField->OnComponentEndOverlap.AddDynamic(this, &APGField::OnOverlapEnd);
 	
-	InitializeField(TeamId);
+	SetGenericTeamId(TeamId);
 
-	for(int i = 0; i < SpawnCount ;i++)
+	//InitializeField(TeamId);
+
+	/*for(int i = 0; i < SpawnCount ;i++)
 	{
 		OnAISpawn();
+	}*/
+}
+
+void APGField::SetUpField(APGGameLevelScriptActor* levelscriptactor)
+{
+	
+	if (levelscriptactor)
+	{
+		mylevelScriptActor = levelscriptactor;
 	}
+
+	InitializeField(TeamId);
 }
 
 void APGField::InitializeField(uint8 teamid)
@@ -49,8 +64,11 @@ void APGField::InitializeField(uint8 teamid)
 	currentFieldGauge = MaxFieldGague;
 
 	SetGenericTeamId(teamid);
-
+	
 	SetTeamColor();
+
+	FindClosetField();
+
 }
 
 void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
@@ -76,7 +94,6 @@ void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 	}
 
 }
-	
 
 
 void APGField::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -226,7 +243,7 @@ void APGField::ChangedField(int8 teamid)
 			}
 		}
 	}
-
+	
 	InitializeField(teamid);
 
 	if (PlayerCharacters.Num() > 0)
@@ -241,6 +258,17 @@ void APGField::ChangedField(int8 teamid)
 	}
 
 
+}
+
+void APGField::FindClosetField()
+{
+
+	APGField* target = mylevelScriptActor->FoundEnemyField(this);
+	if (target != nullptr)
+	{
+		TargetField = target;
+	}
+	
 }
 
 
