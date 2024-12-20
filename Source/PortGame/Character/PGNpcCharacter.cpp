@@ -157,7 +157,7 @@ void APGNpcCharacter::SetDead(int8 teamid)
 {
 	Super::SetDead(teamid);
 
-	APGAIController* aiController = Cast<APGAIController>(GetController());
+	//APGAIController* aiController = Cast<APGAIController>(GetController());
 	
 	//죽으면 모두 초기화
 	//OnAttackFinished.Unbind();

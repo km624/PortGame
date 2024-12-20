@@ -7,3 +7,5 @@
 #define BBKEY_CIRCLEPOS TEXT("CirclePos")
 #define BBKEY_MYFIELD	TEXT("MyField")
 #define BBKEY_PROTECTFIELD	TEXT("ProtectField")
+#define BBKEY_NEXTATTACKFIELD	TEXT("NextAttackField")
+

@@ -22,6 +22,8 @@ public:
 
 	void SetMyFieldData(class APGField* field);
 
+	void SetAttackAIData();
+
 	void RunAI();
 
 	void TOMyFieldDead(int8 teamid);

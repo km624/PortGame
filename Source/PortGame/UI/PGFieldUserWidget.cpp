@@ -82,8 +82,4 @@ void UPGFieldUserWidget::SmoothingGauge(float deltatime)
 	ProgressBar_FieldGauge->SetPercent(newfieldGaugePercent);
 	PreviousGaugePercent = newfieldGaugePercent;
 
-	//float CurrentultiGaugePercent = CurrentUltiSkillGauge / MaxUltiSkillGauge;
-	//float newultiskillGaugePercent = FMath::FInterpTo(PreviousUltiPercent, CurrentultiGaugePercent, deltatime, 3.0f);
-	//ProgressBar_UltiSkillGauge->SetPercent(newultiskillGaugePercent);
-	//PreviousUltiPercent = newultiskillGaugePercent;
 }

@@ -40,22 +40,11 @@ void APGField::BeginPlay()
 	
 	SetGenericTeamId(TeamId);
 
-	//InitializeField(TeamId);
-
-	/*for(int i = 0; i < SpawnCount ;i++)
-	{
-		OnAISpawn();
-	}*/
 }
 
-void APGField::SetUpField(APGGameLevelScriptActor* levelscriptactor)
+void APGField::SetUpField()
 {
 	
-	if (levelscriptactor)
-	{
-		mylevelScriptActor = levelscriptactor;
-	}
-
 	InitializeField(TeamId);
 }
 
@@ -67,8 +56,16 @@ void APGField::InitializeField(uint8 teamid)
 	
 	SetTeamColor();
 
-	FindClosetField();
 
+	for (int i = 0; i < SpawnCount; i++)
+	{
+		OnAISpawn();
+	}
+
+	for (int i = 0; i < AttackAISpawnCount; i++)
+	{
+		OnAttackAISpawn();
+	}
 }
 
 void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
@@ -215,11 +212,17 @@ void APGField::DamageFieldGauge(class APawn* deadpawn, int8 attackteamid)
 	}
 
 	APGNpcCharacter* deadnpc = Cast<APGNpcCharacter>(deadpawn);
-	if (AICharacters.Contains(deadnpc))
+	if (deadnpc)
 	{
-		AICharacters.Remove(deadnpc);
+		if (AICharacters.Contains(deadnpc))
+		{
+			AICharacters.Remove(deadnpc);
+		}
 	}
+	else
+		SLOG(TEXT("NODeadNPC"));
 
+	OnAISpawn();
 
 	if (currentFieldGauge<=0)
 	{
@@ -243,8 +246,13 @@ void APGField::ChangedField(int8 teamid)
 			}
 		}
 	}
-	
-	InitializeField(teamid);
+	currentFieldGauge = MaxFieldGague;
+
+	SetGenericTeamId(teamid);
+
+	SetTeamColor();
+	//InitializeField(teamid);
+
 
 	if (PlayerCharacters.Num() > 0)
 	{
@@ -260,15 +268,51 @@ void APGField::ChangedField(int8 teamid)
 
 }
 
-void APGField::FindClosetField()
+void APGField::OnAttackAISpawn()
 {
+	FVector FieldSize = GetActorScale() * 50.0f;
 
-	APGField* target = mylevelScriptActor->FoundEnemyField(this);
-	if (target != nullptr)
+	FVector SpawnLocation = FVector(FMath::FRandRange(-FieldSize.X, FieldSize.X), FMath::FRandRange(-FieldSize.Y, FieldSize.Y), 100.0f) + GetActorLocation();
+	FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f);
+
+	// Spawn the grenade
+	APGNpcCharacter* AiCharacter = Cast<APGNpcCharacter>((GetWorld()->SpawnActorDeferred<APGNpcCharacter>(
+		APGNpcCharacter::StaticClass(),
+		FTransform(SpawnRotation, SpawnLocation),
+		Owner,
+		nullptr
+	)));
+
+	if (AiCharacter)
 	{
-		TargetField = target;
+		AICharacters.Add(AiCharacter);
+
+		AiCharacter->SetCharacterData(AIDatas[0]);
+		AiCharacter->SetteamId(TeamId);
+
+		AiCharacter->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
 	}
-	
+
+	APGAIController* pgAIcontoller = Cast<APGAIController>((GetWorld()->SpawnActorDeferred<APGAIController>(
+		APGAIController::StaticClass(),
+		FTransform(SpawnRotation, SpawnLocation),
+		Owner,
+		nullptr
+	)));
+
+	if (pgAIcontoller)
+	{
+
+		pgAIcontoller->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+		//어택 가는 ai  데이타 
+		pgAIcontoller->SetAttackAIData();
+		//빙의시 바로 행동트리 시작
+		pgAIcontoller->Possess(AiCharacter);
+
+
+	}
+
 }
+
 
 

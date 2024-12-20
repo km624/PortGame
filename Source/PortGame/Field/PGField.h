@@ -20,7 +20,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void SetUpField(class APGGameLevelScriptActor* levelscriptactor);
+	void SetUpField();
 
 protected:
 	void InitializeField(uint8 teamid);
@@ -89,17 +89,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
 	float FieldDamage= 25.0f;
 
-	//Å¸°Ù ÇÊµå
 
 protected:
-	void FindClosetField();
-
+	void OnAttackAISpawn();
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AIFieldData")
-	TObjectPtr<class APGGameLevelScriptActor> mylevelScriptActor;
-
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly ,Category = "AIFieldData")
-	TObjectPtr<class APGField> TargetField;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
+	int32 AttackAISpawnCount;
+	
 
 };

@@ -4,38 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "Engine/LevelScriptActor.h"
+#include "Interface/FieldManagerInterface.h"
 #include "PGGameLevelScriptActor.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PORTGAME_API APGGameLevelScriptActor : public ALevelScriptActor
+class PORTGAME_API APGGameLevelScriptActor : public ALevelScriptActor, public IFieldManagerInterface
 {
 	GENERATED_BODY()
 
 public:
 	APGGameLevelScriptActor();
 	
-
 protected:
 	virtual void BeginPlay() override;
 
+protected:
+	virtual UFieldManager* GetFieldManager() const override;
 
-public:
 
-	class APGField* FoundEnemyField(class APGField* field);
 
 protected:
+	TObjectPtr<class UFieldManager> FieldManager;
 
-
-	void FindAllFields();
-
-
-	void StartAllFields();
-
-protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Field")
-	TArray<TObjectPtr<class APGField>> Fields;
-	
 };

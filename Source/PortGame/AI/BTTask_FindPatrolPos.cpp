@@ -4,7 +4,7 @@
 #include "AI/BTTask_FindPatrolPos.h"
 #include "PGAI.h"
 #include "AIController.h"
-#include "NavigationSystem.h"
+//#include "NavigationSystem.h"
 #include "BehaviorTree/BlackboardComponent.h"
 //#include "Interface/PGNPCCharacterInterface.h"
 #include "Interface/PGAICharacterInterface.h"
@@ -23,12 +23,12 @@ EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& O
 		return EBTNodeResult::Failed;
 	}
 
-	//버전업이 되서 V1
-	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld());
-	if (NavSystem == NULL)
-	{
-		return EBTNodeResult::Failed;
-	}
+	////버전업이 되서 V1
+	//UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld());
+	//if (NavSystem == NULL)
+	//{
+	//	return EBTNodeResult::Failed;
+	//}
 
 	IPGAICharacterInterface* AIPawn = Cast<IPGAICharacterInterface>(ControllingPawn);
 	if (AIPawn == NULL)

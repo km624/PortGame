@@ -37,6 +37,15 @@ void APGAIController::SetMyFieldData(APGField* field)
 	
 }
 
+void APGAIController::SetAttackAIData()
+{
+	UBlackboardComponent* BlackboardComp = Blackboard.Get();
+	if (UseBlackboard(BBAsset, BlackboardComp))
+	{
+		BlackboardComp->SetValueAsBool(BBKEY_PROTECTFIELD, false);
+	}
+}
+
 void APGAIController::RunAI()
 {
 	//SLOG(TEXT("RunAi"));
