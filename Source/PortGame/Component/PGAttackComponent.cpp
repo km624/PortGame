@@ -21,6 +21,9 @@
 #include "Data/CharacterEnumData.h"
 #include "NiagaraSystem.h" 
 #include "Data/BaseCharacterDataAsset.h"
+#include "Engine/LevelScriptActor.h"
+#include "Field/ObjectPoolManager.h"
+#include "Interface/ObjectPoolingInterface.h"
 
 
 UPGAttackComponent::UPGAttackComponent()
@@ -58,10 +61,13 @@ void UPGAttackComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
 }
 
 void UPGAttackComponent::SetupAttackData(UBaseCharacterDataAsset* attackdata)
 {
+
+	
 	WeaponData = attackdata->WeaponData;
 	SkillClass = attackdata->SkillClass;
 	UltiSkillClass = attackdata->UltiSkillClass;
@@ -75,7 +81,11 @@ void UPGAttackComponent::SetupAttackData(UBaseCharacterDataAsset* attackdata)
 void UPGAttackComponent::SetWeaponClass()
 {
 	if (WeaponData)
+	{
+		
 		WeaponClass = WeaponData->WeaponClass;
+	}
+	
 
 	
 		
@@ -85,21 +95,40 @@ void UPGAttackComponent::SetUpWeapon()
 {
 	if (WeaponClass)
 	{
+		AWeapon* spawnWeapon = nullptr;
+
+		APGPlayerCharacter* player = Cast<APGPlayerCharacter>(GetOwner());
+		if (player)
+		{
+			spawnWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClass);
+		}
+		else
+		{
+			IObjectPoolingInterface* poolmanager = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
+			if (poolmanager)
+			{
+
+				spawnWeapon = poolmanager->GetObjectPoolManager()->GetWeaponPooledObject(WeaponClass);
+			}
+		}
+
+
+		if (spawnWeapon != nullptr)
+		{
+			Weapon = spawnWeapon;
+
+			APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
+
+			spawnWeapon->OnInitializeWeapon(BaseCharacter, WeaponData);
+
+			spawnWeapon->AttachToComponent(BaseCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, spawnWeapon->GetWeaponFname());
+
+			BaseCharacter->SetUpModifierStat(spawnWeapon->ModifierStat);
+
+			OnNextCombo.AddUObject(Weapon, &AWeapon::SetHasNextCombo);
+
+		}
 		
-		AWeapon* spawnWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClass);
-
-		Weapon = spawnWeapon;
-		
-		APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
-
-		spawnWeapon->OnInitializeWeapon(BaseCharacter, WeaponData);
-
-		spawnWeapon->AttachToComponent(BaseCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, spawnWeapon->GetWeaponFname());
-		
-		BaseCharacter->SetUpModifierStat(spawnWeapon->ModifierStat);
-
-		OnNextCombo.AddUObject(Weapon, &AWeapon::SetHasNextCombo);
-
 	}
 
 }
@@ -114,6 +143,18 @@ void UPGAttackComponent::AttackToWeapon()
 	if (Weapon)
 		Weapon->Attack();
 	
+}
+
+void UPGAttackComponent::ReturnWeaponPool()
+{
+	if (Weapon)
+	{
+		IObjectPoolingInterface* poolmanager = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
+		if (poolmanager)
+		{
+			poolmanager->GetObjectPoolManager()->ReturnWeaponObjectToPool(Weapon);
+		}
+	}
 }
 
 void UPGAttackComponent::ComboCheckStart()

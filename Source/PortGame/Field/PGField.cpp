@@ -10,7 +10,10 @@
 #include "PortGame/PortGame.h"
 #include "Character/PGPlayerCharacter.h"
 #include "UI/PGHudWidget.h"
-#include "GameLevel/PGGameLevelScriptActor.h"
+#include "Interface/ObjectPoolingInterface.h"
+#include "Engine/LevelScriptActor.h"
+#include "Field/ObjectPoolManager.h"
+
 
 
 
@@ -38,7 +41,7 @@ void APGField::BeginPlay()
 	AIField->OnComponentBeginOverlap.AddDynamic(this, &APGField::OnOverlapBegin);
 	AIField->OnComponentEndOverlap.AddDynamic(this, &APGField::OnOverlapEnd);
 	
-	SetGenericTeamId(TeamId);
+	//SetGenericTeamId(TeamId);
 
 }
 
@@ -57,15 +60,15 @@ void APGField::InitializeField(uint8 teamid)
 	SetTeamColor();
 
 
-	for (int i = 0; i < SpawnCount; i++)
+	for (int i = AICharacters.Num(); i < SpawnCount; i++)
 	{
 		OnAISpawn();
 	}
 
-	for (int i = 0; i < AttackAISpawnCount; i++)
-	{
-		OnAttackAISpawn();
-	}
+	//for (int i = 0; i < AttackAISpawnCount; i++)
+	//{
+	//	OnAttackAISpawn();
+	//}
 }
 
 void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
@@ -155,43 +158,67 @@ void APGField::OnAISpawn()
 	FVector SpawnLocation = FVector(FMath::FRandRange(-FieldSize.X, FieldSize.X) , FMath::FRandRange(-FieldSize.Y, FieldSize.Y), 100.0f) + GetActorLocation();
 	FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f);
 
-	// Spawn the grenade
-	APGNpcCharacter* AiCharacter = Cast<APGNpcCharacter>((GetWorld()->SpawnActorDeferred<APGNpcCharacter>(
-		APGNpcCharacter::StaticClass(),
-		FTransform(SpawnRotation, SpawnLocation),
-		Owner,
-		nullptr
-	)));
-
-	if (AiCharacter)
+	IObjectPoolingInterface* poolmanager = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
+	
+	if (poolmanager)
 	{
-		AICharacters.Add(AiCharacter);
+		//소환될 데이터 
+		FCharacterSpawnParams Params;
+		Params.SpawnLocation = SpawnLocation;
+		Params.SpawnRotation = SpawnRotation;
+		Params.CharacterData = AIDatas[0];
+		Params.TeamId = TeamId;
+		Params.Field = this;
+		Params.bFieldProtect = true;
 
-		AiCharacter->SetCharacterData(AIDatas[0]);
-		AiCharacter->SetteamId(TeamId);
-		
-		AiCharacter->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+
+		APGNpcCharacter* aicharacter = poolmanager->GetObjectPoolManager()->GetPooledObject(Params);
+
+		if (aicharacter)
+		{
+			AICharacters.Add(aicharacter);
+
+		}
 	}
 	
-	APGAIController* pgAIcontoller = Cast<APGAIController>((GetWorld()->SpawnActorDeferred<APGAIController>(
-		APGAIController::StaticClass(),
-		FTransform(SpawnRotation, SpawnLocation),
-		Owner,
-		nullptr
-	)));
 
-	if (pgAIcontoller)
-	{
-		
-		pgAIcontoller->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
-		//먼저 필드 값을 세팅
-		pgAIcontoller->SetMyFieldData(this);
-		
-		//빙의시 바로 행동트리 시작
-		pgAIcontoller->Possess(AiCharacter);
-		
-		
-	}
+	//// Spawn the grenade
+	//APGNpcCharacter* AiCharacter = Cast<APGNpcCharacter>((GetWorld()->SpawnActorDeferred<APGNpcCharacter>(
+	//	APGNpcCharacter::StaticClass(),
+	//	FTransform(SpawnRotation, SpawnLocation),
+	//	Owner,
+	//	nullptr
+	//)));
+
+	//if (AiCharacter)
+	//{
+	//	AICharacters.Add(AiCharacter);
+
+	//	AiCharacter->SetCharacterData(AIDatas[0]);
+	//	AiCharacter->SetteamId(TeamId);
+	//	
+	//	AiCharacter->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+	//}
+	//
+	//APGAIController* pgAIcontoller = Cast<APGAIController>((GetWorld()->SpawnActorDeferred<APGAIController>(
+	//	APGAIController::StaticClass(),
+	//	FTransform(SpawnRotation, SpawnLocation),
+	//	Owner,
+	//	nullptr
+	//)));
+
+	//if (pgAIcontoller)
+	//{
+	//	
+	//	pgAIcontoller->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+	//	//먼저 필드 값을 세팅
+	//	pgAIcontoller->SetMyFieldData(this);
+	//	
+	//	//빙의시 바로 행동트리 시작
+	//	pgAIcontoller->Possess(AiCharacter);
+	//	
+	//	
+	//}
 
 	
 }
@@ -199,7 +226,8 @@ void APGField::OnAISpawn()
 void APGField::DamageFieldGauge(class APawn* deadpawn, int8 attackteamid)
 {
 	currentFieldGauge -= FieldDamage;
-	
+
+
 	if (PlayerCharacters.Num() > 0)
 	{
 		for (TObjectPtr<APGPlayerCharacter>& palyerCharacter : PlayerCharacters)
@@ -246,12 +274,8 @@ void APGField::ChangedField(int8 teamid)
 			}
 		}
 	}
-	currentFieldGauge = MaxFieldGague;
 
-	SetGenericTeamId(teamid);
-
-	SetTeamColor();
-	//InitializeField(teamid);
+	InitializeField(teamid);
 
 
 	if (PlayerCharacters.Num() > 0)

@@ -34,11 +34,15 @@ protected:
 	virtual void NPCAttackHitStop(float time) override;
 
 	virtual void SetDead(int8 teamid) override;
-protected:
-	FTimerHandle NPCHitStoptimerHandle;
 
+	void ReturnCharacterToPool();
+protected:
+	
+	FTimerHandle NPCHitStoptimerHandle;
+	
 	float currentSlowtime;
 
+	FTimerHandle DeadHiddentimerHandle;
 
 protected:
 	virtual void PlayHitMontage() override;

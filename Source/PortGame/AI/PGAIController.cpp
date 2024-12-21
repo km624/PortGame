@@ -77,8 +77,11 @@ void APGAIController::TOMyFieldDead(int8 teamid)
 void APGAIController::AIIsDead()
 {
 	StopMovement();
+	ClearFocus(EAIFocusPriority::Gameplay);
+	
 	BlackBoardReset();
 	StopAI();
+	UnPossess();
 	
 }
 

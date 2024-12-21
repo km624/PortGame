@@ -7,11 +7,12 @@
 #include "Component/PGStatComponent.h"
 #include "Physics/PGCollision.h"
 #include "GameFramework/CharacterMovementComponent.h"
-//#include "Struct/PGGunStat.h"
-//#include "Data/GunWeaponData.h"
-//#include "Component/PGAttackComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
+#include "Field/ObjectPoolManager.h"
+#include "Engine/LevelScriptActor.h"
+#include "Interface/ObjectPoolingInterface.h"
+#include "Component/PGAttackComponent.h"
 
 
 APGNpcCharacter::APGNpcCharacter()
@@ -50,10 +51,6 @@ void APGNpcCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//임시
-	/*StatComponent->SetCurrentRarity(TEXT("NPC"));
-	StatComponent->SetHitGauge(GetTotalStat().HitGauge);
-	StatComponent->SetHp(GetTotalStat().MaxHp);*/
 
 	if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
 	{
@@ -157,100 +154,38 @@ void APGNpcCharacter::SetDead(int8 teamid)
 {
 	Super::SetDead(teamid);
 
-	//APGAIController* aiController = Cast<APGAIController>(GetController());
-	
-	//죽으면 모두 초기화
-	//OnAttackFinished.Unbind();
+	CustomTimeDilation = 1.0f;
+
 	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
 
 	NAParryUpdateEnd();
+
 	GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
 	
+	GetWorld()->GetTimerManager().SetTimer(
+		DeadHiddentimerHandle,
+		[this]() {
+			
+			if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+			{
+				AnimInstance->StopAllMontages(0.0f);
+			}
+			AttackComponent->ReturnWeaponPool();
+			ReturnCharacterToPool();
+			GetWorld()->GetTimerManager().ClearTimer(DeadHiddentimerHandle);
+		}, 2.0f, false);
 
-	/*if (aiController)
-	{
-		SLOG(TEXT("AI DEAD"));
-		aiController->BlackBoardReset();
-		aiController->StopAI();
-		aiController->StopMovement();
-	}*/
 }
 
-//float APGNpcCharacter::GetPatrolRadius()
-//{
-//
-//	return PatrolRadius;
-//}
-//
-//float APGNpcCharacter::GetAIDetectRange()
-//{
-//	
-//	if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
-//	{
-//		UGunWeaponData* gundata = Cast<UGunWeaponData>(AttackComponent->GetWeaponData());
-//		if (gundata)
-//		{
-//			
-//			return DetectRange*1.25;
-//		}
-//	}
-//	
-//	return DetectRange;
-//}
-//
-//float APGNpcCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
-//{
-//	if (pawn)
-//	{
-//		TargetPawn = pawn;
-//		
-//	}
-//	if (targetDistance > GetTotalStat().AttackRange * 2.5f)
-//	{
-//		if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
-//		{
-//			UGunWeaponData* gundata = Cast<UGunWeaponData>(AttackComponent->GetWeaponData());
-//			if (gundata)
-//			{
-//				bIsShoot = true;
-//				bIsAim = true;
-//				
-//				
-//				return gundata->GunStat.traceDistance * 0.75;
-//			}
-//		}
-//	}
-//
-//	bIsShoot = false;
-//	bIsAim = false;
-//	
-//
-//	return GetTotalStat().AttackRange*2;
-//}
-//
-//void APGNpcCharacter::AttackByAI()
-//{
-//	
-//	AttackToComponent();
-//	
-//	bIsShoot = false;
-//	OnbIsShoot.Broadcast(bIsShoot);
-//}
-//
-//void APGNpcCharacter::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
-//{
-//	OnAttackFinished = InOnAttackFinished;
-//}
-//
-//void APGNpcCharacter::NotifyComboEnd()
-//{
-//	OnAttackFinished.ExecuteIfBound();
-//}
-//
-//float APGNpcCharacter::AITurnSpeed()
-//{
-//	return TurnSpeed;
-//}
+void APGNpcCharacter::ReturnCharacterToPool()
+{
+	IObjectPoolingInterface* poolmanager = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
+	if (poolmanager)
+	{
+		poolmanager->GetObjectPoolManager()->ReturnObjectToPool(this);
+	}
+}
+
 
 void APGNpcCharacter::PlayHitMontage()
 {

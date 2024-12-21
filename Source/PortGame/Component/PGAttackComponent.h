@@ -33,6 +33,8 @@ public:
 
 	void AttackToWeapon();
 
+	void ReturnWeaponPool();
+
 	FORCEINLINE class UWeaponData* GetWeaponData() { return WeaponData; }
 
 	FORCEINLINE class AWeapon* GetWeapon() { return Weapon; }

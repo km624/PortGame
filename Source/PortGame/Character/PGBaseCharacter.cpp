@@ -99,20 +99,7 @@ APGBaseCharacter::APGBaseCharacter()
 		UE_LOG(LogTemp, Warning, TEXT("WidgetClassFail"));
 	}
 
-	//hitMontage
-	/*static ConstructorHelpers::FObjectFinder<class UAnimMontage>
-		MONTAGE_HIT(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/HitMontage.HitMontage'"));
-	if (MONTAGE_HIT.Object)
-	{
-		HitMontage = MONTAGE_HIT.Object;
-	}*/
-
-	/*static ConstructorHelpers::FObjectFinder<class UAnimMontage>
-		MONTAGE_DEAD(TEXT("/Script/Engine.AnimMontage'/Game/PortGame/Animation/Base/DeadSMontage.DeadSMontage'"));
-	if (MONTAGE_DEAD.Object)
-	{
-		DeadMontage = MONTAGE_DEAD.Object;
-	}*/
+	
 
 	//나이아가라
 
@@ -148,9 +135,27 @@ void APGBaseCharacter::BeginPlay()
 
 }
 
+void APGBaseCharacter::EnableCharacter()
+{
+	//이동 기능 제한
+	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+
+	bIsDead = false;
+	bIsGroggy = false;
+	bIsReload = false;
+	bIsAim = false;
+	SetActorEnableCollision(true);
+	SetActorHiddenInGame(false);
+	SetActorTickEnabled(true);
+	HpBarWidgetComponent->SetHiddenInGame(false);
+
+	
+}
+
 void APGBaseCharacter::SetCharacterData(UBaseCharacterDataAsset* characterdata)
 {
 	baseCharacterData = characterdata; 
+	//SetupCharacterData(baseCharacterData);
 }
 
 void APGBaseCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterdata)
@@ -356,8 +361,7 @@ void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperl
 	{
 		AIController->StartTree();
 
-		//임시
-		//CustomTimeDilation = 1.0f;
+		
 	}
 
 }
@@ -382,7 +386,7 @@ void APGBaseCharacter::SetDead(int8 teamid)
 
 	HpBarWidgetComponent->SetHiddenInGame(true);
 
-	//Destroy();
+
 }
 
 void APGBaseCharacter::SetteamId(uint8 teamId)

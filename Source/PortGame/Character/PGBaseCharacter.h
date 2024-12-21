@@ -33,9 +33,9 @@ protected:
 
 	//캐릭터 데이터를 장착
 public:
+	void EnableCharacter();
 	void SetCharacterData(class UBaseCharacterDataAsset* characterdata);
 
-protected:
 	virtual void SetupCharacterData(class UBaseCharacterDataAsset* characterdata);
 
 	//스켈레톤 별 몽타주 검색
@@ -189,6 +189,7 @@ protected:
 
 	UFUNCTION()
 	virtual void SetDead(int8 teamid);
+
 
 protected:
 	static const FString HitMontage;
