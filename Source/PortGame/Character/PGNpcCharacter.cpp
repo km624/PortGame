@@ -92,40 +92,43 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
+	if (!EventInstigator->GetPawn()) return DamageAmount;
 	APGBaseCharacter* attackPawn = Cast<APGBaseCharacter>(EventInstigator->GetPawn());
 	
-	
-	//적팀일시
-	if (GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
+	if (attackPawn)
 	{
-		//패리중일때
-		if (bIsParry)
+		//적팀일시
+		if (GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
 		{
-			
-			StatComponent->HitGaugeDamaged(GetTotalStat().HitGauge);
+			//패리중일때
+			if (bIsParry)
+			{
 
-			NAParryUpdateEnd();
-			
-		}	
-		else
-			StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
-	}
+				StatComponent->HitGaugeDamaged(GetTotalStat().HitGauge);
 
-	//수류탄에 맞았을시
-	if (DamageCauser->ActorHasTag(TAG_GRENADE))
-	{
+				NAParryUpdateEnd();
 
-		FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
-		Direction.Normalize();
-		HitImpulseVector = Direction * 750.0f + (FVector(0, 0, 1) * 100.0f);
-
-		if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
-		{
-			StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
+			}
+			else
+				StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
 		}
-		else
+
+		//수류탄에 맞았을시
+		if (DamageCauser->ActorHasTag(TAG_GRENADE))
 		{
-			StatComponent->Damaged(DamageAmount*0.3f, attackPawn->GetGenericTeamId());
+
+			FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
+			Direction.Normalize();
+			HitImpulseVector = Direction * 750.0f + (FVector(0, 0, 1) * 100.0f);
+
+			if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
+			{
+				StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
+			}
+			else
+			{
+				StatComponent->Damaged(DamageAmount * 0.3f, attackPawn->GetGenericTeamId());
+			}
 		}
 	}
 	

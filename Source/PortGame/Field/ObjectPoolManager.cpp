@@ -38,6 +38,7 @@ APGNpcCharacter* UObjectPoolManager::GetPooledObject(const FCharacterSpawnParams
                
 				Character->SetupCharacterData(SpawnParams.CharacterData);
                 Character->SetteamId(SpawnParams.TeamId);
+				Character->ChangeNpcColor();
 				Character->SetActorLocationAndRotation(SpawnParams.SpawnLocation,SpawnParams.SpawnRotation);
                 Character->EnableCharacter();
 
