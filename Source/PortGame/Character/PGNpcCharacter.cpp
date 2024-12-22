@@ -13,6 +13,7 @@
 #include "Engine/LevelScriptActor.h"
 #include "Interface/ObjectPoolingInterface.h"
 #include "Component/PGAttackComponent.h"
+#include "Component/PGWidgetComponent.h"
 
 
 APGNpcCharacter::APGNpcCharacter()
@@ -95,6 +96,8 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	if (!EventInstigator->GetPawn()) return DamageAmount;
 	APGBaseCharacter* attackPawn = Cast<APGBaseCharacter>(EventInstigator->GetPawn());
 	
+	HpBarWidgetComponent->SetHiddenInGame(false);
+
 	if (attackPawn)
 	{
 		//ÀûÆÀÀÏ½Ã

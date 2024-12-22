@@ -68,7 +68,7 @@ void APGAIController::TOMyFieldDead(int8 teamid)
 		if (myfield)
 		{
 			if(GetPawn())
-				myfield->DamageFieldGauge(GetPawn(),teamid);
+				myfield->DamageField(GetPawn(),teamid);
 		}
 	}
 
@@ -110,6 +110,7 @@ void APGAIController::BlackBoardReset()
 		}
 
 		//BlackboardComp->SetValueAsObject(BBKEY_TARGET,nullptr);
+
 		BlackboardComp->ClearValue(BBKEY_PROTECTFIELD);
 		BlackboardComp->ClearValue(BBKEY_MYFIELD);
 		BlackboardComp->ClearValue(BBKEY_TARGET);

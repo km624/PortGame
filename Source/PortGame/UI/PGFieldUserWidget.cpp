@@ -4,6 +4,7 @@
 #include "UI/PGFieldUserWidget.h"
 #include "Components/ProgressBar.h"
 #include "PortGame/PortGame.h"
+#include "Components/Image.h"
 
 UPGFieldUserWidget::UPGFieldUserWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
@@ -73,6 +74,18 @@ void UPGFieldUserWidget::UpdateFieldGauge(float Newgauge)
 
 	}
 
+}
+
+void UPGFieldUserWidget::SetLockImage(bool lock)
+{
+	if (lock)
+	{
+		Image_Lock->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		Image_Lock->SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
 
 void UPGFieldUserWidget::SmoothingGauge(float deltatime)

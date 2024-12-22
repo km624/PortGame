@@ -53,7 +53,7 @@ APGNpcCharacter* UObjectPoolManager::GetPooledObject(const FCharacterSpawnParams
 
                     Controller->Possess(Character);
 
-					SLOG(TEXT("Recycle : %s"), *Character->GetActorNameOrLabel())
+					//SLOG(TEXT("Recycle : %s"), *Character->GetActorNameOrLabel())
                     return Character;
                 }
             }
@@ -99,7 +99,7 @@ APGNpcCharacter* UObjectPoolManager::GetPooledObject(const FCharacterSpawnParams
 	{
 		ObjectPool.Add(AiCharacter, pgAIcontoller);
 
-		SLOG(TEXT("NewCharacter : %s"), *AiCharacter->GetActorNameOrLabel())
+		//SLOG(TEXT("NewCharacter : %s"), *AiCharacter->GetActorNameOrLabel())
 		return AiCharacter;
 	}
 
@@ -124,7 +124,7 @@ void UObjectPoolManager::ReturnObjectToPool(APGNpcCharacter* Character)
 			Controller->ResetController();*/
 		}
 
-		SLOG(TEXT("return : %s"), *Character->GetActorNameOrLabel())
+		//SLOG(TEXT("return : %s"), *Character->GetActorNameOrLabel())
 	}
 
 }
@@ -155,7 +155,7 @@ AWeapon* UObjectPoolManager::GetWeaponPooledObject(TSubclassOf<AWeapon> weaponcl
 			Weapon->SetActorTickEnabled(true);
 			Weapon->SetActorHiddenInGame(false);
 			Weapon->SetActorEnableCollision(true);
-			SLOG(TEXT("Recycled weapon: %s"), *Weapon->GetActorNameOrLabel());
+			//SLOG(TEXT("Recycled weapon: %s"), *Weapon->GetActorNameOrLabel());
 			return Weapon;
 		}
 	}
@@ -165,7 +165,7 @@ AWeapon* UObjectPoolManager::GetWeaponPooledObject(TSubclassOf<AWeapon> weaponcl
 	if (SpawnedWeapon)
 	{
 		WeaponArray.Add(SpawnedWeapon);
-		SLOG(TEXT("Spawned new weapon: %s"), *SpawnedWeapon->GetActorNameOrLabel());
+		//SLOG(TEXT("Spawned new weapon: %s"), *SpawnedWeapon->GetActorNameOrLabel());
 		return SpawnedWeapon;
 	}
 
@@ -183,6 +183,6 @@ void UObjectPoolManager::ReturnWeaponObjectToPool(AWeapon* weapon)
 	weapon->SetActorHiddenInGame(true);
 	weapon->SetActorEnableCollision(false);
 	
-	SLOG(TEXT("returnweapon : %s"), *weapon->GetActorNameOrLabel())
+	//SLOG(TEXT("returnweapon : %s"), *weapon->GetActorNameOrLabel())
 
 }

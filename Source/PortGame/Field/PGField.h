@@ -7,6 +7,7 @@
 #include "GenericTeamAgentInterface.h"
 #include "PGField.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnFieldChanged, int8 /*teamid*/);
 UCLASS()
 class PORTGAME_API APGField : public AActor ,public IGenericTeamAgentInterface
 {
@@ -23,7 +24,7 @@ public:
 	void SetUpField();
 
 protected:
-	void InitializeField(uint8 teamid);
+	virtual void InitializeField(uint8 teamid);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AIFieldData)
@@ -33,7 +34,7 @@ protected:
 	TObjectPtr<class UBoxComponent> AIField;
 
 	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);
+	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	//Field 팀 설정
@@ -74,9 +75,15 @@ protected:
 
 
 public:
-	void DamageFieldGauge(class APawn* deadpawn,int8 attackteamid);
+	void DamageField(class APawn* deadpawn,int8 attackteamid);
 
-	void ChangedField(int8 teamid);
+	FOnFieldChanged OnFieldChanged;
+
+protected:
+
+	virtual void DamageFieldGauge(int8 attackteamid);
+
+	virtual void ChangedField(int8 teamid);
 
 	//필드 게이지
 protected:
@@ -95,6 +102,7 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
 	int32 AttackAISpawnCount;
-	
+
+
 
 };

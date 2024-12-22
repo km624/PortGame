@@ -40,9 +40,20 @@ protected:
 public:
 	void ChangedCharacterPossess(int8 playernum);
 	
+	void SpawnCharacterAdd(class APGPlayerCharacter* character , class APGAIController* aicontroller);
+
+protected:
+	void ChangeCharacterController(class APGPlayerCharacter* newcharacter, class APGPlayerCharacter* oldcharacter);
 
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TArray<TObjectPtr<class APGPlayerCharacter>> PlayerCharacters;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<TObjectPtr<class APGAIController>> AIPlayerControllers;
+
+	
+
+
 	
 };

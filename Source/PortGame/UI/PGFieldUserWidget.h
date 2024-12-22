@@ -31,6 +31,8 @@ public:
 	UFUNCTION()
 	void UpdateFieldGauge(float Newgauge);
 
+	void SetLockImage(bool lock);
+
 
 protected:
 	void SmoothingGauge(float deltatime);
@@ -46,6 +48,9 @@ protected:
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UProgressBar> ProgressBar_FieldGauge;
+	
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UImage> Image_Lock;
 
 	
 	UPROPERTY()

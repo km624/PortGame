@@ -186,7 +186,7 @@ void APGPlayerCharacter::BeginPlay()
 
 	
 
-	SetCharacterData(CurrentControlData);
+	//SetCharacterInputData(CurrentControlData);
 	
 
 	FOnTimelineFloat TimelineProgress;
@@ -285,7 +285,7 @@ void APGPlayerCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterda
 	LoadAndPlayMontageByPath(CharacterName, RightEvadeMontage);
 }
 
-void APGPlayerCharacter::SetCharacterData(EControlData DataName)
+void APGPlayerCharacter::SetCharacterInputData(EControlData DataName)
 {
 	UPGCharacterData* NewCharacterData = ControlDataManager[DataName];
 	ensure(NewCharacterData);
@@ -444,7 +444,7 @@ void APGPlayerCharacter::PressAim()
 	bIsAim = true;
 	OnbIsAim.Broadcast(bIsAim);
 
-	SetCharacterData(EControlData::Aim);
+	SetCharacterInputData(EControlData::Aim);
 	AimTimeline.PlayFromStart();
 
 	AimLocation = Camera->GetComponentLocation();
@@ -466,7 +466,7 @@ void APGPlayerCharacter::ReleasedAim()
 
 	bIsShoot = false;
 	OnbIsShoot.Broadcast(bIsShoot);
-	SetCharacterData(EControlData::Base);
+	SetCharacterInputData(EControlData::Base);
 	AimTimeline.Reverse();
 
 	if (bIsNikkeSkill)
@@ -500,48 +500,98 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (!EventInstigator->GetPawn()) return DamageAmount;
+	//if (!EventInstigator || !EventInstigator->GetPawn()) return DamageAmount;
+	//APGBaseCharacter* attackPawn = Cast<APGBaseCharacter>(EventInstigator->GetPawn());
+	//
+	//if (attackPawn)
+	//{
+	//	//대쉬 중
+	//	if (bIsDash)
+	//	{
+	//		if (bIsEvade) return DamageAmount;
+
+	//		OnAvoidEffect();
+	//		SetEvadeRotation(DamageCauser->GetActorLocation());
+	//	}
+	//	//무적
+	//	if (AttackComponent->GetbIsGodMode()) return DamageAmount;
+
+	//	//적팀 한테 데미지
+	//	if (GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
+	//	{
+
+	//		StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
+	//	}
+
+	//	//수류탄에 맞았을시
+	//	if (DamageCauser->ActorHasTag(TAG_GRENADE))
+	//	{
+
+	//		FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
+	//		Direction.Normalize();
+	//		HitImpulseVector = Direction * 750.0f + (FVector(0, 0, 1) * 100.0f);
+
+	//		if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
+	//		{
+	//			StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
+	//		}
+	//		else
+	//		{
+	//			StatComponent->Damaged(DamageAmount * 0.3f, attackPawn->GetGenericTeamId());
+	//		}
+	//	}
+	//}
+	//
+	//return DamageAmount;
+	if (!EventInstigator || !EventInstigator->GetPawn()) return DamageAmount;
+
 	APGBaseCharacter* attackPawn = Cast<APGBaseCharacter>(EventInstigator->GetPawn());
-	
 	if (attackPawn)
 	{
-		//대쉬 중
+		// 대쉬 중
 		if (bIsDash)
 		{
 			if (bIsEvade) return DamageAmount;
 
-			OnAvoidEffect();
-			SetEvadeRotation(DamageCauser->GetActorLocation());
+			if (DamageCauser)
+			{
+				OnAvoidEffect();
+				SetEvadeRotation(DamageCauser->GetActorLocation());
+			}
 		}
-		//무적
-		if (AttackComponent->GetbIsGodMode()) return DamageAmount;
+		// 무적
+		if (AttackComponent && AttackComponent->GetbIsGodMode()) return DamageAmount;
 
-		//적팀 한테 데미지
-		if (GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
+		// 적팀한테 데미지
+		if (DamageCauser && GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
 		{
-
-			StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
+			if (StatComponent)
+			{
+				StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
+			}
 		}
 
-		//수류탄에 맞았을시
-		if (DamageCauser->ActorHasTag(TAG_GRENADE))
+		// 수류탄에 맞았을 시
+		if (DamageCauser && DamageCauser->ActorHasTag(TAG_GRENADE))
 		{
-
 			FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
 			Direction.Normalize();
 			HitImpulseVector = Direction * 750.0f + (FVector(0, 0, 1) * 100.0f);
 
-			if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
+			if (EventInstigator && EventInstigator->GetPawn() && StatComponent)
 			{
-				StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
-			}
-			else
-			{
-				StatComponent->Damaged(DamageAmount * 0.3f, attackPawn->GetGenericTeamId());
+				if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
+				{
+					StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
+				}
+				else
+				{
+					StatComponent->Damaged(DamageAmount * 0.3f, attackPawn->GetGenericTeamId());
+				}
 			}
 		}
 	}
-	
+
 	return DamageAmount;
 }
 
@@ -580,7 +630,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 
 			OnbIsAim.AddUObject(hudWidget, &UPGHudWidget::SetGunWidgetEnable);
 		}
-
+		SLOG(TEXT("SetupendWidget : %s"), *GetActorNameOrLabel());
 	}
 }
 
@@ -896,12 +946,12 @@ void APGPlayerCharacter::SetbIsNikkeSkill(bool skill)
 	if (skill)
 	{
 
-		SetCharacterData(EControlData::Base);
+		SetCharacterInputData(EControlData::Base);
 	}
 	else
 	{
 
-		SetCharacterData(EControlData::Base);
+		SetCharacterInputData(EControlData::Base);
 	}
 
 }
@@ -950,7 +1000,7 @@ void APGPlayerCharacter::CreateHudWidget()
 
 		PGHudWidget->SetOwingCharcter(this);
 		SetUpHudWidget(PGHudWidget);
-
+		SLOG(TEXT("CreateWidget : %s"), *GetActorNameOrLabel());
 
 	}
 }

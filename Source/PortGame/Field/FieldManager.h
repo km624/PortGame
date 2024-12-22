@@ -33,6 +33,10 @@ protected:
 
 	void StartAllFields();
 
+	void CheckLastField(int8 teamid);
+
+	void SetLastFieldLock(int8 teamid ,bool lock);
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Field")
 	TArray<TObjectPtr<class APGField>> Fields;

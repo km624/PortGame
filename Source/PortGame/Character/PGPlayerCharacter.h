@@ -42,9 +42,11 @@ protected:
 
 	virtual void Tick(float DeltaTime) override;
 
+public:
 	virtual void SetupCharacterData(class UBaseCharacterDataAsset* characterdata) override;
 
-	void SetCharacterData(EControlData DataName);
+public:
+	void SetCharacterInputData(EControlData DataName);
 
 
 protected:

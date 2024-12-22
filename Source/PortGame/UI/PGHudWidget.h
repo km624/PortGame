@@ -75,6 +75,8 @@ public:
 	void UpdateFieldGague(float newGauge);
 	UFUNCTION()
 	void CollapsedFieldGauge();
+	UFUNCTION()
+	void SetUpLockImage(bool lock);
 
 protected:
 	

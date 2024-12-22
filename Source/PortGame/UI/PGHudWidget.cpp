@@ -145,7 +145,13 @@ void UPGHudWidget::UpdateFieldGague(float newGauge)
 
 void UPGHudWidget::CollapsedFieldGauge()
 {
+	BP_FieldGauge->SetLockImage(false);
 	BP_FieldGauge->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+void UPGHudWidget::SetUpLockImage(bool lock)
+{
+	BP_FieldGauge->SetLockImage(lock);
 }
 
 

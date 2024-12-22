@@ -8,6 +8,7 @@
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
 #include "PortGame/PortGame.h"
+#include "Field/PGLastField.h"
 
 UFieldManager::UFieldManager()
 {
@@ -89,7 +90,48 @@ void UFieldManager::StartAllFields()
 {
 	for (APGField* Field : Fields)
 	{
-
+        
 		Field->SetUpField();
+        Field->OnFieldChanged.AddUObject(this, &ThisClass::CheckLastField);
 	}
+}
+
+void UFieldManager::CheckLastField(int8 teamid)
+{
+    int32 CountTeam = 0;
+    SLOG(TEXT("ChangedField"));
+    for (APGField* Field : Fields)
+    {
+        if (Field->GetGenericTeamId() == teamid)
+            CountTeam++;
+       
+    }
+
+    if (CountTeam == 1)
+    {
+        SetLastFieldLock(teamid, false);
+        SLOG(TEXT("%d team : is last"), teamid);
+    }
+    else
+    {
+        SetLastFieldLock(teamid, true);
+        SLOG(TEXT("%d team : is notlast lock"), teamid);
+    }
+}
+
+void UFieldManager::SetLastFieldLock(int8 teamid, bool lock)
+{
+    for (APGField* Field : Fields)
+    {
+        APGLastField* lastField = Cast<APGLastField>(Field);
+        if (lastField)
+        {
+            if (lastField->GetGenericTeamId() == teamid)
+            {
+                SLOG(TEXT("%s : lock = %d"), *lastField->GetActorNameOrLabel(), lock);
+                lastField->SetbIsLocked(lock);
+            }
+        }
+      
+    }
 }

@@ -83,6 +83,7 @@ void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 			{
 				PlayerCharacters.Add(playerCharacter);
 				
+				SLOG(TEXT("%s in : %s"), *this->GetActorNameOrLabel(), *playerCharacter->GetActorNameOrLabel());
 				if (playerCharacter->GetPlayerHudWidget())
 				{
 					
@@ -185,21 +186,9 @@ void APGField::OnAISpawn()
 	
 }
 
-void APGField::DamageFieldGauge(class APawn* deadpawn, int8 attackteamid)
+void APGField::DamageField(class APawn* deadpawn, int8 attackteamid)
 {
-	currentFieldGauge -= FieldDamage;
 
-
-	if (PlayerCharacters.Num() > 0)
-	{
-		for (TObjectPtr<APGPlayerCharacter>& palyerCharacter : PlayerCharacters)
-		{
-			if (palyerCharacter)
-			{
-				palyerCharacter->GetPlayerHudWidget()->UpdateFieldGague(currentFieldGauge);
-			}
-		}
-	}
 
 	APGNpcCharacter* deadnpc = Cast<APGNpcCharacter>(deadpawn);
 	if (deadnpc)
@@ -214,16 +203,38 @@ void APGField::DamageFieldGauge(class APawn* deadpawn, int8 attackteamid)
 
 	OnAISpawn();
 
-	if (currentFieldGauge<=0)
+	DamageFieldGauge(attackteamid);
+}
+
+void APGField::DamageFieldGauge(int8 attackteamid)
+{
+
+	currentFieldGauge -= FieldDamage;
+
+	if (PlayerCharacters.Num() > 0)
+	{
+		for (TObjectPtr<APGPlayerCharacter>& palyerCharacter : PlayerCharacters)
+		{
+			if (palyerCharacter)
+			{
+				palyerCharacter->GetPlayerHudWidget()->UpdateFieldGague(currentFieldGauge);
+			}
+		}
+	}
+
+	if (currentFieldGauge <= 0)
 	{
 
 		ChangedField(attackteamid);
-		
+
 	}
 }
 
 void APGField::ChangedField(int8 teamid)
 {
+	
+	uint8 PastTeamid = TeamId;
+
 	if (AICharacters.Num()> 0)
 	{
 		for (TObjectPtr<APGNpcCharacter>& AICharacter : AICharacters)
@@ -250,6 +261,9 @@ void APGField::ChangedField(int8 teamid)
 			}
 		}
 	}
+
+	//바뀌고 나서 전에 팀id 브로드 캐스트
+	OnFieldChanged.Broadcast(PastTeamid);
 
 
 }
