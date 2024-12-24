@@ -44,6 +44,14 @@ FVector UFieldManager::FoundEnemyField(AActor* sourceActor)
             continue;
         }
 
+        APGLastField* lastField = Cast<APGLastField>(TargetField);
+        if (lastField)
+        {
+            if (lastField->GetbIsLock())
+            {
+                continue;
+            }
+        }
         
         IGenericTeamAgentInterface* TargetTeam = Cast<IGenericTeamAgentInterface>(TargetField);
         if (!TargetTeam || TargetTeam->GetTeamAttitudeTowards(*sourceActor) != ETeamAttitude::Hostile)

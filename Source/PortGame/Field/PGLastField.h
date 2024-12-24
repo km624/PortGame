@@ -18,6 +18,8 @@ public:
 	
 	APGLastField();
 
+	FORCEINLINE bool GetbIsLock() { return bIsLocked; }
+
 	void SetbIsLocked(bool lock);
 
 protected:

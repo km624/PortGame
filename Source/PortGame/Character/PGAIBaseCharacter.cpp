@@ -38,7 +38,7 @@ float APGAIBaseCharacter::GetAIDetectRange()
 		if (gundata)
 		{
 
-			return DetectRange * 1.25;
+			return DetectRange * 1.5f;
 		}
 	}
 
@@ -63,7 +63,7 @@ float APGAIBaseCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
 				bIsAim = true;
 
 
-				return gundata->GunStat.traceDistance * 0.75;
+				return gundata->GunStat.traceDistance * 0.9f;
 			}
 		}
 	}

@@ -11,11 +11,16 @@
 #include "Data/GunWeaponData.h"
 #include "Interface/PlayerCameraShakeInterface.h"
 #include "Physics/PGCollision.h"
-#include "Interface/AttackHitStopInterface.h"
+//#include "Interface/AttackHitStopInterface.h"
 #include "Character/PGNpcCharacter.h"
 #include "Data/CharacterEnumData.h"
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
+//#include "AIController.h"
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/Controller.h"
+#include "Character/PGAIBaseCharacter.h"
+
 
 const FString ARifle::ReloadMontage = TEXT("ReloadingMontage");
 
@@ -148,9 +153,38 @@ void ARifle::InGunRange(bool bisaim)
 
 	//DrawDebugLine(currentWorld, Camerastart, CameraEnd, FColor::Yellow, false, 1.0f);
 
+
+	AController* Controller = OwnerCharacter->GetController(); // 현재 폰의 컨트롤러 가져오기
+
+	if (Controller)
+	{
+		
+		if (Controller->IsA(APlayerController::StaticClass()))
+		{
+			if (currentWorld)
+			{
+				bool OutHitResult = currentWorld->LineTraceSingleByChannel(
+					hitResult,
+					Camerastart,
+					CameraEnd,
+					CCHANNEL_PGACTION,
+					collisionParams);
+
+				if (OutHitResult)
+					bInGunRange = true;
+				else
+					bInGunRange = false;
+
+				OnbInGunRanged.Broadcast(bInGunRange);
+
+			}
+		}
+	}
+	
+
 	//플레이어인지 확인
-	IAttackHitStopInterface* Player = Cast<IAttackHitStopInterface>(OwnerCharacter);
-	if (Player)
+	//IAttackHitStopInterface* Player = Cast<IAttackHitStopInterface>(OwnerCharacter);
+	/*if (Player)
 	{
 		if (currentWorld)
 		{
@@ -169,7 +203,7 @@ void ARifle::InGunRange(bool bisaim)
 			OnbInGunRanged.Broadcast(bInGunRange);
 
 		}
-	}
+	}*/
 }
 
 void ARifle::ShootCheck(bool bIsShoot)
@@ -277,43 +311,83 @@ void ARifle::FireWithLineTrace()
 	FVector end;
 	DrawDebugLine(currentWorld, Camerastart, CameraEnd, FColor::Green, false, 1.0f);
 
-	//플레이어인지 확인
-	IAttackHitStopInterface* Player = Cast<IAttackHitStopInterface>(OwnerCharacter);
-	if (Player)
-	{
-		if (currentWorld)
-		{
-			bool OutHitResult = currentWorld->LineTraceSingleByChannel(
-				hitResult,
-				Camerastart,
-				CameraEnd,
-				ECollisionChannel::ECC_Visibility,
-				collisionParams);
+	AController* Controller = OwnerCharacter->GetController(); // 현재 폰의 컨트롤러 가져오기
 
-			if (OutHitResult)
+	if (Controller)
+	{
+
+		if (Controller->IsA(APlayerController::StaticClass()))
+		{
+			SLOG(TEXT("PlayerShot"));
+			if (currentWorld)
 			{
+				bool OutHitResult = currentWorld->LineTraceSingleByChannel(
+					hitResult,
+					Camerastart,
+					CameraEnd,
+					ECollisionChannel::ECC_Visibility,
+					collisionParams);
 
-				FVector ForwardVector = OwnerCharacter->GetController()->GetControlRotation().Vector();
-				FVector HitLocationWithOffset = hitResult.Location + (ForwardVector * 50.0f);
-				end = HitLocationWithOffset;
+				if (OutHitResult)
+				{
+
+					FVector ForwardVector = OwnerCharacter->GetController()->GetControlRotation().Vector();
+					FVector HitLocationWithOffset = hitResult.Location + (ForwardVector * 50.0f);
+					end = HitLocationWithOffset;
 
 
+				}
+				else
+					end = CameraEnd;
 			}
-			else
-				end = CameraEnd;
-
-
 		}
-	}
-	else
-	{
-		//이때는 NPC
-		APGNpcCharacter* NPCPlayer = Cast<APGNpcCharacter>(OwnerCharacter);
-		if (NPCPlayer)
+		else
 		{
-			end = NPCPlayer->GetTargetPawn()->GetActorLocation();
+			APGAIBaseCharacter* aicharacter = Cast<APGAIBaseCharacter>(OwnerCharacter);
+			end = aicharacter->GetTargetPawn()->GetActorLocation();
+			
 		}
+	
 	}
+	//플레이어인지 확인
+	//IAttackHitStopInterface* Player = Cast<IAttackHitStopInterface>(OwnerCharacter);
+
+
+	//if (Player)
+	//{
+	//	if (currentWorld)
+	//	{
+	//		bool OutHitResult = currentWorld->LineTraceSingleByChannel(
+	//			hitResult,
+	//			Camerastart,
+	//			CameraEnd,
+	//			ECollisionChannel::ECC_Visibility,
+	//			collisionParams);
+
+	//		if (OutHitResult)
+	//		{
+
+	//			FVector ForwardVector = OwnerCharacter->GetController()->GetControlRotation().Vector();
+	//			FVector HitLocationWithOffset = hitResult.Location + (ForwardVector * 50.0f);
+	//			end = HitLocationWithOffset;
+
+
+	//		}
+	//		else
+	//			end = CameraEnd;
+
+
+	//	}
+	//}
+	//else
+	//{
+	//	//이때는 NPC
+	//	APGNpcCharacter* NPCPlayer = Cast<APGNpcCharacter>(OwnerCharacter);
+	//	if (NPCPlayer)
+	//	{
+	//		end = NPCPlayer->GetTargetPawn()->GetActorLocation();
+	//	}
+	//}
 
 	if (!bIsRifle)
 		GunDamage = OwnerCharacter->GetTotalStat().Attack* 1.5f;
