@@ -5,7 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/Controller.h"
+//#include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -19,18 +19,22 @@
 #include "Component/TargetingComponent.h"
 #include "Component/PGAttackComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Animation/AnimMontage.h"
+//#include "Animation/AnimMontage.h"
 #include "Physics/PGCollision.h"
 #include "Engine/OverlapResult.h"
 #include "Interface/NPCParryCheckInterface.h"
 #include "Interface/PlayerCameraShakeInterface.h"
-#include "LevelSequenceActor.h"
-#include "LevelSequence.h"
-#include "LevelSequencePlayer.h"
+//#include "LevelSequenceActor.h"
+//#include "LevelSequence.h"
+//#include "LevelSequencePlayer.h"
 #include "Skill/SkillBase.h"
 #include "Player/PGPlayerController.h"
 #include "Weapon/Rifle.h"
 #include "Data/PlayerCharacterDataAsset.h"
+
+#include "UI/PGCharcterWidget.h"
+#include "UI/PGAllCharactersWidget.h"
+#include "UI/PGCharcterWidget.h"
 
 const FString APGPlayerCharacter::LeftEvadeMontage = TEXT("LeftEvadeMontage");
 const FString APGPlayerCharacter::RightEvadeMontage = TEXT("RightEvadeMontage");
@@ -500,49 +504,6 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	//if (!EventInstigator || !EventInstigator->GetPawn()) return DamageAmount;
-	//APGBaseCharacter* attackPawn = Cast<APGBaseCharacter>(EventInstigator->GetPawn());
-	//
-	//if (attackPawn)
-	//{
-	//	//대쉬 중
-	//	if (bIsDash)
-	//	{
-	//		if (bIsEvade) return DamageAmount;
-
-	//		OnAvoidEffect();
-	//		SetEvadeRotation(DamageCauser->GetActorLocation());
-	//	}
-	//	//무적
-	//	if (AttackComponent->GetbIsGodMode()) return DamageAmount;
-
-	//	//적팀 한테 데미지
-	//	if (GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
-	//	{
-
-	//		StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
-	//	}
-
-	//	//수류탄에 맞았을시
-	//	if (DamageCauser->ActorHasTag(TAG_GRENADE))
-	//	{
-
-	//		FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
-	//		Direction.Normalize();
-	//		HitImpulseVector = Direction * 750.0f + (FVector(0, 0, 1) * 100.0f);
-
-	//		if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
-	//		{
-	//			StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
-	//		}
-	//		else
-	//		{
-	//			StatComponent->Damaged(DamageAmount * 0.3f, attackPawn->GetGenericTeamId());
-	//		}
-	//	}
-	//}
-	//
-	//return DamageAmount;
 	if (!EventInstigator || !EventInstigator->GetPawn()) return DamageAmount;
 
 	APGBaseCharacter* attackPawn = Cast<APGBaseCharacter>(EventInstigator->GetPawn());
@@ -630,7 +591,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 
 			OnbIsAim.AddUObject(hudWidget, &UPGHudWidget::SetGunWidgetEnable);
 		}
-		SLOG(TEXT("SetupendWidget : %s"), *GetActorNameOrLabel());
+		//SLOG(TEXT("SetupendWidget : %s"), *GetActorNameOrLabel());
 	}
 }
 
@@ -1000,7 +961,7 @@ void APGPlayerCharacter::CreateHudWidget()
 
 		PGHudWidget->SetOwingCharcter(this);
 		SetUpHudWidget(PGHudWidget);
-		SLOG(TEXT("CreateWidget : %s"), *GetActorNameOrLabel());
+		//SLOG(TEXT("CreateWidget : %s"), *GetActorNameOrLabel());
 
 	}
 }
@@ -1010,7 +971,7 @@ void APGPlayerCharacter::HudWidgetAddviewport()
 	if (PGHudWidget)
 		PGHudWidget->AddToViewport();
 
-	SLOG(TEXT("%s: Addtoviewport"), *GetActorNameOrLabel());
+	//SLOG(TEXT("%s: Addtoviewport"), *GetActorNameOrLabel());
 }
 
 void APGPlayerCharacter::RemoveHudWidget()
@@ -1018,7 +979,7 @@ void APGPlayerCharacter::RemoveHudWidget()
 	if (PGHudWidget)
 		PGHudWidget->RemoveFromParent();
 	
-	SLOG(TEXT("%s: REmoveviewport"), *GetActorNameOrLabel());
+	//SLOG(TEXT("%s: REmoveviewport"), *GetActorNameOrLabel());
 }
 
 
@@ -1045,6 +1006,72 @@ void APGPlayerCharacter::CheckandChangePlayerCharacter(int8 num)
 	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
 	if (playerController)
 		playerController->ChangedCharacterPossess(num);
+}
+
+void APGPlayerCharacter::SetupAllCharacterWidget(int32 num)
+{
+	if (PGHudWidget)
+		PGHudWidget->SetUpAllCharactersWidget(num);
+}
+
+void APGPlayerCharacter::SetupMyCharacterWidgetToAnother(const TArray<APGPlayerCharacter*>& allcharacters,float cooltime)
+{
+	if (allcharacters.Num() > 0)
+	{
+
+		if (allcharacters.Contains(this))
+		{
+			int32 num = allcharacters.IndexOfByKey(this);
+			bool bisMine = false;
+			for (int32 i=0;i< allcharacters.Num();i++)
+			{
+				if (i == num)
+					bisMine = true;
+				else
+					bisMine = false;
+
+				//캐릭터별 ui와 셋업, 바인딩 하기위한 똥꼬쇼
+				UPGHudWidget* hud = allcharacters[i]->GetPlayerHudWidget();
+				if (hud)
+				{
+					UPGAllCharactersWidget* allwidget =  hud->GetAllCharacterWidgets();
+					if (allwidget)
+					{
+						allwidget->SetupCharacterWdiget(num, CharacterType, 
+							StatComponent->GetBaseStat(), StatComponent->GetModifierStat(), bisMine, cooltime);
+
+
+						TArray<UPGCharcterWidget*> const characterwidgets = allwidget->GetPCharacterWidgets();
+
+						if (characterwidgets.IsValidIndex(num))
+						{
+
+							StatComponent->OnStatChanged.AddUObject(characterwidgets[num], &UPGCharcterWidget::SetUphpbarWidget);
+							StatComponent->OnHpChanged.AddUObject(characterwidgets[num], &UPGCharcterWidget::UpdateHpBar);
+							StatComponent->OnHitGaugeChanged.AddUObject(characterwidgets[num], &UPGCharcterWidget::UpdateHitGaugeBar);
+							//StatComponent->OnHpZero.AddUObject
+						}
+
+					}
+				}
+				
+
+
+			}
+		}
+	
+	}
+}
+
+void APGPlayerCharacter::OnStartChangeCharacterWidget(int32 num)
+{
+	if (PGHudWidget)
+	{
+		PGHudWidget->OnStartChangeCooltime(num);
+		
+	}
+
+		
 }
 
 

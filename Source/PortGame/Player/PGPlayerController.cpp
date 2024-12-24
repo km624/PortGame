@@ -13,6 +13,7 @@
 
 #include "AI/PGAIController.h"
 
+
 APGPlayerController::APGPlayerController()
 {
 	
@@ -37,7 +38,7 @@ void APGPlayerController::OnPossess(APawn* aPawn)
 	//PlayerCharacters.Add(currentplayer);
 	SetViewTarget(GetPawn());
 	currentplayer->SetCharacterInputData(EControlData::Base);
-	SLOG(TEXT("Possess :%s"), *aPawn->GetActorNameOrLabel());
+	//sSLOG(TEXT("Possess :%s"), *aPawn->GetActorNameOrLabel());
 	if (currentplayer)
 	{
 		currentplayer->HiddenWidget();
@@ -74,13 +75,32 @@ void APGPlayerController::ChangedCharacterPossess(int8 playernum)
 		SLOG(TEXT("CharacterDead"));
 		return;
 	}
+
+	if (biscooltime)
+	{
+		SLOG(TEXT("ChangeCoolTime!!"));
+		return;
+	}
+
 	APGPlayerCharacter* currentplayer = Cast<APGPlayerCharacter>(GetPawn());
 	
 	UnPossess();
 
 	ChangeCharacterController(changeplayer, currentplayer);
 
-	//UnPossess();
+	biscooltime = true;
+	//ÄðÅ¸ÀÓ ¼¼ÆÃ
+	changeplayer->OnStartChangeCharacterWidget(PlayerCharacters.IndexOfByKey(changeplayer));
+
+	GetWorld()->GetTimerManager().SetTimer(
+		ChangedCharacterTimerHanlde,
+		[this]() {
+			biscooltime = false;
+			GetWorld()->GetTimerManager().ClearTimer(ChangedCharacterTimerHanlde);
+		}, ChangeCooltime, false
+	);
+	
+
 	Possess(changeplayer);
 }
 
@@ -91,9 +111,26 @@ void APGPlayerController::SpawnCharacterAdd(APGPlayerCharacter* character,APGAIC
 
 		PlayerCharacters.Add(character);
 		AIPlayerControllers.Add(aicontroller);
-		SLOG(TEXT("%s : add"), *character->GetActorNameOrLabel());
+		//SLOG(TEXT("%s : add"), *character->GetActorNameOrLabel());
 	}
 	
+}
+
+void APGPlayerController::SetupAllCharcterWidget()
+{
+	if (PlayerCharacters.Num() > 0)
+	{
+		for (APGPlayerCharacter* playerCharacter : PlayerCharacters)
+		{
+			playerCharacter->SetupAllCharacterWidget(PlayerCharacters.Num());
+		}
+
+
+		for (APGPlayerCharacter* playerCharacter : PlayerCharacters)
+		{
+			playerCharacter->SetupMyCharacterWidgetToAnother(PlayerCharacters, ChangeCooltime);
+		}
+	}
 }
 
 void APGPlayerController::ChangeCharacterController(APGPlayerCharacter* newcharacter, APGPlayerCharacter* oldcharacter)

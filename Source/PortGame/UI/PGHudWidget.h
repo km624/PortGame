@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Struct/PGCharacterStat.h"
+#include "Data/CharacterEnumData.h"
 #include "PGHudWidget.generated.h"
 
 /**
@@ -67,6 +68,20 @@ public:
 	UFUNCTION()
 	void ChangeCrosshair(bool bInRange);
 
+	UFUNCTION()
+	void SetUpAllCharactersWidget(int32 num);
+
+	FORCEINLINE class UPGAllCharactersWidget* GetAllCharacterWidgets() { return BP_AllCharacterWidget; }
+
+	void OnStartChangeCooltime(int32 num);
+
+	/*UFUNCTION()
+	void SetupCharacterWdiget(int32 num, EPlayerCharacterType type, const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat,bool bIsmine);
+
+	UFUNCTION()
+	void CharaterUpdateHpBar(float NewCurrentHp);
+	UFUNCTION()
+	void CharacterUpdateHitGaugeBar(float NewHitGauge);*/
 
 public:
 	UFUNCTION()
@@ -117,8 +132,8 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPGFieldUserWidget> BP_FieldGauge;
-
-
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGAllCharactersWidget>BP_AllCharacterWidget;
 	//UPROPERTY()
 	//TObjectPtr<class UABCharacterStatWidget> CharacterStat;
 	

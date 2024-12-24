@@ -36,11 +36,16 @@ protected:
 	//virtual void GunRecoilCameraShake(TSubclassOf<class UCameraShakeBase> camerashake) override;
 	virtual void PlayCameraShake(TSubclassOf<class UCameraShakeBase> camerashake) override;
 
-	//캐릭터 변경
+	//캐릭터 변경  - Character에서 접근
 public:
 	void ChangedCharacterPossess(int8 playernum);
 	
+	//StartField에서 접근
+public:
 	void SpawnCharacterAdd(class APGPlayerCharacter* character , class APGAIController* aicontroller);
+
+	void SetupAllCharcterWidget();
+
 
 protected:
 	void ChangeCharacterController(class APGPlayerCharacter* newcharacter, class APGPlayerCharacter* oldcharacter);
@@ -52,6 +57,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TObjectPtr<class APGAIController>> AIPlayerControllers;
 
+protected:
+	FTimerHandle ChangedCharacterTimerHanlde;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	float ChangeCooltime=10.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	uint8 biscooltime:1;
 	
 
 

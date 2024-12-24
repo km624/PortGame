@@ -21,7 +21,7 @@ void UPGHPBarWidget::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 	
-	this->SetVisibility(ESlateVisibility::Hidden);
+	this->SetVisibility(ESlateVisibility::Visible);
 
 }
 
@@ -44,6 +44,7 @@ void UPGHPBarWidget::SetUpWidget(const FPGCharacterStat& Stat, const FPGCharacte
 	if (ProgressBar_HpBar)
 	{
 		ProgressBar_HpBar->SetPercent(CurrentHp / MaxHp);
+		
 	}
 	else
 	{
@@ -66,7 +67,11 @@ void UPGHPBarWidget::SetUpWidget(const FPGCharacterStat& Stat, const FPGCharacte
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Textblocks miss"));
 	}
-	this->SetVisibility(ESlateVisibility::Visible);
+
+
+	PreviousHpPercent = CurrentHp / MaxHp;
+	PreviousHitGaugePercent = CurrentHitGauge / MaxHitGauge;
+	//this->SetVisibility(ESlateVisibility::Visible);
 }
 
 void UPGHPBarWidget::UpdateHpBar(float NewCurrentHp)

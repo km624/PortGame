@@ -339,7 +339,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
 	TObjectPtr<class UPGHudWidget> PGHudWidget;
 	
-	//FieldGauge hud
+	
 
 
 	//캐릭터 교체 
@@ -350,4 +350,11 @@ protected:
 
 	void CheckandChangePlayerCharacter(int8 num);
 
+	//캐릭터 교체 ui
+public:
+	void SetupAllCharacterWidget(int32 num);
+
+	void SetupMyCharacterWidgetToAnother(const TArray<class APGPlayerCharacter*>& allcharacters, float cooltime);
+
+	void OnStartChangeCharacterWidget(int32 num);
 };

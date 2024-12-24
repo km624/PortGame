@@ -105,8 +105,12 @@ void APGStartField::SetupPlayerbleCharacter()
 	//플레이어 첫번째 소환된 캐릭터 빙의
 	if (FirstplayerCharacter && playerController)
 	{
+		//추가한 캐릭터들 ui에 셋업
+		playerController->SetupAllCharcterWidget();
+
+
 		playerController->Possess(FirstplayerCharacter);
-		SLOG(TEXT("First possess Succeess"));
+		//SLOG(TEXT("First possess Succeess"));
 
 	}
 }
