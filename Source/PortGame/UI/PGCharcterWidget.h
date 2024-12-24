@@ -32,6 +32,10 @@ public:
 	UFUNCTION()
 	void UpdateHitGaugeBar(float NewHitGauge);
 
+	//teamÀº Çã¼ö
+	UFUNCTION()
+	void SetDead(int8 team);
+
 
 protected:
 	UPROPERTY(meta = (BindWidget))

@@ -20,6 +20,10 @@ void UFieldManager::InitializeFieldManager()
 	FindAllFields();
 
 	StartAllFields();
+
+    //처음 시작하자마자 체크
+    CheckLastField(1);
+    CheckLastField(2);
 }
 
 FVector UFieldManager::FoundEnemyField(AActor* sourceActor)

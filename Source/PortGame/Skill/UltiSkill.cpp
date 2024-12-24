@@ -105,7 +105,8 @@ void UUltiSkill::StartCinematic()
 		{
 			LevelSequenceActor->SetSequence(LevelSequence);
 
-			LevelSequencePlayer = LevelSequenceActor->SequencePlayer;
+			LevelSequencePlayer = LevelSequenceActor->GetSequencePlayer();
+			
 			// ÄÆ¾À Àç»ý
 			if (LevelSequencePlayer)
 			{

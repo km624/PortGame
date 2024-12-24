@@ -1049,7 +1049,7 @@ void APGPlayerCharacter::SetupMyCharacterWidgetToAnother(const TArray<APGPlayerC
 							StatComponent->OnStatChanged.AddUObject(characterwidgets[num], &UPGCharcterWidget::SetUphpbarWidget);
 							StatComponent->OnHpChanged.AddUObject(characterwidgets[num], &UPGCharcterWidget::UpdateHpBar);
 							StatComponent->OnHitGaugeChanged.AddUObject(characterwidgets[num], &UPGCharcterWidget::UpdateHitGaugeBar);
-							//StatComponent->OnHpZero.AddUObject
+							StatComponent->OnHpZero.AddUObject(characterwidgets[num], &UPGCharcterWidget::SetDead);
 						}
 
 					}

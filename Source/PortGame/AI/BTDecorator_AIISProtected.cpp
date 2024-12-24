@@ -22,10 +22,7 @@ bool UBTDecorator_AIISProtected::CalculateRawConditionValue(UBehaviorTreeCompone
 		return true;
 	}
 	else
-	{
-		return false;
-	}
-
+	
 
 	return false;
 }

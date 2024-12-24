@@ -149,6 +149,7 @@ void UPGAttackComponent::ReturnWeaponPool()
 {
 	if (Weapon)
 	{
+		Weapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		IObjectPoolingInterface* poolmanager = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
 		if (poolmanager)
 		{

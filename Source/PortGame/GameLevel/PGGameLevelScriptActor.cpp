@@ -40,6 +40,7 @@ void APGGameLevelScriptActor::BeginPlay()
 	if (FieldManager)
 	{
 		FieldManager->InitializeFieldManager();
+		
 	}
 
 }

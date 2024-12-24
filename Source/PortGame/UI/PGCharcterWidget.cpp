@@ -76,6 +76,13 @@ void UPGCharcterWidget::UpdateHitGaugeBar(float NewHitGauge)
 	BP_HpBar->UpdateHitGaugeBar(NewHitGauge);
 }
 
+void UPGCharcterWidget::SetDead(int8 team)
+{
+	FLinearColor Fillcolor = FLinearColor(FVector(0.2f, 0.2f, 0.2f));
+	ProgressBar_Character->SetFillColorAndOpacity(Fillcolor);
+	BP_HpBar->SetVisibility(ESlateVisibility::Collapsed);
+}
+
 void UPGCharcterWidget::StartChangeCooltime()
 {
 	
