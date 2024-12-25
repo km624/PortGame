@@ -96,7 +96,8 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	if (!EventInstigator->GetPawn()) return DamageAmount;
 	APGBaseCharacter* attackPawn = Cast<APGBaseCharacter>(EventInstigator->GetPawn());
 	
-	HpBarWidgetComponent->SetHiddenInGame(false);
+	if(TeamId !=1)
+		HpBarWidgetComponent->SetHiddenInGame(false);
 
 	if (attackPawn)
 	{

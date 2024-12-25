@@ -78,6 +78,7 @@ void UPGCharcterWidget::UpdateHitGaugeBar(float NewHitGauge)
 
 void UPGCharcterWidget::SetDead(int8 team)
 {
+	bIsDead = true;
 	FLinearColor Fillcolor = FLinearColor(FVector(0.2f, 0.2f, 0.2f));
 	ProgressBar_Character->SetFillColorAndOpacity(Fillcolor);
 	BP_HpBar->SetVisibility(ESlateVisibility::Collapsed);
@@ -85,7 +86,7 @@ void UPGCharcterWidget::SetDead(int8 team)
 
 void UPGCharcterWidget::StartChangeCooltime()
 {
-	
+	if (bIsDead)return;
 	GetWorld()->GetTimerManager().ClearTimer(ChangeCooltimeTimerHandle);
 
 	FLinearColor Fillcolor = FLinearColor(FVector(0.25f, 0.25f, 0.25f));

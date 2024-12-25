@@ -62,5 +62,7 @@ protected:
 	float Currentcooltime;
 
 	FTimerHandle ChangeCooltimeTimerHandle;
+
+	uint8 bIsDead : 1;
 	
 };

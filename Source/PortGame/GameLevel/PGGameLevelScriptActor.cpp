@@ -10,6 +10,9 @@
 #include "PortGame/PortGame.h"
 #include "Field/FieldManager.h"
 #include "Field/ObjectPoolManager.h"
+#include "WorldPartition/WorldPartitionSubsystem.h"
+#include "WorldPartition/WorldPartition.h"
+#include "GameFramework/PlayerStart.h"
 
 APGGameLevelScriptActor::APGGameLevelScriptActor()
 {
@@ -28,6 +31,8 @@ UObjectPoolManager* APGGameLevelScriptActor::GetObjectPoolManager() const
 void APGGameLevelScriptActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+   
 
 	ObjectPoolManager = NewObject<UObjectPoolManager>(this);
 

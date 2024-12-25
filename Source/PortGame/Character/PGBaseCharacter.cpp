@@ -83,14 +83,14 @@ APGBaseCharacter::APGBaseCharacter()
 	//widget 컴포넌트 추가
 	HpBarWidgetComponent = CreateDefaultSubobject<UPGWidgetComponent>(TEXT("Widget"));
 	HpBarWidgetComponent->SetupAttachment(GetMesh());
-	HpBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 190.0f));
+	HpBarWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
 	static ConstructorHelpers::FClassFinder<UUserWidget>HpBarWidgetClass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/PortGame/UI/BP_HpBar.BP_HpBar_C'"));
 	if (HpBarWidgetClass.Class)
 	{
 		HpBarWidgetComponent->SetWidgetClass(HpBarWidgetClass.Class);
 		HpBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
 		// 위젯 크기 여기서 지정 ( 가느다란 크기)s
-		HpBarWidgetComponent->SetDrawSize(FVector2D(100.0f, 20.0f));
+		HpBarWidgetComponent->SetDrawSize(FVector2D(50.0f, 15.0f));
 		HpBarWidgetComponent->SetHiddenInGame(true);
 		HpBarWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
