@@ -13,5 +13,14 @@ UCLASS()
 class PORTGAME_API UPGIconWidget : public UUserWidget
 {
 	GENERATED_BODY()
+
+public:
+	
+
+	void SetPlayerIconImage();
+
+protected:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UImage> Image_Icon;
 	
 };

@@ -165,6 +165,7 @@ void APGPlayerController::ChangeCharacterController(APGPlayerCharacter* newchara
 		{
 
 			newcharacter->SetbIsAim(false);
+			newcharacter->SetbIsShoot(false);
 			//ai 컨트롤러 초기화 진행
 			APGAIController* newaicontroller = AIPlayerControllers[PlayerCharacters.IndexOfByKey(newcharacter)];
 

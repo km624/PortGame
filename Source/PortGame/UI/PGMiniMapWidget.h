@@ -24,7 +24,7 @@ protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 public:
-	void SetUpMinimap();
+	
 
 	void SetupPlayers(int8 mynum, const TArray<AActor*>& ActorArray);
 
@@ -32,16 +32,27 @@ public:
 protected:
 	FVector2D ConvertWorldToMiniMap(FVector WorldLocation);
 
-	class UPGIconWidget* AddPlayerIcon(bool mine, FVector2D IconPosition);
+	class UPGIconWidget* AddPlayerIcon(bool mine, FVector2D IconPosition, float playerRotatiaon);
 
-	//void UpdateIconPosition(UUserWidget* IconWidget, FVector WorldLocation, FVector2D MapOrigin, FVector2D MapSize, FVector2D MiniMapSize);
+	void UpdateIconPosition();
 
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TSubclassOf<class UPGIconWidget> iconClass;
+	TSubclassOf<class UPGIconWidget> CharacterIconClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class UPGIconWidget> FieldIconClass;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TArray<TObjectPtr<class UPGIconWidget>> Icons;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<TObjectPtr<class UPGIconWidget>> FieldIcons;
+
+	UPROPERTY()
+	TArray<TObjectPtr<AActor>> Players;
+
+	int8 MyNum;
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UCanvasPanel> CanvasPanel_minimap;

@@ -81,6 +81,8 @@ public:
 	
 	FORCEINLINE void SetbIsAim(bool bisaim) { bIsAim = bisaim; }
 	
+	FORCEINLINE void SetbIsShoot(bool bisshoot) { bIsShoot = bisshoot; }
+	
 	//애니메이션 인스턴스에 필요
 	//에임 중일때 앵니메이션
 	float ReturnAimOffset();
