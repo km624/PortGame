@@ -1074,6 +1074,41 @@ void APGPlayerCharacter::OnStartChangeCharacterWidget(int32 num)
 		
 }
 
+void APGPlayerCharacter::SetupPlayerMiniMap(const TArray<class APGPlayerCharacter*>& allcharacters)
+{
+	if (PGHudWidget)
+	{
+		TArray<AActor*> ActorArray;
+		int8 num = 0;
+		if (allcharacters.Num() > 0)
+		{
+
+			if (allcharacters.Contains(this))
+			{
+				num = allcharacters.IndexOfByKey(this);
+
+			}
+		}
+
+		//액터로 변환
+		for (APGPlayerCharacter* Character : allcharacters)
+		{
+			ActorArray.Add(Character); 
+		}
+
+		if (ActorArray.Num() > 0)
+			PGHudWidget->SetupCharacterMinimap(num, ActorArray);
+	}
+}
+
+void APGPlayerCharacter::OnPlayersMiniMap(const TArray<APGPlayerCharacter*>& allcharacters)
+{
+	if (PGHudWidget)
+	{
+
+	}
+}
+
 
 
 

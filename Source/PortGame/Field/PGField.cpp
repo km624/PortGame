@@ -83,7 +83,7 @@ void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 			{
 				PlayerCharacters.Add(playerCharacter);
 				
-				SLOG(TEXT("%s in : %s"), *this->GetActorNameOrLabel(), *playerCharacter->GetActorNameOrLabel());
+				//SLOG(TEXT("%s in : %s"), *this->GetActorNameOrLabel(), *playerCharacter->GetActorNameOrLabel());
 				if (playerCharacter->GetPlayerHudWidget())
 				{
 					

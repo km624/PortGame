@@ -13,6 +13,7 @@
 #include "PortGame/PortGame.h"
 #include "UI/PGFieldUserWidget.h"
 #include "UI/PGAllCharactersWidget.h"
+#include "UI/PGMiniMapWidget.h"
 
 
 
@@ -166,6 +167,11 @@ void UPGHudWidget::CollapsedFieldGauge()
 void UPGHudWidget::SetUpLockImage(bool lock)
 {
 	BP_FieldGauge->SetLockImage(lock);
+}
+
+void UPGHudWidget::SetupCharacterMinimap(int8 mynum, const TArray<AActor*>& ActorArray)
+{
+	BP_MiniMap->SetupPlayers(mynum, ActorArray);
 }
 
 

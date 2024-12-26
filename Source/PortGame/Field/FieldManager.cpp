@@ -111,7 +111,7 @@ void UFieldManager::StartAllFields()
 void UFieldManager::CheckLastField(int8 teamid)
 {
     int32 CountTeam = 0;
-    SLOG(TEXT("ChangedField"));
+   
     for (APGField* Field : Fields)
     {
         if (Field->GetGenericTeamId() == teamid)
@@ -122,12 +122,12 @@ void UFieldManager::CheckLastField(int8 teamid)
     if (CountTeam == 1)
     {
         SetLastFieldLock(teamid, false);
-        SLOG(TEXT("%d team : is last"), teamid);
+        //SLOG(TEXT("%d team : is last"), teamid);
     }
     else
     {
         SetLastFieldLock(teamid, true);
-        SLOG(TEXT("%d team : is notlast lock"), teamid);
+        //SLOG(TEXT("%d team : is notlast lock"), teamid);
     }
 }
 
@@ -140,7 +140,7 @@ void UFieldManager::SetLastFieldLock(int8 teamid, bool lock)
         {
             if (lastField->GetGenericTeamId() == teamid)
             {
-                SLOG(TEXT("%s : lock = %d"), *lastField->GetActorNameOrLabel(), lock);
+                //SLOG(TEXT("%s : lock = %d"), *lastField->GetActorNameOrLabel(), lock);
                 lastField->SetbIsLocked(lock);
             }
         }

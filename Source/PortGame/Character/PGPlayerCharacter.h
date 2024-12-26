@@ -357,4 +357,11 @@ public:
 	void SetupMyCharacterWidgetToAnother(const TArray<class APGPlayerCharacter*>& allcharacters, float cooltime);
 
 	void OnStartChangeCharacterWidget(int32 num);
+	
+	//¹Ì´Ï¸Ê ui
+public:
+	void SetupPlayerMiniMap(const TArray<class APGPlayerCharacter*>& allcharacters);
+	
+	void OnPlayersMiniMap(const TArray<class APGPlayerCharacter*>& allcharacters);
+
 };

@@ -75,13 +75,7 @@ public:
 
 	void OnStartChangeCooltime(int32 num);
 
-	/*UFUNCTION()
-	void SetupCharacterWdiget(int32 num, EPlayerCharacterType type, const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat,bool bIsmine);
-
-	UFUNCTION()
-	void CharaterUpdateHpBar(float NewCurrentHp);
-	UFUNCTION()
-	void CharacterUpdateHitGaugeBar(float NewHitGauge);*/
+	
 
 public:
 	UFUNCTION()
@@ -92,6 +86,10 @@ public:
 	void CollapsedFieldGauge();
 	UFUNCTION()
 	void SetUpLockImage(bool lock);
+
+public:
+	UFUNCTION()
+	void SetupCharacterMinimap(int8 mynum ,const TArray<AActor*>& ActorArray);
 
 protected:
 	
@@ -134,7 +132,8 @@ protected:
 	TObjectPtr<class UPGFieldUserWidget> BP_FieldGauge;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPGAllCharactersWidget>BP_AllCharacterWidget;
-	//UPROPERTY()
-	//TObjectPtr<class UABCharacterStatWidget> CharacterStat;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGMiniMapWidget> BP_MiniMap;
 	
 };

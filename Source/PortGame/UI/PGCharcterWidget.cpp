@@ -53,7 +53,7 @@ void UPGCharcterWidget::SetChangeCoolTime(float cooltime)
 	Changecooltime = cooltime;
 
 	Currentcooltime = cooltime;
-	SLOG(TEXT("cool : %f"), cooltime);
+	//SLOG(TEXT("cool : %f"), cooltime);
 
 	if (ProgressBar_Character)
 	{

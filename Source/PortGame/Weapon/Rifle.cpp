@@ -318,7 +318,7 @@ void ARifle::FireWithLineTrace()
 
 		if (Controller->IsA(APlayerController::StaticClass()))
 		{
-			SLOG(TEXT("PlayerShot"));
+			//SLOG(TEXT("PlayerShot"));
 			if (currentWorld)
 			{
 				bool OutHitResult = currentWorld->LineTraceSingleByChannel(

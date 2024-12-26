@@ -113,7 +113,7 @@ void AWeapon::ComboCheck()
 
 		if (!CurrentMontageEndDelegate)
 		{
-			SLOG(TEXT("WHartthe"));
+			
 			return;
 		}
 		CurrentMontageEndDelegate->Unbind();
