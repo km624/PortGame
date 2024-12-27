@@ -120,7 +120,10 @@ void UPGMiniMapWidget::SetUpFieldIcon()
                         CanvasSlot->SetPosition(fieldiconlocation);
                         CanvasSlot->SetZOrder(0);
 
-                        CanvasSlot->SetSize(FVector2D(30.0f, 30.0f));
+                        SLOG(TEXT("%s : %f , %f"), *field->GetActorNameOrLabel(), field->GetActorScale().X, field->GetActorScale().Y);
+                        FVector2D fieldSize = ConvertFieldSizeToMiniMap(field->GetActorScale());
+
+                        CanvasSlot->SetSize(fieldSize);
 
                     }
 
@@ -151,6 +154,14 @@ FVector2D UPGMiniMapWidget::ConvertWorldToMiniMap(FVector WorldLocation)
 	
 	return FVector2D(MiniMapX, -MiniMapY);
 
+}
+
+FVector2D UPGMiniMapWidget::ConvertFieldSizeToMiniMap(FVector fieldScale)
+{
+       float sizeX = (MiniMapYMax - MiniMapYMin) / (WorldYMax - WorldYMin) * fieldScale.Y * 50.0f * 1.45f;
+       float sizeY = (MiniMapYMax - MiniMapYMin) / (WorldYMax - WorldYMin) * fieldScale.X * 50.0f * 1.55f;
+
+    return FVector2D(sizeX, sizeY);
 }
 
 UPGIconWidget* UPGMiniMapWidget::AddPlayerIcon(bool mine,FVector2D IconPosition,float playerRotatiaon)

@@ -38,6 +38,8 @@ public:
 protected:
 	FVector2D ConvertWorldToMiniMap(FVector WorldLocation);
 
+	FVector2D ConvertFieldSizeToMiniMap(FVector fieldScale);
+
 	class UPGIconWidget* AddPlayerIcon(bool mine, FVector2D IconPosition, float playerRotatiaon);
 
 	void UpdateIconPosition();
@@ -72,10 +74,14 @@ protected:
 	//ÁÂÇ¥
 protected:
 	// ¿ùµå ÁÂÇ¥ ¹üÀ§
-	float WorldXMin = 9400.0f;
+	
+	float WorldXMin = 9000.0f;
+	
 	float WorldXMax = 30900.0f;
-	float WorldYMin = -4850.0f;
-	float WorldYMax = 13000.0f;
+	
+	float WorldYMin = -4450.0f;
+
+	float WorldYMax = 14000.0f;
 
 	// ¹Ì´Ï¸Ê ÁÂÇ¥ ¹üÀ§
 	float MiniMapXMin = 0.0f;

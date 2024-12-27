@@ -278,7 +278,15 @@ void UPGAttackComponent::AttackHitCheck()
 				}
 
 				FDamageEvent DamageEvent;
-				Hit.GetActor()->TakeDamage(AttackDamage, DamageEvent, BaseCharacter->GetController(), BaseCharacter);
+				if (BaseCharacter->GetController()!=nullptr)
+				{
+					Hit.GetActor()->TakeDamage(AttackDamage, DamageEvent, BaseCharacter->GetController(), BaseCharacter);
+				}
+				else
+				{
+					SLOG(TEXT("AttackComponent: ControllerNoting!!"));
+				}
+					
 
 				BaseCharacter->AddUltiSkillGaugeToComp(BaseCharacter->GetTotalStat().Attack);
 			}
