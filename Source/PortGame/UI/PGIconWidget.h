@@ -20,8 +20,13 @@ public:
 
 	void ChangeFieldColor(int8 teamid);
 
+	void VisibleLockImage(bool lock);
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UImage> Image_Icon;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UImage> Image_lock;
 	
 };

@@ -9,7 +9,7 @@
 /**
  * 
  */
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnFieldIndexChanged, int8 /*index*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnFieldIndexChanged, int8 /*index*/,bool /*bislock*/);
 UCLASS()
 class PORTGAME_API UFieldManager : public UObject
 {

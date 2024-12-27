@@ -362,6 +362,6 @@ public:
 public:
 	void SetupPlayerMiniMap(const TArray<class APGPlayerCharacter*>& allcharacters);
 	
-	void OnPlayersMiniMap(const TArray<class APGPlayerCharacter*>& allcharacters);
+	
 
 };

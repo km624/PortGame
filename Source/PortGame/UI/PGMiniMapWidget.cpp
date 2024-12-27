@@ -85,11 +85,10 @@ void UPGMiniMapWidget::SetUpFieldArray()
             if (fieldmanager->GetFieldManager())
             {
                 Fields = fieldmanager->GetFieldManager()->GetFields();
-               
-                fieldmanager->GetFieldManager()->OnfieldIndexchanged.AddUObject(this, &ThisClass::ChangedField);
-                
-
+              
                 SetUpFieldIcon();
+
+                fieldmanager->GetFieldManager()->OnfieldIndexchanged.AddUObject(this, &ThisClass::ChangedField);
             }
            
 
@@ -133,10 +132,15 @@ void UPGMiniMapWidget::SetUpFieldIcon()
     }
 }
 
-void UPGMiniMapWidget::ChangedField(int8 index)
+void UPGMiniMapWidget::ChangedField(int8 index, bool lock)
 {
-    int8 teamcolor = Fields[index]->GetGenericTeamId();
-    FieldIcons[index]->ChangeFieldColor(teamcolor);
+    if (Fields.Num() > 0 && FieldIcons.Num() > 0)
+    {
+        int8 teamcolor = Fields[index]->GetGenericTeamId();
+        FieldIcons[index]->ChangeFieldColor(teamcolor);
+        FieldIcons[index]->VisibleLockImage(lock);
+    }
+
 }
 
 FVector2D UPGMiniMapWidget::ConvertWorldToMiniMap(FVector WorldLocation)

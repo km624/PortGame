@@ -33,7 +33,7 @@ public:
 	void SetUpFieldIcon();
 	
 	UFUNCTION()
-	void ChangedField(int8 index);
+	void ChangedField(int8 index, bool lock);
 
 protected:
 	FVector2D ConvertWorldToMiniMap(FVector WorldLocation);

@@ -91,10 +91,7 @@ void APGPlayerController::ChangedCharacterPossess(int8 playernum)
 	biscooltime = true;
 	//쿨타임 세팅
 	changeplayer->OnStartChangeCharacterWidget(PlayerCharacters.IndexOfByKey(changeplayer));
-	//minpmap 세팅
-	changeplayer->OnPlayersMiniMap(PlayerCharacters);
-
-
+	
 	GetWorld()->GetTimerManager().SetTimer(
 		ChangedCharacterTimerHanlde,
 		[this]() {

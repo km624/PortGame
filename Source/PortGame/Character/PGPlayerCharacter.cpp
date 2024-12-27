@@ -1101,13 +1101,7 @@ void APGPlayerCharacter::SetupPlayerMiniMap(const TArray<class APGPlayerCharacte
 	}
 }
 
-void APGPlayerCharacter::OnPlayersMiniMap(const TArray<APGPlayerCharacter*>& allcharacters)
-{
-	if (PGHudWidget)
-	{
 
-	}
-}
 
 
 

@@ -116,7 +116,7 @@ void UFieldManager::CheckWhoIsChanged(APGField* changefield)
         if (Fields.Contains(changefield))
         {
             int8 index = Fields.IndexOfByKey(changefield);
-            OnfieldIndexchanged.Broadcast(index);
+            OnfieldIndexchanged.Broadcast(index,false);
         }
     }
 
@@ -157,6 +157,9 @@ void UFieldManager::SetLastFieldLock(int8 teamid, bool lock)
             {
                 //SLOG(TEXT("%s : lock = %d"), *lastField->GetActorNameOrLabel(), lock);
                 lastField->SetbIsLocked(lock);
+                
+                int8 index = Fields.IndexOfByKey(lastField);
+                OnfieldIndexchanged.Broadcast(index, lock);
             }
         }
       
