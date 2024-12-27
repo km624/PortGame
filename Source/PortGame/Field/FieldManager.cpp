@@ -105,7 +105,22 @@ void UFieldManager::StartAllFields()
         
 		Field->SetUpField();
         Field->OnFieldChanged.AddUObject(this, &ThisClass::CheckLastField);
+        Field->OnFieldClassChanged.AddUObject(this, &ThisClass::CheckWhoIsChanged);
 	}
+}
+
+void UFieldManager::CheckWhoIsChanged(APGField* changefield)
+{
+    if (IsValid(changefield))
+    {
+        if (Fields.Contains(changefield))
+        {
+            int8 index = Fields.IndexOfByKey(changefield);
+            OnfieldIndexchanged.Broadcast(index);
+        }
+    }
+
+    
 }
 
 void UFieldManager::CheckLastField(int8 teamid)
@@ -147,3 +162,5 @@ void UFieldManager::SetLastFieldLock(int8 teamid, bool lock)
       
     }
 }
+
+

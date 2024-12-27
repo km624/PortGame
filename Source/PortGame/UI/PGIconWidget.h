@@ -16,8 +16,9 @@ class PORTGAME_API UPGIconWidget : public UUserWidget
 
 public:
 	
-
 	void SetPlayerIconImage();
+
+	void ChangeFieldColor(int8 teamid);
 
 protected:
 	UPROPERTY(meta = (BindWidget))

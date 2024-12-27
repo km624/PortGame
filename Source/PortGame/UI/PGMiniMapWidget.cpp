@@ -6,6 +6,10 @@
 #include "Components/CanvasPanelSlot.h"
 #include "UI/PGIconWidget.h"
 #include "PortGame/PortGame.h"
+#include "Engine/LevelScriptActor.h"
+#include "Interface/FieldManagerInterface.h"
+#include "Field/FieldManager.h"
+#include "Field/PGField.h"
 
 
 UPGMiniMapWidget::UPGMiniMapWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
@@ -64,7 +68,75 @@ void UPGMiniMapWidget::SetupPlayers(int8 mynum, const TArray<AActor*>& ActorArra
         }
 
     }
+
+    //�ʵ嵵 setup
+    SetUpFieldArray();
    
+}
+
+void UPGMiniMapWidget::SetUpFieldArray()
+{
+    if (GetWorld())
+    {
+        IFieldManagerInterface* fieldmanager =Cast<IFieldManagerInterface>(GetWorld()->GetLevelScriptActor());
+        if (fieldmanager)
+        {
+
+            if (fieldmanager->GetFieldManager())
+            {
+                Fields = fieldmanager->GetFieldManager()->GetFields();
+               
+                fieldmanager->GetFieldManager()->OnfieldIndexchanged.AddUObject(this, &ThisClass::ChangedField);
+                
+
+                SetUpFieldIcon();
+            }
+           
+
+        }
+    }
+}
+
+void UPGMiniMapWidget::SetUpFieldIcon()
+{
+    if (Fields.Num() > 0)
+    {
+        for (APGField* field : Fields)
+        {
+            if (CanvasPanel_minimap && CharacterIconClass)
+            {
+                FVector2D fieldiconlocation = ConvertWorldToMiniMap(field->GetActorLocation());
+                UPGIconWidget* fieldIcon = CreateWidget<UPGIconWidget>(GetWorld(), FieldIconClass);
+                
+                if (fieldIcon)
+                {
+                    int8 teamcolor = field->GetGenericTeamId();
+                    fieldIcon->ChangeFieldColor(teamcolor);
+
+                    UCanvasPanelSlot* CanvasSlot = CanvasPanel_minimap->AddChildToCanvas(fieldIcon);
+                    if (CanvasSlot)
+                    {
+                        CanvasSlot->SetAnchors(FAnchors(0.0f, 1.0f));
+
+                        CanvasSlot->SetPosition(fieldiconlocation);
+                        CanvasSlot->SetZOrder(0);
+
+                        CanvasSlot->SetSize(FVector2D(30.0f, 30.0f));
+
+                    }
+
+                    FieldIcons.Add(fieldIcon);
+                }
+
+            }
+        }
+    }
+}
+
+void UPGMiniMapWidget::ChangedField(int8 index)
+{
+    int8 teamcolor = Fields[index]->GetGenericTeamId();
+    FieldIcons[index]->ChangeFieldColor(teamcolor);
 }
 
 FVector2D UPGMiniMapWidget::ConvertWorldToMiniMap(FVector WorldLocation)

@@ -8,6 +8,7 @@
 #include "PGField.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnFieldChanged, int8 /*teamid*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnFielclassChanged, class APGField* /*APGField*/);
 UCLASS()
 class PORTGAME_API APGField : public AActor ,public IGenericTeamAgentInterface
 {
@@ -78,6 +79,8 @@ public:
 	void DamageField(class APawn* deadpawn,int8 attackteamid);
 
 	FOnFieldChanged OnFieldChanged;
+
+	FOnFielclassChanged OnFieldClassChanged;
 
 protected:
 

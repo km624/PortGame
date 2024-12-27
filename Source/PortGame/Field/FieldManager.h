@@ -9,6 +9,7 @@
 /**
  * 
  */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnFieldIndexChanged, int8 /*index*/);
 UCLASS()
 class PORTGAME_API UFieldManager : public UObject
 {
@@ -30,12 +31,18 @@ protected:
 
 	void FindAllFields();
 
-
 	void StartAllFields();
+
+	void CheckWhoIsChanged(class APGField* changefield);
 
 	void CheckLastField(int8 teamid);
 
 	void SetLastFieldLock(int8 teamid ,bool lock);
+
+public:
+	FOnFieldIndexChanged OnfieldIndexchanged;
+
+	const TArray<class APGField*>& GetFields() { return Fields; }
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Field")

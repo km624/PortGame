@@ -16,3 +16,18 @@ void UPGIconWidget::SetPlayerIconImage()
 	
 	
 }
+
+void UPGIconWidget::ChangeFieldColor(int8 teamid)
+{
+	FLinearColor teamcolor;
+	if (teamid==1)
+	{
+		teamcolor = FLinearColor(FVector4d(0.0f,0.0f,1.0f,0.3f));
+	}
+	else
+	{
+		teamcolor = FLinearColor(FVector4d(1.0f, 0.0f, 0.0f, 0.3f));
+	}
+	Image_Icon->SetColorAndOpacity(teamcolor);
+
+}

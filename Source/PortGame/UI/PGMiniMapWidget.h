@@ -28,6 +28,12 @@ public:
 
 	void SetupPlayers(int8 mynum, const TArray<AActor*>& ActorArray);
 
+	void SetUpFieldArray();
+
+	void SetUpFieldIcon();
+	
+	UFUNCTION()
+	void ChangedField(int8 index);
 
 protected:
 	FVector2D ConvertWorldToMiniMap(FVector WorldLocation);
@@ -40,14 +46,8 @@ protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TSubclassOf<class UPGIconWidget> CharacterIconClass;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<class UPGIconWidget> FieldIconClass;
-
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TArray<TObjectPtr<class UPGIconWidget>> Icons;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<TObjectPtr<class UPGIconWidget>> FieldIcons;
 
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> Players;
@@ -56,6 +56,17 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UCanvasPanel> CanvasPanel_minimap;
+
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class UPGIconWidget> FieldIconClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<TObjectPtr<class UPGIconWidget>> FieldIcons;
+
+	UPROPERTY()
+	TArray<TObjectPtr<class APGField>> Fields;
 	
 	
 	//ÁÂÇ¥

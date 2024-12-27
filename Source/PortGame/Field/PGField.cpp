@@ -263,6 +263,8 @@ void APGField::ChangedField(int8 teamid)
 	}
 
 	//바뀌고 나서 전에 팀id 브로드 캐스트
+	OnFieldClassChanged.Broadcast(this);
+
 	OnFieldChanged.Broadcast(PastTeamid);
 
 
