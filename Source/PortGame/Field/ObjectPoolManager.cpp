@@ -47,9 +47,14 @@ APGNpcCharacter* UObjectPoolManager::GetPooledObject(const FCharacterSpawnParams
                 if (Controller)
                 {
 					if (SpawnParams.bFieldProtect)
+					{
 						Controller->SetMyFieldData(SpawnParams.Field);
+					}
 					else
+					{
 						Controller->SetAttackAIData();
+						Character->SetbIsAttackField(true);
+					}
 
                     Controller->Possess(Character);
 
@@ -87,10 +92,15 @@ APGNpcCharacter* UObjectPoolManager::GetPooledObject(const FCharacterSpawnParams
 	{
 		pgAIcontoller->FinishSpawning(FTransform(SpawnParams.SpawnRotation, SpawnParams.SpawnLocation));
 		if (SpawnParams.bFieldProtect)
+		{
 			pgAIcontoller->SetMyFieldData(SpawnParams.Field);
+		}
 		else
+		{
+			AiCharacter->SetbIsAttackField(true);
 			pgAIcontoller->SetAttackAIData();
-
+		}
+	
 		//빙의시 바로 행동트리 시작
 		pgAIcontoller->Possess(AiCharacter);
 	}
@@ -115,6 +125,7 @@ void UObjectPoolManager::ReturnObjectToPool(APGNpcCharacter* Character)
 		Character->SetActorEnableCollision(false);
 		Character->SetActorHiddenInGame(true);
 		Character->SetActorTickEnabled(false);
+		Character->SetbIsAttackField(false);
 
 		// 컨트롤러 초기화
 		APGAIController* Controller = ObjectPool[Character];
@@ -185,4 +196,25 @@ void UObjectPoolManager::ReturnWeaponObjectToPool(AWeapon* weapon)
 	
 	//SLOG(TEXT("returnweapon : %s"), *weapon->GetActorNameOrLabel())
 
+}
+
+const TArray<APGNpcCharacter*>& UObjectPoolManager::GetAttackNPCCharacter()
+{
+	// NPC 키 배열
+	TArray<TObjectPtr<APGNpcCharacter>> NpcCharacters;
+
+	AttackNPC.Empty();
+	// 키만 배열로 추출
+	ObjectPool.GenerateKeyArray(NpcCharacters);
+
+	for (APGNpcCharacter* NPC : NpcCharacters)
+	{
+		if (!NPC->GetbIsDead() && NPC->IsActorTickEnabled() && NPC->GetbIsAttackField())
+		{
+			AttackNPC.Add(NPC);
+		}
+	}
+
+
+	return AttackNPC;
 }

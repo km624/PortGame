@@ -81,5 +81,14 @@ protected:
 
 	float ElapsedTime = 0.0f;
 
+public:
+	FORCEINLINE bool GetbIsAttackField() const { return bIsAttackField; }
+
+	FORCEINLINE void SetbIsAttackField(bool bisattacckfield) { bIsAttackField = bisattacckfield; }
+
+protected:
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	uint8 bIsAttackField : 1;
+
 
 };

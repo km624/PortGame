@@ -10,7 +10,9 @@
 #include "Interface/FieldManagerInterface.h"
 #include "Field/FieldManager.h"
 #include "Field/PGField.h"
-
+#include "Field/ObjectPoolManager.h"
+#include "Interface/ObjectPoolingInterface.h"
+#include "Character/PGNpcCharacter.h"
 
 UPGMiniMapWidget::UPGMiniMapWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
@@ -24,6 +26,12 @@ UPGMiniMapWidget::UPGMiniMapWidget(const FObjectInitializer& ObjectInitializer):
     if (FIconc.Class)
     {
         FieldIconClass = FIconc.Class;
+    }
+
+    static ConstructorHelpers::FClassFinder<UPGIconWidget> NPCiconc(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/PortGame/UI/BP_EnemyIcon.BP_EnemyIcon_C'"));
+    if (NPCiconc.Class)
+    {
+        NPCIconClass = NPCiconc.Class;
     }
 }
 
@@ -41,6 +49,11 @@ void UPGMiniMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
     {
         UpdateIconPosition();
     }
+
+   /* if (Players.Num() > 0)
+    {
+        UpdateNPCIconPosition();
+    }*/
 }
 
 
@@ -72,6 +85,8 @@ void UPGMiniMapWidget::SetupPlayers(int8 mynum, const TArray<AActor*>& ActorArra
     //�ʵ嵵 setup
     SetUpFieldArray();
    
+    //NPC setup
+    SetUpNPCCharacter();
 }
 
 void UPGMiniMapWidget::SetUpFieldArray()
@@ -135,6 +150,46 @@ void UPGMiniMapWidget::SetUpFieldIcon()
     }
 }
 
+void UPGMiniMapWidget::GetNPCToIbjectPool()
+{
+    if (GetWorld())
+    {
+        IObjectPoolingInterface* pooling = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
+        if (pooling)
+        {
+
+            if (pooling->GetObjectPoolManager())
+            {
+                NpcCharacters.Empty();
+
+                NpcCharacters = pooling->GetObjectPoolManager()->GetAttackNPCCharacter();
+
+            }
+        }
+    }
+}
+
+
+void UPGMiniMapWidget::SetUpNPCCharacter()
+{
+    GetNPCToIbjectPool();
+
+    if (NpcCharacters.Num() > 0)
+    { 
+        for (APGNpcCharacter* NPC : NpcCharacters)
+        {
+
+            FVector2D minmaplocation = ConvertWorldToMiniMap(NPC->GetActorLocation());
+            UPGIconWidget* newicon = AddNPCIcon(NPC->GetGenericTeamId(), minmaplocation);
+            if (newicon!=nullptr)
+                NPCIcons.Add(newicon);
+        }
+    }
+
+    GetWorld()->GetTimerManager().SetTimer(NPCIconUpdateHandler, this, &UPGMiniMapWidget::UpdateNPCIconPosition, NPCUpdateTime, true);
+   
+}
+
 void UPGMiniMapWidget::ChangedField(int8 index, bool lock)
 {
     if (Fields.Num() > 0 && FieldIcons.Num() > 0)
@@ -168,7 +223,6 @@ UPGIconWidget* UPGMiniMapWidget::AddPlayerIcon(bool mine,FVector2D IconPosition,
 {
     if (CanvasPanel_minimap && CharacterIconClass)
     {
-        
         UPGIconWidget* playerIcon = CreateWidget<UPGIconWidget>(GetWorld(), CharacterIconClass);
         if (playerIcon)
         {
@@ -206,6 +260,67 @@ UPGIconWidget* UPGMiniMapWidget::AddPlayerIcon(bool mine,FVector2D IconPosition,
     return nullptr;
 }
 
+UPGIconWidget* UPGMiniMapWidget::AddNPCIcon(int8 teamid, FVector2D IconPosition)
+{
+    if (CanvasPanel_minimap && NPCIconClass)
+    {
+
+        UPGIconWidget* NPCIcon = CreateWidget<UPGIconWidget>(GetWorld(), NPCIconClass);
+        if (NPCIcon)
+        {
+            UCanvasPanelSlot* CanvasSlot = CanvasPanel_minimap->AddChildToCanvas(NPCIcon);
+            if (CanvasSlot)
+            {
+                CanvasSlot->SetAnchors(FAnchors(0.0f, 1.0f));
+
+                CanvasSlot->SetPosition(IconPosition);
+
+                NPCIcon->SetNPCIconImage(teamid);
+
+                
+                CanvasSlot->SetSize(FVector2D(15.0f, 15.0f));
+
+
+                return NPCIcon;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+void UPGMiniMapWidget::RecycleNPCIcon(int32 index,int8 teamid, FVector2D IconPosition)
+{
+    if (CanvasPanel_minimap)
+    {
+        if (NPCIcons.IsValidIndex(index))
+        {
+            if (NPCIcons[index])
+            {
+                UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(NPCIcons[index]->Slot);
+                if (CanvasSlot)
+                {
+                    NPCIcons[index]->SetVisibility(ESlateVisibility::Visible);
+                    
+                    CanvasSlot->SetPosition(IconPosition);
+
+                    NPCIcons[index]->SetNPCIconImage(teamid);
+
+
+                    CanvasSlot->SetSize(FVector2D(15.0f, 15.0f));
+                }
+            }
+        }
+        else
+        {
+            UPGIconWidget* newicon = AddNPCIcon(teamid, IconPosition);
+            if (newicon != nullptr)
+                NPCIcons.Add(newicon);
+        }
+
+    }
+}
+
 void UPGMiniMapWidget::UpdateIconPosition()
 {
     for (int32 i=0; i < Players.Num(); i++)
@@ -228,5 +343,27 @@ void UPGMiniMapWidget::UpdateIconPosition()
             CanvasSlot->SetPosition(IconPos);
         }
 
+    }
+}
+
+void UPGMiniMapWidget::UpdateNPCIconPosition()
+{
+    GetNPCToIbjectPool();
+
+    for (UPGIconWidget* npcicon : NPCIcons)
+    {
+        npcicon->SetVisibility(ESlateVisibility::Collapsed);
+    }
+
+
+    if (NpcCharacters.Num() > 0)
+    {
+        for (int32 i=0;i< NpcCharacters.Num();i++)
+        {
+
+            FVector2D minmaplocation = ConvertWorldToMiniMap(NpcCharacters[i]->GetActorLocation());
+            RecycleNPCIcon(i, NpcCharacters[i]->GetGenericTeamId(), minmaplocation);
+
+        }
     }
 }

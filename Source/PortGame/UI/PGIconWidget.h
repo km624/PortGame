@@ -22,6 +22,8 @@ public:
 
 	void VisibleLockImage(bool lock);
 
+	void SetNPCIconImage(int8 teamid);
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UImage> Image_Icon;

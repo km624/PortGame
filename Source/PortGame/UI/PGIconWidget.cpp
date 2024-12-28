@@ -43,3 +43,17 @@ void UPGIconWidget::VisibleLockImage(bool lock)
 		Image_lock->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
+
+void UPGIconWidget::SetNPCIconImage(int8 teamid)
+{
+	FLinearColor teamcolor;
+	if (teamid == 1)
+	{
+		teamcolor = FLinearColor(FVector4d(0.0f, 0.0f, 1.0f, 0.8f));
+	}
+	else
+	{
+		teamcolor = FLinearColor(FVector4d(1.0f, 0.0f, 0.0f, 0.8f));
+	}
+	Image_Icon->SetColorAndOpacity(teamcolor);
+}

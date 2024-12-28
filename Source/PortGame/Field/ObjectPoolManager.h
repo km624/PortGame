@@ -57,12 +57,18 @@ public:
     UFUNCTION()
     void ReturnWeaponObjectToPool(class AWeapon* weapon);
 
+    const TArray<class APGNpcCharacter*>& GetAttackNPCCharacter();
+
 private:
 	UPROPERTY()
 	TMap<TObjectPtr<class APGNpcCharacter>, TObjectPtr<class APGAIController>> ObjectPool;
     
   
     TMap<TSubclassOf<class AWeapon>, TArray<AWeapon*>> WeaponObjectPool;
+
+    //공격하는 npc캐릭터
+    UPROPERTY()
+    TArray<APGNpcCharacter*> AttackNPC;
     
     /*UPROPERTY()
     TArray<TObjectPtr<class AWeapon>> WeaponObjectPool;*/

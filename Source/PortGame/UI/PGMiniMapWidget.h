@@ -31,6 +31,10 @@ public:
 	void SetUpFieldArray();
 
 	void SetUpFieldIcon();
+
+	void GetNPCToIbjectPool();
+
+	void SetUpNPCCharacter();
 	
 	UFUNCTION()
 	void ChangedField(int8 index, bool lock);
@@ -42,7 +46,13 @@ protected:
 
 	class UPGIconWidget* AddPlayerIcon(bool mine, FVector2D IconPosition, float playerRotatiaon);
 
+	class UPGIconWidget* AddNPCIcon(int8 teamid, FVector2D IconPosition);
+
+	void RecycleNPCIcon(int32 index ,int8 teamid, FVector2D IconPosition);
+
 	void UpdateIconPosition();
+	
+	void UpdateNPCIconPosition();
 
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
@@ -69,7 +79,21 @@ protected:
 
 	UPROPERTY()
 	TArray<TObjectPtr<class APGField>> Fields;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class UPGIconWidget> NPCIconClass;
+
+	UPROPERTY()
+	TArray<TObjectPtr<class APGNpcCharacter>> NpcCharacters;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<TObjectPtr<class UPGIconWidget>> NPCIcons;
 	
+
+	FTimerHandle NPCIconUpdateHandler;
+
+	float NPCUpdateTime = 2.0f;
 	
 	//ÁÂÇ¥
 protected:
