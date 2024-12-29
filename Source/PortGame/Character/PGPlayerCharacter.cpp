@@ -5,7 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-//#include "GameFramework/Controller.h"
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
@@ -19,14 +19,12 @@
 #include "Component/TargetingComponent.h"
 #include "Component/PGAttackComponent.h"
 #include "Kismet/GameplayStatics.h"
-//#include "Animation/AnimMontage.h"
+
 #include "Physics/PGCollision.h"
 #include "Engine/OverlapResult.h"
 #include "Interface/NPCParryCheckInterface.h"
 #include "Interface/PlayerCameraShakeInterface.h"
-//#include "LevelSequenceActor.h"
-//#include "LevelSequence.h"
-//#include "LevelSequencePlayer.h"
+
 #include "Skill/SkillBase.h"
 #include "Player/PGPlayerController.h"
 #include "Weapon/Rifle.h"
@@ -172,6 +170,14 @@ APGPlayerCharacter::APGPlayerCharacter()
 		ThreeChangeCharacterAction = ThreeC.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> MAPC(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Map.IA_Map'"));
+	if (MAPC.Object)
+	{
+		MapAction = MAPC.Object;
+	}
+	
+	
+
 	Tags.Add(TAG_PLAYER);
 
 
@@ -188,10 +194,7 @@ void APGPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
-
 	//SetCharacterInputData(CurrentControlData);
-	
 
 	FOnTimelineFloat TimelineProgress;
 	TimelineProgress.BindUFunction(this, FName("AimUpdate"));
@@ -247,6 +250,8 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(OneChangeCharacterAction, ETriggerEvent::Started, this, &APGPlayerCharacter::OneChangePlayerCharacter);
 		EnhancedInputComponent->BindAction(TwoChangeCharacterAction, ETriggerEvent::Started, this, &APGPlayerCharacter::TwoChangePlayerCharacter);
 		EnhancedInputComponent->BindAction(ThreeChangeCharacterAction, ETriggerEvent::Started, this, &APGPlayerCharacter::ThreeChangePlayerCharacter);
+
+		EnhancedInputComponent->BindAction(MapAction, ETriggerEvent::Started, this, &APGPlayerCharacter::ChangeMiniMapSize);
 
 	}
 	else
@@ -403,7 +408,7 @@ void APGPlayerCharacter::Look(const FInputActionValue& Value)
 
 void APGPlayerCharacter::Attack()
 {
-	if (bIsSlow || bIsDash)return;
+	if (bIsSlow || bIsDash || !bIsMiniMap)return;
 
 	if (bIsAim)
 	{
@@ -443,7 +448,7 @@ void APGPlayerCharacter::ReleasedAttack()
 
 void APGPlayerCharacter::PressAim()
 {
-	if (bIsSlow || bIsDash || bIsUltiSkill)return;
+	if (bIsSlow || bIsDash || bIsUltiSkill || !bIsMiniMap)return;
 
 	bIsAim = true;
 	OnbIsAim.Broadcast(bIsAim);
@@ -484,7 +489,7 @@ void APGPlayerCharacter::ReleasedAim()
 
 void APGPlayerCharacter::PressReload()
 {
-	if (bIsSlow || bIsDash || bIsUltiSkill) return;
+	if (bIsSlow || bIsDash || bIsUltiSkill || !bIsMiniMap) return;
 	ReloadToWeapon();
 }
 
@@ -1054,9 +1059,6 @@ void APGPlayerCharacter::SetupMyCharacterWidgetToAnother(const TArray<APGPlayerC
 
 					}
 				}
-				
-
-
 			}
 		}
 	
@@ -1074,7 +1076,7 @@ void APGPlayerCharacter::OnStartChangeCharacterWidget(int32 num)
 		
 }
 
-void APGPlayerCharacter::SetupPlayerMiniMap(const TArray<class APGPlayerCharacter*>& allcharacters)
+void APGPlayerCharacter::SetupPlayerMiniMap(const TArray<class APGPlayerCharacter*>& allcharacters, const TArray<APGAIController*>& allaicontrollers)
 {
 	if (PGHudWidget)
 	{
@@ -1097,8 +1099,38 @@ void APGPlayerCharacter::SetupPlayerMiniMap(const TArray<class APGPlayerCharacte
 		}
 
 		if (ActorArray.Num() > 0)
-			PGHudWidget->SetupCharacterMinimap(num, ActorArray);
+			PGHudWidget->SetupCharacterMinimap(num, ActorArray, allaicontrollers);
+
+		bIsMiniMap = true;
 	}
+}
+
+void APGPlayerCharacter::ChangeMiniMapSize()
+{
+	if (PGHudWidget)
+	{
+		APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
+		if (playerController)
+		{
+			if (bIsMiniMap)
+			{
+
+				bIsMiniMap = false;
+				UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.2f);
+			}
+			else
+			{
+				bIsMiniMap = true;
+				UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+			}
+
+			playerController->ChangeMiniMap(bIsMiniMap);
+
+			PGHudWidget->ChangeMiniMapSize(bIsMiniMap);
+		}
+		
+	}
+
 }
 
 

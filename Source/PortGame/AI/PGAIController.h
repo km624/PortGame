@@ -24,6 +24,8 @@ public:
 
 	void SetAttackAIData();
 
+	void SetForceMoveVector(FVector targetVector);
+
 	void RunAI();
 
 	void TOMyFieldDead(int8 teamid);

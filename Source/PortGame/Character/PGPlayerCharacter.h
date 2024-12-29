@@ -103,7 +103,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction>ThreeChangeCharacterAction;
 
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction>MapAction;
 
 	//매개변수 받기 위해 헤더 인클루드
 	void Move(const struct FInputActionValue& Value);
@@ -360,7 +361,16 @@ public:
 	
 	//미니맵 ui
 public:
-	void SetupPlayerMiniMap(const TArray<class APGPlayerCharacter*>& allcharacters);
+	void SetupPlayerMiniMap(const TArray<class APGPlayerCharacter*>& allcharacters, const TArray<class APGAIController*>& allaicontrollers);
+
+	FORCEINLINE bool GetbIsMiniMap(){ return bIsMiniMap; }
+protected:
+	void ChangeMiniMapSize();
+
+protected:
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	uint8 bIsMiniMap : 1;
+
 	
 	
 

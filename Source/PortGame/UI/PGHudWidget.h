@@ -89,11 +89,16 @@ public:
 
 public:
 	UFUNCTION()
-	void SetupCharacterMinimap(int8 mynum ,const TArray<AActor*>& ActorArray);
+	void SetupCharacterMinimap(int8 mynum ,const TArray<AActor*>& ActorArray, const TArray<class APGAIController*>& allaicontrollers);
+	
+	void ChangeMiniMapSize(bool bisminimap);
+
+protected:
+	float DefaultMiniMapXSize = 354.0f;
+	float DefaultMiniMapYSize = 445.5f;
 
 protected:
 	
-
 	virtual void NativeConstruct() override;
 
 

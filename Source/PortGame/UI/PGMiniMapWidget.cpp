@@ -13,6 +13,12 @@
 #include "Field/ObjectPoolManager.h"
 #include "Interface/ObjectPoolingInterface.h"
 #include "Character/PGNpcCharacter.h"
+#include "Components/Image.h"
+#include "UI/PGPlayerIconWidget.h"
+#include "Character/PGBaseCharacter.h"
+#include "AI/PGAIController.h"
+#include "NavigationSystem.h"
+#include "AI/PGAI.h"
 
 UPGMiniMapWidget::UPGMiniMapWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
@@ -45,11 +51,17 @@ void UPGMiniMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+   
     if (Players.Num() > 0)
     {
         UpdateIconPosition();
     }
 
+
+   /* if (SelectIndex != -1)
+    {
+        SLOG(TEXT("Select index : %d"), SelectIndex);
+    }*/
    /* if (Players.Num() > 0)
     {
         UpdateNPCIconPosition();
@@ -58,11 +70,11 @@ void UPGMiniMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 
 
-void UPGMiniMapWidget::SetupPlayers(int8 mynum, const TArray<AActor*>& ActorArray)
+void UPGMiniMapWidget::SetupPlayers(int8 mynum, const TArray<AActor*>& ActorArray, const TArray<APGAIController*>& allaicontrollers)
 {
     Players = ActorArray;
     MyNum = mynum;
-   
+    PlayersControllers = allaicontrollers;
     if (ActorArray.Num() > 0)
     {
         for (int32 i = 0; i < ActorArray.Num(); i++)
@@ -75,12 +87,21 @@ void UPGMiniMapWidget::SetupPlayers(int8 mynum, const TArray<AActor*>& ActorArra
             }
             FVector2D minmaplocation = ConvertWorldToMiniMap(ActorArray[i]->GetActorLocation());
             UPGIconWidget * newicon = AddPlayerIcon(mine, minmaplocation, ActorArray[i]->GetActorRotation().Yaw);
-            Icons.Add(newicon);
-           
-          
+            UPGPlayerIconWidget* playericon = Cast< UPGPlayerIconWidget>(newicon);
+            if (playericon)
+            {
+                //임시
+                APGBaseCharacter* playercharacter = Cast<APGBaseCharacter>(ActorArray[i]);
+                if (playercharacter)
+                {
+                    playericon->SetUpPlayerIconImage(playercharacter->GetPlayerCharacterType() , mine, i, this);
+                    Icons.Add(newicon);
+                }  
+            }     
         }
-
     }
+
+    bIsMiniMap = true;
 
     //필드도 setup
     SetUpFieldArray();
@@ -135,7 +156,7 @@ void UPGMiniMapWidget::SetUpFieldIcon()
                         CanvasSlot->SetPosition(fieldiconlocation);
                         CanvasSlot->SetZOrder(0);
 
-                        SLOG(TEXT("%s : %f , %f"), *field->GetActorNameOrLabel(), field->GetActorScale().X, field->GetActorScale().Y);
+                        
                         FVector2D fieldSize = ConvertFieldSizeToMiniMap(field->GetActorScale());
 
                         CanvasSlot->SetSize(fieldSize);
@@ -198,6 +219,72 @@ void UPGMiniMapWidget::ChangedField(int8 index, bool lock)
         FieldIcons[index]->ChangeFieldColor(teamcolor);
         FieldIcons[index]->VisibleLockImage(lock);
     }
+
+}
+
+void UPGMiniMapWidget::ChangeMinimapSize(bool bisminimap)
+{
+    //미니맵 설정
+    FLinearColor minimapalpha;
+
+    bIsMiniMap = bisminimap;
+
+    if (bisminimap)
+    {
+        //선택한 캐릭터 인덱스 초기화
+        SelectIndex = -1;
+
+        minimapalpha = FLinearColor(FVector4d(1.0f, 1.0f, 1.0f, 0.7f));
+        MiniMapXMax *= 0.5f;
+        MiniMapYMax *= 0.5f;
+        
+    }
+    else
+    {
+        minimapalpha = FLinearColor(FVector4d(1.0f, 1.0f, 1.0f, 1.0f));
+        MiniMapXMax *= 2.0f;
+        MiniMapYMax *= 2.0f;
+       
+    }
+
+    UCanvasPanelSlot* ImageCanvasSlot = Cast<UCanvasPanelSlot>(Image_Minimap->Slot);
+    if (ImageCanvasSlot)
+    {
+        Image_Minimap->SetColorAndOpacity(minimapalpha);
+        ImageCanvasSlot->SetSize(FVector2D(MiniMapXMax, MiniMapYMax));
+    }
+
+    //플레이어 아이콘 설정
+    for (UPGIconWidget* icon : Icons)
+    {
+       
+        UPGPlayerIconWidget* playericon = Cast< UPGPlayerIconWidget>(icon);
+
+        UCanvasPanelSlot* playerCanvasSlot = Cast<UCanvasPanelSlot>(playericon->Slot);
+        if (playerCanvasSlot)
+        {
+            if (bisminimap)
+            {
+                playerCanvasSlot->SetSize(FVector2D(30.0f, 30.0f));
+            }
+            else
+            {
+                playerCanvasSlot->SetSize(FVector2D(100.0f, 100.0f));
+            }
+
+            playericon->ChangePlayerIcon(bisminimap);
+
+        }
+    }
+
+    
+
+    //강제로 한번 Update NPC
+    UpdateNPCIconPosition();
+
+    //필드의 위치와 사이즈 다시 변환
+    UpdateFieldIconPostition();
+
 
 }
 
@@ -330,10 +417,44 @@ void UPGMiniMapWidget::UpdateIconPosition()
 
         FVector2D IconPos = ConvertWorldToMiniMap(playerLocation);
 
+        // 겹침 방지를 위한 오프셋 계산
+        FVector2D TotalOffset = FVector2D(0.0f, 0.0f);
+        for (int32 j = 0; j < i; j++) // 이전 아이콘들과 거리 계산
+        {
+            FVector otherLocation = Players[j]->GetActorLocation();
+            FVector2D OtherIconPos = ConvertWorldToMiniMap(otherLocation);
+
+            float Distance = FVector2D::Distance(IconPos, OtherIconPos);
+            float DistanceSafe;
+            if (bIsMiniMap)
+            {
+                DistanceSafe = 10.0f;
+            }
+            else
+            {
+                DistanceSafe = 50.0f;
+            }
+
+            if (Distance < DistanceSafe) // 거리 임계값 (10은 예시값)
+            {
+                FVector2D Offset = (IconPos - OtherIconPos).GetSafeNormal() * DistanceSafe;
+                TotalOffset += Offset;
+            }
+        }
+        IconPos += TotalOffset;
+
 
  
         FWidgetTransform Transform;
-        Transform.Angle = playerRotation.Yaw;
+        if (bIsMiniMap)
+        {
+            Transform.Angle = playerRotation.Yaw;
+        }
+        else
+        {
+            Transform.Angle = 0.0f;
+        }
+      
 
         Icons[i]->SetRenderTransform(Transform);
 
@@ -366,4 +487,121 @@ void UPGMiniMapWidget::UpdateNPCIconPosition()
 
         }
     }
+}
+
+void UPGMiniMapWidget::UpdateFieldIconPostition()
+{
+    if (Fields.Num() > 0)
+    {
+        for (int32 i=0;i< Fields.Num();i++)
+        {
+            if (CanvasPanel_minimap)
+            {
+                FVector2D fieldiconlocation = ConvertWorldToMiniMap(Fields[i]->GetActorLocation());
+               
+                if (FieldIcons.IsValidIndex(i))
+                {
+
+                    UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(FieldIcons[i]->Slot);
+                    if (CanvasSlot)
+                    {
+                        //CanvasSlot->SetAnchors(FAnchors(0.0f, 1.0f));
+
+                        CanvasSlot->SetPosition(fieldiconlocation);
+                        CanvasSlot->SetZOrder(0);
+
+
+                        FVector2D fieldSize = ConvertFieldSizeToMiniMap(Fields[i]->GetActorScale());
+
+                        CanvasSlot->SetSize(fieldSize);
+
+                    }
+
+        
+                }
+
+            }
+        }
+    }
+}
+
+UNavigationPath* UPGMiniMapWidget::CalculateNavigationPath(FVector StartLocation, FVector TargetLocation)
+{
+   
+    UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+    if (!NavSys) return nullptr;
+
+    return NavSys->FindPathToLocationSynchronously(GetWorld(), StartLocation, TargetLocation);
+   
+}
+
+FReply UPGMiniMapWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+    if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+    {
+        FVector2D ClickedPosition = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+        //SLOG(TEXT("%f , %f "), ClickedPosition.X, ClickedPosition.Y);
+        FVector TargetWorldLocation = ConvertMiniMapToWorld(ClickedPosition);
+        //SLOG(TEXT("%f , %f "), TargetWorldLocation.X, TargetWorldLocation.Y);
+
+        if (SelectIndex != -1)
+        {
+            MoveSelectCharacterToLocation(SelectIndex, TargetWorldLocation);
+        }
+
+    }
+    return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+}
+
+void UPGMiniMapWidget::MoveSelectCharacterToLocation(int32 index, FVector TargetLocation)
+{
+    if (PlayersControllers.IsValidIndex(index))
+    {
+        UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(PlayersControllers[index]);
+        if (NavSys)
+        {
+            PlayersControllers[index]->SetForceMoveVector(TargetLocation);
+            SLOG(TEXT("ForceMove"));
+        }
+    }
+}
+
+FVector UPGMiniMapWidget::ConvertMiniMapToWorld(FVector2D targetPostion)
+{
+
+    float WorldMapX = ((((targetPostion.Y - MiniMapYMax)*-1) - MiniMapYMin) / (MiniMapYMax - MiniMapYMin)) * (WorldXMax - WorldXMin) + WorldXMin;
+    float WorldMapY = ((targetPostion.X - MiniMapXMin) / (MiniMapXMax - MiniMapXMin)) * (WorldYMax - WorldYMin) + WorldYMin;
+    
+    //// 미니맵 좌표를 정규화 (0~1 범위로 변환)
+    /*FVector2D NormalizedPosition;
+    NormalizedPosition.X = (targetPostion.X - MiniMapXMin) / (MiniMapXMax - MiniMapXMin);
+    NormalizedPosition.Y = (targetPostion.Y - MiniMapYMin) / (MiniMapYMax - MiniMapYMin);
+
+    float WorldX = FMath::Lerp(WorldXMin, WorldXMax, NormalizedPosition.Y);
+    float WorldY = FMath::Lerp(WorldYMin, WorldYMax, NormalizedPosition.X);*/
+    
+
+    FVector CheckLocation = CheckNavigableLocation(FVector(WorldMapX, WorldMapY, 1200.f));
+
+    return CheckLocation;
+}
+
+FVector UPGMiniMapWidget::CheckNavigableLocation(FVector TargetLocation)
+{
+    UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+    if (NavSys)
+    {
+       
+        FNavLocation NavLocation;
+        FVector QueryExtent = FVector(100.0f, 100.0f, 2000.0f);
+        if (NavSys->ProjectPointToNavigation(TargetLocation, NavLocation, QueryExtent))
+        {
+
+           
+            return NavLocation.Location; 
+        }
+    }
+
+    
+    return FVector::ZeroVector;
 }

@@ -46,6 +46,21 @@ void APGAIController::SetAttackAIData()
 	}
 }
 
+void APGAIController::SetForceMoveVector(FVector targetVector)
+{
+	UBlackboardComponent* BlackboardComp = Blackboard.Get();
+	if (BlackboardComp)
+	{
+		if (targetVector == FVector::ZeroVector)
+		{
+			SLOG(TEXT("CantMovetoTarget"));
+			return;
+		}
+		
+		BlackboardComp->SetValueAsVector(BBKEY_FORCEMOVEVECTOR, targetVector);
+	}
+}
+
 void APGAIController::RunAI()
 {
 	//SLOG(TEXT("RunAi"));

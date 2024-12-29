@@ -26,6 +26,7 @@ void APGPlayerController::BeginPlay()
 	
 	FInputModeGameOnly GameOnlyInputMode;
 	SetInputMode(GameOnlyInputMode);
+	
 
 }
 
@@ -37,6 +38,7 @@ void APGPlayerController::OnPossess(APawn* aPawn)
 	APGPlayerCharacter* currentplayer = Cast<APGPlayerCharacter>(aPawn);
 	//PlayerCharacters.Add(currentplayer);
 	SetViewTarget(GetPawn());
+
 	currentplayer->SetCharacterInputData(EControlData::Base);
 	//sSLOG(TEXT("Possess :%s"), *aPawn->GetActorNameOrLabel());
 	if (currentplayer)
@@ -83,6 +85,12 @@ void APGPlayerController::ChangedCharacterPossess(int8 playernum)
 	}
 
 	APGPlayerCharacter* currentplayer = Cast<APGPlayerCharacter>(GetPawn());
+
+	if (!currentplayer->GetbIsMiniMap())
+	{
+		SLOG(TEXT("Map!!!!"));
+		return;
+	}
 	
 	UnPossess();
 
@@ -130,7 +138,7 @@ void APGPlayerController::SetupAllCharcterWidget()
 		{
 			playerCharacter->SetupMyCharacterWidgetToAnother(PlayerCharacters, ChangeCooltime);
 
-			playerCharacter->SetupPlayerMiniMap(PlayerCharacters);
+			playerCharacter->SetupPlayerMiniMap(PlayerCharacters, AIPlayerControllers);
 		}
 	}
 }
@@ -171,6 +179,24 @@ void APGPlayerController::ChangeCharacterController(APGPlayerCharacter* newchara
 				newaicontroller->AIIsDead();
 			}
 		}
+	}
+}
+
+void APGPlayerController::ChangeMiniMap(bool bIsMiniMap)
+{
+	if(bIsMiniMap)
+	{
+		FInputModeGameOnly GameOnlyInputMode;
+		SetIgnoreLookInput(false);
+		bShowMouseCursor = false;
+		SetInputMode(GameOnlyInputMode);
+	}
+	else
+	{
+		FInputModeGameAndUI GameAndUI;
+		SetIgnoreLookInput(true);
+		bShowMouseCursor = true;
+		SetInputMode(GameAndUI);
 	}
 }
 

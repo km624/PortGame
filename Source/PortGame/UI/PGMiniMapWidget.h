@@ -25,8 +25,7 @@ protected:
 
 public:
 	
-
-	void SetupPlayers(int8 mynum, const TArray<AActor*>& ActorArray);
+	void SetupPlayers(int8 mynum, const TArray<AActor*>& ActorArray, const TArray<class APGAIController*>& allaicontrollers);
 
 	void SetUpFieldArray();
 
@@ -38,6 +37,8 @@ public:
 	
 	UFUNCTION()
 	void ChangedField(int8 index, bool lock);
+
+	void ChangeMinimapSize(bool bisminimap);
 
 protected:
 	FVector2D ConvertWorldToMiniMap(FVector WorldLocation);
@@ -54,6 +55,21 @@ protected:
 	
 	void UpdateNPCIconPosition();
 
+	void UpdateFieldIconPostition();
+
+protected:
+	class UNavigationPath* CalculateNavigationPath(FVector StartLocation, FVector TargetLocation);
+
+	FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
+
+	void MoveSelectCharacterToLocation(int32 index, FVector TargetLocation);
+
+	FVector ConvertMiniMapToWorld(FVector2D targetPostion);
+
+	FVector CheckNavigableLocation(FVector TargetLocation);
+
+protected:
+	uint8 bIsMiniMap : 1;
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TSubclassOf<class UPGIconWidget> CharacterIconClass;
@@ -63,6 +79,8 @@ protected:
 
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> Players;
+
+	TArray<TObjectPtr<class APGAIController>> PlayersControllers;
 
 	int8 MyNum;
 
@@ -94,17 +112,26 @@ protected:
 	FTimerHandle NPCIconUpdateHandler;
 
 	float NPCUpdateTime = 2.0f;
+
+protected:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UImage> Image_Minimap;
+
+public:
+	FORCEINLINE void SetSelectIndex(int32 select) { SelectIndex = select; }
+
+protected:
+	UPROPERTY()
+	int32 SelectIndex = -1;
+
 	
 	//ÁÂÇ¥
 protected:
 	// ¿ùµå ÁÂÇ¥ ¹üÀ§
 	
 	float WorldXMin = 9000.0f;
-	
 	float WorldXMax = 30900.0f;
-	
 	float WorldYMin = -4450.0f;
-
 	float WorldYMax = 14000.0f;
 
 	// ¹Ì´Ï¸Ê ÁÂÇ¥ ¹üÀ§

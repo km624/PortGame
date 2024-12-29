@@ -14,6 +14,9 @@
 #include "UI/PGFieldUserWidget.h"
 #include "UI/PGAllCharactersWidget.h"
 #include "UI/PGMiniMapWidget.h"
+#include "Components/CanvasPanel.h"
+#include "Components/CanvasPanelSlot.h"
+#include "AI/PGAIController.h"
 
 
 
@@ -169,9 +172,37 @@ void UPGHudWidget::SetUpLockImage(bool lock)
 	BP_FieldGauge->SetLockImage(lock);
 }
 
-void UPGHudWidget::SetupCharacterMinimap(int8 mynum, const TArray<AActor*>& ActorArray)
+void UPGHudWidget::SetupCharacterMinimap(int8 mynum, const TArray<AActor*>& ActorArray, const TArray<APGAIController*>& allaicontrollers)
 {
-	BP_MiniMap->SetupPlayers(mynum, ActorArray);
+	BP_MiniMap->SetupPlayers(mynum, ActorArray, allaicontrollers);
+}
+
+void UPGHudWidget::ChangeMiniMapSize(bool bisminimap)
+{
+
+	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(BP_MiniMap->Slot);
+	if (CanvasSlot)
+	{
+		if (bisminimap)
+		{
+			CanvasSlot->SetSize(FVector2D(DefaultMiniMapXSize, DefaultMiniMapYSize));
+
+			CanvasSlot->SetAnchors(FAnchors(1.0f, 0.0f, 1.0f, 0.0f));
+			CanvasSlot->SetAlignment(FVector2D(1.0f, 0.0f));
+
+			CanvasSlot->SetPosition(FVector2D(-50.0f, 50.0f));
+			
+		}
+		else
+		{
+			CanvasSlot->SetSize(FVector2D(DefaultMiniMapXSize*2.0f, DefaultMiniMapYSize*2.0f));
+			CanvasSlot->SetAnchors(FAnchors(0.5f,0.5f));
+			CanvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));
+			CanvasSlot->SetPosition(FVector2D(0.0f, 0.0f));		
+		}
+
+		BP_MiniMap->ChangeMinimapSize(bisminimap);
+	}
 }
 
 

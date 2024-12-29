@@ -46,9 +46,12 @@ public:
 
 	void SetupAllCharcterWidget();
 
-
 protected:
 	void ChangeCharacterController(class APGPlayerCharacter* newcharacter, class APGPlayerCharacter* oldcharacter);
+
+public:
+	void ChangeMiniMap(bool bIsMiniMap);
+
 
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
