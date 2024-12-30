@@ -20,6 +20,7 @@
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/Controller.h"
 #include "Character/PGAIBaseCharacter.h"
+#include "GenericTeamAgentInterface.h"
 
 
 const FString ARifle::ReloadMontage = TEXT("ReloadingMontage");
@@ -349,45 +350,6 @@ void ARifle::FireWithLineTrace()
 		}
 	
 	}
-	//플레이어인지 확인
-	//IAttackHitStopInterface* Player = Cast<IAttackHitStopInterface>(OwnerCharacter);
-
-
-	//if (Player)
-	//{
-	//	if (currentWorld)
-	//	{
-	//		bool OutHitResult = currentWorld->LineTraceSingleByChannel(
-	//			hitResult,
-	//			Camerastart,
-	//			CameraEnd,
-	//			ECollisionChannel::ECC_Visibility,
-	//			collisionParams);
-
-	//		if (OutHitResult)
-	//		{
-
-	//			FVector ForwardVector = OwnerCharacter->GetController()->GetControlRotation().Vector();
-	//			FVector HitLocationWithOffset = hitResult.Location + (ForwardVector * 50.0f);
-	//			end = HitLocationWithOffset;
-
-
-	//		}
-	//		else
-	//			end = CameraEnd;
-
-
-	//	}
-	//}
-	//else
-	//{
-	//	//이때는 NPC
-	//	APGNpcCharacter* NPCPlayer = Cast<APGNpcCharacter>(OwnerCharacter);
-	//	if (NPCPlayer)
-	//	{
-	//		end = NPCPlayer->GetTargetPawn()->GetActorLocation();
-	//	}
-	//}
 
 	if (!bIsRifle)
 		GunDamage = OwnerCharacter->GetTotalStat().Attack* 1.5f;
@@ -419,16 +381,22 @@ void ARifle::FireWithLineTrace()
 
 		if (OutHitResult)
 		{
-			FDamageEvent DamageEvent;
-			hitResult.GetActor()->TakeDamage(GunDamage, DamageEvent, OwnerCharacter->GetController(), OwnerCharacter);
+			IGenericTeamAgentInterface* teamcheck = Cast<IGenericTeamAgentInterface>(hitResult.GetActor());
+			if (teamcheck)
+			{
+				if (teamcheck->GetTeamAttitudeTowards(*OwnerCharacter))
+				{
+					APGBaseCharacter* hitTarget = Cast<APGBaseCharacter>(hitResult.GetActor());
+					if (hitTarget)
+						hitTarget->StartNiagaraEffect(NAGunEffect, hitTarget->GetActorLocation());
 
-			APGBaseCharacter* hitTarget = Cast<APGBaseCharacter>(hitResult.GetActor());
-			if(hitTarget)
-				hitTarget->StartNiagaraEffect(NAGunEffect, hitTarget->GetActorLocation());
+					FDamageEvent DamageEvent;
+					hitResult.GetActor()->TakeDamage(GunDamage, DamageEvent, OwnerCharacter->GetController(), OwnerCharacter);
 
-			OwnerCharacter->AddUltiSkillGaugeToComp(GunDamage);
+					OwnerCharacter->AddUltiSkillGaugeToComp(GunDamage);
+				}
+			}
 		}
-
 	}
 	StartGunEffect();
 

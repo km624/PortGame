@@ -131,6 +131,8 @@ void APGAIController::BlackBoardReset()
 		BlackboardComp->ClearValue(BBKEY_TARGET);
 		
 
+		
+
 	}
 	
 }

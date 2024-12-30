@@ -101,10 +101,18 @@ protected:
 
 
 protected:
+
 	void OnAttackAISpawn();
+
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
 	int32 AttackAISpawnCount;
+
+	FTimerHandle AttackAISpawnTimeHandler;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
+	float AttackAISpawnTime= 30.0f;
 
 
 

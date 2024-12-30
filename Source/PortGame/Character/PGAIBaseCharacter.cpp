@@ -52,27 +52,30 @@ float APGAIBaseCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
 		TargetPawn = pawn;
 
 	}
-	if (targetDistance > GetTotalStat().AttackRange * 2.5f)
+	if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
 	{
-		if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
+		
+		UGunWeaponData* gundata = Cast<UGunWeaponData>(AttackComponent->GetWeaponData());
+		if (gundata)
 		{
-			UGunWeaponData* gundata = Cast<UGunWeaponData>(AttackComponent->GetWeaponData());
-			if (gundata)
+			if (gundata->GunStat.traceDistance * 0.9f >= targetDistance && targetDistance > 100.0f)
 			{
 				bIsShoot = true;
 				bIsAim = true;
-
-
+				
 				return gundata->GunStat.traceDistance * 0.9f;
+			}
+			else if(gundata->GunStat.traceDistance * 0.9f < targetDistance)
+			{
+				bIsShoot = false;
+				bIsAim = false;
 			}
 		}
 	}
 
 	bIsShoot = false;
 	bIsAim = false;
-
-
-	return GetTotalStat().AttackRange * 2;
+	return 100.0f;
 }
 
 void APGAIBaseCharacter::AttackByAI()

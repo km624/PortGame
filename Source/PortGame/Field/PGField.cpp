@@ -65,10 +65,11 @@ void APGField::InitializeField(uint8 teamid)
 		OnAISpawn();
 	}
 
-	for (int i = 0; i < AttackAISpawnCount; i++)
-	{
-		OnAttackAISpawn();
-	}
+	GetWorld()->GetTimerManager().SetTimer(AttackAISpawnTimeHandler,
+		this, &ThisClass::OnAttackAISpawn, AttackAISpawnTime, true);
+	OnAttackAISpawn();
+
+	
 }
 
 void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)
@@ -247,6 +248,7 @@ void APGField::ChangedField(int8 teamid)
 			}
 		}
 	}
+	GetWorld()->GetTimerManager().ClearTimer(AttackAISpawnTimeHandler);
 
 	InitializeField(teamid);
 
@@ -273,30 +275,32 @@ void APGField::ChangedField(int8 teamid)
 void APGField::OnAttackAISpawn()
 {
 	FVector FieldSize = GetActorScale() * 50.0f;
-
-	FVector SpawnLocation = FVector(FMath::FRandRange(-FieldSize.X, FieldSize.X), FMath::FRandRange(-FieldSize.Y, FieldSize.Y), 125.0f) + GetActorLocation();
-	FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f);
-
 	IObjectPoolingInterface* poolmanager = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
 
-	if (poolmanager)
+	for (int i = 0; i < AttackAISpawnCount; i++)
 	{
-		//소환될 데이터 
-		FCharacterSpawnParams Params;
-		Params.SpawnLocation = SpawnLocation;
-		Params.SpawnRotation = SpawnRotation;
-		Params.CharacterData = AIDatas[0];
-		Params.TeamId = TeamId;
-		Params.Field = this;
-		Params.bFieldProtect = false;
+		FVector SpawnLocation = FVector(FMath::FRandRange(-FieldSize.X, FieldSize.X), FMath::FRandRange(-FieldSize.Y, FieldSize.Y), 125.0f) + GetActorLocation();
+		FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f);
 
-
-		APGNpcCharacter* aicharacter = poolmanager->GetObjectPoolManager()->GetPooledObject(Params);
-
-		if (aicharacter)
+		if (poolmanager)
 		{
-			AICharacters.Add(aicharacter);
+			//소환될 데이터 
+			FCharacterSpawnParams Params;
+			Params.SpawnLocation = SpawnLocation;
+			Params.SpawnRotation = SpawnRotation;
+			Params.CharacterData = AIDatas[0];
+			Params.TeamId = TeamId;
+			Params.Field = this;
+			Params.bFieldProtect = false;
 
+
+			APGNpcCharacter* aicharacter = poolmanager->GetObjectPoolManager()->GetPooledObject(Params);
+
+			if (aicharacter)
+			{
+				AICharacters.Add(aicharacter);
+
+			}
 		}
 	}
 

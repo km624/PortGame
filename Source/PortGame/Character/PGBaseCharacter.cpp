@@ -52,7 +52,9 @@ APGBaseCharacter::APGBaseCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
-	//GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
+
+	
+
 
 	// Mesh 위치랑 회전 해줌 안맞아서
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -100.0f), FRotator(0.0f, -90.0f, 0.0f));

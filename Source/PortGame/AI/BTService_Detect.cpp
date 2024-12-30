@@ -13,6 +13,7 @@
 #include "PortGame/PortGame.h"
 #include "GenericTeamAgentInterface.h"
 #include "Interface/AITargetPlayerInterface.h"
+#include "Character/PGBaseCharacter.h"
 
 
 UBTService_Detect::UBTService_Detect()
@@ -172,8 +173,15 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			player->DeletePlayerTargetPawn(ControllingPawn);
 		}
 	}
+	APGBaseCharacter* basecharacter = Cast<APGBaseCharacter>(ControllingPawn);
+	if (basecharacter)
+	{
+		basecharacter->SetbIsAim(false);
+		basecharacter->SetbIsShoot(false);
+	}
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);
+
 
 	if (protecteField)
 	{

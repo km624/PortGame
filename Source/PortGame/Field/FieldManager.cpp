@@ -38,7 +38,7 @@ FVector UFieldManager::FoundEnemyField(AActor* sourceActor)
 
     float MinDistance = FLT_MAX; // 최소 거리
     FVector ClosestFieldLocation = FVector::ZeroVector; // 반환할 위치
-
+    FVector FieldSize = FVector::ZeroVector;
     FVector SourceLocation = sourceActor->GetActorLocation(); // SourceActor의 위치
 
     for (APGField* TargetField : Fields)
@@ -74,12 +74,15 @@ FVector UFieldManager::FoundEnemyField(AActor* sourceActor)
             if (PathLength < MinDistance)
             {
                 MinDistance = PathLength;
+                FieldSize = TargetField->GetActorScale() * 50.0f;
                 ClosestFieldLocation = TargetLocation;
             }
         }
     }
+   
+    FVector OffsetLocation = ClosestFieldLocation + FVector(FMath::FRandRange(-FieldSize.X, FieldSize.X), FMath::FRandRange(-FieldSize.Y, FieldSize.Y), 0.0f);
 
-    return ClosestFieldLocation; 
+    return OffsetLocation;
 }
 
 void UFieldManager::FindAllFields()

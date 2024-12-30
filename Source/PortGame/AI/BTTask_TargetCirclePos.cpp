@@ -10,6 +10,7 @@
 #include "Interface/PGAICharacterInterface.h"
 #include "Math/UnrealMathUtility.h"
 #include "DrawDebugHelpers.h"
+#include "Character/PGBaseCharacter.h"
 
 
 UBTTask_TargetCirclePos::UBTTask_TargetCirclePos()
@@ -52,32 +53,22 @@ EBTNodeResult::Type UBTTask_TargetCirclePos::ExecuteTask(UBehaviorTreeComponent&
 		return EBTNodeResult::Failed;
 	}
 
-	// 0에서 360도 사이의 랜덤 각도 생성 (라디안으로 변환)
-	//float RandomAngle = FMath::RandRange(0.0f, 360.0f); // 0도에서 360도까지 랜덤
-	//float Radian = FMath::DegreesToRadians(RandomAngle); // 도를 라디안으로 변환
-
-	//// 플레이어의 위치 가져오기
-	//FVector TargetLocation = TargetPawn->GetActorLocation();
-	//FVector ControllingLocation = ControllingPawn->GetActorLocation();
-
-	//// 상대방 방향 벡터 계산
-	//FVector DirectionToPlayer = (TargetLocation - ControllingLocation).GetSafeNormal();
-
-	//// 방향 벡터에서 각도 계산
-	//float PlayerAngle = FMath::Atan2(DirectionToPlayer.Y, DirectionToPlayer.X) * 180.0f / PI; // 라디안에서 도로 변환
-
-	//// 90도 범위 내에서 랜덤 각도 생성 (±45도)
-	//float RandomAngle = FMath::RandRange(PlayerAngle -30.0f, PlayerAngle + 30.0f);
-	//float Radian = FMath::DegreesToRadians(RandomAngle); // 도를 라디안으로 변환
-
-	//FVector NewLocation = TargetLocation + FVector(FMath::Cos(Radian) * 300.0f, FMath::Sin(Radian) * 300.0f, 0.0f);
-
-
+	
 	// 플레이어의 위치 가져오기
 	FVector TargetLocation = TargetPawn->GetActorLocation();
 	FVector ControllingLocation = ControllingPawn->GetActorLocation();
-	float TraceDistance = AIPawn->GetAIAttackRange(ControllingPawn->GetDistanceTo(TargetPawn), TargetPawn)/0.5f;
+	float TraceDistance = AIPawn->GetAIAttackRange(ControllingPawn->GetDistanceTo(TargetPawn), TargetPawn)*1.5f;
 
+	APGBaseCharacter* character = Cast<APGBaseCharacter>(ControllingPawn);
+	if (character)
+	{
+		character->SetbIsAim(false);
+		character->SetbIsShoot(false);
+	}
+	if (TraceDistance < 350.0f)
+	{
+		TraceDistance = 350.0f;
+	}
 	// 상대방 방향 벡터 계산
 	FVector DirectionToPlayer = (TargetLocation - ControllingLocation).GetSafeNormal();
 
@@ -88,13 +79,15 @@ EBTNodeResult::Type UBTTask_TargetCirclePos::ExecuteTask(UBehaviorTreeComponent&
 	float  RandomAngle = FMath::RandRange(PlayerAngle - 60.0f, PlayerAngle + 60.0f);
 	float Radian = FMath::DegreesToRadians(RandomAngle+180.0f); // 도를 라디안으로 변환
 
-	// TargetPawn의 위치를 기준으로 새로운 위치 계산 (반지름 300미터)
+	
 	FVector NewLocation = TargetLocation + FVector(FMath::Cos(Radian) * TraceDistance, FMath::Sin(Radian) * TraceDistance, 0.0f);
 	
 	OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_CIRCLEPOS, NewLocation);
 
 	DrawDebugPoint(World, NewLocation, 10.0f, FColor::Blue, false, 1.0f);
 	DrawDebugLine(World, ControllingPawn->GetActorLocation(), NewLocation, FColor::Blue, false, 1.0f);
+
+	
 
 	return EBTNodeResult::Succeeded;
 
