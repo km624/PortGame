@@ -57,10 +57,11 @@ protected:
 
 	void UpdateFieldIconPostition();
 
+	//미니맵으로 ai 이동
 protected:
 	class UNavigationPath* CalculateNavigationPath(FVector StartLocation, FVector TargetLocation);
 
-	FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent);
+	FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
 	void MoveSelectCharacterToLocation(int32 index, FVector TargetLocation);
 
@@ -68,8 +69,31 @@ protected:
 
 	FVector CheckNavigableLocation(FVector TargetLocation);
 
+	//가능한 경로인지 확인
+	bool IsLocationReachable(int32 index, FVector TargetLocation);
+
+	//미니맵 ai 경로 표시
 protected:
+	TArray<FVector> CalculateNavPath(FVector StartLocation, FVector EndLocation);
+
+	FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	
+	int32 NativePaint(
+		const FPaintArgs& Args,
+		const FGeometry& AllottedGeometry,
+		const FSlateRect& MyCullingRect,
+		FSlateWindowElementList& OutDrawElements,
+		int32 LayerId,
+		const FWidgetStyle& InWidgetStyle,
+		bool bParentEnabled) const override;
+	
+protected:
+
 	uint8 bIsMiniMap : 1;
+
+	UPROPERTY()
+	TArray<FVector2D> MiniMapPathPoints;
+
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TSubclassOf<class UPGIconWidget> CharacterIconClass;

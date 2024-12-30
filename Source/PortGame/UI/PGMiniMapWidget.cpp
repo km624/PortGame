@@ -18,7 +18,9 @@
 #include "Character/PGBaseCharacter.h"
 #include "AI/PGAIController.h"
 #include "NavigationSystem.h"
+#include "NavigationPath.h"
 #include "AI/PGAI.h"
+#include "SlateCore.h"
 
 UPGMiniMapWidget::UPGMiniMapWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
@@ -58,14 +60,7 @@ void UPGMiniMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
     }
 
 
-   /* if (SelectIndex != -1)
-    {
-        SLOG(TEXT("Select index : %d"), SelectIndex);
-    }*/
-   /* if (Players.Num() > 0)
-    {
-        UpdateNPCIconPosition();
-    }*/
+   
 }
 
 
@@ -547,6 +542,7 @@ FReply UPGMiniMapWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, co
         if (SelectIndex != -1)
         {
             MoveSelectCharacterToLocation(SelectIndex, TargetWorldLocation);
+         
         }
 
     }
@@ -560,8 +556,14 @@ void UPGMiniMapWidget::MoveSelectCharacterToLocation(int32 index, FVector Target
         UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(PlayersControllers[index]);
         if (NavSys)
         {
-            PlayersControllers[index]->SetForceMoveVector(TargetLocation);
-            SLOG(TEXT("ForceMove"));
+            if (IsLocationReachable(index, TargetLocation))
+            {
+                PlayersControllers[index]->SetForceMoveVector(TargetLocation);
+                SelectIndex = -1;
+                MiniMapPathPoints.Empty();
+               
+            }
+           
         }
     }
 }
@@ -572,15 +574,7 @@ FVector UPGMiniMapWidget::ConvertMiniMapToWorld(FVector2D targetPostion)
     float WorldMapX = ((((targetPostion.Y - MiniMapYMax)*-1) - MiniMapYMin) / (MiniMapYMax - MiniMapYMin)) * (WorldXMax - WorldXMin) + WorldXMin;
     float WorldMapY = ((targetPostion.X - MiniMapXMin) / (MiniMapXMax - MiniMapXMin)) * (WorldYMax - WorldYMin) + WorldYMin;
     
-    //// 미니맵 좌표를 정규화 (0~1 범위로 변환)
-    /*FVector2D NormalizedPosition;
-    NormalizedPosition.X = (targetPostion.X - MiniMapXMin) / (MiniMapXMax - MiniMapXMin);
-    NormalizedPosition.Y = (targetPostion.Y - MiniMapYMin) / (MiniMapYMax - MiniMapYMin);
-
-    float WorldX = FMath::Lerp(WorldXMin, WorldXMax, NormalizedPosition.Y);
-    float WorldY = FMath::Lerp(WorldYMin, WorldYMax, NormalizedPosition.X);*/
     
-
     FVector CheckLocation = CheckNavigableLocation(FVector(WorldMapX, WorldMapY, 1200.f));
 
     return CheckLocation;
@@ -605,3 +599,102 @@ FVector UPGMiniMapWidget::CheckNavigableLocation(FVector TargetLocation)
     
     return FVector::ZeroVector;
 }
+
+bool UPGMiniMapWidget::IsLocationReachable(int32 index, FVector TargetLocation)
+{
+    UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(Players[index]->GetWorld());
+    if (NavSys)
+    {
+        // AIActor의 현재 위치
+        FVector StartLocation = Players[index]->GetActorLocation();
+
+        // 경로 계산
+        UNavigationPath* NavPath = NavSys->FindPathToLocationSynchronously(Players[index]->GetWorld(), StartLocation, TargetLocation);
+        if (NavPath && NavPath->IsValid())
+        {
+            return true; 
+        }
+    }
+    return false; 
+   
+}
+
+TArray<FVector> UPGMiniMapWidget::CalculateNavPath(FVector StartLocation, FVector EndLocation)
+{
+    UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+    TArray<FVector> PathPoints;
+
+    if (NavSys)
+    {
+        UNavigationPath* NavPath = NavSys->FindPathToLocationSynchronously(GetWorld(), StartLocation, EndLocation);
+        if (NavPath && NavPath->IsValid())
+        {
+            PathPoints = NavPath->PathPoints;
+        }
+
+    
+    }
+
+    return PathPoints;
+}
+
+FReply UPGMiniMapWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+    Super::NativeOnMouseMove(InGeometry, InMouseEvent);
+    if (SelectIndex != -1)
+    {
+        
+        FVector2D MousePosition = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+        FVector WorldTargetLocation = ConvertMiniMapToWorld(MousePosition);
+        TArray<FVector> Paths = CalculateNavPath(Players[SelectIndex]->GetActorLocation(), WorldTargetLocation);
+        MiniMapPathPoints.Empty();
+        for (const FVector&  path : Paths)
+        {
+            FVector2D Convertpath = ConvertWorldToMiniMap(path);
+            MiniMapPathPoints.Add(FVector2D(Convertpath.X, Convertpath.Y+ 910.0f));
+        }
+      
+    }
+   
+    return FReply::Handled();
+}
+
+int32 UPGMiniMapWidget::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
+{
+
+    Super::NativePaint(Args, AllottedGeometry, MyCullingRect, OutDrawElements, LayerId, InWidgetStyle, bParentEnabled);
+    
+    // 경로를 그릴 준비가 되었는지 확인
+    if (MiniMapPathPoints.Num() > 1)
+    {
+        for (int32 i = 0; i < MiniMapPathPoints.Num() - 1; ++i)
+        {
+            
+           
+            /*FVector2D Start = AllottedGeometry.LocalToAbsolute(MiniMapPathPoints[i]);
+            FVector2D End = AllottedGeometry.LocalToAbsolute(MiniMapPathPoints[i + 1]);*/
+            FVector2D Start = MiniMapPathPoints[i];
+            FVector2D End =MiniMapPathPoints[i + 1];
+
+            /*FVector2D ConvertStart = FVector2D(MiniMapYMaxStart.X, MiniMapYMax- Start.Y );
+            FVector2D ConvertEnd = FVector2D(End.X, End.Y - MiniMapYMax);*/
+            if (i == 0)
+            {
+                SLOG(TEXT("Start Vector : %f   , %f"), Start.X, Start.Y);
+            }
+            FSlateDrawElement::MakeLines(
+                OutDrawElements,
+                LayerId,
+                AllottedGeometry.ToPaintGeometry(),
+                { Start, End },
+                ESlateDrawEffect::None,
+                FLinearColor::Green.CopyWithNewOpacity(1.0f), // 완전히 불투명
+                true,
+                5.0f // 더 두꺼운 선
+            );
+        }
+    }
+
+    return LayerId + 1;
+}
+
