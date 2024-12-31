@@ -70,6 +70,7 @@ float APGAIBaseCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
 				bIsShoot = false;
 				bIsAim = false;
 			}
+			
 		}
 	}
 

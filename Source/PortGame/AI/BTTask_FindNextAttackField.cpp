@@ -11,6 +11,7 @@
 #include "GameLevel/PGGameLevelScriptActor.h"
 #include "Engine/LevelScriptActor.h"
 #include "PortGame/PortGame.h"
+#include "Character/PGBaseCharacter.h"
 
 UBTTask_FindNextAttackField::UBTTask_FindNextAttackField()
 {
@@ -52,6 +53,13 @@ EBTNodeResult::Type UBTTask_FindNextAttackField::ExecuteTask(UBehaviorTreeCompon
 	{
 		
 		return EBTNodeResult::Failed;
+	}
+
+	APGBaseCharacter* basecharacter = Cast<APGBaseCharacter>(ControllingPawn);
+	if (basecharacter)
+	{
+		basecharacter->SetbIsAim(false);
+		basecharacter->SetbIsShoot(false);
 	}
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_NEXTATTACKFIELD, AttackfieldLoc);

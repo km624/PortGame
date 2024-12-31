@@ -559,6 +559,13 @@ void UPGMiniMapWidget::MoveSelectCharacterToLocation(int32 index, FVector Target
             if (IsLocationReachable(index, TargetLocation))
             {
                 PlayersControllers[index]->SetForceMoveVector(TargetLocation);
+                APGBaseCharacter* basecharacter = Cast<APGBaseCharacter>(Players[index]);
+                if (basecharacter)
+                {
+                    basecharacter->SetbIsAim(false);
+                    basecharacter->SetbIsShoot(false);
+                }
+                
                 SelectIndex = -1;
                 MiniMapPathPoints.Empty();
                

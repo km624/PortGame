@@ -112,7 +112,7 @@ protected:
 	FTimerHandle AttackAISpawnTimeHandler;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
-	float AttackAISpawnTime= 30.0f;
+	float AttackAISpawnTime= 60.0f;
 
 
 
