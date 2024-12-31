@@ -538,7 +538,7 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 		}
 
 		// 수류탄에 맞았을 시
-		if (DamageCauser && DamageCauser->ActorHasTag(TAG_GRENADE))
+		/*if (DamageCauser && DamageCauser->ActorHasTag(TAG_GRENADE))
 		{
 			FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
 			Direction.Normalize();
@@ -555,7 +555,7 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 					StatComponent->Damaged(DamageAmount * 0.3f, attackPawn->GetGenericTeamId());
 				}
 			}
-		}
+		}*/
 	}
 
 	return DamageAmount;

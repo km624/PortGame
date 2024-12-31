@@ -53,8 +53,9 @@ APGBaseCharacter::APGBaseCharacter()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
-	
-
+	GetCharacterMovement()->bUseRVOAvoidance = true; // RVO 회피 활성화
+	GetCharacterMovement()->AvoidanceWeight = 0.8f; // 회피 강도
+	GetCharacterMovement()->AvoidanceConsiderationRadius = 100.0f;
 
 	// Mesh 위치랑 회전 해줌 안맞아서
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -100.0f), FRotator(0.0f, -90.0f, 0.0f));
