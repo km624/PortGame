@@ -14,6 +14,9 @@
 #include "Interface/ObjectPoolingInterface.h"
 #include "Component/PGAttackComponent.h"
 #include "Component/PGWidgetComponent.h"
+#include "WorldPartition/WorldPartition.h"
+#include "WorldPartition/WorldPartitionSubsystem.h"
+#include "Components/SkeletalMeshComponent.h"
 
 
 APGNpcCharacter::APGNpcCharacter()
@@ -60,7 +63,34 @@ void APGNpcCharacter::BeginPlay()
 	}
 	//NPC 캐릭터 팀 색깔 설정
 	ChangeNpcColor();
+	
+	
 }
+
+void APGNpcCharacter::Tick(float deltatime)
+{
+	Super::Tick(deltatime);
+
+	//if (USkeletalMeshComponent* MeshComponent = GetMesh())
+	//{
+	//	// 제일 낮은 LOD로 강제 설정 (0이 가장 높은 디테일, 숫자가 클수록 낮은 디테일)
+	//	int32 LowestLODIndex = MeshComponent->GetNumLODs() - 1;
+	//	MeshComponent->MinLodModel = LowestLODIndex;
+	//	SLOG(TEXT("LOD: %d"), GetMesh()->GetPredictedLODLevel());
+	//}
+
+	//if (GetMesh()->WasRecentlyRendered(5.0f))
+	//{
+	//	SLOG(TEXT("View"));
+	//}
+	//else
+	//{
+	//	SLOG(TEXT("NotView"));
+	//}
+}
+
+	
+	
 
 void APGNpcCharacter::ChangeNpcColor()
 {

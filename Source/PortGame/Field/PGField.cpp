@@ -28,9 +28,13 @@ APGField::APGField()
 	
 	AIField->SetCollisionProfileName(CPROFILE_PGTRIGGER);
 	AIField->SetCanEverAffectNavigation(false);
+	AIField->SetBoxExtent(FVector(50.0f, 50.0f, 50.0f));
 
 	FieldMesh->SetCollisionProfileName(TEXT("NoCollision"));
+
+	FieldMesh->SetCachedMaxDrawDistance(DrawDistance);
 	
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 
@@ -41,7 +45,14 @@ void APGField::BeginPlay()
 	AIField->OnComponentBeginOverlap.AddDynamic(this, &APGField::OnOverlapBegin);
 	AIField->OnComponentEndOverlap.AddDynamic(this, &APGField::OnOverlapEnd);
 	
-	//SetGenericTeamId(TeamId);
+	FieldMesh->OnActorVisibilityChanged();
+	
+}
+
+void APGField::Tick(float deltatime)
+{
+	Super::Tick(deltatime);
+
 
 }
 

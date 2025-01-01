@@ -11,6 +11,7 @@
 #include "Weapon/Rifle.h" 
 #include "Weapon/Sword.h" 
 
+
 UObjectPoolManager::UObjectPoolManager()
 {
 }
@@ -78,8 +79,10 @@ APGNpcCharacter* UObjectPoolManager::GetPooledObject(const FCharacterSpawnParams
 		AiCharacter->SetCharacterData(SpawnParams.CharacterData);
 		AiCharacter->SetteamId(SpawnParams.TeamId);
 
-		AiCharacter->FinishSpawning(FTransform(SpawnParams.SpawnRotation, SpawnParams.SpawnLocation));
+			
 	}
+	AiCharacter->FinishSpawning(FTransform(SpawnParams.SpawnRotation, SpawnParams.SpawnLocation));
+	
 
 	APGAIController* pgAIcontoller = Cast<APGAIController>((GetWorld()->SpawnActorDeferred<APGAIController>(
 		APGAIController::StaticClass(),

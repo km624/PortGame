@@ -21,6 +21,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float deltatime) override;
+
 public:
 	void SetUpField();
 
@@ -33,6 +35,11 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = AIFieldData)
 	TObjectPtr<class UBoxComponent> AIField;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float DrawDistance = 5000.0f;
+
+protected:
 
 	UFUNCTION()
 	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);

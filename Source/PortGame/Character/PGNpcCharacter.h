@@ -22,6 +22,8 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float deltatime) override;
+
 	void ChangeNpcColor();
 
 protected:

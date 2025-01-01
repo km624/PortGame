@@ -70,12 +70,12 @@ APGBaseCharacter::APGBaseCharacter()
 		GetMesh()->SetSkeletalMesh(Skeletal.Object);
 	}*/
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstance(TEXT("/Script/Engine.AnimBlueprint'/Game/PortGame/Animation/ABP_Animation.ABP_Animation_C'"));
+	/*static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstance(TEXT("/Script/Engine.AnimBlueprint'/Game/PortGame/Animation/ABP_Animation.ABP_Animation_C'"));
 	if (AnimInstance.Class)
 
 	{
 		GetMesh()->SetAnimInstanceClass(AnimInstance.Class);
-	}
+	}*/
 	//Attack 컴포넌트 추가
 	AttackComponent = CreateDefaultSubobject<UPGAttackComponent>(TEXT("ATTACK_COMP"));
 	//StatComponent 추가
@@ -135,7 +135,7 @@ void APGBaseCharacter::BeginPlay()
 
 	SetGenericTeamId(TeamId);
 
-
+	
 }
 
 void APGBaseCharacter::EnableCharacter()
@@ -147,6 +147,7 @@ void APGBaseCharacter::EnableCharacter()
 	bIsGroggy = false;
 	bIsReload = false;
 	bIsAim = false;
+	bIsShoot = false;
 	SetActorEnableCollision(true);
 	SetActorHiddenInGame(false);
 	SetActorTickEnabled(true);
@@ -308,6 +309,7 @@ float APGBaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
 	HitImpulseVector = -GetActorForwardVector() * 1000.0f;
+	
 
 	return DamageAmount;
 }
@@ -344,7 +346,8 @@ void APGBaseCharacter::HitGaugeZeroEffect()
 	if (bIsDead)
 		return;
 
-	GetCharacterMovement()->AddImpulse(HitImpulseVector, true);
+	//GetCharacterMovement()->AddImpulse(HitImpulseVector, true);
+	LaunchCharacter(HitImpulseVector, true, true);
 
 }
 

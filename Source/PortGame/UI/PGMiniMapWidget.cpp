@@ -150,7 +150,7 @@ void UPGMiniMapWidget::SetUpFieldIcon()
 
                         CanvasSlot->SetPosition(fieldiconlocation);
                         CanvasSlot->SetZOrder(0);
-
+                        CanvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));
                         
                         FVector2D fieldSize = ConvertFieldSizeToMiniMap(field->GetActorScale());
 
@@ -328,7 +328,7 @@ UPGIconWidget* UPGMiniMapWidget::AddPlayerIcon(bool mine,FVector2D IconPosition,
                 FWidgetTransform Transform;
                 Transform.Angle = playerRotatiaon; 
                
-
+                CanvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));
                 playerIcon->SetRenderTransform(Transform);
 
 
@@ -358,7 +358,7 @@ UPGIconWidget* UPGMiniMapWidget::AddNPCIcon(int8 teamid, FVector2D IconPosition)
                 CanvasSlot->SetPosition(IconPosition);
 
                 NPCIcon->SetNPCIconImage(teamid);
-
+                CanvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));
                 
                 CanvasSlot->SetSize(FVector2D(15.0f, 15.0f));
 
@@ -387,7 +387,7 @@ void UPGMiniMapWidget::RecycleNPCIcon(int32 index,int8 teamid, FVector2D IconPos
                     CanvasSlot->SetPosition(IconPosition);
 
                     NPCIcons[index]->SetNPCIconImage(teamid);
-
+                    CanvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));
 
                     CanvasSlot->SetSize(FVector2D(15.0f, 15.0f));
                 }
@@ -504,7 +504,7 @@ void UPGMiniMapWidget::UpdateFieldIconPostition()
 
                         CanvasSlot->SetPosition(fieldiconlocation);
                         CanvasSlot->SetZOrder(0);
-
+                        CanvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));
 
                         FVector2D fieldSize = ConvertFieldSizeToMiniMap(Fields[i]->GetActorScale());
 
