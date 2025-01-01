@@ -47,6 +47,8 @@ protected:
 
 	void EndReloading();
 
+	UFUNCTION()
+	void StopReloading();
 
 	void FireWithLineTrace();
 

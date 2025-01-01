@@ -134,8 +134,8 @@ void UObjectPoolManager::ReturnObjectToPool(APGNpcCharacter* Character)
 		APGAIController* Controller = ObjectPool[Character];
 		if (Controller)
 		{
-			/*Controller->UnPossess();
-			Controller->ResetController();*/
+			Controller->AIIsDead();
+			//Controller->ResetController();
 		}
 
 		//SLOG(TEXT("return : %s"), *Character->GetActorNameOrLabel())

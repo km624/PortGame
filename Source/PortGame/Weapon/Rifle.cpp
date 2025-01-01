@@ -21,6 +21,7 @@
 #include "GameFramework/Controller.h"
 #include "Character/PGAIBaseCharacter.h"
 #include "GenericTeamAgentInterface.h"
+#include "Character/PGPlayerCharacter.h"
 
 
 const FString ARifle::ReloadMontage = TEXT("ReloadingMontage");
@@ -59,6 +60,11 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 	OwnerCharacter->OnbIsAim.AddUObject(this,
 		&ThisClass::InGunRange);
 	
+	APGPlayerCharacter* playerCharacter=  Cast<APGPlayerCharacter>(OwnerCharacter);
+	if (playerCharacter)
+	{
+		playerCharacter->OndashDelegate.AddUObject(this, &ThisClass::StopReloading);
+	}
 
 	if (weaponData)
 	{
@@ -107,16 +113,7 @@ void ARifle::Attack()
 	}
 	else
 	{
-		if (ReloadTimerHandle.IsValid())
-		{
-			GetWorldTimerManager().ClearTimer(ReloadTimerHandle);
-			UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
-
-			AnimInstance->StopAllMontages(0.0f);
-			bIsGunReloaded = false;
-			OwnerCharacter->SetbIsReload(bIsGunReloaded);
-			OnbIsGunReload.Broadcast(false, ReloadMontageTime);
-		}
+		StopReloading();
 		ComboStart();
 
 	}
@@ -182,29 +179,6 @@ void ARifle::InGunRange(bool bisaim)
 		}
 	}
 	
-
-	//플레이어인지 확인
-	//IAttackHitStopInterface* Player = Cast<IAttackHitStopInterface>(OwnerCharacter);
-	/*if (Player)
-	{
-		if (currentWorld)
-		{
-			bool OutHitResult = currentWorld->LineTraceSingleByChannel(
-				hitResult,
-				Camerastart,
-				CameraEnd,
-				CCHANNEL_PGACTION,
-				collisionParams);
-
-			if (OutHitResult)
-				bInGunRange = true;
-			else
-				bInGunRange = false;
-
-			OnbInGunRanged.Broadcast(bInGunRange);
-
-		}
-	}*/
 }
 
 void ARifle::ShootCheck(bool bIsShoot)
@@ -277,6 +251,20 @@ void ARifle::EndReloading()
 	OwnerCharacter->SetbIsReload(bIsGunReloaded);
 	OnbIsGunReload.Broadcast(bIsGunReloaded, ReloadMontageTime);
 	ReloadTimerHandle.Invalidate();
+}
+
+void ARifle::StopReloading()
+{
+	if (ReloadTimerHandle.IsValid())
+	{
+		GetWorldTimerManager().ClearTimer(ReloadTimerHandle);
+		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+
+		AnimInstance->StopAllMontages(0.0f);
+		bIsGunReloaded = false;
+		OwnerCharacter->SetbIsReload(bIsGunReloaded);
+		OnbIsGunReload.Broadcast(false, ReloadMontageTime);
+	}
 }
 
 

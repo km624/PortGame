@@ -140,6 +140,7 @@ void APGBaseCharacter::BeginPlay()
 
 void APGBaseCharacter::EnableCharacter()
 {
+	GetCharacterMovement()->SetActive(true);
 	//이동 기능 제한
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
 
@@ -151,8 +152,8 @@ void APGBaseCharacter::EnableCharacter()
 	SetActorEnableCollision(true);
 	SetActorHiddenInGame(false);
 	SetActorTickEnabled(true);
-	HpBarWidgetComponent->SetHiddenInGame(false);
-
+	HpBarWidgetComponent->SetHiddenInGame(true);
+	
 	
 }
 
@@ -395,6 +396,8 @@ void APGBaseCharacter::SetDead(int8 teamid)
 	SetActorEnableCollision(false);
 
 	HpBarWidgetComponent->SetHiddenInGame(true);
+
+	GetCharacterMovement()->Deactivate();
 
 
 }

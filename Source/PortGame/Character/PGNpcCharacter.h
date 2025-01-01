@@ -49,6 +49,10 @@ protected:
 	FTimerHandle NPCHitStoptimerHandle;
 	
 	float currentSlowtime;
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ReturnPoolTime = 4.0f;
 
 	FTimerHandle DeadHiddentimerHandle;
 
@@ -88,7 +92,7 @@ protected:
 	FTimerHandle NAScaleTimerHandle;
 
 	float ElapsedTime = 0.0f;
-
+	
 public:
 	FORCEINLINE bool GetbIsAttackField() const { return bIsAttackField; }
 
@@ -97,6 +101,9 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	uint8 bIsAttackField : 1;
+
+public:
+	void ForceReturnObjectPool();
 
 
 };

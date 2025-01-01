@@ -19,6 +19,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Character/PGPlayerCharacter.h"
+#include "Components/SkeletalMeshComponent.h"
 
 APGNpcCharacter::APGNpcCharacter()
 {
@@ -234,15 +235,19 @@ void APGNpcCharacter::SetDead(int8 teamid)
 			{
 				AnimInstance->StopAllMontages(0.0f);
 			}
-			AttackComponent->ReturnWeaponPool();
+			//AttackComponent->ReturnWeaponPool();
 			ReturnCharacterToPool();
 			GetWorld()->GetTimerManager().ClearTimer(DeadHiddentimerHandle);
-		}, 2.0f, false);
+		}, ReturnPoolTime, false);
 
 }
 
 void APGNpcCharacter::ReturnCharacterToPool()
 {
+	//애니메이션 제거후
+	GetMesh()->SetAnimInstanceClass(nullptr);
+
+	AttackComponent->ReturnWeaponPool();
 	IObjectPoolingInterface* poolmanager = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
 	if (poolmanager)
 	{
@@ -343,6 +348,20 @@ void APGNpcCharacter::NAParryUpdateEnd()
 	ElapsedTime = 0.0f; // 리셋
 	
 	ParryNiagaraComponent->Deactivate();
+}
+
+void APGNpcCharacter::ForceReturnObjectPool()
+{
+	
+	GetCharacterMovement()->Deactivate();
+
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		AnimInstance->StopAllMontages(0.0f);
+	}
+	
+	ReturnCharacterToPool();
+	
 }
 
 

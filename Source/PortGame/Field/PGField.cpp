@@ -52,15 +52,7 @@ void APGField::Tick(float deltatime)
 {
 	Super::Tick(deltatime);
 
-	if (FieldMesh->WasRecentlyRendered(5.0f))
-	{
-		SLOG(TEXT("View %s"),*GetActorNameOrLabel());
-	}
-	else
-	{
-		SLOG(TEXT("NotView %s"), *GetActorNameOrLabel());
-	}
-
+	CheckFieldVisible();
 
 }
 
@@ -78,11 +70,6 @@ void APGField::InitializeField(uint8 teamid)
 	
 	SetTeamColor();
 
-
-	for (int i = AICharacters.Num(); i < SpawnCount; i++)
-	{
-		OnAISpawn();
-	}
 
 	GetWorld()->GetTimerManager().SetTimer(AttackAISpawnTimeHandler,
 		this, &ThisClass::OnAttackAISpawn, AttackAISpawnTime, true);
@@ -371,14 +358,61 @@ void APGField::OnAttackAISpawn()
 
 			APGNpcCharacter* aicharacter = poolmanager->GetObjectPoolManager()->GetPooledObject(Params);
 
-			if (aicharacter)
-			{
-				AICharacters.Add(aicharacter);
-
-			}
+			
 		}
 	}
 
+}
+
+void APGField::CheckFieldVisible()
+{
+	if (FieldMesh->WasRecentlyRendered(visibleTime))
+	{
+		StartProtectAISpawn();
+		bIsVisibled = true;
+		
+	}
+	else
+	{
+		AllAIReturnObjectPool();
+		bIsVisibled = false;
+		
+
+	}
+	
+}
+
+void APGField::AllAIReturnObjectPool()
+{
+	if (!bIsVisibled)
+	{
+		//SLOG(TEXT("AlreadyNotVisible"));
+		return;
+	}
+	//모든 캐릭터 오브젝트 풀링으로 반환
+	if (AICharacters.Num() > 0)
+	{
+		for (APGNpcCharacter* npc : AICharacters)
+		{
+			npc->ForceReturnObjectPool();
+		}
+	}
+
+	//배열 초기화
+	AICharacters.Empty();
+}
+
+void APGField::StartProtectAISpawn()
+{
+	if (bIsVisibled)
+	{
+		//SLOG(TEXT("AlreadySpawn"));
+		return;
+	}
+	for (int i = AICharacters.Num(); i < SpawnCount; i++)
+	{
+		OnAISpawn();
+	}
 }
 
 

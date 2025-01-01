@@ -19,7 +19,7 @@ void UFieldManager::InitializeFieldManager()
 
 	FindAllFields();
 
-	StartAllFields();
+    StartAllFields();
 
     //처음 시작하자마자 체크
     CheckLastField(1);

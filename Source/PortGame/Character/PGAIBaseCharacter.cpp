@@ -163,13 +163,13 @@ void APGAIBaseCharacter::SetDead(int8 teamid)
 {
 	Super::SetDead(teamid);
 
-	APGAIController* aiController = Cast<APGAIController>(GetController());
+	/*APGAIController* aiController = Cast<APGAIController>(GetController());
 	if (aiController)
 	{
 		SLOG(TEXT("AI DEAD"));
 		if (teamid!=0)
 			aiController->TOMyFieldDead(teamid);
 		aiController->AIIsDead();
-	}
+	}*/
 }
 

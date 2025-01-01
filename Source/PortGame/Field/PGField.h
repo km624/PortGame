@@ -141,6 +141,20 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
 	float AttackAISpawnTime= 60.0f;
 
+protected:
+	void CheckFieldVisible();
+
+	void AllAIReturnObjectPool();
+
+	void StartProtectAISpawn();
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
+	uint8 bIsVisibled : 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
+	float visibleTime = 3.0f;
+
 
 
 };
