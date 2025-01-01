@@ -16,7 +16,7 @@ USkillETC::USkillETC()
 		SkillETCMontage = SkillMontage.Object;
 	}*/
 
-	SkillCooltime = 10.0f;
+	SkillCooltime = 20.0f;
 }
 
 void USkillETC::SetSkillSetting(APGBaseCharacter* owner)

@@ -97,8 +97,8 @@ void UFieldManager::FindAllFields()
 			Fields.Add(Field);
 		}
 	}
-	if (Fields.Num() > 0)
-		SLOG(TEXT("%d"), Fields.Num());
+	
+		
 }
 
 void UFieldManager::StartAllFields()

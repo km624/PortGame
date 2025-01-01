@@ -4,26 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_Attack.generated.h"
+#include "BTTask_OnPhysicsSimulate.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PORTGAME_API UBTTask_Attack : public UBTTaskNode
+class PORTGAME_API UBTTask_OnPhysicsSimulate : public UBTTaskNode
 {
 	GENERATED_BODY()
 
-public:
-	UBTTask_Attack();
+	UBTTask_OnPhysicsSimulate();
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 	
-	
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float MinShootTime;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MaxShootTime;
+	uint8 bOnPhysics : 1;
 };

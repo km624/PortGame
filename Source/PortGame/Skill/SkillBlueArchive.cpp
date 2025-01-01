@@ -17,7 +17,7 @@ USkillBlueArchive::USkillBlueArchive()
 	}*/
 	
 
-	SkillCooltime = 10.0f;
+	SkillCooltime = 25.0f;
 
 
 }

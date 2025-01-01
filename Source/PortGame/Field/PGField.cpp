@@ -44,14 +44,22 @@ void APGField::BeginPlay()
 
 	AIField->OnComponentBeginOverlap.AddDynamic(this, &APGField::OnOverlapBegin);
 	AIField->OnComponentEndOverlap.AddDynamic(this, &APGField::OnOverlapEnd);
-	
-	FieldMesh->OnActorVisibilityChanged();
+
 	
 }
 
 void APGField::Tick(float deltatime)
 {
 	Super::Tick(deltatime);
+
+	if (FieldMesh->WasRecentlyRendered(5.0f))
+	{
+		SLOG(TEXT("View %s"),*GetActorNameOrLabel());
+	}
+	else
+	{
+		SLOG(TEXT("NotView %s"), *GetActorNameOrLabel());
+	}
 
 
 }
@@ -171,6 +179,32 @@ void APGField::OnAISpawn()
 	FVector SpawnLocation = FVector(FMath::FRandRange(-FieldSize.X, FieldSize.X) , FMath::FRandRange(-FieldSize.Y, FieldSize.Y), 125.0f) + GetActorLocation();
 	FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f);
 
+	float TotalWeight = 0.0f;
+	for (const FWeightedAIData& Data : AIDatas)
+	{
+		TotalWeight += Data.Weight;
+	}
+
+	// 난수를 기반으로 데이터 선택
+	float RandomValue = FMath::FRand() * TotalWeight;
+	float AccumulatedWeight = 0.0f;
+
+	UBaseCharacterDataAsset* selectAIData =nullptr;
+	for (const FWeightedAIData& Data : AIDatas)
+	{
+		AccumulatedWeight += Data.Weight;
+		if (RandomValue <= AccumulatedWeight)
+		{
+			selectAIData = Data.AIData;
+			break;
+		}
+	}
+	if (selectAIData == nullptr)
+	{
+		SLOG(TEXT("NoAiData"));
+		return;
+	}
+
 	IObjectPoolingInterface* poolmanager = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
 	
 	if (poolmanager)
@@ -179,7 +213,7 @@ void APGField::OnAISpawn()
 		FCharacterSpawnParams Params;
 		Params.SpawnLocation = SpawnLocation;
 		Params.SpawnRotation = SpawnRotation;
-		Params.CharacterData = AIDatas[0];
+		Params.CharacterData = selectAIData;
 		Params.TeamId = TeamId;
 		Params.Field = this;
 		Params.bFieldProtect = true;
@@ -288,10 +322,40 @@ void APGField::OnAttackAISpawn()
 	FVector FieldSize = GetActorScale() * 50.0f;
 	IObjectPoolingInterface* poolmanager = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
 
+
+
+
 	for (int i = 0; i < AttackAISpawnCount; i++)
 	{
 		FVector SpawnLocation = FVector(FMath::FRandRange(-FieldSize.X, FieldSize.X), FMath::FRandRange(-FieldSize.Y, FieldSize.Y), 125.0f) + GetActorLocation();
 		FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f);
+
+		float TotalWeight = 0.0f;
+		for (const FWeightedAIData& Data : AIDatas)
+		{
+			TotalWeight += Data.Weight;
+		}
+
+		// 난수를 기반으로 데이터 선택
+		float RandomValue = FMath::FRand() * TotalWeight;
+		float AccumulatedWeight = 0.0f;
+
+		UBaseCharacterDataAsset* selectAIData = nullptr;
+		for (const FWeightedAIData& Data : AIDatas)
+		{
+			AccumulatedWeight += Data.Weight;
+			if (RandomValue <= AccumulatedWeight)
+			{
+				selectAIData = Data.AIData;
+				break;
+			}
+		}
+		if (selectAIData == nullptr)
+		{
+			SLOG(TEXT("NoAiData"));
+			return;
+		}
+
 
 		if (poolmanager)
 		{
@@ -299,7 +363,7 @@ void APGField::OnAttackAISpawn()
 			FCharacterSpawnParams Params;
 			Params.SpawnLocation = SpawnLocation;
 			Params.SpawnRotation = SpawnRotation;
-			Params.CharacterData = AIDatas[0];
+			Params.CharacterData = selectAIData;
 			Params.TeamId = TeamId;
 			Params.Field = this;
 			Params.bFieldProtect = false;

@@ -9,9 +9,12 @@
 #include "PortGame/PortGame.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+
 UBTTask_Attack::UBTTask_Attack()
 {
-	
+	MinShootTime = 2.0f;
+
+	MaxShootTime = 5.0f;
 }
 
 EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -43,6 +46,11 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	);
 
 	AIPawn->SetAIAttackDelegate(OnAttackFinished);
+
+	if (AIPawn->CheckShotterType())
+	{
+		AIPawn->SetTimerShooterAttack(FMath::FRandRange(MinShootTime, MaxShootTime));
+	}
 
 	return EBTNodeResult::InProgress;
 

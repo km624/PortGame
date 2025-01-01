@@ -79,6 +79,8 @@ APGPlayerCharacter::APGPlayerCharacter()
 	CutSceneCamera->SetupAttachment(RootComponent);
 	CutSceneCamera->SetActive(false);
 
+	
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> Jump(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Jump.IA_Jump'"));
 	if (Jump.Object)
 	{
@@ -276,6 +278,8 @@ void APGPlayerCharacter::Tick(float DeltaTime)
 			SetAttackRotation(DeltaTime);
 
 	}
+	
+	
 
 }
 

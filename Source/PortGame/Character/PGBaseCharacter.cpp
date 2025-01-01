@@ -54,7 +54,7 @@ APGBaseCharacter::APGBaseCharacter()
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 
 	GetCharacterMovement()->bUseRVOAvoidance = true; // RVO 회피 활성화
-	GetCharacterMovement()->AvoidanceWeight = 0.8f; // 회피 강도
+	GetCharacterMovement()->AvoidanceWeight = 0.6f; // 회피 강도
 	GetCharacterMovement()->AvoidanceConsiderationRadius = 100.0f;
 
 	// Mesh 위치랑 회전 해줌 안맞아서
@@ -308,7 +308,11 @@ float APGBaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	HitImpulseVector = -GetActorForwardVector() * 1000.0f;
+	FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
+	Direction.Normalize();
+	HitImpulseVector = Direction * 500.0f;
+
+	//HitImpulseVector = -GetActorForwardVector() * 1000.0f;
 	
 
 	return DamageAmount;

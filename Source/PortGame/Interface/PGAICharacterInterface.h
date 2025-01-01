@@ -31,11 +31,19 @@ public:
 
 	virtual void AttackByAI() = 0;
 
+	virtual void ShotByAI() = 0;
+
 	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) = 0;
 
 	virtual void NotifyComboEnd() = 0;
 
 	virtual float AITurnSpeed() = 0;
+
+	virtual bool CheckShotterType() = 0;
+
+	virtual void SetTimerShooterAttack(float shottime) = 0;
+
+	virtual bool CheckTargetDead(APawn* Target) = 0;
 
 	
 };

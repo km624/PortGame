@@ -17,7 +17,8 @@
 #include "WorldPartition/WorldPartition.h"
 #include "WorldPartition/WorldPartitionSubsystem.h"
 #include "Components/SkeletalMeshComponent.h"
-
+#include "Components/CapsuleComponent.h"
+#include "Character/PGPlayerCharacter.h"
 
 APGNpcCharacter::APGNpcCharacter()
 {
@@ -37,6 +38,7 @@ APGNpcCharacter::APGNpcCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
 	
+
 	bUseControllerRotationYaw = true;
 
 	ParryNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ParryEffectComp"));
@@ -55,7 +57,8 @@ void APGNpcCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	SetPhysicsSetting();
+	
 	if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
 	{
 		bIsAim = true;
@@ -63,8 +66,15 @@ void APGNpcCharacter::BeginPlay()
 	}
 	//NPC Ä³¸¯ÅÍ ÆÀ »ö±ò ¼³Á¤
 	ChangeNpcColor();
+
 	
 	
+}
+
+void APGNpcCharacter::EnableCharacter()
+{
+	Super::EnableCharacter();
+
 }
 
 void APGNpcCharacter::Tick(float deltatime)
@@ -87,6 +97,7 @@ void APGNpcCharacter::Tick(float deltatime)
 	//{
 	//	SLOG(TEXT("NotView"));
 	//}
+
 }
 
 	
@@ -117,6 +128,19 @@ void APGNpcCharacter::ChangeNpcColor()
 	}
 }
 
+void APGNpcCharacter::SetPhysicsSetting()
+{
+	
+	GetCapsuleComponent()->SetMassOverrideInKg(NAME_None, 20.0f, true);
+
+	
+	GetCapsuleComponent()->SetLinearDamping(1.0f);
+
+	
+	GetCapsuleComponent()->BodyInstance.bLockXRotation = true; 
+	GetCapsuleComponent()->BodyInstance.bLockYRotation = true; 
+
+}
 
 
 float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -129,6 +153,7 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	if(TeamId !=1)
 		HpBarWidgetComponent->SetHiddenInGame(false);
 
+	HitImpulseVector *= 3.0f;
 	if (attackPawn)
 	{
 		//ÀûÆÀÀÏ½Ã
@@ -151,9 +176,9 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 		if (DamageCauser->ActorHasTag(TAG_GRENADE))
 		{
 
-			FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
-			Direction.Normalize();
-			HitImpulseVector = Direction * 750.0f + (FVector(0, 0, 1) * 100.0f);
+			/*FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
+			Direction.Normalize();*/
+			HitImpulseVector += (FVector(0, 0, 1) * 50.0f);
 
 			if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
 			{
@@ -192,6 +217,8 @@ void APGNpcCharacter::SetDead(int8 teamid)
 	Super::SetDead(teamid);
 
 	CustomTimeDilation = 1.0f;
+
+	GetCapsuleComponent()->SetSimulatePhysics(false);
 
 	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
 

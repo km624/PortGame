@@ -7,6 +7,7 @@
 #include "Component/PGAttackComponent.h"
 #include "AI/PGAIController.h"
 #include "PortGame/PortGame.h"
+#include "Components/CapsuleComponent.h"
 
 APGAIBaseCharacter::APGAIBaseCharacter()
 {
@@ -38,7 +39,7 @@ float APGAIBaseCharacter::GetAIDetectRange()
 		if (gundata)
 		{
 
-			return DetectRange * 1.5f;
+			return gundata->GunStat.traceDistance * 0.9f;
 		}
 	}
 
@@ -58,32 +59,49 @@ float APGAIBaseCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
 		UGunWeaponData* gundata = Cast<UGunWeaponData>(AttackComponent->GetWeaponData());
 		if (gundata)
 		{
-			if (gundata->GunStat.traceDistance * 0.9f >= targetDistance && targetDistance > 100.0f)
+			if (gundata->GunStat.traceDistance * 0.8f >= targetDistance && targetDistance > 200.0f)
 			{
-				bIsShoot = true;
-				bIsAim = true;
+				/*bIsShoot = true;
+				bIsAim = true;*/
 				
-				return gundata->GunStat.traceDistance * 0.9f;
+				return gundata->GunStat.traceDistance * 0.8f;
 			}
-			else if(gundata->GunStat.traceDistance * 0.9f < targetDistance)
-			{
-				bIsShoot = false;
-				bIsAim = false;
-			}
+			//else if(gundata->GunStat.traceDistance * 0.8f < targetDistance)
+			//{
+			//	/*bIsShoot = false;
+			//	bIsAim = false;*/
+			//}
 			
 		}
 	}
 
-	bIsShoot = false;
-	bIsAim = false;
-	return 100.0f;
+	/*bIsShoot = false;
+	bIsAim = false;*/
+	return 200.0f;
 }
 
 void APGAIBaseCharacter::AttackByAI()
 {
-
+	if (ShotCompeteTimerHandle.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ShotCompeteTimerHandle);
+	}
+	bIsAim = false;
+	bIsShoot = false;
 	AttackToComponent();
+	
+	
+}
 
+void APGAIBaseCharacter::ShotByAI()
+{
+	if (ShotCompeteTimerHandle.IsValid())
+	{
+		bIsAim = true;
+		bIsShoot = true;
+	}
+	AttackToComponent();
+	
 	bIsShoot = false;
 	OnbIsShoot.Broadcast(bIsShoot);
 }
@@ -102,6 +120,44 @@ float APGAIBaseCharacter::AITurnSpeed()
 {
 	return TurnSpeed;
 }
+
+bool APGAIBaseCharacter::CheckShotterType()
+{
+	if (CharacterType == EPlayerCharacterType::ETC) return false;
+
+	return true;
+}
+
+void APGAIBaseCharacter::SetTimerShooterAttack(float shottime)
+{
+	GetWorld()->GetTimerManager().SetTimer(
+		ShotCompeteTimerHandle,
+		[this]() {
+
+			bIsAim = false;
+			bIsShoot = false;
+			OnAttackFinished.ExecuteIfBound();
+			GetWorld()->GetTimerManager().ClearTimer(ShotCompeteTimerHandle);
+
+		}, shottime, false
+	);
+}
+
+bool APGAIBaseCharacter::CheckTargetDead(APawn* Target)
+{
+	APGBaseCharacter* TargetCharacter = Cast<APGBaseCharacter>(Target);
+	if (TargetCharacter)
+	{
+		if (TargetCharacter->GetbIsDead())
+		{
+			return true;
+		}
+
+	}
+	return false;
+}
+
+
 
 void APGAIBaseCharacter::SetDead(int8 teamid)
 {

@@ -10,12 +10,14 @@
 #include "Interface/PGAICharacterInterface.h"
 #include "Math/UnrealMathUtility.h"
 #include "DrawDebugHelpers.h"
-#include "Character/PGBaseCharacter.h"
+//#include "Character/PGBaseCharacter.h"
 
 
 UBTTask_TargetCirclePos::UBTTask_TargetCirclePos()
 {
+	CirlceAngle = 60.0f;
 
+	AddAttackRange = 1.25f;
 }
 
 EBTNodeResult::Type UBTTask_TargetCirclePos::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -57,17 +59,18 @@ EBTNodeResult::Type UBTTask_TargetCirclePos::ExecuteTask(UBehaviorTreeComponent&
 	// 플레이어의 위치 가져오기
 	FVector TargetLocation = TargetPawn->GetActorLocation();
 	FVector ControllingLocation = ControllingPawn->GetActorLocation();
-	float TraceDistance = AIPawn->GetAIAttackRange(ControllingPawn->GetDistanceTo(TargetPawn), TargetPawn)*1.5f;
+	float TraceDistance = AIPawn->GetAIAttackRange(ControllingPawn->GetDistanceTo(TargetPawn), TargetPawn);
 
-	APGBaseCharacter* character = Cast<APGBaseCharacter>(ControllingPawn);
+	/*APGBaseCharacter* character = Cast<APGBaseCharacter>(ControllingPawn);
 	if (character)
 	{
 		character->SetbIsAim(false);
 		character->SetbIsShoot(false);
-	}
-	if (TraceDistance < 350.0f)
+	}*/
+	if (TraceDistance >200.f)
 	{
-		TraceDistance = 350.0f;
+		AddAttackRange = 1.0f;
+		CirlceAngle *= 0.1f;
 	}
 	// 상대방 방향 벡터 계산
 	FVector DirectionToPlayer = (TargetLocation - ControllingLocation).GetSafeNormal();
@@ -76,11 +79,11 @@ EBTNodeResult::Type UBTTask_TargetCirclePos::ExecuteTask(UBehaviorTreeComponent&
 	float PlayerAngle = FMath::Atan2(DirectionToPlayer.Y, DirectionToPlayer.X) * 180.0f / PI; // 라디안에서 도로 변환
 
 	// 60도 범위 내에서 랜덤 각도 생성 (±30도)
-	float  RandomAngle = FMath::RandRange(PlayerAngle - 60.0f, PlayerAngle + 60.0f);
+	float  RandomAngle = FMath::RandRange(PlayerAngle - CirlceAngle, PlayerAngle + CirlceAngle);
 	float Radian = FMath::DegreesToRadians(RandomAngle+180.0f); // 도를 라디안으로 변환
 
 	
-	FVector NewLocation = TargetLocation + FVector(FMath::Cos(Radian) * TraceDistance, FMath::Sin(Radian) * TraceDistance, 0.0f);
+	FVector NewLocation = TargetLocation + FVector(FMath::Cos(Radian) * TraceDistance* AddAttackRange, FMath::Sin(Radian) * TraceDistance* AddAttackRange, 0.0f);
 	
 	OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_CIRCLEPOS, NewLocation);
 

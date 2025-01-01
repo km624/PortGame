@@ -22,15 +22,21 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void EnableCharacter() override;
+
 	virtual void Tick(float deltatime) override;
 
 	void ChangeNpcColor();
+
+protected:
+	void SetPhysicsSetting();
 
 protected:
 	//팀 색상을 동적 변경 위함
 	UMaterialInstanceDynamic* DynamicMaterial;
 
 protected:
+
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 	virtual void NPCAttackHitStop(float time) override;

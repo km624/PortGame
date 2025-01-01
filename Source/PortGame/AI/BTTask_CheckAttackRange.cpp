@@ -1,81 +1,55 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AI/BTService_Attack.h"
+#include "AI/BTTask_CheckAttackRange.h"
 #include "AIController.h"
 //#include "Interface/PGNPCCharacterInterface.h"
 #include "Interface/PGAICharacterInterface.h"
 #include "PGAI.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "PortGame/PortGame.h"
 
-
-
-UBTService_Attack::UBTService_Attack()
+UBTTask_CheckAttackRange::UBTTask_CheckAttackRange()
 {
-	NodeName = TEXT("Attack");
-	Interval = 1.5f;
 }
 
-void UBTService_Attack::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
+EBTNodeResult::Type UBTTask_CheckAttackRange::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
+	EBTNodeResult::Type Result = Super::ExecuteTask(OwnerComp, NodeMemory);
 
 	APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 	if (ControllingPawn == NULL)
 	{
-		return;
+		return EBTNodeResult::Failed;
 	}
-	FVector Center = ControllingPawn->GetActorLocation();
+
 	UWorld* World = ControllingPawn->GetWorld();
 	if (nullptr == World)
 	{
-		return;
+		return EBTNodeResult::Failed;
 	}
 
 	IPGAICharacterInterface* AIPawn = Cast<IPGAICharacterInterface>(ControllingPawn);
 	if (AIPawn == NULL)
 	{
-		return;
+		return EBTNodeResult::Failed;
 	}
 
 	//Å¸°Ù °ªÀ» °¡Á®¿È (Å¸°ÙÀÇ PAawn)
 	APawn* Target = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_TARGET));
 	if (nullptr == Target)
 	{
-		return;
+		return EBTNodeResult::Failed;
 	}
-
-	if (AIPawn->CheckTargetDead(Target))
-	{
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);
-
-		return;
-	}
-	
-
 
 	//NPCÀÇ Å¸°Ù°ú ³ªÀÇ °Å¸®¸¦ °¡Á®¿È
 	float DistanceToTarget = ControllingPawn->GetDistanceTo(Target);
 
 	float AttackRangeWithRadius = AIPawn->GetAIAttackRange(DistanceToTarget, Target);
+	bool canAttack;
+	canAttack = (DistanceToTarget <= AttackRangeWithRadius);
 	
+	OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_INATTACKRANGE, canAttack);
 
-	if (DistanceToTarget > AttackRangeWithRadius)
-	{
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);
-
-		return;
-	}
-
-
-	if (AttackRangeWithRadius > 200.0f)
-	{
-		AIPawn->ShotByAI();
-	}
-	else
-	{
-		AIPawn->AttackByAI();
-	}
-	
-	
+	return EBTNodeResult::Succeeded;
 }

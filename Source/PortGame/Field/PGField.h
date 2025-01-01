@@ -9,6 +9,23 @@
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnFieldChanged, int8 /*teamid*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnFielclassChanged, class APGField* /*APGField*/);
+
+USTRUCT(BlueprintType)
+struct FWeightedAIData
+{
+	GENERATED_BODY()
+
+	// 데이터 항목
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UBaseCharacterDataAsset> AIData;
+
+	// 확률 (0~100)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Weight;
+
+	FWeightedAIData() : AIData(nullptr), Weight(0.0f) {}
+};
+
 UCLASS()
 class PORTGAME_API APGField : public AActor ,public IGenericTeamAgentInterface
 {
@@ -71,8 +88,11 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "AIFieldData")
 	TArray<TObjectPtr<class APGNpcCharacter>> AICharacters;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "AIFieldData")
-	TArray<TObjectPtr<class UBaseCharacterDataAsset>> AIDatas;
+	/*UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "AIFieldData")
+	TArray<TObjectPtr<class UBaseCharacterDataAsset>> AIDatas;*/
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
+	TArray<FWeightedAIData> AIDatas;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
 	int32 SpawnCount;

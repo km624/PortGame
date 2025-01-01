@@ -4,26 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_Attack.generated.h"
+#include "BTTask_DetectNode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PORTGAME_API UBTTask_Attack : public UBTTaskNode
+class PORTGAME_API UBTTask_DetectNode : public UBTTaskNode
 {
 	GENERATED_BODY()
 
 public:
-	UBTTask_Attack();
+	UBTTask_DetectNode();
 
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-	
-	
-protected:
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float MinShootTime;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MaxShootTime;
+protected:
+	float TargetToDistance(FVector myloc, FVector targetLoc);
 };

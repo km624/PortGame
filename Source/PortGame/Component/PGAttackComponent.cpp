@@ -184,7 +184,7 @@ void UPGAttackComponent::AttackHitCheck()
 	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
 
 	
-	float AttackRange = 50.0f;
+	float AttackRange = 150.0f;
 	float AttackRadius = BaseCharacter->GetTotalStat().AttackRange;
 	float AttackDamage = BaseCharacter->GetTotalStat().Attack;
 	if (BaseCharacter->GetPlayerCharacterType() == EPlayerCharacterType::BlueArchive)

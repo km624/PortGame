@@ -21,7 +21,7 @@ USkillNikke::USkillNikke()
         SkillNikkeMontage = SkillMontage.Object;
     }*/
 
-	SkillCooltime = 10.0f;
+	SkillCooltime = 30.0f;
 }
 
 void USkillNikke::SetSkillSetting(APGBaseCharacter* owner)

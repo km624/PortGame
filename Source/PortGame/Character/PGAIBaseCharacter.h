@@ -32,11 +32,22 @@ protected:
 
 	virtual void AttackByAI() override;
 
+	virtual void ShotByAI() override;
+
 	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
 
 	virtual void NotifyComboEnd() override;
 
 	virtual float AITurnSpeed() override;
+
+	virtual bool CheckShotterType() override;
+
+	virtual void SetTimerShooterAttack(float shottime) override;
+
+	virtual bool CheckTargetDead(APawn* Target) override;
+	
+protected:
+	FTimerHandle ShotCompeteTimerHandle;
 
 
 

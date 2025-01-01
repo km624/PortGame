@@ -33,7 +33,8 @@ protected:
 
 	//캐릭터 데이터를 장착
 public:
-	void EnableCharacter();
+	virtual void EnableCharacter();
+
 	void SetCharacterData(class UBaseCharacterDataAsset* characterdata);
 
 	virtual void SetupCharacterData(class UBaseCharacterDataAsset* characterdata);
