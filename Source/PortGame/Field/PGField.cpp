@@ -34,6 +34,8 @@ APGField::APGField()
 	FieldMesh->SetCachedMaxDrawDistance(DrawDistance);
 	
 	PrimaryActorTick.bCanEverTick = true;
+
+	bIsVisibled = false;
 }
 
 
@@ -100,22 +102,18 @@ void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 		}
 	}
 
-	if (!bIsVisibled)
+	APGNpcCharacter* NPCcharacter =  Cast<APGNpcCharacter>(OtherActor);
+	if (NPCcharacter)
 	{
-		APGNpcCharacter* NPCcharacter =  Cast<APGNpcCharacter>(OtherActor);
-		if (NPCcharacter)
+		if (GetTeamAttitudeTowards(*NPCcharacter))
 		{
-			if (GetTeamAttitudeTowards(*NPCcharacter))
-			{
-				if (!bIsVisibled)
-				{
-					OnAttackPawnIn(NPCcharacter);
-				}
-
-			}
+				
+			SetTimerAttackPawnDamage(NPCcharacter);
+				
 		}
-		
 	}
+		
+	
 
 
 }
@@ -139,6 +137,23 @@ void APGField::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 		}
 	}
+	APGNpcCharacter* NPCcharacter = Cast<APGNpcCharacter>(OtherActor);
+	if (NPCcharacter)
+	{
+		if (GetTeamAttitudeTowards(*NPCcharacter))
+		{
+
+			if (AttackPawns.Contains(NPCcharacter))
+			{
+
+				GetWorldTimerManager().ClearTimer(AttackPawns[NPCcharacter]);
+
+				AttackPawns.Remove(NPCcharacter);
+			}
+
+		}
+	}
+
 }
 
 void APGField::SetTeamColor()
@@ -393,15 +408,17 @@ void APGField::CheckFieldVisible()
 	if (FieldMesh->WasRecentlyRendered(visibleTime))
 	{
 		StartProtectAISpawn();
+		VisibleClearTimer();
 		bIsVisibled = true;
+		
+		
+	
 	}
 	else
 	{
 		AllAIReturnObjectPool();
+		NotVisibleAllSetupTimer();
 		bIsVisibled = false;
-
-		//안에 들어와있는 폰이 있나 확인
-		CheckAttackPawnIn();
 
 	}
 }
@@ -443,16 +460,16 @@ void APGField::OnAttackPawnIn(APGNpcCharacter* attackNPC)
 		int8 teamid = attackNPC->GetGenericTeamId();
 		
 		DamageFieldGauge(teamid);
-
-		attackNPC->ForceReturnObjectPool();
-
 		SLOG(TEXT("Field Not Visible Attacked"));
 		
+		attackNPC->ForceReturnObjectPool();
+
+		AttackPawns.Remove(attackNPC);
 
 	}
 }
 
-void APGField::CheckAttackPawnIn()
+bool APGField::CheckAttackPawnIn(APGNpcCharacter* attackPawn)
 {
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(Detect), false, this);
@@ -477,18 +494,91 @@ void APGField::CheckAttackPawnIn()
 
 		for (auto const& OverlapResult : OverlapResults)
 		{
-			// 다른 팀
-			if(GetTeamAttitudeTowards(*OverlapResult.GetActor()))
-			{
-				APGNpcCharacter* AttackPAwn = Cast<APGNpcCharacter>(OverlapResult.GetActor());
-				if (IsValid(AttackPAwn))
-				{
-					OnAttackPawnIn(AttackPAwn);
-				}
-			}
-
+			if (OverlapResult.GetActor() == attackPawn)
+				return true;
 		}
 
+		
+	}
+	if (AttackPawns.Contains(attackPawn))
+	{
+		SLOG(TEXT("ISAlreadDead or Out"));
+		
+		GetWorldTimerManager().ClearTimer(AttackPawns[attackPawn]);
+
+		AttackPawns.Remove(attackPawn);
+	}
+
+
+	return false;
+}
+
+void APGField::SetTimerAttackPawnDamage(APGNpcCharacter* attackPawn)
+{
+	FTimerHandle TimerHandle;
+	if (AttackPawns.Contains(attackPawn))
+	{
+		AttackPawns.Remove(attackPawn);
+	}
+	SLOG(TEXT("SetTimerAttackRange %s "), *attackPawn->GetActorNameOrLabel());
+	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([attackPawn,this]()
+		{
+			if (attackPawn && !attackPawn->GetbIsDead()) 
+			{
+				if (CheckAttackPawnIn(attackPawn))
+				{
+					OnAttackPawnIn(attackPawn);
+				}
+			}
+		}), AttackPawnDamageTime, false);
+
+	AttackPawns.Add(attackPawn, TimerHandle);
+
+}
+
+void APGField::VisibleClearTimer()
+{
+	if (bIsVisibled) return;
+
+	
+	if (AttackPawns.Num() > 0)
+	{
+		SLOG(TEXT("ClearTimer"));
+		for (auto& attackpawn : AttackPawns)
+		{
+			if (CheckAttackPawnIn(attackpawn.Key))
+			{
+				if (attackpawn.Value.IsValid())
+				{
+					GetWorldTimerManager().ClearTimer(attackpawn.Value);
+
+				}
+			}
+		}
+	}
+	
+
+}
+
+void APGField::NotVisibleAllSetupTimer()
+{
+	if (!bIsVisibled) return;
+
+
+	if (AttackPawns.Num() > 0)
+	{
+		SLOG(TEXT("NotVisibleAllSetupTimer"));
+
+		for (auto& attackpawn : AttackPawns)
+		{
+			if (CheckAttackPawnIn(attackpawn.Key))
+			{
+				
+				SetTimerAttackPawnDamage(attackpawn.Key);
+
+				
+			}
+		}
 		
 	}
 }

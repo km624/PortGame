@@ -150,7 +150,13 @@ protected:
 
 	void OnAttackPawnIn(class APGNpcCharacter* attackNPC);
 
-	void CheckAttackPawnIn();
+	bool CheckAttackPawnIn(class APGNpcCharacter* attackPawn);
+
+	void SetTimerAttackPawnDamage(class APGNpcCharacter* attackPawn);
+
+	void VisibleClearTimer();
+
+	void NotVisibleAllSetupTimer();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
@@ -158,8 +164,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
 	float visibleTime = 3.0f;
-
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
+	float AttackPawnDamageTime=3.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
+	TMap<TObjectPtr<class APGNpcCharacter>, FTimerHandle> AttackPawns;
 
 	
 
