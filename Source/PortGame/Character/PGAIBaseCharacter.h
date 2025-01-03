@@ -18,8 +18,20 @@ class PORTGAME_API APGAIBaseCharacter : public APGBaseCharacter ,public IPGAICha
 public:
 	APGAIBaseCharacter();
 
+
+protected:
+	TObjectPtr<class APGAIController> MyAIController;
+
 protected:
 	virtual void BeginPlay() override;
+
+
+	virtual void PossessedBy(AController* NewController) override;
+
+	
+
+protected:
+
 
 	//AI 
 protected:
@@ -45,6 +57,8 @@ protected:
 	virtual void SetTimerShooterAttack(float shottime) override;
 
 	virtual bool CheckTargetDead(APawn* Target) override;
+
+	virtual void NotVisibleAttack(APawn* Target) override;
 	
 protected:
 	FTimerHandle ShotCompeteTimerHandle;

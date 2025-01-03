@@ -26,6 +26,8 @@ public:
 
 	void SetForceMoveVector(FVector targetVector);
 
+	void SetVisible(bool visible);
+
 	void RunAI();
 
 	void TOMyFieldDead(int8 teamid);

@@ -13,8 +13,7 @@
 #include "Interface/ObjectPoolingInterface.h"
 #include "Engine/LevelScriptActor.h"
 #include "Field/ObjectPoolManager.h"
-
-
+#include "Engine/OverlapResult.h"
 
 
 // Sets default values
@@ -100,6 +99,24 @@ void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 		}
 	}
+
+	if (!bIsVisibled)
+	{
+		APGNpcCharacter* NPCcharacter =  Cast<APGNpcCharacter>(OtherActor);
+		if (NPCcharacter)
+		{
+			if (GetTeamAttitudeTowards(*NPCcharacter))
+			{
+				if (!bIsVisibled)
+				{
+					OnAttackPawnIn(NPCcharacter);
+				}
+
+			}
+		}
+		
+	}
+
 
 }
 
@@ -241,16 +258,23 @@ void APGField::DamageField(class APawn* deadpawn, int8 attackteamid)
 
 void APGField::DamageFieldGauge(int8 attackteamid)
 {
+	float Add = 1.0f;
 
-	currentFieldGauge -= FieldDamage;
+	if (!bIsVisibled)
+		Add *= 0.25f;
 
-	if (PlayerCharacters.Num() > 0)
+	currentFieldGauge -= FieldDamage* Add;
+
+	if (bIsVisibled)
 	{
-		for (TObjectPtr<APGPlayerCharacter>& palyerCharacter : PlayerCharacters)
+		if (PlayerCharacters.Num() > 0)
 		{
-			if (palyerCharacter)
+			for (TObjectPtr<APGPlayerCharacter>& palyerCharacter : PlayerCharacters)
 			{
-				palyerCharacter->GetPlayerHudWidget()->UpdateFieldGague(currentFieldGauge);
+				if (palyerCharacter)
+				{
+					palyerCharacter->GetPlayerHudWidget()->UpdateFieldGague(currentFieldGauge);
+				}
 			}
 		}
 	}
@@ -370,25 +394,23 @@ void APGField::CheckFieldVisible()
 	{
 		StartProtectAISpawn();
 		bIsVisibled = true;
-		
 	}
 	else
 	{
 		AllAIReturnObjectPool();
 		bIsVisibled = false;
-		
+
+		//안에 들어와있는 폰이 있나 확인
+		CheckAttackPawnIn();
 
 	}
-	
 }
 
 void APGField::AllAIReturnObjectPool()
 {
-	if (!bIsVisibled)
-	{
-		//SLOG(TEXT("AlreadyNotVisible"));
-		return;
-	}
+	if (!bIsVisibled)return;
+
+	SLOG(TEXT("FieldAllReturn"));
 	//모든 캐릭터 오브젝트 풀링으로 반환
 	if (AICharacters.Num() > 0)
 	{
@@ -404,14 +426,70 @@ void APGField::AllAIReturnObjectPool()
 
 void APGField::StartProtectAISpawn()
 {
-	if (bIsVisibled)
-	{
-		//SLOG(TEXT("AlreadySpawn"));
-		return;
-	}
+	if (bIsVisibled) return;
+	
+	SLOG(TEXT("FieldStartSpawn"));
 	for (int i = AICharacters.Num(); i < SpawnCount; i++)
 	{
 		OnAISpawn();
+	}
+}
+
+void APGField::OnAttackPawnIn(APGNpcCharacter* attackNPC)
+{
+	if (IsValid(attackNPC))
+	{
+	
+		int8 teamid = attackNPC->GetGenericTeamId();
+		
+		DamageFieldGauge(teamid);
+
+		attackNPC->ForceReturnObjectPool();
+
+		SLOG(TEXT("Field Not Visible Attacked"));
+		
+
+	}
+}
+
+void APGField::CheckAttackPawnIn()
+{
+	TArray<FOverlapResult> OverlapResults;
+	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(Detect), false, this);
+
+	bool bResult = false;
+	FVector Detectsize;
+	
+
+	Detectsize = GetActorScale() * 50.0f;
+	bResult = GetWorld()->OverlapMultiByChannel(
+		OverlapResults,
+		GetActorLocation(),
+		FQuat::Identity,
+		CCHANNEL_PGACTION,
+		FCollisionShape::MakeBox(Detectsize),
+		CollisionQueryParam
+	);
+		
+
+	if (bResult)
+	{
+
+		for (auto const& OverlapResult : OverlapResults)
+		{
+			// 다른 팀
+			if(GetTeamAttitudeTowards(*OverlapResult.GetActor()))
+			{
+				APGNpcCharacter* AttackPAwn = Cast<APGNpcCharacter>(OverlapResult.GetActor());
+				if (IsValid(AttackPAwn))
+				{
+					OnAttackPawnIn(AttackPAwn);
+				}
+			}
+
+		}
+
+		
 	}
 }
 

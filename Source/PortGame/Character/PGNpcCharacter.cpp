@@ -21,7 +21,7 @@
 #include "Character/PGPlayerCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 
-APGNpcCharacter::APGNpcCharacter()
+APGNpcCharacter::APGNpcCharacter() 
 {
 	/*AIControllerClass = APGAIController::StaticClass();
 
@@ -52,6 +52,8 @@ APGNpcCharacter::APGNpcCharacter()
 		NAParryEffect = parryEffect.Object;
 	}
 
+	bIsRendered = true;
+
 }
 
 void APGNpcCharacter::BeginPlay()
@@ -76,28 +78,23 @@ void APGNpcCharacter::EnableCharacter()
 {
 	Super::EnableCharacter();
 
+	bIsRendered = true;
+	bIsParry = false;
 }
 
 void APGNpcCharacter::Tick(float deltatime)
 {
 	Super::Tick(deltatime);
 
-	if (USkeletalMeshComponent* MeshComponent = GetMesh())
-	{
-		// 제일 낮은 LOD로 강제 설정 (0이 가장 높은 디테일, 숫자가 클수록 낮은 디테일)
-		int32 LowestLODIndex = MeshComponent->GetNumLODs() - 1;
-		//MeshComponent->MinLodModel = LowestLODIndex;
-		SLOG(TEXT("LOD: %d"), GetMesh()->GetPredictedLODLevel());
-	}
-
-	/*if (GetMesh()->WasRecentlyRendered(5.0f))
-	{*/
-	//	SLOG(TEXT("View"));
-	//}
-	//else
+	//if (USkeletalMeshComponent* MeshComponent = GetMesh())
 	//{
-	//	SLOG(TEXT("NotView"));
+	//	// 제일 낮은 LOD로 강제 설정 (0이 가장 높은 디테일, 숫자가 클수록 낮은 디테일)
+	//	int32 LowestLODIndex = MeshComponent->GetNumLODs() - 1;
+	//	//MeshComponent->MinLodModel = LowestLODIndex;
+	//	SLOG(TEXT("LOD: %d"), GetMesh()->GetPredictedLODLevel());
 	//}
+
+	CheckCharacterRender();
 
 }
 
@@ -244,10 +241,11 @@ void APGNpcCharacter::SetDead(int8 teamid)
 
 void APGNpcCharacter::ReturnCharacterToPool()
 {
-	//애니메이션 제거후
+	//애니메이션 제거
 	GetMesh()->SetAnimInstanceClass(nullptr);
-
+	//무기 리턴
 	AttackComponent->ReturnWeaponPool();
+
 	IObjectPoolingInterface* poolmanager = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
 	if (poolmanager)
 	{
@@ -355,6 +353,8 @@ void APGNpcCharacter::ForceReturnObjectPool()
 	
 	GetCharacterMovement()->Deactivate();
 
+	GetMesh()->SetAnimInstanceClass(nullptr);
+
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
 		AnimInstance->StopAllMontages(0.0f);
@@ -362,6 +362,38 @@ void APGNpcCharacter::ForceReturnObjectPool()
 	
 	ReturnCharacterToPool();
 	
+}
+
+void APGNpcCharacter::CheckCharacterRender()
+{
+	if (GetMesh()->WasRecentlyRendered())
+	{
+		OnRenderCharacter();
+		
+	}
+	else
+	{
+		NotRenderCharacter();
+	
+	}
+}
+
+void APGNpcCharacter::NotRenderCharacter()
+{
+	if (!bIsRendered) return;
+	bIsRendered = false;
+	
+	MyAIController->SetVisible(bIsRendered);
+	GetMesh()->bPauseAnims = true;
+}
+
+void APGNpcCharacter::OnRenderCharacter()
+{
+	if (bIsRendered) return;
+	bIsRendered = true;
+
+	MyAIController->SetVisible(bIsRendered);
+	GetMesh()->bPauseAnims = false;
 }
 
 

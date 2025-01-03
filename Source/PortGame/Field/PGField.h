@@ -148,6 +148,10 @@ protected:
 
 	void StartProtectAISpawn();
 
+	void OnAttackPawnIn(class APGNpcCharacter* attackNPC);
+
+	void CheckAttackPawnIn();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
 	uint8 bIsVisibled : 1;
@@ -155,6 +159,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
 	float visibleTime = 3.0f;
 
+	
+
+	
 
 
 };

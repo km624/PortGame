@@ -45,5 +45,6 @@ public:
 
 	virtual bool CheckTargetDead(APawn* Target) = 0;
 
+	virtual void NotVisibleAttack(APawn* Target) = 0;
 	
 };

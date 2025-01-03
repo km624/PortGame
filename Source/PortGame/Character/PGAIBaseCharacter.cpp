@@ -8,6 +8,7 @@
 #include "AI/PGAIController.h"
 #include "PortGame/PortGame.h"
 #include "Components/CapsuleComponent.h"
+#include "Engine/DamageEvents.h"
 
 APGAIBaseCharacter::APGAIBaseCharacter()
 {
@@ -19,9 +20,21 @@ APGAIBaseCharacter::APGAIBaseCharacter()
 	
 }
 
+
 void APGAIBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void APGAIBaseCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	APGAIController* aicontroller = Cast<APGAIController>(NewController);
+	if (aicontroller)
+	{
+		MyAIController = aicontroller;
+	}
 }
 
 float APGAIBaseCharacter::GetPatrolRadius()
@@ -155,6 +168,24 @@ bool APGAIBaseCharacter::CheckTargetDead(APawn* Target)
 
 	}
 	return false;
+}
+
+void APGAIBaseCharacter::NotVisibleAttack(APawn* Target)
+{
+	FDamageEvent DamageEvent;
+	if (Target->GetController() != nullptr&& Target!=nullptr)
+	{
+		float AttackDamage = GetTotalStat().Attack;
+		
+		if (ActorHasTag(TAG_AI))
+		{
+			AttackDamage *= 0.5f;
+		}
+
+		Target->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
+		SLOG(TEXT("NOTVISIBLE ATTACK"));
+	}
+	
 }
 
 

@@ -143,10 +143,13 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		// ( 플레이어 관여하는 액터랑 상관없이 몇명이든 아무나)
 		if (TargetActor)
 		{
-			
 			APawn* Pawn = Cast<APawn>(TargetActor);
-			OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn);
 
+			APawn* CurrentTarget = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_TARGET));
+
+			if (Pawn != CurrentTarget)
+				OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn);
+			
 			if (protecteField)
 				DrawDebugBox(World, myfield->GetActorLocation(), Detectsize, FColor::Green, false, 0.2f);
 			else

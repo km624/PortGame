@@ -81,7 +81,7 @@ protected:
 	uint8 bIsParry : 1;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Parry", meta =(ClampMin = "0.0", ClampMax = "100.0"))
-	float ParryPercent = 40.0f;
+	float ParryPercent = 30.0f;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UNiagaraComponent> ParryNiagaraComponent;
@@ -104,6 +104,17 @@ protected:
 
 public:
 	void ForceReturnObjectPool();
+
+protected:
+	void CheckCharacterRender();
+
+	void NotRenderCharacter();
+
+	void OnRenderCharacter();
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
+	uint8 bIsRendered : 1;
 
 
 };

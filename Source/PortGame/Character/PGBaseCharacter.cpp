@@ -143,7 +143,7 @@ void APGBaseCharacter::EnableCharacter()
 	GetCharacterMovement()->SetActive(true);
 	//이동 기능 제한
 	GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-
+	GetMesh()->bPauseAnims = false;
 	bIsDead = false;
 	bIsGroggy = false;
 	bIsReload = false;

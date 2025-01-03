@@ -9,4 +9,5 @@
 #define BBKEY_PROTECTFIELD	TEXT("ProtectField")
 #define BBKEY_NEXTATTACKFIELD	TEXT("NextAttackField")
 #define BBKEY_FORCEMOVEVECTOR	TEXT("ForceMoveVector")
+#define BBKEY_VISIBLE	TEXT("Visible")
 

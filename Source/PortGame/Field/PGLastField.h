@@ -33,6 +33,7 @@ protected:
 
 	virtual void ChangedField(int8 teamid) override;
 
+
 protected:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)

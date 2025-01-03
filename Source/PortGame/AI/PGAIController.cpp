@@ -62,6 +62,15 @@ void APGAIController::SetForceMoveVector(FVector targetVector)
 	}
 }
 
+void APGAIController::SetVisible(bool visible)
+{
+	UBlackboardComponent* BlackboardComp = Blackboard.Get();
+	if (BlackboardComp)
+	{
+		BlackboardComp->SetValueAsBool(BBKEY_VISIBLE, visible);
+	}
+}
+
 void APGAIController::RunAI()
 {
 	//SLOG(TEXT("RunAi"));
