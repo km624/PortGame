@@ -149,6 +149,8 @@ void APGField::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 				GetWorldTimerManager().ClearTimer(AttackPawns[NPCcharacter]);
 
 				AttackPawns.Remove(NPCcharacter);
+
+				SLOG(TEXT("Out and ClearTimer: %s"), *NPCcharacter->GetActorNameOrLabel());
 			}
 
 		}
@@ -464,7 +466,8 @@ void APGField::OnAttackPawnIn(APGNpcCharacter* attackNPC)
 		
 		attackNPC->ForceReturnObjectPool();
 
-		AttackPawns.Remove(attackNPC);
+		//강제 귀한할때 overlapend 됨
+		//AttackPawns.Remove(attackNPC);
 
 	}
 }
@@ -495,7 +498,11 @@ bool APGField::CheckAttackPawnIn(APGNpcCharacter* attackPawn)
 		for (auto const& OverlapResult : OverlapResults)
 		{
 			if (OverlapResult.GetActor() == attackPawn)
+			{
+				
 				return true;
+			}
+				
 		}
 
 		
@@ -515,23 +522,29 @@ bool APGField::CheckAttackPawnIn(APGNpcCharacter* attackPawn)
 
 void APGField::SetTimerAttackPawnDamage(APGNpcCharacter* attackPawn)
 {
+	
 	FTimerHandle TimerHandle;
 	if (AttackPawns.Contains(attackPawn))
 	{
 		AttackPawns.Remove(attackPawn);
 	}
-	SLOG(TEXT("SetTimerAttackRange %s "), *attackPawn->GetActorNameOrLabel());
-	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([attackPawn,this]()
-		{
-			if (attackPawn && !attackPawn->GetbIsDead()) 
+	
+	//안보일때만 타이머
+	if (!bIsVisibled)
+	{
+		SLOG(TEXT("SetTimerAttackRange %s "), *attackPawn->GetActorNameOrLabel());
+		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([attackPawn, this]()
 			{
-				if (CheckAttackPawnIn(attackPawn))
+				if (attackPawn && !attackPawn->GetbIsDead())
 				{
-					OnAttackPawnIn(attackPawn);
+					if (CheckAttackPawnIn(attackPawn))
+					{
+						OnAttackPawnIn(attackPawn);
+					}
 				}
-			}
-		}), AttackPawnDamageTime, false);
-
+			}), AttackPawnDamageTime, false);
+	}
+	
 	AttackPawns.Add(attackPawn, TimerHandle);
 
 }
@@ -563,7 +576,10 @@ void APGField::VisibleClearTimer()
 void APGField::NotVisibleAllSetupTimer()
 {
 	if (!bIsVisibled) return;
-
+	
+	//강제로 비지블 변경
+	//SetTimerAttackPawnDamage여기서 먹질 않음
+	bIsVisibled = false; 
 
 	if (AttackPawns.Num() > 0)
 	{
@@ -574,7 +590,9 @@ void APGField::NotVisibleAllSetupTimer()
 			if (CheckAttackPawnIn(attackpawn.Key))
 			{
 				
+
 				SetTimerAttackPawnDamage(attackpawn.Key);
+
 
 				
 			}

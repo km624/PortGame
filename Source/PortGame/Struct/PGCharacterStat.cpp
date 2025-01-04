@@ -3,6 +3,16 @@
 
 #include "Struct/PGCharacterStat.h"
 
-FPGCharacterStat::FPGCharacterStat()
+FPGCharacterStat::FPGCharacterStat() :MaxHp(0.0f), Attack(0.0f), AttackRange(0.0f), AttackSpeed(0.0f), MovementSpeed(0.0f), HitGauge(0.0f)
 {
+}
+
+FPGCharacterStat::FPGCharacterStat(int32 level):MaxHp(100.0f), Attack(5.0f), AttackRange(5.0f), AttackSpeed(0.02f), MovementSpeed(500.0f), HitGauge(1.0f)
+{
+    MaxHp *= level;
+    Attack *= level;
+    AttackRange *= level;
+    AttackSpeed *= level;
+    MovementSpeed *= level;
+    HitGauge *= level;
 }

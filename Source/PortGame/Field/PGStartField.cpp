@@ -10,6 +10,7 @@
 
 APGStartField::APGStartField()
 {
+	
 }
 
 void APGStartField::InitializeField(uint8 teamid)
@@ -68,6 +69,7 @@ void APGStartField::SetupPlayerbleCharacter()
 		{
 			playerCharacter->SetCharacterData(PlayerCharacterData[i]);
 			playerCharacter->SetteamId(TeamId);
+			playerCharacter->SetupPlayerLevel(PlayerCharacterLevels[i]);
 
 			playerCharacter->FinishSpawning(FTransform(SpawnRotation,SpawnLocation));
 

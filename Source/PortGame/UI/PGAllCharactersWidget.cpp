@@ -52,7 +52,7 @@ void UPGAllCharactersWidget::SetUpCharacters(int32 num)
 	
 }
 
-void UPGAllCharactersWidget::SetupCharacterWdiget(int32 num, EPlayerCharacterType type, const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat, bool bIsmine, float cooltime)
+void UPGAllCharactersWidget::SetupCharacterWdiget(int32 num, EPlayerCharacterType type, const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat, const FPGCharacterStat& LevelStat, bool bIsmine, float cooltime)
 {
 	if (PCharacterWidgets.IsValidIndex(num))
 	{
@@ -60,7 +60,7 @@ void UPGAllCharactersWidget::SetupCharacterWdiget(int32 num, EPlayerCharacterTyp
 		PCharacterWidgets[num]->SetChangeCoolTime(cooltime);
 		if(!CharactertypeImages.IsEmpty())
 			PCharacterWidgets[num]->SetStyle(CharactertypeImages[type]);
-		PCharacterWidgets[num]->SetUphpbarWidget(BaseStat, ModifierStat);
+		PCharacterWidgets[num]->SetUphpbarWidget(BaseStat, ModifierStat, LevelStat);
 
 	}
 }

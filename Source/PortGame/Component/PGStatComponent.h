@@ -8,19 +8,19 @@
 #include "Portgame/Portgame.h"
 #include "PGStatComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnHpZeroDelegate, int8 /*teamid*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHpZeroDelegate, AActor* /*DamageCauser*/);
 
 DECLARE_MULTICAST_DELEGATE(FOnHitGaugeZeroDelegate);
 // Hp ∫Ø∞Êµ 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHpChangedDelegate, float /*CurrentHp*/);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHitGaugeChangedDelegate, float /*CurrentHitGauge*/);
-
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnCharacterLevelChangedDelegate, float /*Level*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnEXPChangedDelegate, float /*EXP*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnCharacterLevelChangedDelegate, int32 /*Level*/);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnUltiSkillGaugeChangedDelegate, float /*CurrentUltiSkillGauge*/);
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FOnStatChangedDelegate, const FPGCharacterStat& /*BaseStat*/ , const FPGCharacterStat& /*Modifier*/);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FOnStatChangedDelegate, const FPGCharacterStat& /*BaseStat*/ , const FPGCharacterStat& /*Modifier*/, const FPGCharacterStat&/*LEvelStat*/);
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -48,6 +48,8 @@ public:
 	FOnHitGaugeZeroDelegate OnHitGaugeZero;
 	FOnHitGaugeChangedDelegate OnHitGaugeChanged;
 	FOnUltiSkillGaugeChangedDelegate OnUltiSkillGaugechanged;
+	FOnCharacterLevelChangedDelegate OnLevelChanged;
+	FOnEXPChangedDelegate OnEXPChanged;
 
 	
 
@@ -55,17 +57,25 @@ public:
 
 	FORCEINLINE void SetBaseStat(FName rarity) 
 	{
-		BaseStat = AllStat[rarity];  OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat());
+		BaseStat = AllStat[rarity];  OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat(), GetLevelStat());
 	}
 	FORCEINLINE void SetModifierStat(const FPGCharacterStat& InModifierStat)
 	{
-		ModifierStat = InModifierStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat());
+		ModifierStat = InModifierStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat(), GetLevelStat());
+	}
+
+	void SetUpPlayerLevel(int32 lelvel);
+
+	FORCEINLINE void SetLevelStat(const FPGCharacterStat& InLevelStat)
+	{
+		LevelStat = InLevelStat; OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat(), GetLevelStat());
 	}
 
 	FORCEINLINE const FPGCharacterStat& GetBaseStat() const { return BaseStat; }
 	FORCEINLINE const FPGCharacterStat& GetModifierStat() const { return ModifierStat; }
+	FORCEINLINE const FPGCharacterStat& GetLevelStat() const { return LevelStat; }
 
-	FORCEINLINE FPGCharacterStat GetTotalStat() const { return BaseStat + ModifierStat; }
+	FORCEINLINE FPGCharacterStat GetTotalStat() const { return BaseStat + ModifierStat + LevelStat; }
 	
 	
 	FORCEINLINE float  GetCurrentHp() { return CurrentHp; }
@@ -79,7 +89,7 @@ public:
 	
 public:
 
-	void Damaged(float Damage,int8 teamid);
+	void Damaged(float Damage, AActor* DamageActor);
 	
 	void HitGaugeDamaged(float Damage);
 
@@ -87,14 +97,15 @@ public:
 
 	void ResetUlitSkillGauge();
 
-
-	//¿”Ω√
-//protected:
+	void AddEXP();
+	
+protected:
 	void SetHp(float NewHp);
 
 	void SetHitGauge(float NewHitGauge);
 
-	void SetLevelCharacter(int32 level);
+
+	void LevelUp();
 
 protected:
 
@@ -112,7 +123,7 @@ protected:
 	FName CurrentCharacterRarity;
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
-	float CurrentCharacterLevel;
+	int32 CurrentCharacterLevel;
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float EXP;
@@ -125,6 +136,7 @@ protected:
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat)
 	float CurrentUltiSkillGauge;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
 	float addPrecentUlitSkillGuage = 10.0f;
 
@@ -137,6 +149,9 @@ protected:
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	FPGCharacterStat ModifierStat;
+
+	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	FPGCharacterStat LevelStat;
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	TMap<FName, FPGCharacterStat> AllStat;

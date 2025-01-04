@@ -61,9 +61,9 @@ void UPGCharcterWidget::SetChangeCoolTime(float cooltime)
 	}
 }
 
-void UPGCharcterWidget::SetUphpbarWidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat)
+void UPGCharcterWidget::SetUphpbarWidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat,const FPGCharacterStat& LevelStat)
 {
-	BP_HpBar->SetUpWidget(Stat, ModifierStat);
+	BP_HpBar->SetUpWidget(Stat, ModifierStat, LevelStat);
 }
 
 void UPGCharcterWidget::UpdateHpBar(float NewCurrentHp)
@@ -76,7 +76,7 @@ void UPGCharcterWidget::UpdateHitGaugeBar(float NewHitGauge)
 	BP_HpBar->UpdateHitGaugeBar(NewHitGauge);
 }
 
-void UPGCharcterWidget::SetDead(int8 team)
+void UPGCharcterWidget::SetDead(AActor* DamageCauser)
 {
 	bIsDead = true;
 	FLinearColor Fillcolor = FLinearColor(FVector(0.2f, 0.2f, 0.2f));

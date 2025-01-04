@@ -28,7 +28,7 @@ protected:
 
 public:
 
-	void SetUpWidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat);
+	void SetUpWidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat, const FPGCharacterStat& LevelStat);
 
 	UFUNCTION()
 	void UpdateHpBar(float NewCurrentHp);

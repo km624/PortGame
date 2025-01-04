@@ -33,9 +33,9 @@ void UPGHudWidget::SetOwingCharcter(AActor* owningCharacter)
 	OwningCharacter = owningCharacter;
 }
 
-void UPGHudWidget::SetUpWidget(const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat)
+void UPGHudWidget::SetUpWidget(const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat,const FPGCharacterStat& LevelStat)
 {
-	BP_HpBar->SetUpWidget(BaseStat, ModifierStat);
+	BP_HpBar->SetUpWidget(BaseStat, ModifierStat, LevelStat);
 }
 
 void UPGHudWidget::SetupUltiSkillWidget(const float currentGague)

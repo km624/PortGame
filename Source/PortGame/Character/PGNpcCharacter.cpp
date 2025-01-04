@@ -18,20 +18,11 @@
 #include "WorldPartition/WorldPartitionSubsystem.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Character/PGPlayerCharacter.h"
 #include "Components/SkeletalMeshComponent.h"
 
 APGNpcCharacter::APGNpcCharacter() 
 {
-	/*AIControllerClass = APGAIController::StaticClass();
-
-	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;*/
-
-	/*PatrolRadius = 1000.0f;
-
-	DetectRange = 1000.0f;
-
-	TurnSpeed = 10.0f;*/
+	
 
 	Tags.Add(TAG_AI);
 
@@ -70,8 +61,6 @@ void APGNpcCharacter::BeginPlay()
 	//NPC 캐릭터 팀 색깔 설정
 	ChangeNpcColor();
 
-	
-	
 }
 
 void APGNpcCharacter::EnableCharacter()
@@ -95,6 +84,8 @@ void APGNpcCharacter::Tick(float deltatime)
 	//}
 
 	CheckCharacterRender();
+
+
 
 }
 
@@ -167,7 +158,7 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 			}
 			else
-				StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
+				StatComponent->Damaged(DamageAmount, DamageCauser);
 		}
 
 		//수류탄에 맞았을시
@@ -180,11 +171,11 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 			if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
 			{
-				StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
+				StatComponent->Damaged(DamageAmount, DamageCauser);
 			}
 			else
 			{
-				StatComponent->Damaged(DamageAmount * 0.3f, attackPawn->GetGenericTeamId());
+				StatComponent->Damaged(DamageAmount * 0.3f, DamageCauser);
 			}
 		}
 	}
@@ -210,9 +201,9 @@ void APGNpcCharacter::NPCAttackHitStop(float time)
 	
 }
 
-void APGNpcCharacter::SetDead(int8 teamid)
+void APGNpcCharacter::SetDead(AActor* DamageCauser)
 {
-	Super::SetDead(teamid);
+	Super::SetDead(DamageCauser);
 
 	CustomTimeDilation = 1.0f;
 
@@ -223,6 +214,17 @@ void APGNpcCharacter::SetDead(int8 teamid)
 	NAParryUpdateEnd();
 
 	GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
+
+	//자신의 필드에 데이터 내가 누가한테 죽었는지 보냄
+	if (MyAIController)
+	{
+		IGenericTeamAgentInterface* team = Cast<IGenericTeamAgentInterface>(DamageCauser);
+		int8 teamid = team->GetGenericTeamId();
+		SLOG(TEXT("AI DEAD"));
+		if (teamid != 0)
+			MyAIController->TOMyFieldDead(teamid);
+	}
+
 	
 	GetWorld()->GetTimerManager().SetTimer(
 		DeadHiddentimerHandle,

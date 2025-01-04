@@ -27,7 +27,7 @@ protected:
 
 public:
 	UFUNCTION()
-	void SetUpWidget(const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat);
+	void SetUpWidget(const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat, const FPGCharacterStat& LevelStat);
 	UFUNCTION()
 	void SetupUltiSkillWidget(const float currentGague);
 

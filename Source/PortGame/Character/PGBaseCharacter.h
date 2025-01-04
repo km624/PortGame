@@ -193,7 +193,7 @@ protected:
 
 
 	UFUNCTION()
-	virtual void SetDead(int8 teamid);
+	virtual void SetDead(AActor* DamageCauser);
 
 
 protected:

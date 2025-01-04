@@ -537,7 +537,7 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 		{
 			if (StatComponent)
 			{
-				StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
+				StatComponent->Damaged(DamageAmount, DamageCauser);
 			}
 		}
 
@@ -571,7 +571,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 	//SLOG(TEXT("%s : Setup"), *GetActorNameOrLabel());
 	if (hudWidget)
 	{
-		hudWidget->SetUpWidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat());
+		hudWidget->SetUpWidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat(), StatComponent->GetLevelStat());
 		hudWidget->SetupUltiSkillWidget(StatComponent->GetCurrentUltiSkillGauge());
 		hudWidget->SetupSkillWidget(AttackComponent->GetSkill()->GetSkillCooltime());
 		hudWidget->SetupDashWidget(DashColltime);
@@ -1047,7 +1047,7 @@ void APGPlayerCharacter::SetupMyCharacterWidgetToAnother(const TArray<APGPlayerC
 					if (allwidget)
 					{
 						allwidget->SetupCharacterWdiget(num, CharacterType, 
-							StatComponent->GetBaseStat(), StatComponent->GetModifierStat(), bisMine, cooltime);
+							StatComponent->GetBaseStat(), StatComponent->GetModifierStat(), StatComponent->GetLevelStat(), bisMine, cooltime);
 
 
 						TArray<UPGCharcterWidget*> const characterwidgets = allwidget->GetPCharacterWidgets();
@@ -1134,6 +1134,21 @@ void APGPlayerCharacter::ChangeMiniMapSize()
 		}
 		
 	}
+
+}
+
+void APGPlayerCharacter::SetupPlayerLevel(int32 level)
+{
+	StatComponent->SetUpPlayerLevel(level);
+}
+
+void APGPlayerCharacter::PlayerAddEXP()
+{
+	StatComponent->AddEXP();
+}
+
+void APGPlayerCharacter::PlayLevelUpEffet()
+{
 
 }
 

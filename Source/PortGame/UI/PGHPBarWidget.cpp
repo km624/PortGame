@@ -33,12 +33,12 @@ void UPGHPBarWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	SmoothingHitGauge(InDeltaTime);
 }	
 
-void UPGHPBarWidget::SetUpWidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat)
+void UPGHPBarWidget::SetUpWidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat, const FPGCharacterStat& LevelStat)
 {
 	
-	MaxHp = (Stat + ModifierStat).MaxHp;
+	MaxHp = (Stat + ModifierStat+ LevelStat).MaxHp;
 	CurrentHp = MaxHp;
-	MaxHitGauge = (Stat + ModifierStat).HitGauge;
+	MaxHitGauge = (Stat + ModifierStat+ LevelStat).HitGauge;
 	CurrentHitGauge = MaxHitGauge;
 
 	if (ProgressBar_HpBar)

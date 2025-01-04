@@ -24,7 +24,7 @@ public:
 
 	void SetChangeCoolTime(float cooltime);
 	UFUNCTION()
-	void SetUphpbarWidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat);
+	void SetUphpbarWidget(const FPGCharacterStat& Stat, const FPGCharacterStat& ModifierStat, const FPGCharacterStat& LevelStat);
 
 	UFUNCTION()
 	void UpdateHpBar(float NewCurrentHp);
@@ -34,7 +34,7 @@ public:
 
 	//teamÀº Çã¼ö
 	UFUNCTION()
-	void SetDead(int8 team);
+	void SetDead(AActor* DamageCauser);
 
 
 protected:

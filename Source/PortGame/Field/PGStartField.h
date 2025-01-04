@@ -26,6 +26,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerData")
 	TArray<TObjectPtr<class UPlayerCharacterDataAsset>> PlayerCharacterData;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerData")
+	TArray<int32> PlayerCharacterLevels;
+
 
 
 

@@ -23,7 +23,7 @@ public:
 
 	void SetUpCharacters(int32 num);
 
-	void SetupCharacterWdiget(int32 num, EPlayerCharacterType type, const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat, bool bIsmine ,float cooltime);
+	void SetupCharacterWdiget(int32 num, EPlayerCharacterType type, const FPGCharacterStat& BaseStat, const FPGCharacterStat& ModifierStat, const FPGCharacterStat& LevelStat, bool bIsmine ,float cooltime);
 
 	void OnChangeCharacter(int32 num);
 	/*void CharaterUpdateHpBar(float NewCurrentHp);

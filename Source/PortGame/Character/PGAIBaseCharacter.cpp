@@ -190,9 +190,9 @@ void APGAIBaseCharacter::NotVisibleAttack(APawn* Target)
 
 
 
-void APGAIBaseCharacter::SetDead(int8 teamid)
+void APGAIBaseCharacter::SetDead(AActor* DamageCauser)
 {
-	Super::SetDead(teamid);
+	Super::SetDead(DamageCauser);
 
 	/*APGAIController* aiController = Cast<APGAIController>(GetController());
 	if (aiController)

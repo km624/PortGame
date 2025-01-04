@@ -41,7 +41,7 @@ protected:
 
 	virtual void NPCAttackHitStop(float time) override;
 
-	virtual void SetDead(int8 teamid) override;
+	virtual void SetDead(AActor* DamageCauser) override;
 
 	void ReturnCharacterToPool();
 protected:
@@ -115,6 +115,7 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
 	uint8 bIsRendered : 1;
+
 
 
 };

@@ -5,6 +5,8 @@
 #include "Interface/PlayerAttackInterface.h"
 #include "TimerManager.h"
 #include "PortGame/PortGame.h"
+#include "GenericTeamAgentInterface.h"
+#include "Interface/PlayerAddEXPInterface.h"
 
 
 
@@ -40,12 +42,6 @@ void UPGStatComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
-	/*SetCurrentRarity(CurrentCharacterRarity);
-
-	SetHp(GetTotalStat().MaxHp);
-
-	SetHitGauge(GetTotalStat().HitGauge);*/
-
 	CurrentUltiSkillGauge = 100.0f;
 }
 
@@ -62,6 +58,15 @@ void UPGStatComponent::SetCurrentRarity(FName rarity)
 
 		
 	}
+}
+
+void UPGStatComponent::SetUpPlayerLevel(int32 lelvel)
+{
+	CurrentCharacterLevel = lelvel;
+
+	SetLevelStat(FPGCharacterStat(CurrentCharacterLevel));
+
+	OnLevelChanged.Broadcast(CurrentCharacterLevel);
 }
 
 void UPGStatComponent::SetHp(float NewHp)
@@ -94,11 +99,37 @@ void UPGStatComponent::SetHitGauge(float NewHitGauge)
 
 }
 
-
-void UPGStatComponent::SetLevelCharacter(int32 level)
+void UPGStatComponent::AddEXP()
 {
+	EXP += 50.0f;
 
+	if (EXP >= 100)
+	{
+		LevelUp();
+		EXP = 0;
+	}
+	
+	OnEXPChanged.Broadcast(EXP);
+		
+
+	
 }
+
+void UPGStatComponent::LevelUp()
+{
+	LevelStat += 1;
+	CurrentCharacterLevel += 1;
+	
+	SetHp(GetTotalStat().MaxHp);
+	SetHitGauge(GetTotalStat().HitGauge);
+
+	//플레이어 이펙트
+
+	OnLevelChanged.Broadcast(CurrentCharacterLevel);
+	OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat(), GetLevelStat());
+}
+
+
 
 void UPGStatComponent::ResetHitGauge()
 {
@@ -116,7 +147,7 @@ void UPGStatComponent::HitGaugeZeroEffect()
 	ResetHitGauge();
 }
 
-void UPGStatComponent::Damaged(float Damage, int8 teamid)
+void UPGStatComponent::Damaged(float Damage, AActor* DamageActor)
 {
 
 	GetWorld()->GetTimerManager().ClearTimer(ResetHitGaugeTimer);
@@ -128,9 +159,17 @@ void UPGStatComponent::Damaged(float Damage, int8 teamid)
 	
 	HitGaugeDamaged(Damage);
 
-	if (CurrentHp <= KINDA_SMALL_NUMBER)
+	
+	if (CurrentHp <= 0)
 	{
-			OnHpZero.Broadcast(teamid);
+
+		IPlayerAddEXPInterface* player = Cast<IPlayerAddEXPInterface>(DamageActor);
+		if (player)
+		{
+			player->PlayerAddEXP();
+		}
+
+		OnHpZero.Broadcast(DamageActor);
 		
 	}
 	

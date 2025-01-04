@@ -166,7 +166,7 @@ protected:
 	float visibleTime = 3.0f;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
-	float AttackPawnDamageTime=3.0f;
+	float AttackPawnDamageTime= 3.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
 	TMap<TObjectPtr<class APGNpcCharacter>, FTimerHandle> AttackPawns;

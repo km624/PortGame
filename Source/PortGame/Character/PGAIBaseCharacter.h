@@ -88,6 +88,6 @@ protected:
 
 	//죽었을때 오버라이드
 protected:
-	virtual void SetDead(int8 teamid) override;
+	virtual void SetDead(AActor* DamageCauser) override;
 	
 };

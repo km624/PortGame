@@ -9,6 +9,7 @@
 #include "Interface/PGHudWidgetInterface.h"
 #include "Interface/AttackHitStopInterface.h"
 #include "Interface/AITargetPlayerInterface.h"
+#include "Interface/PlayerAddEXPInterface.h"
 #include "PGPlayerCharacter.generated.h"
 
 /**
@@ -22,9 +23,8 @@ enum class EControlData : uint8
 	Aim
 };
 UCLASS()
-class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface, public IAITargetPlayerInterface
+class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface, public IAITargetPlayerInterface, public IPlayerAddEXPInterface
 {
-
 	GENERATED_BODY()
 
 public:
@@ -371,7 +371,17 @@ protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	uint8 bIsMiniMap : 1;
 
-	
+
+	//레벨 관련
+public:
+
+	void SetupPlayerLevel(int32 level);
+
+protected:
+
+	virtual void PlayerAddEXP() override;
+
+	virtual void PlayLevelUpEffet() override;
 	
 
 };

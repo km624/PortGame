@@ -64,18 +64,7 @@ APGBaseCharacter::APGBaseCharacter()
 	GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_PGCAPSULE);
 
 	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
-	/*static ConstructorHelpers::FObjectFinder<USkeletalMesh> Skeletal(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
-	if (Skeletal.Object)
-	{
-		GetMesh()->SetSkeletalMesh(Skeletal.Object);
-	}*/
-
-	/*static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstance(TEXT("/Script/Engine.AnimBlueprint'/Game/PortGame/Animation/ABP_Animation.ABP_Animation_C'"));
-	if (AnimInstance.Class)
-
-	{
-		GetMesh()->SetAnimInstanceClass(AnimInstance.Class);
-	}*/
+	
 	//Attack 컴포넌트 추가
 	AttackComponent = CreateDefaultSubobject<UPGAttackComponent>(TEXT("ATTACK_COMP"));
 	//StatComponent 추가
@@ -285,7 +274,7 @@ void APGBaseCharacter::SetUpHpWidget(UPGUserWidget* InUserWidget)
 	UPGHPBarWidget* HpBarWidget = Cast<UPGHPBarWidget>(InUserWidget);
 	if (HpBarWidget)
 	{
-		HpBarWidget->SetUpWidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat());
+		HpBarWidget->SetUpWidget(StatComponent->GetBaseStat(), StatComponent->GetModifierStat(),StatComponent->GetLevelStat());
 		HpBarWidget->UpdateHpBar(StatComponent->GetCurrentHp());
 		HpBarWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
 
@@ -377,7 +366,7 @@ void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperl
 
 }
 
-void APGBaseCharacter::SetDead(int8 teamid)
+void APGBaseCharacter::SetDead(AActor* DamageCauser)
 {
 
 	//이동 기능 제한

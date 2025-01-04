@@ -17,6 +17,8 @@ struct  FPGCharacterStat : public FTableRowBase
 
 public:
 	FPGCharacterStat();
+
+	FPGCharacterStat(int32 level);
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
@@ -52,5 +54,20 @@ public:
 
 		return Result;
 	}
+
+	FPGCharacterStat& operator+=(int32 AddLevel) 
+	{
+
+		MaxHp += 100.0f* AddLevel;
+		Attack += 5.0f * AddLevel;
+		AttackRange += 5.0f * AddLevel;
+		AttackSpeed += 0.02f * AddLevel;
+		MovementSpeed += 0;
+		HitGauge += 1.0f * AddLevel;
+
+		return *this;
+	}
+
+	
 	
 };
