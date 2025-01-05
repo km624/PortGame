@@ -43,7 +43,7 @@ public:
 
 	virtual void SetTimerShooterAttack(float shottime) = 0;
 
-	virtual bool CheckTargetDead(APawn* Target) = 0;
+	virtual bool CheckTargetDead() = 0;
 
 	virtual void NotVisibleAttack(APawn* Target) = 0;
 	

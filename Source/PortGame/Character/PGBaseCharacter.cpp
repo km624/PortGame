@@ -81,8 +81,9 @@ APGBaseCharacter::APGBaseCharacter()
 	{
 		HpBarWidgetComponent->SetWidgetClass(HpBarWidgetClass.Class);
 		HpBarWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+
 		// 위젯 크기 여기서 지정 ( 가느다란 크기)s
-		HpBarWidgetComponent->SetDrawSize(FVector2D(75.0f, 15.0f));
+		HpBarWidgetComponent->SetDrawSize(FVector2D(50.0f, 15.0f));
 		HpBarWidgetComponent->SetHiddenInGame(true);
 		HpBarWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
@@ -138,6 +139,7 @@ void APGBaseCharacter::EnableCharacter()
 	bIsReload = false;
 	bIsAim = false;
 	bIsShoot = false;
+	bIsRifle = false;
 	SetActorEnableCollision(true);
 	SetActorHiddenInGame(false);
 	SetActorTickEnabled(true);

@@ -112,6 +112,9 @@ protected:
 
 	void OnRenderCharacter();
 
+	//보류 -  거리 기반 업데이트 비율 설정
+	void SetAnimationDistanceFactor();
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
 	uint8 bIsRendered : 1;

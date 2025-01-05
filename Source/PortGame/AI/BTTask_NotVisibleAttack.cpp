@@ -37,7 +37,13 @@ EBTNodeResult::Type UBTTask_NotVisibleAttack::ExecuteTask(UBehaviorTreeComponent
 		return EBTNodeResult::Failed;
 	}
 
-	if (AIPawn->CheckTargetDead(Target))
+	IPGAICharacterInterface* TargetPawn = Cast<IPGAICharacterInterface>(Target);
+	if (TargetPawn == NULL)
+	{
+		return EBTNodeResult::Failed;
+	}
+
+	if (TargetPawn->CheckTargetDead())
 	{
 		return EBTNodeResult::Failed;
 	}

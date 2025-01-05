@@ -40,12 +40,20 @@ void UBTService_Attack::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
 	//Å¸°Ù °ªÀ» °¡Á®¿È (Å¸°ÙÀÇ PAawn)
 	APawn* Target = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_TARGET));
+
+
 	if (nullptr == Target)
 	{
 		return;
 	}
 
-	if (AIPawn->CheckTargetDead(Target))
+	IPGAICharacterInterface* TargetPawn = Cast<IPGAICharacterInterface>(Target);
+	if (TargetPawn == NULL)
+	{
+		return;
+	}
+
+	if (TargetPawn->CheckTargetDead())
 	{
 		OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);
 

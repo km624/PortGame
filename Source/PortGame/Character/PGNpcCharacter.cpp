@@ -20,6 +20,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 
+
 APGNpcCharacter::APGNpcCharacter() 
 {
 	
@@ -51,7 +52,7 @@ void APGNpcCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetPhysicsSetting();
+	//SetPhysicsSetting();
 	
 	if (CharacterType == EPlayerCharacterType::BlueArchive || CharacterType == EPlayerCharacterType::Nikke)
 	{
@@ -60,7 +61,7 @@ void APGNpcCharacter::BeginPlay()
 	}
 	//NPC Ä³¸¯ÅÍ ÆÀ »ö±ò ¼³Á¤
 	ChangeNpcColor();
-
+	
 }
 
 void APGNpcCharacter::EnableCharacter()
@@ -69,6 +70,7 @@ void APGNpcCharacter::EnableCharacter()
 
 	bIsRendered = true;
 	bIsParry = false;
+	
 }
 
 void APGNpcCharacter::Tick(float deltatime)
@@ -89,7 +91,6 @@ void APGNpcCharacter::Tick(float deltatime)
 
 }
 
-	
 	
 
 void APGNpcCharacter::ChangeNpcColor()
@@ -142,7 +143,7 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	if(TeamId !=1)
 		HpBarWidgetComponent->SetHiddenInGame(false);
 
-	HitImpulseVector *= 3.0f;
+	HitImpulseVector *= 2.0f;
 	if (attackPawn)
 	{
 		//ÀûÆÀÀÏ½Ã
@@ -171,11 +172,11 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 			if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
 			{
-				StatComponent->Damaged(DamageAmount, DamageCauser);
+				StatComponent->Damaged(DamageAmount, EventInstigator->GetPawn());
 			}
 			else
 			{
-				StatComponent->Damaged(DamageAmount * 0.3f, DamageCauser);
+				StatComponent->Damaged(DamageAmount * 0.3f, EventInstigator->GetPawn());
 			}
 		}
 	}
@@ -220,7 +221,7 @@ void APGNpcCharacter::SetDead(AActor* DamageCauser)
 	{
 		IGenericTeamAgentInterface* team = Cast<IGenericTeamAgentInterface>(DamageCauser);
 		int8 teamid = team->GetGenericTeamId();
-		SLOG(TEXT("AI DEAD"));
+		//SLOG(TEXT("AI DEAD"));
 		if (teamid != 0)
 			MyAIController->TOMyFieldDead(teamid);
 	}
@@ -386,6 +387,7 @@ void APGNpcCharacter::NotRenderCharacter()
 	bIsRendered = false;
 	
 	MyAIController->SetVisible(bIsRendered);
+	
 	GetMesh()->bPauseAnims = true;
 }
 
@@ -396,6 +398,23 @@ void APGNpcCharacter::OnRenderCharacter()
 
 	MyAIController->SetVisible(bIsRendered);
 	GetMesh()->bPauseAnims = false;
+}
+
+void APGNpcCharacter::SetAnimationDistanceFactor()
+{
+	if (GetMesh())
+	{
+		
+		GetMesh()->bEnableUpdateRateOptimizations = true;
+
+		
+		FAnimUpdateRateParameters* Params = GetMesh()->AnimUpdateRateParams;
+		
+		int32 LODLevel = GetMesh()->GetPredictedLODLevel();
+		
+
+		Params->BaseVisibleDistanceFactorThesholds = { 0.5f, 0.3f, 0.1f };
+	}
 }
 
 

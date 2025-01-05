@@ -61,6 +61,7 @@ void APGField::SetUpField()
 {
 	
 	InitializeField(TeamId);
+	OnAttackAISpawn();
 }
 
 void APGField::InitializeField(uint8 teamid)
@@ -74,7 +75,7 @@ void APGField::InitializeField(uint8 teamid)
 
 	GetWorld()->GetTimerManager().SetTimer(AttackAISpawnTimeHandler,
 		this, &ThisClass::OnAttackAISpawn, AttackAISpawnTime, true);
-	OnAttackAISpawn();
+	/*OnAttackAISpawn();*/
 
 	
 }
@@ -103,15 +104,20 @@ void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 	}
 
 	APGNpcCharacter* NPCcharacter =  Cast<APGNpcCharacter>(OtherActor);
-	if (NPCcharacter)
+	if (!bIsVisibled)
 	{
-		if (GetTeamAttitudeTowards(*NPCcharacter))
+		if (NPCcharacter)
 		{
-				
-			SetTimerAttackPawnDamage(NPCcharacter);
-				
+			if (GetTeamAttitudeTowards(*NPCcharacter))
+			{
+
+				OnAttackPawnIn(NPCcharacter);
+
+			}
 		}
+
 	}
+
 		
 	
 
@@ -137,7 +143,7 @@ void APGField::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 		}
 	}
-	APGNpcCharacter* NPCcharacter = Cast<APGNpcCharacter>(OtherActor);
+	/*APGNpcCharacter* NPCcharacter = Cast<APGNpcCharacter>(OtherActor);
 	if (NPCcharacter)
 	{
 		if (GetTeamAttitudeTowards(*NPCcharacter))
@@ -154,7 +160,7 @@ void APGField::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 			}
 
 		}
-	}
+	}*/
 
 }
 
@@ -410,7 +416,7 @@ void APGField::CheckFieldVisible()
 	if (FieldMesh->WasRecentlyRendered(visibleTime))
 	{
 		StartProtectAISpawn();
-		VisibleClearTimer();
+		//VisibleClearTimer();
 		bIsVisibled = true;
 		
 		
@@ -419,7 +425,8 @@ void APGField::CheckFieldVisible()
 	else
 	{
 		AllAIReturnObjectPool();
-		NotVisibleAllSetupTimer();
+		//NotVisibleAllSetupTimer();
+		CheckAttackPawnIn();
 		bIsVisibled = false;
 
 	}
@@ -447,7 +454,7 @@ void APGField::StartProtectAISpawn()
 {
 	if (bIsVisibled) return;
 	
-	SLOG(TEXT("FieldStartSpawn"));
+	//SLOG(TEXT("FieldStartSpawn"));
 	for (int i = AICharacters.Num(); i < SpawnCount; i++)
 	{
 		OnAISpawn();
@@ -462,7 +469,7 @@ void APGField::OnAttackPawnIn(APGNpcCharacter* attackNPC)
 		int8 teamid = attackNPC->GetGenericTeamId();
 		
 		DamageFieldGauge(teamid);
-		SLOG(TEXT("Field Not Visible Attacked"));
+		//SLOG(TEXT("Field Not Visible Attacked"));
 		
 		attackNPC->ForceReturnObjectPool();
 
@@ -472,7 +479,7 @@ void APGField::OnAttackPawnIn(APGNpcCharacter* attackNPC)
 	}
 }
 
-bool APGField::CheckAttackPawnIn(APGNpcCharacter* attackPawn)
+void APGField::CheckAttackPawnIn()
 {
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(Detect), false, this);
@@ -497,109 +504,98 @@ bool APGField::CheckAttackPawnIn(APGNpcCharacter* attackPawn)
 
 		for (auto const& OverlapResult : OverlapResults)
 		{
-			if (OverlapResult.GetActor() == attackPawn)
+			APGNpcCharacter* NPCcharacter = Cast<APGNpcCharacter>(OverlapResult.GetActor());
+			if (GetTeamAttitudeTowards(*NPCcharacter))
 			{
-				
-				return true;
-			}
-				
-		}
+				OnAttackPawnIn(NPCcharacter);
 
-		
-	}
-	if (AttackPawns.Contains(attackPawn))
-	{
-		SLOG(TEXT("ISAlreadDead or Out"));
-		
-		GetWorldTimerManager().ClearTimer(AttackPawns[attackPawn]);
-
-		AttackPawns.Remove(attackPawn);
-	}
-
-
-	return false;
-}
-
-void APGField::SetTimerAttackPawnDamage(APGNpcCharacter* attackPawn)
-{
-	
-	FTimerHandle TimerHandle;
-	if (AttackPawns.Contains(attackPawn))
-	{
-		AttackPawns.Remove(attackPawn);
-	}
-	
-	//안보일때만 타이머
-	if (!bIsVisibled)
-	{
-		SLOG(TEXT("SetTimerAttackRange %s "), *attackPawn->GetActorNameOrLabel());
-		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([attackPawn, this]()
-			{
-				if (attackPawn && !attackPawn->GetbIsDead())
-				{
-					if (CheckAttackPawnIn(attackPawn))
-					{
-						OnAttackPawnIn(attackPawn);
-					}
-				}
-			}), AttackPawnDamageTime, false);
-	}
-	
-	AttackPawns.Add(attackPawn, TimerHandle);
-
-}
-
-void APGField::VisibleClearTimer()
-{
-	if (bIsVisibled) return;
-
-	
-	if (AttackPawns.Num() > 0)
-	{
-		SLOG(TEXT("ClearTimer"));
-		for (auto& attackpawn : AttackPawns)
-		{
-			if (CheckAttackPawnIn(attackpawn.Key))
-			{
-				if (attackpawn.Value.IsValid())
-				{
-					GetWorldTimerManager().ClearTimer(attackpawn.Value);
-
-				}
 			}
 		}
 	}
-	
+
 
 }
 
-void APGField::NotVisibleAllSetupTimer()
-{
-	if (!bIsVisibled) return;
-	
-	//강제로 비지블 변경
-	//SetTimerAttackPawnDamage여기서 먹질 않음
-	bIsVisibled = false; 
-
-	if (AttackPawns.Num() > 0)
-	{
-		SLOG(TEXT("NotVisibleAllSetupTimer"));
-
-		for (auto& attackpawn : AttackPawns)
-		{
-			if (CheckAttackPawnIn(attackpawn.Key))
-			{
-				
-
-				SetTimerAttackPawnDamage(attackpawn.Key);
-
-
-				
-			}
-		}
-		
-	}
-}
+//void APGField::SetTimerAttackPawnDamage(APGNpcCharacter* attackPawn)
+//{
+//	
+//	FTimerHandle TimerHandle;
+//	if (AttackPawns.Contains(attackPawn))
+//	{
+//		AttackPawns.Remove(attackPawn);
+//	}
+//	
+//	//안보일때만 타이머
+//	if (!bIsVisibled)
+//	{
+//		SLOG(TEXT("SetTimerAttackRange %s "), *attackPawn->GetActorNameOrLabel());
+//		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([attackPawn, this]()
+//			{
+//				if (attackPawn && !attackPawn->GetbIsDead())
+//				{
+//					if (CheckAttackPawnIn(attackPawn))
+//					{
+//						OnAttackPawnIn(attackPawn);
+//					}
+//				}
+//			}), AttackPawnDamageTime, false);
+//	}
+//	
+//	AttackPawns.Add(attackPawn, TimerHandle);
+//
+//}
+//
+//void APGField::VisibleClearTimer()
+//{
+//	if (bIsVisibled) return;
+//
+//	
+//	if (AttackPawns.Num() > 0)
+//	{
+//		SLOG(TEXT("ClearTimer"));
+//		for (auto& attackpawn : AttackPawns)
+//		{
+//			if (CheckAttackPawnIn(attackpawn.Key))
+//			{
+//				if (attackpawn.Value.IsValid())
+//				{
+//					GetWorldTimerManager().ClearTimer(attackpawn.Value);
+//
+//				}
+//			}
+//		}
+//	}
+//	
+//
+//}
+//
+//void APGField::NotVisibleAllSetupTimer()
+//{
+//	if (!bIsVisibled) return;
+//	
+//	//강제로 비지블 변경
+//	//SetTimerAttackPawnDamage여기서 먹질 않음
+//	bIsVisibled = false; 
+//
+//	if (AttackPawns.Num() > 0)
+//	{
+//		SLOG(TEXT("NotVisibleAllSetupTimer"));
+//
+//		for (auto& attackpawn : AttackPawns)
+//		{
+//			if (CheckAttackPawnIn(attackpawn.Key))
+//			{
+//				
+//
+//				SetTimerAttackPawnDamage(attackpawn.Key);
+//
+//
+//				
+//			}
+//		}
+//		
+//	}
+//}
 
 
 

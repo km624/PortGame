@@ -60,6 +60,20 @@ void AWeapon::SetHasNextCombo(bool nextcombo)
 	HasNextComboCommand = nextcombo;
 	if (OwnerCharacter->GetPlayerCharacterType() == EPlayerCharacterType::Nikke) return;
 
+	if (OwnerCharacter->GetMesh()->bPauseAnims)
+	{
+		SLOG(TEXT("PauseAnim!!"));
+		HasNextComboCommand = false;
+		CurrentCombo = 0;
+		UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+		if (IsValid(AnimInstance))
+		{
+			AnimInstance->StopAllMontages(0.0f);
+		}
+
+		return;
+	}
+
 	if (HasNextComboCommand)
 	{
 		ComboCheck();
@@ -97,7 +111,13 @@ void AWeapon::ComboBegin()
 	{
 		playerCharacter->SetbIsAttackRotation(true);
 	}
-	
+	if (OwnerCharacter->GetMesh()->bPauseAnims)
+	{
+		SLOG(TEXT("ComboBeginPauseAnim!!"));
+		HasNextComboCommand = false;
+		CurrentCombo = 0;
+		return;
+	}
 	EndDelegate.BindUObject(this, &AWeapon::ComboEnd);
 	AnimInstance->Montage_SetEndDelegate(EndDelegate, OwnerCharacter->AllMontage[ComboMontage]);
 	CurrentMontageEndDelegate = AnimInstance->Montage_GetEndedDelegate(OwnerCharacter->AllMontage[ComboMontage]);
@@ -107,16 +127,42 @@ void AWeapon::ComboBegin()
 
 void AWeapon::ComboCheck()
 {
+
+	/*if (OwnerCharacter->GetMesh()->bPauseAnims)
+	{
+		SLOG(TEXT("PauseAnim!!"));
+		HasNextComboCommand = false;
+		CurrentCombo = 0;
+		return;
+	}*/
+
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
+	if (!IsValid(AnimInstance))return;
 	if (HasNextComboCommand)
 	{
-
-		if (!CurrentMontageEndDelegate)
+		if (CurrentMontageEndDelegate!=nullptr)
 		{
-			
+			if (CurrentMontageEndDelegate->IsBound())
+			{
+				CurrentMontageEndDelegate->Unbind();
+			}
+			else
+			{
+				SLOG(TEXT("CurrentMontageEndDeleage IsNotBound"));
+				HasNextComboCommand = false;
+				CurrentCombo = 0;
+				return;
+			}
+				
+		}
+		else
+		{
+			SLOG(TEXT("CurrentMontageEndDeleage Nullptr"));
+			HasNextComboCommand = false;
+			CurrentCombo = 0;
 			return;
 		}
-		CurrentMontageEndDelegate->Unbind();
+		//CurrentMontageEndDelegate->Unbind();
 		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboData->MaxComboCount);
 
 		//다음 섹션의 이름 정보 저장
@@ -168,6 +214,7 @@ void AWeapon::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 	//ensure(CurrentCombo != 0);
 	
 	CurrentCombo = 0;
+	CurrentMontageEndDelegate = nullptr;
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OwnerCharacter);
 	if (playerCharacter)
 	{

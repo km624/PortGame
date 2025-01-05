@@ -156,17 +156,15 @@ void APGAIBaseCharacter::SetTimerShooterAttack(float shottime)
 	);
 }
 
-bool APGAIBaseCharacter::CheckTargetDead(APawn* Target)
+bool APGAIBaseCharacter::CheckTargetDead()
 {
-	APGBaseCharacter* TargetCharacter = Cast<APGBaseCharacter>(Target);
-	if (TargetCharacter)
+	
+	if (bIsDead)
 	{
-		if (TargetCharacter->GetbIsDead())
-		{
-			return true;
-		}
-
+		return true;
 	}
+
+	
 	return false;
 }
 
@@ -183,7 +181,7 @@ void APGAIBaseCharacter::NotVisibleAttack(APawn* Target)
 		}
 
 		Target->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
-		SLOG(TEXT("NOTVISIBLE ATTACK"));
+		//SLOG(TEXT("NOTVISIBLE ATTACK"));
 	}
 	
 }

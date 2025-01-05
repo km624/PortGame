@@ -56,7 +56,7 @@ protected:
 
 	virtual void SetTimerShooterAttack(float shottime) override;
 
-	virtual bool CheckTargetDead(APawn* Target) override;
+	virtual bool CheckTargetDead() override;
 
 	virtual void NotVisibleAttack(APawn* Target) override;
 	
@@ -71,7 +71,7 @@ protected:
 	float PatrolRadius = 1000.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float DetectRange = 1000.0f;;
+	float DetectRange = 500.0f;;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TurnSpeed = 10.0f;
