@@ -204,20 +204,49 @@ void UObjectPoolManager::ReturnWeaponObjectToPool(AWeapon* weapon)
 const TArray<APGNpcCharacter*>& UObjectPoolManager::GetAttackNPCCharacter()
 {
 	// NPC 키 배열
-	TArray<TObjectPtr<APGNpcCharacter>> NpcCharacters;
+	//TArray<TObjectPtr<APGNpcCharacter>> NpcCharacters;
 
 	AttackNPC.Empty();
 	// 키만 배열로 추출
-	ObjectPool.GenerateKeyArray(NpcCharacters);
+	//ObjectPool.GenerateKeyArray(NpcCharacters);
 
-	for (APGNpcCharacter* NPC : NpcCharacters)
+	/*for (APGNpcCharacter* NPC : NpcCharacters)
 	{
 		if (!NPC->GetbIsDead() && NPC->IsActorTickEnabled() && NPC->GetbIsAttackField())
 		{
 			AttackNPC.Add(NPC);
 		}
+	}*/
+
+	for (auto& Elem : ObjectPool)
+	{
+		APGNpcCharacter* attack = Elem.Key;
+		if (!attack->GetbIsDead() && attack->IsActorTickEnabled() && attack->GetbIsAttackField() )
+		{
+			AttackNPC.Add(attack);
+		}
 	}
 
 
 	return AttackNPC;
+}
+
+const int32 UObjectPoolManager::GetAttackNPCCount(int8 teamid)
+{
+	//TArray<TObjectPtr<APGNpcCharacter>> NpcCharacters;
+	
+	int32 attackcount = 0;
+
+	//ObjectPool.GenerateKeyArray(NpcCharacters);
+
+	for (auto& Elem : ObjectPool)
+	{
+		APGNpcCharacter* attack = Elem.Key;
+		if (!attack->GetbIsDead() && attack->IsActorTickEnabled() && attack->GetbIsAttackField()&&attack->GetGenericTeamId() == teamid)
+		{
+			attackcount++;
+		}
+	}
+
+	return attackcount;
 }

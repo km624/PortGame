@@ -9,9 +9,11 @@
 #include "PortGame/PortGame.h"
 #include "Interface/AITargetPlayerInterface.h"
 #include "Field/PGField.h"
+#include "Navigation/CrowdFollowingComponent.h"
 
 
-APGAIController::APGAIController()
+APGAIController::APGAIController(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent")))
 {
 	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBoard(TEXT("/Script/AIModule.BlackboardData'/Game/PortGame/AI/BB_PGAICharacter.BB_PGAICharacter'"));
 	if (BBoard.Object)
@@ -24,6 +26,7 @@ APGAIController::APGAIController()
 		BTAsset = BTree.Object;
 	}
 
+	
 }
 
 void APGAIController::SetMyFieldData(APGField* field)

@@ -13,6 +13,7 @@
 //#include "Character/PGBaseCharacter.h"
 
 
+
 UBTTask_TargetCirclePos::UBTTask_TargetCirclePos()
 {
 	CirlceAngle = 60.0f;
@@ -85,7 +86,29 @@ EBTNodeResult::Type UBTTask_TargetCirclePos::ExecuteTask(UBehaviorTreeComponent&
 	
 	FVector NewLocation = TargetLocation + FVector(FMath::Cos(Radian) * TraceDistance* AddAttackRange, FMath::Sin(Radian) * TraceDistance* AddAttackRange, 0.0f);
 	
-	OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_CIRCLEPOS, NewLocation);
+	FNavLocation ProjectedLocation;
+	bool bProjected = NavSystem->ProjectPointToNavigation(NewLocation, ProjectedLocation);
+
+	if (bProjected)
+	{
+
+		NewLocation = ProjectedLocation.Location;
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_CIRCLEPOS, NewLocation);
+	}
+	else
+	{
+		FVector Origin = NewLocation;
+		float PatrolRadius = 300.0f;
+		FNavLocation NextPatrolPos;
+		if (NavSystem->GetRandomPointInNavigableRadius(Origin, PatrolRadius, NextPatrolPos))
+		{
+			OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_CIRCLEPOS, NextPatrolPos.Location);
+			
+		}
+	}
+
+
+	
 
 	DrawDebugPoint(World, NewLocation, 10.0f, FColor::Blue, false, 1.0f);
 	DrawDebugLine(World, ControllingPawn->GetActorLocation(), NewLocation, FColor::Blue, false, 1.0f);

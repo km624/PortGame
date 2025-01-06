@@ -13,6 +13,8 @@
 #include "Physics/PGCollision.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/OverlapResult.h"
+#include "NavigationSystem.h"
+#include "NavigationPath.h"
 
 UBTTask_DetectNode::UBTTask_DetectNode()
 {
@@ -151,8 +153,21 @@ EBTNodeResult::Type UBTTask_DetectNode::ExecuteTask(UBehaviorTreeComponent& Owne
 float UBTTask_DetectNode::TargetToDistance(FVector myloc, FVector targetLoc)
 {
 
-	FVector MyLocation = myloc;
+	/*FVector MyLocation = myloc;
 	FVector TargetLocation = targetLoc;
 	float Distance = FVector::Dist(MyLocation, TargetLocation);
-	return Distance;
+	return Distance;*/
+
+	UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
+	if (NavSys)
+	{
+		UNavigationPath* NavPath = NavSys->FindPathToLocationSynchronously(GetWorld(), myloc, targetLoc);
+		if (NavPath && NavPath->IsValid())
+		{
+			// NavPath의 길이 계산
+			return NavPath->GetPathLength();
+		}
+	}
+	// NavMesh 경로를 찾지 못했을 경우 직선 거리 반환 (예외 처리)
+	return FVector::Dist(myloc, targetLoc);
 }

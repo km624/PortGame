@@ -13,6 +13,13 @@ UBTTask_TimerMoveTo::UBTTask_TimerMoveTo()
     NodeName = TEXT("Timer Move To");
 }
 
+EBTNodeResult::Type UBTTask_TimerMoveTo::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+{
+    ElapsedTime = 0.0f;
+
+    // 기본 Move To 로직 실행
+    return Super::ExecuteTask(OwnerComp, NodeMemory);
+}
 
 
 void UBTTask_TimerMoveTo::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)

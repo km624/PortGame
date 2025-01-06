@@ -382,6 +382,11 @@ protected:
 	virtual void PlayerAddEXP() override;
 
 	virtual void PlayLevelUpEffet() override;
+
+	//TEST
+protected:
+	UFUNCTION()
+	void OnComponentHit(UPrimitiveComponent* HitComponent, AActor*OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
 
 };

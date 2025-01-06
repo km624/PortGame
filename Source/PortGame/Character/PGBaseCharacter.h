@@ -258,4 +258,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite ,Category = Effect)
 	TObjectPtr<class  UNiagaraSystem> CharacterTypeEffect;
 
+
 };

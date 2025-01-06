@@ -52,9 +52,10 @@ APGBaseCharacter::APGBaseCharacter()
 	GetCharacterMovement()->MaxWalkSpeed = 500.f;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
+	GetCharacterMovement()->PerchRadiusThreshold = 10.0f;
 
-	GetCharacterMovement()->bUseRVOAvoidance = true; // RVO 회피 활성화
-	GetCharacterMovement()->AvoidanceWeight = 0.6f; // 회피 강도
+	GetCharacterMovement()->bUseRVOAvoidance = false; // RVO 회피 활성화
+	GetCharacterMovement()->AvoidanceWeight = 0.8f; // 회피 강도
 	GetCharacterMovement()->AvoidanceConsiderationRadius = 100.0f;
 
 	// Mesh 위치랑 회전 해줌 안맞아서
@@ -483,7 +484,12 @@ void APGBaseCharacter::SetbIsUltiSkill(bool bisulti)
 		}
 
 	}
+
+
 }
+
+
+
 
 
 

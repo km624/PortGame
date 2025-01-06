@@ -32,7 +32,7 @@ APGNpcCharacter::APGNpcCharacter()
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
 	
 
-	bUseControllerRotationYaw = true;
+	//bUseControllerRotationYaw = true;
 
 	ParryNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ParryEffectComp"));
 	ParryNiagaraComponent->SetupAttachment(RootComponent);
@@ -208,7 +208,7 @@ void APGNpcCharacter::SetDead(AActor* DamageCauser)
 
 	CustomTimeDilation = 1.0f;
 
-	GetCapsuleComponent()->SetSimulatePhysics(false);
+	//GetCapsuleComponent()->SetSimulatePhysics(false);
 
 	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
 

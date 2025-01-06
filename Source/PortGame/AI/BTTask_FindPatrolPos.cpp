@@ -54,17 +54,24 @@ EBTNodeResult::Type UBTTask_FindPatrolPos::ExecuteTask(UBehaviorTreeComponent& O
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_PATROLPOS, PatrolLocation);
 
-	FVector Turn = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_PATROLPOS);
-		float TurnSpeed = AIPawn->AITurnSpeed();
+	/*FVector Turn = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_PATROLPOS);
+	float TurnSpeed = AIPawn->AITurnSpeed();*/
+		
+	/*FVector LookVector = Turn - ControllingPawn->GetActorLocation();
+	LookVector.Z = 0.0f;
+	FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
 
 		
-		FVector LookVector = Turn - ControllingPawn->GetActorLocation();
-		LookVector.Z = 0.0f;
-		FRotator TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
+	ControllingPawn->SetActorRotation(FMath::RInterpTo(ControllingPawn->GetActorRotation(), TargetRot, GetWorld()->GetDeltaSeconds(), 100.0f));*/
 
-		
-		ControllingPawn->SetActorRotation(FMath::RInterpTo(ControllingPawn->GetActorRotation(), TargetRot, GetWorld()->GetDeltaSeconds(), 100.0f));
-		return EBTNodeResult::Succeeded;
+	FVector CurrentLocation = ControllingPawn-> GetActorLocation();
+	FVector Direction = PatrolLocation - CurrentLocation;
+	Direction.Z = 0; 
+
+	FRotator NewRotation = Direction.Rotation();
+	ControllingPawn->SetActorRotation(NewRotation);
+
+	return EBTNodeResult::Succeeded;
 
 	//if (NavSystem->GetRandomPointInNavigableRadius(Origin, PatrolRadius, NextPatrolPos))
 	//{

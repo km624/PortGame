@@ -13,6 +13,9 @@
 #include "PortGame/PortGame.h"
 #include "GenericTeamAgentInterface.h"
 #include "Interface/AITargetPlayerInterface.h"
+#include "NavigationSystem.h"
+#include "NavigationPath.h"
+
 //#include "Character/PGBaseCharacter.h"
 
 
@@ -200,10 +203,23 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 float UBTService_Detect::TargetToDistance(FVector myloc,FVector targetLoc)
 {
 
-	FVector MyLocation = myloc;
+	/*FVector MyLocation = myloc;
 	FVector TargetLocation = targetLoc;
 	float Distance = FVector::Dist(MyLocation, TargetLocation);
-	return Distance;
+	return Distance;*/
+
+	UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
+	if (NavSys)
+	{
+		UNavigationPath* NavPath = NavSys->FindPathToLocationSynchronously(GetWorld(), myloc, targetLoc);
+		if (NavPath && NavPath->IsValid())
+		{
+			// NavPath의 길이 계산
+			return NavPath->GetPathLength();
+		}
+	}
+	// NavMesh 경로를 찾지 못했을 경우 직선 거리 반환 (예외 처리)
+	return FVector::Dist(myloc, targetLoc);
 }
 
 

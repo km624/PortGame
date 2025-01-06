@@ -11,12 +11,12 @@
  * 
  */
 UCLASS()
-class PORTGAME_API APGAIController : public AAIController,public IAIControllerInterface
+class PORTGAME_API APGAIController : public AAIController, public IAIControllerInterface
 {
 	GENERATED_BODY()
 
 public:
-	APGAIController();
+	APGAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 public:
 
@@ -54,4 +54,8 @@ protected:
 	virtual void StopTree() override;
 
 	virtual void StartTree() override;
+
+protected:
+	/*UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	TObjectPtr<class UCrowdFollowingComponent> CrowdFollingComponent;*/
 };

@@ -198,6 +198,8 @@ void APGPlayerCharacter::BeginPlay()
 
 	//SetCharacterInputData(CurrentControlData);
 
+	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ThisClass::OnComponentHit);
+
 	FOnTimelineFloat TimelineProgress;
 	TimelineProgress.BindUFunction(this, FName("AimUpdate"));
 	AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
@@ -1151,6 +1153,36 @@ void APGPlayerCharacter::PlayLevelUpEffet()
 {
 
 }
+
+void APGPlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	if (OtherActor && OtherActor != this && OtherComp)
+	{
+		ACharacter* OtherCharacter = Cast<ACharacter>(OtherActor);
+		if (OtherCharacter)
+		{
+
+			// 밀리는 방향 계산
+			FVector Direction = (OtherActor->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+			Direction.Z = 0.0f;
+			// 밀리는 힘의 크기
+			float PushStrength = 500.0f; // 조절 가능
+
+			// 물리적 힘을 적용
+			//OtherCharacter->LaunchCharacter(Direction * PushStrength, true, true);
+			OtherCharacter->GetCharacterMovement()->AddImpulse(Direction * PushStrength, true);
+			//OtherCharacter->LaunchCharacter(Direction * PushStrength, true, false);
+
+
+		}
+
+
+
+	}
+}
+
+
+
 
 
 

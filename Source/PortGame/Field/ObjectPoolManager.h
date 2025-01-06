@@ -59,6 +59,8 @@ public:
 
     const TArray<class APGNpcCharacter*>& GetAttackNPCCharacter();
 
+
+    const int32 GetAttackNPCCount(int8 teamid);
 private:
 	UPROPERTY()
 	TMap<TObjectPtr<class APGNpcCharacter>, TObjectPtr<class APGAIController>> ObjectPool;
@@ -68,7 +70,7 @@ private:
 
     //공격하는 npc캐릭터
     UPROPERTY()
-    TArray<APGNpcCharacter*> AttackNPC;
+    TArray<TObjectPtr<class APGNpcCharacter>> AttackNPC;
     
     /*UPROPERTY()
     TArray<TObjectPtr<class AWeapon>> WeaponObjectPool;*/
