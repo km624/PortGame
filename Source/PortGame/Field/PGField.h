@@ -174,6 +174,10 @@ protected:
 	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
 	TArray<TObjectPtr<class APGNpcCharacter>>AttackPawns;*/
 
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
+	int32 MaxAttackAISpawnCount = 20.0f;
 	
 
 

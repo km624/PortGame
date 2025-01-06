@@ -72,9 +72,10 @@ void APGField::InitializeField(uint8 teamid)
 	
 	SetTeamColor();
 
+	float RandSpawnTime = FMath::FRandRange(AttackAISpawnTime - 5.0f, AttackAISpawnTime + 5.0f);
 
 	GetWorld()->GetTimerManager().SetTimer(AttackAISpawnTimeHandler,
-		this, &ThisClass::OnAttackAISpawn, AttackAISpawnTime, true);
+		this, &ThisClass::OnAttackAISpawn, RandSpawnTime, true);
 	/*OnAttackAISpawn();*/
 
 	
@@ -356,10 +357,31 @@ void APGField::OnAttackAISpawn()
 	FVector FieldSize = GetActorScale() * 50.0f;
 	IObjectPoolingInterface* poolmanager = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
 
+	if (!poolmanager)return;
+
+	if (!poolmanager->GetObjectPoolManager())return;
+
+	int32 minusSpawnCount = 0;
+
+	int32 AttackAIInWorld = poolmanager->GetObjectPoolManager()->GetAttackNPCCount(TeamId);
+
+	//SLOG(TEXT("currentAttackAI %d"), AttackAIInWorld);
+	//지금 이제스폰할 카운트 + 현재가  MAxSpawnCount보다 크면 
+	if (MaxAttackAISpawnCount < AttackAIInWorld + AttackAISpawnCount)
+	{
+		
+		minusSpawnCount = AttackAIInWorld + AttackAISpawnCount - MaxAttackAISpawnCount;
+		//SLOG(TEXT("Over %d count"), minusSpawnCount);
+	}
+	
+	if (minusSpawnCount == AttackAISpawnCount)
+	{
+		//SLOG(TEXT("Full Attack AI"));
+		return;
+	}
 
 
-
-	for (int i = 0; i < AttackAISpawnCount; i++)
+	for (int32 i = 0; i < AttackAISpawnCount- minusSpawnCount; i++)
 	{
 		FVector SpawnLocation = FVector(FMath::FRandRange(-FieldSize.X, FieldSize.X), FMath::FRandRange(-FieldSize.Y, FieldSize.Y), 125.0f) + GetActorLocation();
 		FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f);
