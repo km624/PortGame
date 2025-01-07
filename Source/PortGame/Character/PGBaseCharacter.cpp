@@ -251,10 +251,6 @@ FPGCharacterStat APGBaseCharacter::GetTotalStat()
 	return StatComponent->GetTotalStat();
 }
 
-void APGBaseCharacter::SetUpBaseStat(FName baseStat)
-{
-	StatComponent->SetBaseStat(baseStat);
-}
 
 void APGBaseCharacter::SetUpModifierStat(FPGCharacterStat ModiferStat)
 {

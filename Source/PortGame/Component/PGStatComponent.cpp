@@ -7,29 +7,32 @@
 #include "PortGame/PortGame.h"
 #include "GenericTeamAgentInterface.h"
 #include "Interface/PlayerAddEXPInterface.h"
+#include "Engine/GameInstance.h"
+#include "GameInstance/PGGameInstanceInterface.h"
+
 
 
 
 UPGStatComponent::UPGStatComponent()
 {
 	//const UDataTable* DataTable;
-	static ConstructorHelpers::FObjectFinder<UDataTable>DT_STAT(TEXT("/Script/Engine.DataTable'/Game/PortGame/Data/Stat/DT_CharacterStat.DT_CharacterStat'"));
-	if (DT_STAT.Object)
-	{
-		UDataTable* characterstatDataTable = DT_STAT.Object;
+	//static ConstructorHelpers::FObjectFinder<UDataTable>DT_STAT(TEXT("/Script/Engine.DataTable'/Game/PortGame/Data/Stat/DT_CharacterStat.DT_CharacterStat'"));
+	//if (DT_STAT.Object)
+	//{
+	//	UDataTable* characterstatDataTable = DT_STAT.Object;
 
-		FString contextString;
-	
-		//행의 네임을 가져와서 그 순 차례대로 하나씩 찾는법으로 map에 추가
-		TArray<FName> rowNames = characterstatDataTable->GetRowNames();
+	//	FString contextString;
+	//
+	//	//행의 네임을 가져와서 그 순 차례대로 하나씩 찾는법으로 map에 추가
+	//	TArray<FName> rowNames = characterstatDataTable->GetRowNames();
 
-		for (FName rowName : rowNames)
-		{
-			const FPGCharacterStat* rowInfo = characterstatDataTable->FindRow<FPGCharacterStat>(rowName, contextString);
-			AllStat.Add(rowName, *rowInfo);
-		}	
+	//	for (FName rowName : rowNames)
+	//	{
+	//		const FPGCharacterStat* rowInfo = characterstatDataTable->FindRow<FPGCharacterStat>(rowName, contextString);
+	//		AllStat.Add(rowName, *rowInfo);
+	//	}	
 
-	}
+	//}
 
 	CurrentCharacterRarity = TEXT("Normal");
 	
@@ -47,7 +50,23 @@ void UPGStatComponent::InitializeComponent()
 
 void UPGStatComponent::SetCurrentRarity(FName rarity)
 {
-	if (AllStat.Find(rarity))
+	UGameInstance* GameInstance = GetWorld()->GetGameInstance();
+	if (GameInstance)
+	{
+		IPGGameInstanceInterface* pggameinstance = Cast<IPGGameInstanceInterface>(GameInstance);
+
+		if (pggameinstance)
+		{
+			CurrentCharacterRarity = rarity;
+			SetBaseStat(pggameinstance->GetStat(CurrentCharacterRarity));
+			
+			SetHp(GetTotalStat().MaxHp);
+			SetHitGauge(GetTotalStat().HitGauge);
+		}
+		
+	}
+
+	/*if (AllStat.Find(rarity))
 	{
 		CurrentCharacterRarity = rarity;
 		SetBaseStat(CurrentCharacterRarity);
@@ -57,7 +76,7 @@ void UPGStatComponent::SetCurrentRarity(FName rarity)
 		SetHitGauge(GetTotalStat().HitGauge);
 
 		
-	}
+	}*/
 }
 
 void UPGStatComponent::SetUpPlayerLevel(int32 lelvel)

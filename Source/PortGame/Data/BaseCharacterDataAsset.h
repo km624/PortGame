@@ -30,6 +30,11 @@ class PORTGAME_API UBaseCharacterDataAsset : public UPrimaryDataAsset
 public:
 	UBaseCharacterDataAsset();
 
+	virtual FPrimaryAssetId GetPrimaryAssetId() const override
+	{
+		return FPrimaryAssetId(TEXT("BaseCharacterDataAsset"), GetFName());
+	}
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite ,Category = "Character")
 	EMeshNameOption MeshName;

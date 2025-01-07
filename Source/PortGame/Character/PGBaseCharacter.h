@@ -130,8 +130,6 @@ protected:
 public:
 	FPGCharacterStat GetTotalStat();
 
-	void SetUpBaseStat(FName baseStat);
-
 	void SetUpModifierStat(FPGCharacterStat ModiferStat);
 
 	void AddUltiSkillGaugeToComp(float addUlitSkill);

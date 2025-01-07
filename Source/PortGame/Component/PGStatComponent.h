@@ -55,9 +55,9 @@ public:
 
 	void SetCurrentRarity(FName rarity);
 
-	FORCEINLINE void SetBaseStat(FName rarity) 
+	FORCEINLINE void SetBaseStat(const FPGCharacterStat& InBaseStat)
 	{
-		BaseStat = AllStat[rarity];  OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat(), GetLevelStat());
+		BaseStat = InBaseStat;  OnStatChanged.Broadcast(GetBaseStat(), GetModifierStat(), GetLevelStat());
 	}
 	FORCEINLINE void SetModifierStat(const FPGCharacterStat& InModifierStat)
 	{
@@ -153,7 +153,7 @@ protected:
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	FPGCharacterStat LevelStat;
 
-	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
-	TMap<FName, FPGCharacterStat> AllStat;
+	/*UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TMap<FName, FPGCharacterStat> AllStat;*/
 		
 };

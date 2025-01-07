@@ -17,6 +17,12 @@ class PORTGAME_API UPlayerCharacterDataAsset : public UBaseCharacterDataAsset
 public:
 	UPlayerCharacterDataAsset();
 
+	
+	virtual FPrimaryAssetId GetPrimaryAssetId() const override
+	{
+		return FPrimaryAssetId(TEXT("PlayerData"), GetFName());
+	}
+
 public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UltiSkill")
