@@ -158,6 +158,14 @@ void UPGAttackComponent::ReturnWeaponPool()
 	}
 }
 
+void UPGAttackComponent::DestroyWeapon()
+{
+	if (Weapon)
+	{
+		Weapon->Destroy();
+	}
+}
+
 void UPGAttackComponent::ComboCheckStart()
 {
 	ComboTiming = true;

@@ -35,7 +35,7 @@ protected:
 public:
 	virtual void EnableCharacter();
 
-	void SetCharacterData(class UBaseCharacterDataAsset* characterdata);
+	void SetupCharacterDataAsset(class UBaseCharacterDataAsset* characterdata);
 
 	virtual void SetupCharacterData(class UBaseCharacterDataAsset* characterdata);
 
@@ -256,5 +256,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite ,Category = Effect)
 	TObjectPtr<class  UNiagaraSystem> CharacterTypeEffect;
 
+public:
+	void DestroyWeapontoAtackComp();
 
+	void SetGravityNone();
 };

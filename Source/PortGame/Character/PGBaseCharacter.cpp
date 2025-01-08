@@ -149,7 +149,7 @@ void APGBaseCharacter::EnableCharacter()
 	
 }
 
-void APGBaseCharacter::SetCharacterData(UBaseCharacterDataAsset* characterdata)
+void APGBaseCharacter::SetupCharacterDataAsset(UBaseCharacterDataAsset* characterdata)
 {
 	baseCharacterData = characterdata; 
 	//SetupCharacterData(baseCharacterData);
@@ -170,7 +170,6 @@ void APGBaseCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterdata
 	
 	AttackComponent->SetupAttackData(characterdata);
 
-	StatComponent->SetCurrentRarity(characterdata->Rarity);
 
 	//SLOG(TEXT("BaseCharacterr : SetupCharacterEnd"));
 
@@ -482,6 +481,21 @@ void APGBaseCharacter::SetbIsUltiSkill(bool bisulti)
 	}
 
 
+}
+
+void APGBaseCharacter::DestroyWeapontoAtackComp()
+{
+	
+	AttackComponent->DestroyWeapon();
+	
+}
+
+void APGBaseCharacter::SetGravityNone()
+{
+
+	GetCapsuleComponent()->SetEnableGravity(false);
+	GetMesh()->SetEnableGravity(false);
+	GetCharacterMovement()->GravityScale = 0.0f;
 }
 
 

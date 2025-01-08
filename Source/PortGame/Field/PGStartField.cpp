@@ -67,7 +67,7 @@ void APGStartField::SetupPlayerbleCharacter()
 
 		if (playerCharacter)
 		{
-			playerCharacter->SetCharacterData(PlayerCharacterData[i]);
+			playerCharacter->SetupCharacterDataAsset(PlayerCharacterData[i]);
 			playerCharacter->SetteamId(TeamId);
 			playerCharacter->SetupPlayerLevel(PlayerCharacterLevels[i]);
 

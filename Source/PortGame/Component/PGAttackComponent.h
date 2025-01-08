@@ -38,6 +38,8 @@ public:
 	FORCEINLINE class UWeaponData* GetWeaponData() { return WeaponData; }
 
 	FORCEINLINE class AWeapon* GetWeapon() { return Weapon; }
+
+	void DestroyWeapon();
 public:	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UWeaponData> WeaponData;

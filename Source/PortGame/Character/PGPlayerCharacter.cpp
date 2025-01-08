@@ -294,6 +294,7 @@ void APGPlayerCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterda
 
 	Super::SetupCharacterData(characterdata);
 
+	StatComponent->SetCurrentRarity(palyerdata->Rarity);
 	
 	LoadAndPlayMontageByPath(CharacterName, DashMontage);
 	LoadAndPlayMontageByPath(CharacterName, LeftEvadeMontage);

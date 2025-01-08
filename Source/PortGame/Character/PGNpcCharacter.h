@@ -22,6 +22,8 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void SetupCharacterData(class UBaseCharacterDataAsset* characterdata) override;
+
 	virtual void EnableCharacter() override;
 
 	virtual void Tick(float deltatime) override;

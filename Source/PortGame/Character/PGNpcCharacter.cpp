@@ -64,6 +64,13 @@ void APGNpcCharacter::BeginPlay()
 	
 }
 
+void APGNpcCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterdata)
+{
+	Super::SetupCharacterData(characterdata);
+
+	StatComponent->SetCurrentRarity(TEXT("NPC"));
+}
+
 void APGNpcCharacter::EnableCharacter()
 {
 	Super::EnableCharacter();

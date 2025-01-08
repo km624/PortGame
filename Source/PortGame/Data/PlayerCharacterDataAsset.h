@@ -25,6 +25,9 @@ public:
 
 public:
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
+	FName Rarity;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UltiSkill")
 	TObjectPtr<class ULevelSequence> LevelSequence;
 };

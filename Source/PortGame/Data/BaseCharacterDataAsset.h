@@ -57,8 +57,8 @@ public:
 		}
 	}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite ,Category = "Character")
-	FName Rarity;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite ,Category = "Character")
+	FName Rarity;*/
 
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 	FString MeshName;*/
