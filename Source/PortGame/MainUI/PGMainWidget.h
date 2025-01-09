@@ -19,19 +19,16 @@ public:
 	UPGMainWidget(const FObjectInitializer& ObjectInitializer);
 
 public:
-	void SetCharacterWidget(const TArray<class UPlayerCharacterDataAsset*>& characterDatas);
-
-	void SetWeaponWidget(const TArray<class UWeaponData*>& swordDatas, const TArray<class UWeaponData*>& gunDatas);
-
-	void ShowWeaponWidget(EPlayerCharacterType characterType);
+	void SetUpMainWidget();
+	
 
 protected:
 	UFUNCTION()
 	void SelectButtonClicked();
+	
 
 protected:
-	UPROPERTY(meta = (BindWidget))
-	TObjectPtr<class UPGSelectWidget> BP_SelectWidget;
+	
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton>Button_SelectCharacter;

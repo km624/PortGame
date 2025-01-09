@@ -26,6 +26,13 @@ public:
 
 	void ShowSelectWeaponWidget(EPlayerCharacterType characterType);
 
+
+protected:
+	UFUNCTION()
+	void TurnBackToMainWidget();
+
+	UFUNCTION()
+	void OnSelectComplete();
 protected:
 	TSubclassOf<class UPGPlayerButtonWidget> PlayerButtonClass;
 
@@ -44,6 +51,14 @@ protected:
 	TObjectPtr<class UPGSelectWeaponWidget> BP_SelectWeapon_Sword;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPGSelectWeaponWidget> BP_SelectWeapon_Gun;
+
+
+protected:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UButton> Button_Complete;
 	
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UButton> Button_BackMain;
 
 };

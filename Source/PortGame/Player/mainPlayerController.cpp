@@ -10,6 +10,10 @@
 #include "Character/PGPlayerCharacter.h"
 #include "Data/WeaponData.h"
 #include "Data/CharacterEnumData.h"
+#include "Engine/GameInstance.h"
+#include "GameInstance/PGGameInstanceInterface.h"
+#include "MainUI/PGSelectWidget.h"
+
 
 AmainPlayerController::AmainPlayerController()
 {
@@ -18,6 +22,12 @@ AmainPlayerController::AmainPlayerController()
 	{
 		MainWidgetClass = mainwidgetClass.Class;
 	}
+	static ConstructorHelpers::FClassFinder<UPGSelectWidget> selectwidgetClass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/PortGame/UI/Main/BP_SelectWidget.BP_SelectWidget_C'"));
+	if (selectwidgetClass.Class)
+	{
+		SelectWidgetClass = selectwidgetClass.Class;
+	}
+
 	SelectNum = 0;
 	
 }
@@ -34,9 +44,7 @@ void AmainPlayerController::BeginPlay()
 	SpawnCharacters.Add(2, nullptr);
 
 
-	SelectWeaponDatasMap.Add(0, nullptr);
-	SelectWeaponDatasMap.Add(1, nullptr);
-	SelectWeaponDatasMap.Add(2, nullptr);
+	
 
 	bShowMouseCursor = true;
 
@@ -93,16 +101,50 @@ void AmainPlayerController::AllFindCharacterData()
 
 void AmainPlayerController::SetUpMainWidget()
 {
+	if (SelectWidget)
+	{
+		SelectWidget->RemoveFromParent();
+		SelectWidget = nullptr;
+	}
+		
+
 	if (MainWidgetClass)
 	{
 		MainWidget = CreateWidget<UPGMainWidget>(this, MainWidgetClass);
 		if (MainWidget)
 		{
-			MainWidget->SetCharacterWidget(AllPlayerDatas);
+			/*MainWidget->SetCharacterWidget(AllPlayerDatas);
 
-			MainWidget->SetWeaponWidget(SwordDatas, GunDatas);
-
+			MainWidget->SetWeaponWidget(SwordDatas, GunDatas);*/
+			MainWidget->SetUpMainWidget();
 			MainWidget->AddToViewport();
+
+		}
+	}
+}
+
+void AmainPlayerController::SetUpSelectWidget()
+{
+	if (MainWidget)
+	{
+		MainWidget->RemoveFromParent();
+		MainWidget = nullptr;
+	}
+		
+
+	if (SelectWidgetClass)
+	{
+		SelectWidget = CreateWidget<UPGSelectWidget>(this, SelectWidgetClass);
+		if (SelectWidget)
+		{
+
+			SelectWidget->SetUpPlayerButton(AllPlayerDatas);
+
+			SelectWidget->SetUpSwordData(SwordDatas);
+
+			SelectWidget->SetUpGunData(GunDatas);
+
+			SelectWidget->AddToViewport();
 
 		}
 	}
@@ -154,7 +196,6 @@ bool AmainPlayerController::SetSelectCharcterData(UPlayerCharacterDataAsset* cha
 
 		SpawnCharacters[*selectPlayerNum] = nullptr;
 
-		SelectWeaponDatasMap[*selectPlayerNum] = nullptr;
 		SLOG(TEXT("Select Back"));
 
 		return false;
@@ -201,14 +242,14 @@ void AmainPlayerController::SpawnCharacter(int8 num)
 
 void AmainPlayerController::ShowSelectWeaponWidget(EPlayerCharacterType characterType)
 {
-	MainWidget->ShowWeaponWidget(characterType);
+	SelectWidget->ShowSelectWeaponWidget(characterType);
 }
 
 void AmainPlayerController::SetSelectWeaponrData(UWeaponData* weaponData)
 {
 	if (weaponData)
 	{
-		SelectWeaponDatasMap[SelectNum] = weaponData;
+		//SelectWeaponDatasMap[SelectNum] = weaponData;
 
 		SelectPlayerDatasMap[SelectNum]->WeaponData = weaponData;
 
@@ -273,6 +314,41 @@ void AmainPlayerController::FindSwordData()
 			SwordDatas.Add(swordData);
 		}
 	}
+
+}
+
+void AmainPlayerController::SelectComplete()
+{
+	TArray<UPlayerCharacterDataAsset*> selectCharacter;
+
+	for (TPair<int8, UPlayerCharacterDataAsset*>& select : SelectPlayerDatasMap)
+	{
+		if (select.Value != nullptr)
+		{
+
+			selectCharacter.Add(select.Value);
+		}
+
+	}
+
+	if (selectCharacter.Num() == 0)
+	{
+		SLOG(TEXT("Not Select!!"));
+		return;
+	}
+
+	IPGGameInstanceInterface* gameinstance = Cast<IPGGameInstanceInterface>( GetWorld()->GetGameInstance());
+
+	if (gameinstance)
+	{
+		for (UPlayerCharacterDataAsset* select : selectCharacter)
+		{
+			gameinstance->SetCharacterData(select);
+		}
+	}
+
+
+
 
 }
 

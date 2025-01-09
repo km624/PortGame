@@ -26,12 +26,19 @@ protected:
 protected:
 	void AllFindCharacterData();
 
+public:
 	void SetUpMainWidget();
+
+	void SetUpSelectWidget();
 
 protected:
 	TSubclassOf<class UPGMainWidget> MainWidgetClass;
 
 	TObjectPtr<class UPGMainWidget> MainWidget;
+
+	TSubclassOf<class UPGSelectWidget> SelectWidgetClass;
+
+	TObjectPtr<class UPGSelectWidget> SelectWidget;
 
 public:
 	bool SetSelectCharcterData(class UPlayerCharacterDataAsset* characterData);
@@ -42,6 +49,7 @@ protected:
 
 	void SpawnCharacter(int8 num);
 
+public:
 	void ShowSelectWeaponWidget(EPlayerCharacterType characterType);
 	
 protected:
@@ -72,9 +80,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<TObjectPtr<class UWeaponData>> SwordDatas;
 
-	UPROPERTY(VisibleAnywhere)
-	TMap<int8, class UWeaponData*> SelectWeaponDatasMap;
 
 	int8 SelectNum;
+
+public:
+	void SelectComplete();
 
 };

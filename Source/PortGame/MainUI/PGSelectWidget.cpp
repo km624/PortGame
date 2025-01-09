@@ -9,6 +9,8 @@
 #include "Components/VerticalBoxSlot.h"
 #include "Data/WeaponData.h"
 #include "MainUI/PGSelectWeaponWidget.h"
+#include "Player/mainPlayerController.h"
+#include "Components/Button.h"
 
 
 UPGSelectWidget::UPGSelectWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
@@ -22,6 +24,9 @@ UPGSelectWidget::UPGSelectWidget(const FObjectInitializer& ObjectInitializer):Su
 
 void UPGSelectWidget::SetUpPlayerButton(const TArray<UPlayerCharacterDataAsset*>& characterDatas)
 {
+	Button_BackMain->OnClicked.AddDynamic(this, &ThisClass::TurnBackToMainWidget);
+	Button_Complete->OnClicked.AddDynamic(this, &ThisClass::OnSelectComplete);
+
 	if (characterDatas.Num() > 0 && PlayerButtonClass)
 	{
 		for (UPlayerCharacterDataAsset* Data : characterDatas)
@@ -75,5 +80,25 @@ void UPGSelectWidget::ShowSelectWeaponWidget(EPlayerCharacterType characterType)
 	else
 	{
 		BP_SelectWeapon_Gun->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void UPGSelectWidget::TurnBackToMainWidget()
+{
+	AmainPlayerController* playerController = Cast<AmainPlayerController>(GetOwningPlayer());
+
+	if (playerController)
+	{
+		playerController->SetUpMainWidget();
+	}
+}
+
+void UPGSelectWidget::OnSelectComplete()
+{
+	AmainPlayerController* playerController = Cast<AmainPlayerController>(GetOwningPlayer());
+
+	if (playerController)
+	{
+		playerController->SelectComplete();
 	}
 }

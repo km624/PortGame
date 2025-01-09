@@ -2,6 +2,7 @@
 
 
 #include "GameInstance/PGGameInstance.h"
+#include "Data/PlayerCharacterDataAsset.h"
 
 UPGGameInstance::UPGGameInstance()
 {
@@ -27,4 +28,9 @@ UPGGameInstance::UPGGameInstance()
 FPGCharacterStat UPGGameInstance::GetStat(FName rarity)
 {
 	return AllStat.Contains(rarity) ? AllStat[rarity] : FPGCharacterStat();
+}
+
+void UPGGameInstance::SetCharacterData(UPlayerCharacterDataAsset* playerdata)
+{
+	SelectPlayerDatas.Add(playerdata);
 }

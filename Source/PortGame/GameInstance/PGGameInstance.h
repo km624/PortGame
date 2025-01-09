@@ -19,13 +19,18 @@ class PORTGAME_API UPGGameInstance : public UGameInstance,public IPGGameInstance
 public:
 	UPGGameInstance();
 
-	
+protected:
 	virtual FPGCharacterStat GetStat(FName rarity) override; 
+
+	virtual void SetCharacterData(class UPlayerCharacterDataAsset* playerdata) override;
 
 private:
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	TMap<FName, FPGCharacterStat> AllStat;
 
 	//TArray<>SelectPlayerData;
+
+protected:
+	TArray<TObjectPtr<class UPlayerCharacterDataAsset>> SelectPlayerDatas;
 	
 };
