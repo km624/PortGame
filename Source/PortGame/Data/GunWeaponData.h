@@ -18,6 +18,11 @@ class PORTGAME_API UGunWeaponData : public UWeaponData
 public:
 	UGunWeaponData();
 
+	virtual FPrimaryAssetId GetPrimaryAssetId() const override
+	{
+		return FPrimaryAssetId(TEXT("GunData"), GetFName());
+	}
+
 public:
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gun)
 	TObjectPtr<class UAnimMontage> ReloadMontage;*/

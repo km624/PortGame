@@ -45,6 +45,8 @@ protected:
 public:
 	virtual void SetupCharacterData(class UBaseCharacterDataAsset* characterdata) override;
 
+	
+
 public:
 	void SetCharacterInputData(EControlData DataName);
 

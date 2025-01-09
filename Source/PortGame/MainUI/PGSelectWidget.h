@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Data/CharacterEnumData.h"
 #include "PGSelectWidget.generated.h"
 
 /**
@@ -19,6 +20,12 @@ public:
 public:
 	void SetUpPlayerButton(const TArray<class UPlayerCharacterDataAsset*>& characterDatas);
 
+	void SetUpSwordData(const TArray<class UWeaponData*>& sworddatas);
+	
+	void SetUpGunData(const TArray<class UWeaponData*>& gunddatas);
+
+	void ShowSelectWeaponWidget(EPlayerCharacterType characterType);
+
 protected:
 	TSubclassOf<class UPGPlayerButtonWidget> PlayerButtonClass;
 
@@ -32,4 +39,11 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UVerticalBox> VerticalBox_ETC;
 	
+protected:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGSelectWeaponWidget> BP_SelectWeapon_Sword;
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGSelectWeaponWidget> BP_SelectWeapon_Gun;
+	
+
 };

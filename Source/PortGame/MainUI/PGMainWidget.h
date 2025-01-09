@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Data/CharacterEnumData.h"
 #include "PGMainWidget.generated.h"
 
 /**
@@ -19,6 +20,10 @@ public:
 
 public:
 	void SetCharacterWidget(const TArray<class UPlayerCharacterDataAsset*>& characterDatas);
+
+	void SetWeaponWidget(const TArray<class UWeaponData*>& swordDatas, const TArray<class UWeaponData*>& gunDatas);
+
+	void ShowWeaponWidget(EPlayerCharacterType characterType);
 
 protected:
 	UFUNCTION()

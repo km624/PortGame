@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Data/CharacterEnumData.h"
 #include "mainPlayerController.generated.h"
 
 /**
@@ -27,6 +28,11 @@ protected:
 
 	void SetUpMainWidget();
 
+protected:
+	TSubclassOf<class UPGMainWidget> MainWidgetClass;
+
+	TObjectPtr<class UPGMainWidget> MainWidget;
+
 public:
 	bool SetSelectCharcterData(class UPlayerCharacterDataAsset* characterData);
 
@@ -35,28 +41,40 @@ protected:
 	void AddSpawnLocation(FVector location,FRotator rotator);
 
 	void SpawnCharacter(int8 num);
-	
 
+	void ShowSelectWeaponWidget(EPlayerCharacterType characterType);
+	
 protected:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite)
 	TArray<TObjectPtr<class UPlayerCharacterDataAsset>> AllPlayerDatas;
 
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TArray<TObjectPtr<class UPlayerCharacterDataAsset>> SelectPlayerDatas;*/
-
 	TArray<FTransform> SpawnLocation;
-
-	//TArray<bool> bIsSelected;
-
-	TSubclassOf<class UPGMainWidget> MainWidgetClass;
-	
-	TObjectPtr<class UPGMainWidget> MainWidget;
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<int8, class UPlayerCharacterDataAsset*> SelectPlayerDatasMap;
 	UPROPERTY(VisibleAnywhere)
 	TMap<int8, class APGPlayerCharacter*> SpawnCharacters;
 
+
+public:
+	void SetSelectWeaponrData(class UWeaponData* weaponData);
+
+protected:
+	void FindGunData();
+
+	void FindSwordData();
+
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TArray<TObjectPtr<class UWeaponData>> GunDatas;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TArray<TObjectPtr<class UWeaponData>> SwordDatas;
+
+	UPROPERTY(VisibleAnywhere)
+	TMap<int8, class UWeaponData*> SelectWeaponDatasMap;
+
+	int8 SelectNum;
 
 };

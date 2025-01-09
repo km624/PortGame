@@ -64,6 +64,7 @@ void UPGAttackComponent::BeginPlay()
 	
 }
 
+
 void UPGAttackComponent::SetupAttackData(UBaseCharacterDataAsset* attackdata)
 {
 

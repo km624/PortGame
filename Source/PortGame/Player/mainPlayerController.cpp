@@ -8,6 +8,8 @@
 #include "Data/BaseCharacterDataAsset.h"
 #include "MainUI/PGMainWidget.h"
 #include "Character/PGPlayerCharacter.h"
+#include "Data/WeaponData.h"
+#include "Data/CharacterEnumData.h"
 
 AmainPlayerController::AmainPlayerController()
 {
@@ -16,11 +18,7 @@ AmainPlayerController::AmainPlayerController()
 	{
 		MainWidgetClass = mainwidgetClass.Class;
 	}
-
-	
-	//bIsSelected.Add(false);
-	//bIsSelected.Add(false);
-	//bIsSelected.Add(false);
+	SelectNum = 0;
 	
 }
 
@@ -34,9 +32,14 @@ void AmainPlayerController::BeginPlay()
 	SpawnCharacters.Add(0, nullptr);
 	SpawnCharacters.Add(1, nullptr);
 	SpawnCharacters.Add(2, nullptr);
-	
+
+
+	SelectWeaponDatasMap.Add(0, nullptr);
+	SelectWeaponDatasMap.Add(1, nullptr);
+	SelectWeaponDatasMap.Add(2, nullptr);
 
 	bShowMouseCursor = true;
+
 	AddSpawnLocation(FVector(120.0f, 0.0f, 580.0f),FRotator(0.0f, -180.0f, 0.0f));
 	AddSpawnLocation(FVector(170.0f, -150.0f, 580.0f),FRotator(0.0f, 130.0f, 0.0f));
 	AddSpawnLocation(FVector(170.0f, 150.0f, 580.0f),FRotator(0.0f, -150.0f, 0.0f));
@@ -49,6 +52,10 @@ void AmainPlayerController::OnPossess(APawn* aPawn)
 
 
 	AllFindCharacterData();
+
+	FindSwordData();
+
+	FindGunData();
 
 	SetUpMainWidget();
 }
@@ -93,6 +100,8 @@ void AmainPlayerController::SetUpMainWidget()
 		{
 			MainWidget->SetCharacterWidget(AllPlayerDatas);
 
+			MainWidget->SetWeaponWidget(SwordDatas, GunDatas);
+
 			MainWidget->AddToViewport();
 
 		}
@@ -123,7 +132,10 @@ bool AmainPlayerController::SetSelectCharcterData(UPlayerCharacterDataAsset* cha
 
 				select.Value = characterData;
 				SLOG(TEXT("%s  -> %d "), *characterData->GetMeshNameAsString(), select.Key);
-				SpawnCharacter(select.Key);
+				//SpawnCharacter(select.Key);
+
+				SelectNum = select.Key;
+				ShowSelectWeaponWidget(characterData->Charactertype);
 				break;
 			}
 
@@ -142,6 +154,7 @@ bool AmainPlayerController::SetSelectCharcterData(UPlayerCharacterDataAsset* cha
 
 		SpawnCharacters[*selectPlayerNum] = nullptr;
 
+		SelectWeaponDatasMap[*selectPlayerNum] = nullptr;
 		SLOG(TEXT("Select Back"));
 
 		return false;
@@ -184,6 +197,83 @@ void AmainPlayerController::SpawnCharacter(int8 num)
 	character->FinishSpawning(SpawnLocation[num]);
 
 	SpawnCharacters[num] = character;
+}
+
+void AmainPlayerController::ShowSelectWeaponWidget(EPlayerCharacterType characterType)
+{
+	MainWidget->ShowWeaponWidget(characterType);
+}
+
+void AmainPlayerController::SetSelectWeaponrData(UWeaponData* weaponData)
+{
+	if (weaponData)
+	{
+		SelectWeaponDatasMap[SelectNum] = weaponData;
+
+		SelectPlayerDatasMap[SelectNum]->WeaponData = weaponData;
+
+		SpawnCharacter(SelectNum);
+	}
+}
+
+void AmainPlayerController::FindGunData()
+{
+	UAssetManager& Manager = UAssetManager::Get();
+
+	TArray<FPrimaryAssetId> Assets;
+
+	//에셋 아이디 리스트에서 태그 아이디를 가지고 있는 애를 배열로 반환
+	Manager.GetPrimaryAssetIdList(TEXT("GunData"), Assets);
+
+	SLOG(TEXT("Gun %d"), Assets.Num());
+	ensure(0 < Assets.Num());
+
+	for (FPrimaryAssetId& playerAsset : Assets)
+	{
+		FSoftObjectPtr AssetPtr(Manager.GetPrimaryAssetPath(playerAsset));
+		if (AssetPtr.IsPending())
+		{
+			AssetPtr.LoadSynchronous();
+		}
+
+		UWeaponData* gunData = Cast<UWeaponData>(AssetPtr.Get());
+
+		if (IsValid(gunData))
+		{
+			GunDatas.Add(gunData);
+		}
+	}
+
+}
+
+void AmainPlayerController::FindSwordData()
+{
+	UAssetManager& Manager = UAssetManager::Get();
+
+	TArray<FPrimaryAssetId> Assets;
+
+	//에셋 아이디 리스트에서 태그 아이디를 가지고 있는 애를 배열로 반환
+	Manager.GetPrimaryAssetIdList(TEXT("SwordData"), Assets);
+
+	SLOG(TEXT("Sword %d"), Assets.Num());
+	ensure(0 < Assets.Num());
+
+	for (FPrimaryAssetId& playerAsset : Assets)
+	{
+		FSoftObjectPtr AssetPtr(Manager.GetPrimaryAssetPath(playerAsset));
+		if (AssetPtr.IsPending())
+		{
+			AssetPtr.LoadSynchronous();
+		}
+
+		UWeaponData* swordData = Cast<UWeaponData>(AssetPtr.Get());
+
+		if (IsValid(swordData))
+		{
+			SwordDatas.Add(swordData);
+		}
+	}
+
 }
 
 

@@ -7,6 +7,9 @@
 #include "Components/VerticalBox.h"
 #include "Data/CharacterEnumData.h"
 #include "Components/VerticalBoxSlot.h"
+#include "Data/WeaponData.h"
+#include "MainUI/PGSelectWeaponWidget.h"
+
 
 UPGSelectWidget::UPGSelectWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
@@ -50,5 +53,27 @@ void UPGSelectWidget::SetUpPlayerButton(const TArray<UPlayerCharacterDataAsset*>
 			}
 
 		}
+	}
+}
+
+void UPGSelectWidget::SetUpSwordData(const TArray<UWeaponData*>& sworddatas)
+{
+	BP_SelectWeapon_Sword->SetUpWeapon(sworddatas);
+}
+
+void UPGSelectWidget::SetUpGunData(const TArray<UWeaponData*>& gunddatas)
+{
+	BP_SelectWeapon_Gun->SetUpWeapon(gunddatas);
+}
+
+void UPGSelectWidget::ShowSelectWeaponWidget(EPlayerCharacterType characterType)
+{
+	if (characterType == EPlayerCharacterType::ETC)
+	{
+		BP_SelectWeapon_Sword->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		BP_SelectWeapon_Gun->SetVisibility(ESlateVisibility::Visible);
 	}
 }

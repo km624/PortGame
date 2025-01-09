@@ -6,6 +6,7 @@
 #include "Data/PlayerCharacterDataAsset.h"
 #include "Components/Button.h"
 #include "PortGame/PortGame.h"
+#include "Data/WeaponData.h"
 
 UPGMainWidget::UPGMainWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
@@ -16,6 +17,17 @@ void UPGMainWidget::SetCharacterWidget(const TArray<UPlayerCharacterDataAsset*>&
 	BP_SelectWidget->SetUpPlayerButton(characterDatas);
 
 	Button_SelectCharacter->OnClicked.AddDynamic(this, &ThisClass::SelectButtonClicked);
+}
+
+void UPGMainWidget::SetWeaponWidget(const TArray<UWeaponData*>& swordDatas, const TArray<UWeaponData*>& gunDatas)
+{
+	BP_SelectWidget->SetUpSwordData(swordDatas);
+	BP_SelectWidget->SetUpGunData(gunDatas);
+}
+
+void UPGMainWidget::ShowWeaponWidget(EPlayerCharacterType characterType)
+{
+	BP_SelectWidget->ShowSelectWeaponWidget(characterType);
 }
 
 void UPGMainWidget::SelectButtonClicked()

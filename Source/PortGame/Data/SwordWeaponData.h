@@ -15,4 +15,9 @@ class PORTGAME_API USwordWeaponData : public UWeaponData
 	GENERATED_BODY()
 public:
 	USwordWeaponData();
+
+	virtual FPrimaryAssetId GetPrimaryAssetId() const override
+	{
+		return FPrimaryAssetId(TEXT("SwordData"), GetFName());
+	}
 };
