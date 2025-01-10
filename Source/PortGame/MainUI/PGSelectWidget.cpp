@@ -12,6 +12,7 @@
 #include "Player/mainPlayerController.h"
 #include "Components/Button.h"
 #include "MainUI/PGStatWidget.h"
+#include "Components/Image.h"
 
 UPGSelectWidget::UPGSelectWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
@@ -74,6 +75,8 @@ void UPGSelectWidget::SetUpGunData(const TArray<UWeaponData*>& gunddatas)
 
 void UPGSelectWidget::ShowSelectWeaponWidget(EPlayerCharacterType characterType)
 {
+	Image_BlockButton->SetVisibility(ESlateVisibility::Visible);
+
 	if (characterType == EPlayerCharacterType::ETC)
 	{
 		BP_SelectWeapon_Sword->SetVisibility(ESlateVisibility::Visible);
@@ -83,6 +86,13 @@ void UPGSelectWidget::ShowSelectWeaponWidget(EPlayerCharacterType characterType)
 		BP_SelectWeapon_Gun->SetVisibility(ESlateVisibility::Visible);
 	}
 }
+
+void UPGSelectWidget::CharacterButtonEnable()
+{
+	Image_BlockButton->SetVisibility(ESlateVisibility::Collapsed);
+}
+
+
 
 void UPGSelectWidget::TurnBackToMainWidget()
 {
@@ -117,15 +127,43 @@ void UPGSelectWidget::UpdateStatWidget(int8 num,UPlayerCharacterDataAsset* palye
 	switch (num)
 	{
 	case 0:
+		BP_FirstStatWidget->SetVisibility(ESlateVisibility::Visible);
 		BP_FirstStatWidget->UpdateBaseStat(palyerdata);
 		break;
 
 	case 1:
+		BP_SecondStatWidget->SetVisibility(ESlateVisibility::Visible);
 		BP_SecondStatWidget->UpdateBaseStat(palyerdata);
 		break;
 
 	default:
+		BP_ThirdStatWidget->SetVisibility(ESlateVisibility::Visible);
 		BP_ThirdStatWidget->UpdateBaseStat(palyerdata);
 		break;
 	}
+}
+
+void UPGSelectWidget::UpdateWeaponStatWidget(int8 num, UWeaponData* weapondata)
+{
+	switch (num)
+	{
+	case 0:
+		BP_FirstStatWidget->UpdateWeaponStat(weapondata);
+		break;
+
+	case 1:
+		BP_SecondStatWidget->UpdateWeaponStat(weapondata);
+		break;
+
+	default:
+		BP_ThirdStatWidget->UpdateWeaponStat(weapondata);
+		break;
+	}
+}
+
+void UPGSelectWidget::HiddenStatWidget()
+{
+	BP_FirstStatWidget->SetVisibility(ESlateVisibility::Hidden);
+	BP_SecondStatWidget->SetVisibility(ESlateVisibility::Hidden);
+	BP_ThirdStatWidget->SetVisibility(ESlateVisibility::Hidden);
 }

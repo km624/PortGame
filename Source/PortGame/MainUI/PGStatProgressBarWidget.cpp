@@ -57,15 +57,15 @@ void UPGStatProgressBarWidget::UpdateBase(float newstat)
 {
 	
 	PreviousBasePercent = CurrentBaseStat / MaxStat;
-
+	PreviousWeaponPercent = CurrentBaseStat / MaxStat;
 	
 
 	if (ProgressBar_Base)
 	{
 
 		CurrentBaseStat = newstat;
+		CurrentWeaponStat = CurrentBaseStat;
 	
-
 	}
 
 
@@ -101,7 +101,7 @@ void UPGStatProgressBarWidget::SmoothingWeaponStat(float deltatime)
 {
 	float CurrentWeaponPercent = CurrentWeaponStat/ MaxStat;
 
-	float NewHpPercent = FMath::FInterpTo(PreviousWeaponPercent, CurrentWeaponPercent, deltatime, 1.0f);
+	float NewHpPercent = FMath::FInterpTo(PreviousWeaponPercent, CurrentWeaponPercent, deltatime, 2.0f);
 	ProgressBar_Weapon->SetPercent(NewHpPercent);
 	PreviousWeaponPercent = NewHpPercent;
 }

@@ -89,4 +89,5 @@ public:
 public:
 	void ShowCharacterStat(class UPlayerCharacterDataAsset* characterData);
 
+	void ShowWeaponStat(class UWeaponData* weapondata);
 };

@@ -26,6 +26,9 @@ protected:
 	UFUNCTION()
 	void OnButtonClicked();
 
+	UFUNCTION()
+	void OnButtonHovered();
+
 protected:
 	UPROPERTY()
 	TObjectPtr<class UWeaponData> WeaponData;
@@ -33,6 +36,8 @@ protected:
 	TObjectPtr<class AmainPlayerController> PlayerController;
 	UPROPERTY()
 	TObjectPtr<class UPGSelectWeaponWidget> SelectWeaponWidget;
+
+	
 
 protected:
 	UPROPERTY(meta = (BindWidget))

@@ -26,7 +26,7 @@ void UPGWeaponButtonWidget::SetWeaponData(UWeaponData* weaponData, UPGSelectWeap
 	//SetButtonStyle(false);
 
 	Button_SelectWeapon->OnClicked.AddDynamic(this, &ThisClass::OnButtonClicked);
-
+	Button_SelectWeapon->OnHovered.AddDynamic(this, &ThisClass::OnButtonHovered);
 }
 
 void UPGWeaponButtonWidget::OnButtonClicked()
@@ -34,7 +34,11 @@ void UPGWeaponButtonWidget::OnButtonClicked()
 
 	PlayerController->SetSelectWeaponrData(WeaponData);
 	SelectWeaponWidget->SetVisibility(ESlateVisibility::Hidden);
-	/*bool selected = PlayerController->SetSelectCharcterData(CharacterData);
+	
+}
 
-	SetButtonStyle(selected);*/
+void UPGWeaponButtonWidget::OnButtonHovered()
+{
+	
+	PlayerController->ShowWeaponStat(WeaponData);
 }

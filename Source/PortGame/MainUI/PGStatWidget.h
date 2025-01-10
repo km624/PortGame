@@ -19,6 +19,8 @@ public:
 
 	void UpdateBaseStat(class UPlayerCharacterDataAsset* characterData);
 
+	void UpdateWeaponStat(class UWeaponData* weapondata);
+
 
 protected:
 	float MaxHp = 3000.0f;

@@ -26,6 +26,8 @@ public:
 
 	void ShowSelectWeaponWidget(EPlayerCharacterType characterType);
 
+	void CharacterButtonEnable();
+
 
 protected:
 	UFUNCTION()
@@ -51,7 +53,8 @@ protected:
 	TObjectPtr<class UPGSelectWeaponWidget> BP_SelectWeapon_Sword;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPGSelectWeaponWidget> BP_SelectWeapon_Gun;
-
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UImage> Image_BlockButton;
 
 protected:
 	UPROPERTY(meta = (BindWidget))
@@ -65,6 +68,10 @@ public:
 	void SetUpAllStatWidget();
 
 	void UpdateStatWidget(int8 num,class UPlayerCharacterDataAsset* palyerdata);
+
+	void UpdateWeaponStatWidget(int8 num, class UWeaponData* weapondata);
+
+	void HiddenStatWidget();
 
 protected:
 	UPROPERTY(meta = (BindWidget))

@@ -254,7 +254,8 @@ void AmainPlayerController::SetSelectWeaponrData(UWeaponData* weaponData)
 		//SelectWeaponDatasMap[SelectNum] = weaponData;
 
 		SelectPlayerDatasMap[SelectNum]->WeaponData = weaponData;
-
+		SelectWidget->CharacterButtonEnable();
+		SelectWidget->HiddenStatWidget();
 		SpawnCharacter(SelectNum);
 	}
 }
@@ -396,5 +397,19 @@ void AmainPlayerController::ShowCharacterStat(UPlayerCharacterDataAsset* charact
 	}
 
 }
+
+
+void AmainPlayerController::ShowWeaponStat(UWeaponData* weapondata)
+{
+	//선택되면 Return true;
+
+	if (weapondata)
+	{
+		SelectWidget->UpdateWeaponStatWidget(SelectNum, weapondata);
+	
+		
+	}
+}
+
 
 
