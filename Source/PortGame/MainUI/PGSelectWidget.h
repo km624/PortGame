@@ -61,4 +61,19 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton> Button_BackMain;
 
+public:
+	void SetUpAllStatWidget();
+
+	void UpdateStatWidget(int8 num,class UPlayerCharacterDataAsset* palyerdata);
+
+protected:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGStatWidget> BP_FirstStatWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGStatWidget> BP_SecondStatWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGStatWidget> BP_ThirdStatWidget;
+
 };

@@ -86,4 +86,7 @@ protected:
 public:
 	void SelectComplete();
 
+public:
+	void ShowCharacterStat(class UPlayerCharacterDataAsset* characterData);
+
 };

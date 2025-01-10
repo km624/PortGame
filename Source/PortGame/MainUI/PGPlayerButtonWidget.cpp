@@ -27,6 +27,7 @@ void UPGPlayerButtonWidget::SetCharacterData(UPlayerCharacterDataAsset* characte
 	SetButtonStyle(false);
 
 	Button_SelectCharacter->OnClicked.AddDynamic(this, &ThisClass::OnButtonClicked);
+	Button_SelectCharacter->OnHovered.AddDynamic(this, &ThisClass::OnButtonHovered);
 
 	
 }
@@ -99,8 +100,14 @@ void UPGPlayerButtonWidget::SetButtonStyle(bool select)
 
 void UPGPlayerButtonWidget::OnButtonClicked()
 {
-	bool selected = PlayerController->SetSelectCharcterData(CharacterData);
+	bIsSelected = PlayerController->SetSelectCharcterData(CharacterData);
 	
-	SetButtonStyle(selected);
+	SetButtonStyle(bIsSelected);
 	
+}
+
+void UPGPlayerButtonWidget::OnButtonHovered()
+{
+	if(!bIsSelected)
+		PlayerController->ShowCharacterStat(CharacterData);
 }

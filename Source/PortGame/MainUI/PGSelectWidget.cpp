@@ -11,7 +11,7 @@
 #include "MainUI/PGSelectWeaponWidget.h"
 #include "Player/mainPlayerController.h"
 #include "Components/Button.h"
-
+#include "MainUI/PGStatWidget.h"
 
 UPGSelectWidget::UPGSelectWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
@@ -59,6 +59,7 @@ void UPGSelectWidget::SetUpPlayerButton(const TArray<UPlayerCharacterDataAsset*>
 
 		}
 	}
+
 }
 
 void UPGSelectWidget::SetUpSwordData(const TArray<UWeaponData*>& sworddatas)
@@ -100,5 +101,31 @@ void UPGSelectWidget::OnSelectComplete()
 	if (playerController)
 	{
 		playerController->SelectComplete();
+	}
+}
+
+void UPGSelectWidget::SetUpAllStatWidget()
+{
+	BP_FirstStatWidget->SetUpAllProgressBar();
+	BP_SecondStatWidget->SetUpAllProgressBar();
+	BP_ThirdStatWidget->SetUpAllProgressBar();
+}
+
+void UPGSelectWidget::UpdateStatWidget(int8 num,UPlayerCharacterDataAsset* palyerdata)
+{
+
+	switch (num)
+	{
+	case 0:
+		BP_FirstStatWidget->UpdateBaseStat(palyerdata);
+		break;
+
+	case 1:
+		BP_SecondStatWidget->UpdateBaseStat(palyerdata);
+		break;
+
+	default:
+		BP_ThirdStatWidget->UpdateBaseStat(palyerdata);
+		break;
 	}
 }

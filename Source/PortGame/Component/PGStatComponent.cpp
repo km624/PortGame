@@ -66,17 +66,7 @@ void UPGStatComponent::SetCurrentRarity(FName rarity)
 		
 	}
 
-	/*if (AllStat.Find(rarity))
-	{
-		CurrentCharacterRarity = rarity;
-		SetBaseStat(CurrentCharacterRarity);
 
-		SetHp(GetTotalStat().MaxHp);
-
-		SetHitGauge(GetTotalStat().HitGauge);
-
-		
-	}*/
 }
 
 void UPGStatComponent::SetUpPlayerLevel(int32 lelvel)

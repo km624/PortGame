@@ -144,6 +144,8 @@ void AmainPlayerController::SetUpSelectWidget()
 
 			SelectWidget->SetUpGunData(GunDatas);
 
+			SelectWidget->SetUpAllStatWidget();
+
 			SelectWidget->AddToViewport();
 
 		}
@@ -349,6 +351,49 @@ void AmainPlayerController::SelectComplete()
 
 
 
+
+}
+
+void AmainPlayerController::ShowCharacterStat(UPlayerCharacterDataAsset* characterData)
+{
+	//선택되면 Return true;
+
+	const int8* selectPlayerNum = SelectPlayerDatasMap.FindKey(characterData);
+
+	//셀렉트 되있는 캐릭터중에 없는경우
+	if (selectPlayerNum == nullptr)
+	{
+		//이미 3명 셀렉트가 되있는경우
+		if (!SelectPlayerDatasMap.FindKey(nullptr))
+		{
+			SLOG(TEXT("FULL!!"));
+			return;
+		}
+		int8 selectNum = 0;
+		for (TPair<int8, UPlayerCharacterDataAsset*>& select : SelectPlayerDatasMap)
+		{
+			if (select.Value == nullptr)
+			{
+				
+				selectNum = select.Key;
+				if (SelectWidget)
+				{
+					SelectWidget->UpdateStatWidget(selectNum, characterData);
+				}
+				
+				break;
+			}
+
+		}	
+	}
+	//셀렉트 되있는 캐릭터중에 있는경우
+	//다시 클릭해서 취소한다는것
+	else
+	{
+
+		SLOG(TEXT("Already Select"));
+		
+	}
 
 }
 

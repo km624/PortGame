@@ -26,6 +26,9 @@ protected:
 	UFUNCTION()
 	void OnButtonClicked();
 
+	UFUNCTION()
+	void OnButtonHovered();
+
 protected:
 	UPROPERTY()
 	TObjectPtr<class UPlayerCharacterDataAsset> CharacterData;
@@ -37,5 +40,8 @@ protected:
 	TObjectPtr<class UButton> Button_SelectCharacter;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> TextBlock_CharacterName;
+
+protected:
+	uint8 bIsSelected : 1;
 	
 };
