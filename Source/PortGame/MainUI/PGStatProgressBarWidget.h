@@ -24,12 +24,16 @@ public:
 	void SetupCharacterStat(float maxstat ,FString statname);
 
 
-	void UpdateBase(float newstat);
+	void UpdateBase(float newstat, float newlevelstat);
 
 	void UpdateWeapon(float newstat);
 
 protected:
 	void SmoothingBaseStat(float deltatime);
+
+
+	void SmoothingLevelStat(float deltatime);
+
 
 	void SmoothingWeaponStat(float deltatime);
 
@@ -42,9 +46,14 @@ protected:
 	float CurrentBaseStat;
 
 	UPROPERTY()
+	float CurrentLevelStat;
+
+	UPROPERTY()
 	float CurrentWeaponStat;
 
 	float PreviousBasePercent;
+
+	float PreviousLevelPercent;
 
 	float PreviousWeaponPercent;
 
@@ -52,6 +61,8 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UProgressBar> ProgressBar_Weapon;
 
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UProgressBar> ProgressBar_Level;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UProgressBar> ProgressBar_Base;
 

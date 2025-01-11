@@ -67,7 +67,7 @@ protected:
 public:
 	void SetUpAllStatWidget();
 
-	void UpdateStatWidget(int8 num,class UPlayerCharacterDataAsset* palyerdata);
+	void UpdateStatWidget(int8 num,class UPlayerCharacterDataAsset* palyerdata, int32 level);
 
 	void UpdateWeaponStatWidget(int8 num, class UWeaponData* weapondata);
 

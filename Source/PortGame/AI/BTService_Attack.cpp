@@ -7,6 +7,7 @@
 #include "Interface/PGAICharacterInterface.h"
 #include "PGAI.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "GenericTeamAgentInterface.h"
 
 
 
@@ -46,12 +47,25 @@ void UBTService_Attack::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	{
 		return;
 	}
+	IGenericTeamAgentInterface* team = Cast<IGenericTeamAgentInterface>(Target);
+	if (team)
+	{
+		if (!team->GetTeamAttitudeTowards(*ControllingPawn))
+		{
+			OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);
+
+			return;
+		}
+	}
+
 
 	IPGAICharacterInterface* TargetPawn = Cast<IPGAICharacterInterface>(Target);
 	if (TargetPawn == NULL)
 	{
 		return;
 	}
+
+
 
 	if (TargetPawn->CheckTargetDead())
 	{

@@ -25,5 +25,5 @@ class PORTGAME_API IPGGameInstanceInterface
 public:
 	virtual FPGCharacterStat GetStat(FName rarity) = 0;
 
-	virtual void SetCharacterData(class UPlayerCharacterDataAsset* playerdata) =0;
+	
 };

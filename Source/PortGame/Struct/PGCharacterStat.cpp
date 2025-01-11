@@ -9,10 +9,10 @@ FPGCharacterStat::FPGCharacterStat() :MaxHp(0.0f), Attack(0.0f), AttackRange(0.0
 
 FPGCharacterStat::FPGCharacterStat(int32 level):MaxHp(100.0f), Attack(5.0f), AttackRange(5.0f), AttackSpeed(0.02f), MovementSpeed(500.0f), HitGauge(1.0f)
 {
-    MaxHp *= level;
-    Attack *= level;
-    AttackRange *= level;
-    AttackSpeed *= level;
-    MovementSpeed *= level;
-    HitGauge *= level;
+    MaxHp *= level-1;
+    Attack *= level-1;
+    AttackRange *= level-1;
+    AttackSpeed *= level-1;
+    MovementSpeed *= level-1;
+    HitGauge *= level-1;
 }

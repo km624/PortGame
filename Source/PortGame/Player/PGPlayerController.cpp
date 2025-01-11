@@ -13,6 +13,9 @@
 
 #include "AI/PGAIController.h"
 
+#include "Save/PGSaveGame.h"
+
+#include "Kismet/GameplayStatics.h"
 
 APGPlayerController::APGPlayerController()
 {
@@ -198,5 +201,16 @@ void APGPlayerController::ChangeMiniMap(bool bIsMiniMap)
 		bShowMouseCursor = true;
 		SetInputMode(GameAndUI);
 	}
+}
+
+UPGSaveGame* APGPlayerController::LoadSaveFile()
+{
+	SaveGameInstance = Cast<UPGSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("Player0"), 0));
+	if (SaveGameInstance)
+	{
+		
+		return SaveGameInstance;
+	}
+	return nullptr;
 }
 

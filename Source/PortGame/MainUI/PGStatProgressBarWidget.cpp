@@ -8,19 +8,20 @@
 UPGStatProgressBarWidget::UPGStatProgressBarWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
 	
-	MaxStat = -1;
-	CurrentBaseStat = -1;
-	CurrentWeaponStat = -1;
-
-	PreviousBasePercent = -1;
-
-	PreviousWeaponPercent = -1;
+	MaxStat = -1.0f;
+	CurrentBaseStat = -1.0f;
+	CurrentWeaponStat = -1.0f;
+	CurrentLevelStat = -1.0f;
+	PreviousBasePercent = -1.0f;
+	PreviousLevelPercent = -1.0f;
+	PreviousWeaponPercent = -1.0f;
 }
 
 void UPGStatProgressBarWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 	SmoothingBaseStat(InDeltaTime);
+	SmoothingLevelStat(InDeltaTime);
 	SmoothingWeaponStat(InDeltaTime);
 }
 
@@ -28,14 +29,21 @@ void UPGStatProgressBarWidget::SetupCharacterStat(float maxstat, FString statnam
 {
 	MaxStat = maxstat;
 	CurrentBaseStat = 0.0f; 
+	CurrentLevelStat = 0.0f;
 	CurrentWeaponStat = 0.0f;
 	PreviousBasePercent = 0.0f;
-
+	PreviousLevelPercent = 0.0f;
 	PreviousWeaponPercent = 0.0f;
 
 	if (ProgressBar_Base)
 	{
 		ProgressBar_Base->SetPercent(CurrentBaseStat / MaxStat);
+
+	}
+
+	if (ProgressBar_Level)
+	{
+		ProgressBar_Level->SetPercent(CurrentLevelStat / MaxStat);
 
 	}
 	
@@ -53,18 +61,20 @@ void UPGStatProgressBarWidget::SetupCharacterStat(float maxstat, FString statnam
 
 }
 
-void UPGStatProgressBarWidget::UpdateBase(float newstat)
+void UPGStatProgressBarWidget::UpdateBase(float newstat,float newlevelstat)
 {
 	
 	PreviousBasePercent = CurrentBaseStat / MaxStat;
-	PreviousWeaponPercent = CurrentBaseStat / MaxStat;
+	PreviousLevelPercent = CurrentLevelStat / MaxStat;
+	PreviousWeaponPercent = CurrentLevelStat / MaxStat;
 	
 
 	if (ProgressBar_Base)
 	{
 
 		CurrentBaseStat = newstat;
-		CurrentWeaponStat = CurrentBaseStat;
+		CurrentLevelStat = CurrentBaseStat + newlevelstat;
+		CurrentWeaponStat = CurrentLevelStat;
 	
 	}
 
@@ -81,7 +91,7 @@ void UPGStatProgressBarWidget::UpdateWeapon(float newstat)
 	if (ProgressBar_Weapon)
 	{
 
-		CurrentWeaponStat = newstat + CurrentBaseStat;
+		CurrentWeaponStat = newstat + CurrentLevelStat;
 
 
 	}
@@ -95,6 +105,15 @@ void UPGStatProgressBarWidget::SmoothingBaseStat(float deltatime)
 	float NewHpPercent = FMath::FInterpTo(PreviousBasePercent, CurrentBasePercent, deltatime, 2.0f);
 	ProgressBar_Base->SetPercent(NewHpPercent);
 	PreviousBasePercent = NewHpPercent;
+}
+
+void UPGStatProgressBarWidget::SmoothingLevelStat(float deltatime)
+{
+	float CurrentLevelPercent = CurrentLevelStat / MaxStat;
+
+	float NewHpPercent = FMath::FInterpTo(PreviousLevelPercent, CurrentLevelPercent, deltatime, 1.5f);
+	ProgressBar_Level->SetPercent(NewHpPercent);
+	PreviousLevelPercent = NewHpPercent;
 }
 
 void UPGStatProgressBarWidget::SmoothingWeaponStat(float deltatime)

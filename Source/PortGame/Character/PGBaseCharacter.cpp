@@ -178,6 +178,7 @@ void APGBaseCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterdata
 
 void APGBaseCharacter::LoadAndPlayMontageByPath(const FString& SkeletonName, const FString& MontageName)
 {
+
 	FString AssetPath = FString::Printf(TEXT("/Game/PortGame/Character/%s/Animation/Montage/%s.%s"), *SkeletonName, *MontageName, *MontageName);
 	
 	// 소프트 오브젝트 경로 생성

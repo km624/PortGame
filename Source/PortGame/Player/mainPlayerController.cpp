@@ -10,9 +10,13 @@
 #include "Character/PGPlayerCharacter.h"
 #include "Data/WeaponData.h"
 #include "Data/CharacterEnumData.h"
-#include "Engine/GameInstance.h"
-#include "GameInstance/PGGameInstanceInterface.h"
+//#include "Engine/GameInstance.h"
+//#include "GameInstance/PGGameInstanceInterface.h"
 #include "MainUI/PGSelectWidget.h"
+#include "Save/PGSaveGame.h"
+#include "Kismet/GameplayStatics.h"
+#include "Engine/StreamableManager.h"
+#include "Engine/AssetManager.h"
 
 
 AmainPlayerController::AmainPlayerController()
@@ -49,8 +53,8 @@ void AmainPlayerController::BeginPlay()
 	bShowMouseCursor = true;
 
 	AddSpawnLocation(FVector(120.0f, 0.0f, 580.0f),FRotator(0.0f, -180.0f, 0.0f));
-	AddSpawnLocation(FVector(170.0f, -150.0f, 580.0f),FRotator(0.0f, 130.0f, 0.0f));
-	AddSpawnLocation(FVector(170.0f, 150.0f, 580.0f),FRotator(0.0f, -150.0f, 0.0f));
+	AddSpawnLocation(FVector(170.0f, -140.0f, 580.0f),FRotator(0.0f, 130.0f, 0.0f));
+	AddSpawnLocation(FVector(170.0f, 140.0f, 580.0f),FRotator(0.0f, -150.0f, 0.0f));
 
 }
 
@@ -64,6 +68,8 @@ void AmainPlayerController::OnPossess(APawn* aPawn)
 	FindSwordData();
 
 	FindGunData();
+
+	LoadSaveFile();
 
 	SetUpMainWidget();
 }
@@ -203,7 +209,7 @@ bool AmainPlayerController::SetSelectCharcterData(UPlayerCharacterDataAsset* cha
 		return false;
 	}
 
-	return false;
+	
 }
 
 void AmainPlayerController::AddSpawnLocation(FVector location, FRotator rotator)
@@ -330,6 +336,7 @@ void AmainPlayerController::SelectComplete()
 		{
 
 			selectCharacter.Add(select.Value);
+			
 		}
 
 	}
@@ -340,19 +347,18 @@ void AmainPlayerController::SelectComplete()
 		return;
 	}
 
-	IPGGameInstanceInterface* gameinstance = Cast<IPGGameInstanceInterface>( GetWorld()->GetGameInstance());
-
-	if (gameinstance)
+	
+	for (UPlayerCharacterDataAsset* select : selectCharacter)
 	{
-		for (UPlayerCharacterDataAsset* select : selectCharacter)
-		{
-			gameinstance->SetCharacterData(select);
-		}
+		SLOG(TEXT("sleelct : %s"), *select->GetMeshNameAsString());
+		//gameinstance->SetCharacterData(select);
+		SaveGameInstance->SelectPlayerDatas.Add(select);
 	}
+	
+	SavesaveFile();
+	OnLoadGameLevel();
 
-
-
-
+	
 }
 
 void AmainPlayerController::ShowCharacterStat(UPlayerCharacterDataAsset* characterData)
@@ -375,17 +381,20 @@ void AmainPlayerController::ShowCharacterStat(UPlayerCharacterDataAsset* charact
 		{
 			if (select.Value == nullptr)
 			{
-				
+
 				selectNum = select.Key;
 				if (SelectWidget)
 				{
-					SelectWidget->UpdateStatWidget(selectNum, characterData);
+					int32 level = 0;
+					if (SaveGameInstance)
+						level = SaveGameInstance->CharacterLevel[characterData->GetMeshNameAsString()];
+					SelectWidget->UpdateStatWidget(selectNum, characterData, level);
 				}
-				
+
 				break;
 			}
 
-		}	
+		}
 	}
 	//셀렉트 되있는 캐릭터중에 있는경우
 	//다시 클릭해서 취소한다는것
@@ -393,7 +402,7 @@ void AmainPlayerController::ShowCharacterStat(UPlayerCharacterDataAsset* charact
 	{
 
 		SLOG(TEXT("Already Select"));
-		
+
 	}
 
 }
@@ -406,9 +415,85 @@ void AmainPlayerController::ShowWeaponStat(UWeaponData* weapondata)
 	if (weapondata)
 	{
 		SelectWidget->UpdateWeaponStatWidget(SelectNum, weapondata);
-	
-		
+
+
 	}
+}
+
+void AmainPlayerController::LoadSaveFile()
+{
+
+	SaveGameInstance = Cast<UPGSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("Player0"), 0));
+	if (SaveGameInstance)
+	{
+		if (AllPlayerDatas.Num() > 0)
+		{
+			for (UPlayerCharacterDataAsset* playerdata : AllPlayerDatas)
+			{
+				if (SaveGameInstance->CharacterLevel.Contains(playerdata->GetMeshNameAsString()))
+				{
+					FString charactername = playerdata->GetMeshNameAsString();
+					SLOG(TEXT("%s  : %d "), *charactername, SaveGameInstance->CharacterLevel[charactername]);
+				}
+
+			}
+			SLOG(TEXT("LoadComplete"));
+		}
+
+		//SelectPlayer 초기화
+		SaveGameInstance->SelectPlayerDatas.Empty();
+	}
+	else
+	{
+		SaveGameInstance = NewObject<UPGSaveGame>();
+		SLOG(TEXT("CreateSaveFile"));
+		if (AllPlayerDatas.Num() > 0)
+		{
+			for (UPlayerCharacterDataAsset* playerdata : AllPlayerDatas)
+			{
+				SaveGameInstance->CharacterLevel.Add(playerdata->GetMeshNameAsString(), 10);
+			}
+		}
+
+		SavesaveFile();
+	}
+}
+
+void AmainPlayerController::SavesaveFile()
+{
+	if (!UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("Player0"), 0))
+	{
+		SLOG(TEXT("Save Error!!"));
+	}
+}
+
+void AmainPlayerController::OnLoadGameLevel()
+{
+	//FLatentActionInfo LatentInfo;
+	//LatentInfo.CallbackTarget = this;
+	//LatentInfo.ExecutionFunction = FName("OnLevelLoadCompleted"); // 로딩 완료 후 호출될 함수
+	//LatentInfo.Linkage = 0;
+	//LatentInfo.UUID = 1;
+
+	//UGameplayStatics::LoadStreamLevel(this, TEXT("Asian_Village_Copy1"), true, true, LatentInfo);
+
+	
+	FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
+	FString AssetPath = FString::Printf(TEXT("/Game/PortGame/Level/Asian_Village_Copy1.Asian_Village_Copy1"));
+	//FSoftObjectPath LevelRef(TEXT("/Game/PortGame/Level/Asian_Village_Copy1.Asian_Village_Copy1"));
+	FSoftObjectPath LevelRef(AssetPath);
+
+	StreamableManager.RequestAsyncLoad(LevelRef, FStreamableDelegate::CreateUObject(this, &ThisClass::OnLevelLoadCompleted));
+	
+}
+
+void AmainPlayerController::OnLevelLoadCompleted()
+{
+	
+	SLOG(TEXT("LoadComplete"));
+
+	UGameplayStatics::OpenLevel(this, TEXT("Asian_Village_Copy1"));
+	
 }
 
 

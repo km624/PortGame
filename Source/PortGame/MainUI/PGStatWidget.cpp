@@ -10,6 +10,7 @@
 #include "GameInstance/PGGameInstanceInterface.h"
 #include "Data/GunWeaponData.h"
 #include "Components/VerticalBox.h"
+#include "Components/TextBlock.h"
 
 
 void UPGStatWidget::SetUpAllProgressBar()
@@ -30,7 +31,7 @@ void UPGStatWidget::SetUpAllProgressBar()
 		
 }
 
-void UPGStatWidget::UpdateBaseStat(UPlayerCharacterDataAsset* characterData)
+void UPGStatWidget::UpdateBaseStat(UPlayerCharacterDataAsset* characterData,int32 level)
 {
 
 	FPGCharacterStat characterStat;
@@ -47,11 +48,16 @@ void UPGStatWidget::UpdateBaseStat(UPlayerCharacterDataAsset* characterData)
 		}
 	}
 
-	BP_StatProgressBar_HP->UpdateBase(characterStat.MaxHp);
-	BP_StatProgressBar_Attack->UpdateBase(characterStat.Attack);
-	BP_StatProgressBar_Range->UpdateBase(characterStat.AttackRange);
-	BP_StatProgressBar_AttackSpeed->UpdateBase(characterStat.AttackSpeed);
-	BP_StatProgressBar_HitGauge->UpdateBase(characterStat.HitGauge);
+	FPGCharacterStat LevelStat = FPGCharacterStat(level);
+
+	FText levelText = FText::FromString(FString::Printf(TEXT("Lv.%d"), level));
+	TextBlock_level->SetText(levelText);
+
+	BP_StatProgressBar_HP->UpdateBase(characterStat.MaxHp, LevelStat.MaxHp);
+	BP_StatProgressBar_Attack->UpdateBase(characterStat.Attack, LevelStat.Attack);
+	BP_StatProgressBar_Range->UpdateBase(characterStat.AttackRange, LevelStat.AttackRange);
+	BP_StatProgressBar_AttackSpeed->UpdateBase(characterStat.AttackSpeed, LevelStat.AttackSpeed);
+	BP_StatProgressBar_HitGauge->UpdateBase(characterStat.HitGauge, LevelStat.HitGauge);
 }
 
 void UPGStatWidget::UpdateWeaponStat(UWeaponData* weapondata)

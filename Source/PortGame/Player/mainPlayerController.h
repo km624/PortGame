@@ -90,4 +90,19 @@ public:
 	void ShowCharacterStat(class UPlayerCharacterDataAsset* characterData);
 
 	void ShowWeaponStat(class UWeaponData* weapondata);
+
+protected:
+
+	void LoadSaveFile();
+
+	void SavesaveFile();
+
+protected:
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	TObjectPtr<class UPGSaveGame> SaveGameInstance;
+
+protected:
+	void OnLoadGameLevel();
+	UFUNCTION()
+	void OnLevelLoadCompleted();
 };

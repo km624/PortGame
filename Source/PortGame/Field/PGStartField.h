@@ -22,12 +22,14 @@ protected:
 
 	void SetupPlayerbleCharacter();
 
+	
+
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerData")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerData")
 	TArray<TObjectPtr<class UPlayerCharacterDataAsset>> PlayerCharacterData;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PlayerData")
-	TArray<int32> PlayerCharacterLevels;
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerData")
+	TArray<int32> PlayerCharacterLevels;*/
 
 
 

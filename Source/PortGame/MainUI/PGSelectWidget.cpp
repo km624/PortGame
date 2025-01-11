@@ -121,24 +121,24 @@ void UPGSelectWidget::SetUpAllStatWidget()
 	BP_ThirdStatWidget->SetUpAllProgressBar();
 }
 
-void UPGSelectWidget::UpdateStatWidget(int8 num,UPlayerCharacterDataAsset* palyerdata)
+void UPGSelectWidget::UpdateStatWidget(int8 num,UPlayerCharacterDataAsset* palyerdata,int32 level)
 {
 
 	switch (num)
 	{
 	case 0:
 		BP_FirstStatWidget->SetVisibility(ESlateVisibility::Visible);
-		BP_FirstStatWidget->UpdateBaseStat(palyerdata);
+		BP_FirstStatWidget->UpdateBaseStat(palyerdata,level);
 		break;
 
 	case 1:
 		BP_SecondStatWidget->SetVisibility(ESlateVisibility::Visible);
-		BP_SecondStatWidget->UpdateBaseStat(palyerdata);
+		BP_SecondStatWidget->UpdateBaseStat(palyerdata, level);
 		break;
 
 	default:
 		BP_ThirdStatWidget->SetVisibility(ESlateVisibility::Visible);
-		BP_ThirdStatWidget->UpdateBaseStat(palyerdata);
+		BP_ThirdStatWidget->UpdateBaseStat(palyerdata, level);
 		break;
 	}
 }

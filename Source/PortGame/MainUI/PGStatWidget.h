@@ -17,7 +17,7 @@ class PORTGAME_API UPGStatWidget : public UUserWidget
 public:
 	void SetUpAllProgressBar();
 
-	void UpdateBaseStat(class UPlayerCharacterDataAsset* characterData);
+	void UpdateBaseStat(class UPlayerCharacterDataAsset* characterData, int32 level);
 
 	void UpdateWeaponStat(class UWeaponData* weapondata);
 
@@ -35,6 +35,8 @@ protected:
 	float MaxTraceDistance = 3000.0f;
 
 protected:
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> TextBlock_level;
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPGStatProgressBarWidget> BP_StatProgressBar_HP;
 

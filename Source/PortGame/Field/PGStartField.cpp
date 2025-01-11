@@ -8,6 +8,12 @@
 #include "Data/PlayerCharacterDataAsset.h"
 #include "PortGame/PortGame.h"
 
+#include "Engine/GameInstance.h"
+#include "GameInstance/PGGameInstanceInterface.h"
+
+#include "Save/PGSaveGame.h"
+//#include "Kismet/GameplayStatics.h"
+
 APGStartField::APGStartField()
 {
 	
@@ -17,6 +23,7 @@ void APGStartField::InitializeField(uint8 teamid)
 {
 	Super::InitializeField(teamid);
 
+	
 	SetupPlayerbleCharacter();
 }
 
@@ -38,7 +45,23 @@ void APGStartField::SetupPlayerbleCharacter()
 		}
 	}
 
+	UPGSaveGame* savefile= playerController->LoadSaveFile();
 
+	if (!savefile)
+	{
+		SLOG(TEXT("LoadFAil"));
+		return;
+	}
+
+	PlayerCharacterData = savefile->SelectPlayerDatas;
+
+	if (PlayerCharacterData.Num() == 0)
+	{
+		SLOG(TEXT("Notting"));
+		return;
+
+	}
+	
 	FVector OriginSpawnLocation = GetActorLocation()+ FVector(0.0f,0.0f,95.0f);
 	FRotator OriginSpawnRotation = FRotator::ZeroRotator;
 	
@@ -69,7 +92,7 @@ void APGStartField::SetupPlayerbleCharacter()
 		{
 			playerCharacter->SetupCharacterDataAsset(PlayerCharacterData[i]);
 			playerCharacter->SetteamId(TeamId);
-			playerCharacter->SetupPlayerLevel(PlayerCharacterLevels[i]);
+			playerCharacter->SetupPlayerLevel(savefile->CharacterLevel[PlayerCharacterData[i]->GetMeshNameAsString()]);
 
 			playerCharacter->FinishSpawning(FTransform(SpawnRotation,SpawnLocation));
 
@@ -116,3 +139,5 @@ void APGStartField::SetupPlayerbleCharacter()
 
 	}
 }
+
+

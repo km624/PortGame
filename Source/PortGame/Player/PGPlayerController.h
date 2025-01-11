@@ -23,17 +23,9 @@ protected:
 
 	virtual void OnPossess(APawn* aPawn) override;
 
-protected:
-	////HUD의 클래스 정보
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HUD)
-	//TSubclassOf<class UPGHudWidget> PGHudWidgetClass;
-
-	////생성할 위젯을 담을 위젯 포인트 보관하는 변수
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
-	//TObjectPtr<class UPGHudWidget> PGHudWidget;
 
 protected:
-	//virtual void GunRecoilCameraShake(TSubclassOf<class UCameraShakeBase> camerashake) override;
+	
 	virtual void PlayCameraShake(TSubclassOf<class UCameraShakeBase> camerashake) override;
 
 	//캐릭터 변경  - Character에서 접근
@@ -52,7 +44,7 @@ protected:
 public:
 	void ChangeMiniMap(bool bIsMiniMap);
 
-
+	//플레이어 교체 캐릭터들 모음
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TArray<TObjectPtr<class APGPlayerCharacter>> PlayerCharacters;
@@ -68,6 +60,17 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	uint8 biscooltime:1;
+
+	//세이브 파일
+
+public:
+	class UPGSaveGame* LoadSaveFile();
+
+protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UPGSaveGame> SaveGameInstance;
+
 	
 
 

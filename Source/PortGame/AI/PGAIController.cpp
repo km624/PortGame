@@ -80,7 +80,7 @@ void APGAIController::RunAI()
 	UBlackboardComponent* BlackboardComp = Blackboard.Get();
 	if (UseBlackboard(BBAsset, BlackboardComp))
 	{
-		
+		BlackboardComp->SetValueAsBool(BBKEY_VISIBLE, true);
 		bool RunResult = RunBehaviorTree(BTAsset);
 		ensure(RunResult);
 	}
