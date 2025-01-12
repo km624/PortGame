@@ -12,6 +12,7 @@
 #include "GameInstance/PGGameInstanceInterface.h"
 
 #include "Save/PGSaveGame.h"
+#include "GameMode/PGGameState.h" 
 //#include "Kismet/GameplayStatics.h"
 
 APGStartField::APGStartField()
@@ -23,7 +24,7 @@ void APGStartField::InitializeField(uint8 teamid)
 {
 	Super::InitializeField(teamid);
 
-	
+	if (teamid != 1) return;
 	SetupPlayerbleCharacter();
 }
 
@@ -139,5 +140,16 @@ void APGStartField::SetupPlayerbleCharacter()
 
 	}
 }
+
+void APGStartField::PlayerGameState()
+{
+	APGGameState* gamestate = Cast<APGGameState>(GetWorld()->GetGameState());
+	if (gamestate)
+	{
+		gamestate->GameOver();
+	}
+}
+
+
 
 

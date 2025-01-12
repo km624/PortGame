@@ -33,6 +33,8 @@ protected:
 
 	virtual void ChangedField(int8 teamid) override;
 
+	virtual void PlayerGameState();
+
 
 protected:
 

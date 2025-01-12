@@ -4,6 +4,7 @@
 #include "Field/PGLastField.h"
 #include "Character/PGPlayerCharacter.h"
 #include "UI/PGHudWidget.h"
+#include "GameMode/PGGameState.h"
 
 APGLastField::APGLastField() : bIsLocked(true)
 {
@@ -50,6 +51,17 @@ void APGLastField::DamageFieldGauge(int8 attackteamid)
 void APGLastField::ChangedField(int8 teamid)
 {
 	Super::ChangedField(teamid);
+
+	PlayerGameState();
+}
+
+void APGLastField::PlayerGameState()
+{
+	APGGameState* gamestate =Cast<APGGameState>(GetWorld()->GetGameState());
+	if (gamestate)
+	{
+		gamestate->GameClear();
+	}
 }
 
 

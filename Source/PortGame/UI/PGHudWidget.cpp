@@ -17,6 +17,8 @@
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "AI/PGAIController.h"
+#include "UI/PGGameStateWidget.h"
+#include "UI/PGKoWidget.h"
 
 
 
@@ -207,20 +209,21 @@ void UPGHudWidget::ChangeMiniMapSize(bool bisminimap)
 
 
 
+void UPGHudWidget::UpdateKOCount(int32 count)
+{
+	BP_KOWidget->UpdateKOCount(count);
+}
 
+void UPGHudWidget::UpdateGameState(bool bisclear)
+{
+	BP_GameStateWidget->SetVisibility(ESlateVisibility::Visible);
+	BP_GameStateWidget->UpdateGameState(bisclear);
+}
 
 void UPGHudWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	////SLOG(TEXT("HUD : NativeConstruct"));
-	//IPGHudWidgetInterface* HUDPawn = Cast<IPGHudWidgetInterface>(OwningCharacter);
-	//SLOG(TEXT("%s : SetUpHudWidget"), *OwningCharacter->GetActorNameOrLabel());
-	//if (HUDPawn)
-	//{
-	//	
-	//	HUDPawn->SetUpHudWidget(this);
-	//}
-
+	
 
 }

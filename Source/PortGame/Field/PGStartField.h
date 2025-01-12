@@ -31,6 +31,9 @@ protected:
 	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerData")
 	TArray<int32> PlayerCharacterLevels;*/
 
+protected:
+	virtual void PlayerGameState() override;
+
 
 
 

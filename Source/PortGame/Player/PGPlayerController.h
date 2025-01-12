@@ -66,10 +66,17 @@ protected:
 public:
 	class UPGSaveGame* LoadSaveFile();
 
+	void SavesaveGameFile();
+
 protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UPGSaveGame> SaveGameInstance;
+
+public:
+	void GameClear();
+
+	void GameOver();
 
 	
 

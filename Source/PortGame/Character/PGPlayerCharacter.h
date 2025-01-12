@@ -16,6 +16,7 @@
  * 
  */
 DECLARE_MULTICAST_DELEGATE(FOnDashDelegate);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnKOCountChangeDelegate, int32 /*KOCount*/);
 UENUM()
 enum class EControlData : uint8
 {
@@ -379,16 +380,31 @@ public:
 
 	void SetupPlayerLevel(int32 level);
 
+	int32 GetPlayerCharacterLevel();
+
 protected:
 
 	virtual void PlayerAddEXP() override;
 
-	virtual void PlayLevelUpEffet() override;
+	//void PlayerLevelUp(int32 currentlevel);
+
+	void PlayLevelUpEffet(int32 currentlevel);
+
+	//적 처치 카운트
+protected:
+	int32 KOCount = 0;
+
+	FOnKOCountChangeDelegate FKoCountChanged;
+
+public:
+	void UpdateGameState(bool bIsclear);
 
 	//TEST
 protected:
 	UFUNCTION()
 	void OnComponentHit(UPrimitiveComponent* HitComponent, AActor*OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+
 	
 
 };

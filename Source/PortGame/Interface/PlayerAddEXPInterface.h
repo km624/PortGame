@@ -24,6 +24,6 @@ class PORTGAME_API IPlayerAddEXPInterface
 public:
 	virtual void PlayerAddEXP() = 0;
 
-	virtual void PlayLevelUpEffet() = 0;
+	
 
 };

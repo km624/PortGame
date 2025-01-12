@@ -75,7 +75,7 @@ void UPGStatComponent::SetUpPlayerLevel(int32 lelvel)
 
 	SetLevelStat(FPGCharacterStat(CurrentCharacterLevel));
 
-	OnLevelChanged.Broadcast(CurrentCharacterLevel);
+	//OnLevelChanged.Broadcast(CurrentCharacterLevel);
 }
 
 void UPGStatComponent::SetHp(float NewHp)
@@ -110,7 +110,8 @@ void UPGStatComponent::SetHitGauge(float NewHitGauge)
 
 void UPGStatComponent::AddEXP()
 {
-	EXP += 5.0f;
+	//EXP += 5.0f;
+	EXP += 50.0f;
 
 	if (EXP >= 100)
 	{

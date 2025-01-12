@@ -214,3 +214,54 @@ UPGSaveGame* APGPlayerController::LoadSaveFile()
 	return nullptr;
 }
 
+void APGPlayerController::SavesaveGameFile()
+{
+	for (APGPlayerCharacter* playercharacter : PlayerCharacters)
+	{
+		int32 level = playercharacter->GetPlayerCharacterLevel();
+		FString CharacterName = playercharacter->CharacterName;
+		if (SaveGameInstance->CharacterLevel.Contains(CharacterName))
+		{
+			SaveGameInstance->CharacterLevel[CharacterName] = level;
+			SLOG(TEXT("Save %s "), *CharacterName);
+		}
+			
+	}
+
+	if (!UGameplayStatics::SaveGameToSlot(SaveGameInstance, TEXT("Player0"), 0))
+	{
+		SLOG(TEXT("Save Error!!"));
+	}
+}
+
+void APGPlayerController::GameClear()
+{
+	/*APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(GetPawn());
+	if (playerCharacter)
+	{
+		SLOG(TEXT("GameClear controller"));*/
+
+	bShowMouseCursor = true;
+	for (APGPlayerCharacter* playerCharacter : PlayerCharacters)
+	{
+		if (!playerCharacter->GetbIsDead())
+			playerCharacter->UpdateGameState(true);
+	}
+
+		
+		SavesaveGameFile();
+	
+}
+void APGPlayerController::GameOver()
+{
+	bShowMouseCursor = true;
+	for (APGPlayerCharacter* playerCharacter : PlayerCharacters)
+	{
+		if(!playerCharacter->GetbIsDead())
+			playerCharacter->UpdateGameState(false);
+	}
+		SavesaveGameFile();
+	
+}
+
+

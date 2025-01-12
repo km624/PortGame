@@ -111,7 +111,7 @@ void UPGStatProgressBarWidget::SmoothingLevelStat(float deltatime)
 {
 	float CurrentLevelPercent = CurrentLevelStat / MaxStat;
 
-	float NewHpPercent = FMath::FInterpTo(PreviousLevelPercent, CurrentLevelPercent, deltatime, 1.5f);
+	float NewHpPercent = FMath::FInterpTo(PreviousLevelPercent, CurrentLevelPercent, deltatime, 2.0f);
 	ProgressBar_Level->SetPercent(NewHpPercent);
 	PreviousLevelPercent = NewHpPercent;
 }

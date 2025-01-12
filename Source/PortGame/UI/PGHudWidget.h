@@ -97,6 +97,16 @@ protected:
 	float DefaultMiniMapXSize = 354.0f;
 	float DefaultMiniMapYSize = 445.5f;
 
+
+
+public:
+	UFUNCTION()
+	void UpdateKOCount(int32 count);
+
+
+	UFUNCTION()
+	void UpdateGameState(bool bisclear);
+
 protected:
 	
 	virtual void NativeConstruct() override;
@@ -140,5 +150,11 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPGMiniMapWidget> BP_MiniMap;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGGameStateWidget> BP_GameStateWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGKoWidget> BP_KOWidget;
 	
 };

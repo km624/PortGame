@@ -198,6 +198,8 @@ void APGPlayerCharacter::BeginPlay()
 
 	//SetCharacterInputData(CurrentControlData);
 
+	StatComponent->OnLevelChanged.AddUObject(this, &ThisClass::PlayLevelUpEffet);
+
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ThisClass::OnComponentHit);
 
 	FOnTimelineFloat TimelineProgress;
@@ -580,6 +582,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		hudWidget->SetupDashWidget(DashColltime);
 		hudWidget->UpdateHpBar(StatComponent->GetCurrentHp());
 		hudWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
+		hudWidget->UpdateKOCount(KOCount);
 
 		//델리게이트 바인딩
 		StatComponent->OnStatChanged.AddUObject(hudWidget, &UPGHudWidget::SetUpWidget);
@@ -588,6 +591,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		StatComponent->OnUltiSkillGaugechanged.AddUObject(hudWidget, &UPGHudWidget::UpdateUltiSkillGaugeBar);
 		AttackComponent->GetSkill()->OnbCanSkill.AddUObject(hudWidget, &UPGHudWidget::StartSkillCoolTime);
 		OndashDelegate.AddUObject(hudWidget, &UPGHudWidget::StartDash);
+		FKoCountChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateKOCount);
 
 		//총이 있을때만
 		ARifle* rifle = Cast<ARifle>(AttackComponent->GetWeapon());
@@ -1145,14 +1149,38 @@ void APGPlayerCharacter::SetupPlayerLevel(int32 level)
 	StatComponent->SetUpPlayerLevel(level);
 }
 
+int32 APGPlayerCharacter::GetPlayerCharacterLevel()
+{
+
+	return StatComponent->GetCurrentLevel();
+}
+
 void APGPlayerCharacter::PlayerAddEXP()
 {
+	KOCount++; 
+
+	FKoCountChanged.Broadcast(KOCount);
+
 	StatComponent->AddEXP();
 }
 
-void APGPlayerCharacter::PlayLevelUpEffet()
+void APGPlayerCharacter::PlayLevelUpEffet(int32 currentlevel)
 {
 
+}
+
+void APGPlayerCharacter::UpdateGameState(bool bIsclear)
+{
+	if (PGHudWidget)
+	{
+
+		PGHudWidget->UpdateGameState(bIsclear);
+
+		if (!bIsclear)
+		{
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.0f);
+		}
+	}
 }
 
 void APGPlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

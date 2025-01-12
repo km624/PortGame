@@ -85,6 +85,8 @@ public:
 	
 	FORCEINLINE float  GetMaxUltiSkillGauge() { return MaxUltiSkillGauge; }
 	FORCEINLINE float  GetCurrentUltiSkillGauge() { return CurrentUltiSkillGauge; }
+
+	FORCEINLINE int32 GetCurrentLevel() { return CurrentCharacterLevel; }
 	
 	
 public:
