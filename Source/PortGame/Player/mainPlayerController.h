@@ -105,4 +105,7 @@ protected:
 	void OnLoadGameLevel();
 	UFUNCTION()
 	void OnLevelLoadCompleted();
+
+public:
+	void QuitGame();
 };

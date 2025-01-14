@@ -202,7 +202,6 @@ void UPGMiniMapWidget::SetUpNPCCharacter()
         }
     }
 
-    GetWorld()->GetTimerManager().SetTimer(NPCIconUpdateHandler, this, &UPGMiniMapWidget::UpdateNPCIconPosition, NPCUpdateTime, true);
    
 }
 
@@ -687,7 +686,7 @@ int32 UPGMiniMapWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
             FVector2D ConvertEnd = FVector2D(End.X, End.Y - MiniMapYMax);*/
             if (i == 0)
             {
-                SLOG(TEXT("Start Vector : %f   , %f"), Start.X, Start.Y);
+                //SLOG(TEXT("Start Vector : %f   , %f"), Start.X, Start.Y);
             }
             FSlateDrawElement::MakeLines(
                 OutDrawElements,

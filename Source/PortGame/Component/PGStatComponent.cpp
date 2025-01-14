@@ -111,7 +111,7 @@ void UPGStatComponent::SetHitGauge(float NewHitGauge)
 void UPGStatComponent::AddEXP()
 {
 	//EXP += 5.0f;
-	EXP += 50.0f;
+	EXP += 10.0f;
 
 	if (EXP >= 100)
 	{

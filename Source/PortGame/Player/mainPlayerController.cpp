@@ -105,6 +105,25 @@ void AmainPlayerController::AllFindCharacterData()
 
 void AmainPlayerController::SetUpMainWidget()
 {
+
+	for (int32 i = 0; i < SelectPlayerDatasMap.Num(); i++)
+	{
+		if (SelectPlayerDatasMap[i] != nullptr)
+		{
+			SelectPlayerDatasMap[i] = nullptr;
+
+			if (SpawnCharacters[i] != nullptr)
+			{
+				SpawnCharacters[i]->DestroyWeapontoAtackComp();
+				SpawnCharacters[i]->Destroy();
+
+				SpawnCharacters[i] = nullptr;
+			}
+
+		}
+	}
+
+
 	if (SelectWidget)
 	{
 		SelectWidget->RemoveFromParent();
@@ -117,9 +136,7 @@ void AmainPlayerController::SetUpMainWidget()
 		MainWidget = CreateWidget<UPGMainWidget>(this, MainWidgetClass);
 		if (MainWidget)
 		{
-			/*MainWidget->SetCharacterWidget(AllPlayerDatas);
-
-			MainWidget->SetWeaponWidget(SwordDatas, GunDatas);*/
+			
 			MainWidget->SetUpMainWidget();
 			MainWidget->AddToViewport();
 
@@ -449,7 +466,7 @@ void AmainPlayerController::LoadSaveFile()
 		{
 			for (UPlayerCharacterDataAsset* playerdata : AllPlayerDatas)
 			{
-				SaveGameInstance->CharacterLevel.Add(playerdata->GetMeshNameAsString(), 10);
+				SaveGameInstance->CharacterLevel.Add(playerdata->GetMeshNameAsString(), 5);
 			}
 		}
 
@@ -492,6 +509,11 @@ void AmainPlayerController::OnLevelLoadCompleted()
 
 	UGameplayStatics::OpenLevel(this, TEXT("Asian_Village_Copy1"));
 	
+}
+
+void AmainPlayerController::QuitGame()
+{
+	ConsoleCommand("quit");
 }
 
 

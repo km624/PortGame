@@ -12,6 +12,7 @@ UPGMainWidget::UPGMainWidget(const FObjectInitializer& ObjectInitializer):Super(
 void UPGMainWidget::SetUpMainWidget()
 {
 	Button_SelectCharacter->OnClicked.AddDynamic(this, &ThisClass::SelectButtonClicked);
+	Button_EXIT->OnClicked.AddDynamic(this, &ThisClass::QuitGame);
 }
 
 
@@ -25,5 +26,14 @@ void UPGMainWidget::SelectButtonClicked()
 	
 
 
+}
+
+void UPGMainWidget::QuitGame()
+{
+	AmainPlayerController* playercontroller = Cast<AmainPlayerController>(GetOwningPlayer());
+	if (playercontroller)
+	{
+		playercontroller->QuitGame();
+	}
 }
 

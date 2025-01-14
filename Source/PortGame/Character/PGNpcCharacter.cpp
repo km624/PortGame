@@ -61,8 +61,20 @@ void APGNpcCharacter::BeginPlay()
 	}
 	//NPC Ä³¸¯ÅÍ ÆÀ »ö±ò ¼³Á¤
 	ChangeNpcColor();
+
 	
 }
+
+void APGNpcCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	
+	GetWorld()->GetTimerManager().ClearTimer(DeadHiddentimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
+}
+
+
 
 void APGNpcCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterdata)
 {

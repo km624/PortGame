@@ -49,6 +49,12 @@ void APGField::BeginPlay()
 	
 }
 
+void APGField::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	GetWorld()->GetTimerManager().ClearTimer(AttackAISpawnTimeHandler);
+}
+
 void APGField::Tick(float deltatime)
 {
 	Super::Tick(deltatime);
@@ -76,8 +82,7 @@ void APGField::InitializeField(uint8 teamid)
 
 	GetWorld()->GetTimerManager().SetTimer(AttackAISpawnTimeHandler,
 		this, &ThisClass::OnAttackAISpawn, RandSpawnTime, true);
-	/*OnAttackAISpawn();*/
-
+	
 	
 }
 
@@ -99,6 +104,12 @@ void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 					
 					playerCharacter->GetPlayerHudWidget()->SetupFieldGauge(TeamId, MaxFieldGague, currentFieldGauge);
 				}
+			}
+
+			if (!bIsVisibled)
+			{
+				StartProtectAISpawn();
+				bIsVisibled = true;
 			}
 
 		}
@@ -446,8 +457,16 @@ void APGField::CheckFieldVisible()
 	}
 	else
 	{
+
+		if (PlayerCharacters.Num() > 0)
+		{
+			SLOG(TEXT("PlayerAlready IN field"));
+			return;
+		}
+			
 		AllAIReturnObjectPool();
-		//NotVisibleAllSetupTimer();
+		
+
 		CheckAttackPawnIn();
 		bIsVisibled = false;
 

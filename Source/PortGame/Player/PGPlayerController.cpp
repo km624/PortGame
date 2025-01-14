@@ -17,6 +17,8 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "GameFramework/GameUserSettings.h"
+
 APGPlayerController::APGPlayerController()
 {
 	
@@ -33,10 +35,27 @@ void APGPlayerController::BeginPlay()
 
 }
 
+void APGPlayerController::PlayerTick(float DeltaTime)
+{
+	Super::PlayerTick(DeltaTime);
+
+}
+
 void APGPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 	
+	UGameUserSettings* UserSettings = GEngine->GetGameUserSettings();
+	if (UserSettings)
+	{
+		int32 ScreenWidth = UserSettings->GetScreenResolution().X;
+		int32 ScreenHeight = UserSettings->GetScreenResolution().Y;
+
+		FString ResolutionText = FString::Printf(TEXT("User Resolution: %d x %d"),
+			ScreenWidth,
+			ScreenHeight);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, ResolutionText);
+	}
 	
 	APGPlayerCharacter* currentplayer = Cast<APGPlayerCharacter>(aPawn);
 	//PlayerCharacters.Add(currentplayer);

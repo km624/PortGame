@@ -21,6 +21,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void PlayerTick(float DeltaTime)override;
+
 	virtual void OnPossess(APawn* aPawn) override;
 
 

@@ -22,4 +22,6 @@ public:
 	void GameClear();
 
 	void GameOver();
+
+
 };

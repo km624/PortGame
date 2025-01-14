@@ -22,6 +22,8 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
+
 	virtual void SetupCharacterData(class UBaseCharacterDataAsset* characterdata) override;
 
 	virtual void EnableCharacter() override;

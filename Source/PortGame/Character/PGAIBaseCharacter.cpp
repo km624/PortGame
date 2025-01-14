@@ -26,6 +26,14 @@ void APGAIBaseCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
+void APGAIBaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorld()->GetTimerManager().ClearTimer(ShotCompeteTimerHandle);
+	
+}
+
 void APGAIBaseCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);

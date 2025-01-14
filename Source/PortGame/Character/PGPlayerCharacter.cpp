@@ -210,6 +210,14 @@ void APGPlayerCharacter::BeginPlay()
 
 }
 
+void APGPlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(DashCooltimeTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(EvadeTimerHandle);
+}
+
 //인풋 매핑 - 액션에 함수 바인딩
 void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {

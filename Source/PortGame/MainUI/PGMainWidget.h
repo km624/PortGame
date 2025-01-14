@@ -25,6 +25,8 @@ public:
 protected:
 	UFUNCTION()
 	void SelectButtonClicked();
+	UFUNCTION()
+	void QuitGame();
 	
 
 protected:
@@ -32,5 +34,8 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton>Button_SelectCharacter;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UButton>Button_EXIT;
 	
 };

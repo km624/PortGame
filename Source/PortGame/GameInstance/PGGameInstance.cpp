@@ -21,7 +21,7 @@ UPGGameInstance::UPGGameInstance()
 			const FPGCharacterStat* rowInfo = characterstatDataTable->FindRow<FPGCharacterStat>(rowName, contextString);
 			AllStat.Add(rowName, *rowInfo);
 		}
-
+		
 	}
 }
 
