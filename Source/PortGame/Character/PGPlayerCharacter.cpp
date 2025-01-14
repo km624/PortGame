@@ -182,7 +182,7 @@ APGPlayerCharacter::APGPlayerCharacter()
 
 	Tags.Add(TAG_PLAYER);
 
-
+	bIsGameStated = false;
 }
 
 void APGPlayerCharacter::PostInitializeComponents()
@@ -411,7 +411,8 @@ void APGPlayerCharacter::SetNoneMove()
 
 void APGPlayerCharacter::Look(const FInputActionValue& Value)
 {
-
+	if (bIsGameStated)
+		return;
 
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
@@ -425,7 +426,7 @@ void APGPlayerCharacter::Look(const FInputActionValue& Value)
 
 void APGPlayerCharacter::Attack()
 {
-	if (bIsSlow || bIsDash || !bIsMiniMap)return;
+	if (bIsSlow || bIsDash || !bIsMiniMap ||bIsGameStated)return;
 
 	if (bIsAim)
 	{
@@ -465,7 +466,7 @@ void APGPlayerCharacter::ReleasedAttack()
 
 void APGPlayerCharacter::PressAim()
 {
-	if (bIsSlow || bIsDash || bIsUltiSkill || !bIsMiniMap)return;
+	if (bIsSlow || bIsDash || bIsUltiSkill || !bIsMiniMap || bIsGameStated)return;
 
 	bIsAim = true;
 	OnbIsAim.Broadcast(bIsAim);
@@ -918,7 +919,7 @@ void APGPlayerCharacter::DeletePlayerTargetPawn(APawn* enemy)
 
 void APGPlayerCharacter::InputSkill()
 {
-	if (bIsSlow || bIsDash)return;
+	if (bIsSlow || bIsDash|| bIsGameStated)return;
 
 	SkillToComponent();
 
@@ -948,6 +949,7 @@ void APGPlayerCharacter::StopDefenceNikke()
 
 void APGPlayerCharacter::OnUltimateSkill()
 {
+	if (bIsGameStated)return;
 	UltimateSkillToComponent();
 }
 
@@ -1179,10 +1181,13 @@ void APGPlayerCharacter::PlayLevelUpEffet(int32 currentlevel)
 
 void APGPlayerCharacter::UpdateGameState(bool bIsclear)
 {
+	bIsGameStated = true;
 	if (PGHudWidget)
 	{
 
 		PGHudWidget->UpdateGameState(bIsclear);
+
+
 
 		if (!bIsclear)
 		{

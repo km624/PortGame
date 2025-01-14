@@ -31,6 +31,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	//캐릭터 데이터를 장착
 public:
 	virtual void EnableCharacter();

@@ -157,6 +157,11 @@ void UPGStatComponent::HitGaugeZeroEffect()
 	ResetHitGauge();
 }
 
+void UPGStatComponent::ResetTimeHandle()
+{
+	GetWorld()->GetTimerManager().ClearTimer(ResetHitGaugeTimer);
+}
+
 void UPGStatComponent::Damaged(float Damage, AActor* DamageActor)
 {
 

@@ -139,6 +139,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Skill")
 	float FirstSkillSlowTime = 3.0f;
 
+public:
+	void ResetTimeHandle();
+
+
 		
 
 };

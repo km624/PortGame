@@ -247,7 +247,7 @@ void UPGAttackComponent::AttackHitCheck()
 	
 	//bool parryCheck = false;
 
-	float stoptime = 0.2f;
+	float stoptime = 0.5f;
 	if (HitDetected)
 	{
 		IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
@@ -313,7 +313,7 @@ void UPGAttackComponent::AttackHitCheck()
 			}
 			else
 			{
-				AttackHitStop(stoptime / 0.75f, AttackCameraShakeClass);
+				AttackHitStop(stoptime, AttackCameraShakeClass);
 			}
 			
 		}
@@ -352,7 +352,7 @@ void UPGAttackComponent::AttackHitStop(float time, TSubclassOf<class UCameraShak
 
 	IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
 	playerCharacter->SetbIsSlowMotion(true);
-
+	
 	GetOwner()->CustomTimeDilation = 0.01f;
 	bIsGodMode = true;
 
@@ -456,6 +456,12 @@ void UPGAttackComponent::FirstUltiSkillEffect()
 	IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
 	if (playerCharacter)
 		playerCharacter->OnSlowOVerlapToNPC(FirstSkillSlowTime);
+}
+
+void UPGAttackComponent::ResetTimeHandle()
+{
+	GetWorld()->GetTimerManager().ClearTimer(HitStoptimerHandle);
+	
 }
 
 

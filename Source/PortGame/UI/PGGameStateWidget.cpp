@@ -30,13 +30,6 @@ void UPGGameStateWidget::UpdateGameState(bool bIsclear)
 
 void UPGGameStateWidget::GoMainScreen()
 {
-	//for (TActorIterator<AActor> ActorItr(GetWorld()); ActorItr; ++ActorItr)
-	//{
-	//	AActor* Actor = *ActorItr;
-	//	// 여기서 Actor에 대한 작업을 수행합니다.
-	//	//SLOG(TEXT("Found Actor: %s"), *Actor->GetName());
-	//	GetWorld()->GetTimerManager().ClearAllTimersForObject(Actor);
-	//}
-	//UGameplayStatics::SetGlobalTimeDilation(GetWorld(),0.0f);
+	
 	UGameplayStatics::OpenLevel(this, TEXT("MainMap"));
 }

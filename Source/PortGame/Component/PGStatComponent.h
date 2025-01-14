@@ -114,6 +114,10 @@ protected:
 	void ResetHitGauge();
 
 	void HitGaugeZeroEffect();
+
+
+public:
+	void ResetTimeHandle();
 	
 
 	

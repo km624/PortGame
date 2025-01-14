@@ -401,6 +401,9 @@ protected:
 public:
 	void UpdateGameState(bool bIsclear);
 
+protected:
+	uint8 bIsGameStated : 1;
+
 	//TEST
 protected:
 	UFUNCTION()

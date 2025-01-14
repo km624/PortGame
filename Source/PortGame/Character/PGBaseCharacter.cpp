@@ -129,6 +129,13 @@ void APGBaseCharacter::BeginPlay()
 	
 }
 
+void APGBaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	AttackComponent->ResetTimeHandle();
+	StatComponent->ResetTimeHandle();
+}
+
 void APGBaseCharacter::EnableCharacter()
 {
 	GetCharacterMovement()->SetActive(true);

@@ -261,6 +261,9 @@ void APGPlayerController::GameClear()
 		SLOG(TEXT("GameClear controller"));*/
 
 	bShowMouseCursor = true;
+
+	FInputModeGameAndUI gameandui;
+	SetInputMode(gameandui);
 	for (APGPlayerCharacter* playerCharacter : PlayerCharacters)
 	{
 		if (!playerCharacter->GetbIsDead())
@@ -274,6 +277,9 @@ void APGPlayerController::GameClear()
 void APGPlayerController::GameOver()
 {
 	bShowMouseCursor = true;
+
+	FInputModeGameAndUI gameandui;
+	SetInputMode(gameandui);
 	for (APGPlayerCharacter* playerCharacter : PlayerCharacters)
 	{
 		if(!playerCharacter->GetbIsDead())

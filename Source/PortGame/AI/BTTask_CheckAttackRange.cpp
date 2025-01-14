@@ -11,6 +11,7 @@
 
 UBTTask_CheckAttackRange::UBTTask_CheckAttackRange()
 {
+	AddAttackRange = 1.0f;
 }
 
 EBTNodeResult::Type UBTTask_CheckAttackRange::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -47,7 +48,7 @@ EBTNodeResult::Type UBTTask_CheckAttackRange::ExecuteTask(UBehaviorTreeComponent
 
 	float AttackRangeWithRadius = AIPawn->GetAIAttackRange(DistanceToTarget, Target);
 	bool canAttack;
-	canAttack = (DistanceToTarget <= AttackRangeWithRadius);
+	canAttack = (DistanceToTarget <= (AttackRangeWithRadius* AddAttackRange));
 	
 	OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_INATTACKRANGE, canAttack);
 
