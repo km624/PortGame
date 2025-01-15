@@ -21,6 +21,7 @@ public:
 	void SetUpWeapon(const TArray<class UWeaponData*>& weapondatas);
 
 protected:
+	UPROPERTY()
 	TSubclassOf<class UPGWeaponButtonWidget> WeaponButtonClass;
 
 protected:

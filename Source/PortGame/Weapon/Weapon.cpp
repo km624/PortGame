@@ -109,6 +109,7 @@ void AWeapon::ComboBegin()
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OwnerCharacter);
 	if (playerCharacter)
 	{
+		playerCharacter->AttackTimeline.PlayFromStart();
 		playerCharacter->SetbIsAttackRotation(true);
 	}
 	if (OwnerCharacter->GetMesh()->bPauseAnims)
@@ -128,13 +129,6 @@ void AWeapon::ComboBegin()
 void AWeapon::ComboCheck()
 {
 
-	/*if (OwnerCharacter->GetMesh()->bPauseAnims)
-	{
-		SLOG(TEXT("PauseAnim!!"));
-		HasNextComboCommand = false;
-		CurrentCombo = 0;
-		return;
-	}*/
 
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	if (!IsValid(AnimInstance))return;
@@ -219,10 +213,13 @@ void AWeapon::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 	if (playerCharacter)
 	{
 		playerCharacter->SetbIsAttackRotation(false);
+
+		playerCharacter->AttackTimeline.Reverse();
 	}
 	
-	//12강 AI  - AI가 끝날때를 파악할 수 있게 추가
 	NotifyComboActionEnd();
+
+
 }
 
 void AWeapon::NotifyComboActionEnd()

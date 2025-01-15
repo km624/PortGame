@@ -43,7 +43,7 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UProgressBar> ProgressBar_Character;
-
+	UPROPERTY()
 	TObjectPtr<class UTexture2D> CharacerImage;
 	FSlateBrush BackgroundBrush;
 	FSlateBrush FillBrush;

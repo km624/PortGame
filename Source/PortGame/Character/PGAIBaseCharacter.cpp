@@ -82,22 +82,15 @@ float APGAIBaseCharacter::GetAIAttackRange(float targetDistance, APawn* pawn)
 		{
 			if (gundata->GunStat.traceDistance * 0.8f >= targetDistance && targetDistance > 200.0f)
 			{
-				/*bIsShoot = true;
-				bIsAim = true;*/
+			
 				
 				return gundata->GunStat.traceDistance * 0.8f;
 			}
-			//else if(gundata->GunStat.traceDistance * 0.8f < targetDistance)
-			//{
-			//	/*bIsShoot = false;
-			//	bIsAim = false;*/
-			//}
+		
 			
 		}
 	}
 
-	/*bIsShoot = false;
-	bIsAim = false;*/
 	return 200.0f;
 }
 
@@ -189,7 +182,7 @@ void APGAIBaseCharacter::NotVisibleAttack(APawn* Target)
 		}
 
 		Target->TakeDamage(AttackDamage, DamageEvent, GetController(), this);
-		//SLOG(TEXT("NOTVISIBLE ATTACK"));
+	
 	}
 	
 }
@@ -200,13 +193,6 @@ void APGAIBaseCharacter::SetDead(AActor* DamageCauser)
 {
 	Super::SetDead(DamageCauser);
 
-	/*APGAIController* aiController = Cast<APGAIController>(GetController());
-	if (aiController)
-	{
-		SLOG(TEXT("AI DEAD"));
-		if (teamid!=0)
-			aiController->TOMyFieldDead(teamid);
-		aiController->AIIsDead();
-	}*/
+
 }
 

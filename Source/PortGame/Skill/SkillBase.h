@@ -39,6 +39,7 @@ protected:
 	virtual void EndSkill();
 
 protected:
+	UPROPERTY()
 	TObjectPtr<class APGBaseCharacter> ownercharacter;
 
 protected:

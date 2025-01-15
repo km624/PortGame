@@ -32,12 +32,13 @@ public:
 	void SetUpSelectWidget();
 
 protected:
+	UPROPERTY()
 	TSubclassOf<class UPGMainWidget> MainWidgetClass;
-
+	UPROPERTY()
 	TObjectPtr<class UPGMainWidget> MainWidget;
-
+	UPROPERTY()
 	TSubclassOf<class UPGSelectWidget> SelectWidgetClass;
-
+	UPROPERTY()
 	TObjectPtr<class UPGSelectWidget> SelectWidget;
 
 public:

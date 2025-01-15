@@ -59,6 +59,8 @@ void UPGMiniMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
         UpdateIconPosition();
     }
 
+   
+    UpdateNPCIconPosition();
 
    
 }
@@ -677,13 +679,9 @@ int32 UPGMiniMapWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
         {
             
            
-            /*FVector2D Start = AllottedGeometry.LocalToAbsolute(MiniMapPathPoints[i]);
-            FVector2D End = AllottedGeometry.LocalToAbsolute(MiniMapPathPoints[i + 1]);*/
+            
             FVector2D Start = MiniMapPathPoints[i];
             FVector2D End =MiniMapPathPoints[i + 1];
-
-            /*FVector2D ConvertStart = FVector2D(MiniMapYMaxStart.X, MiniMapYMax- Start.Y );
-            FVector2D ConvertEnd = FVector2D(End.X, End.Y - MiniMapYMax);*/
             if (i == 0)
             {
                 //SLOG(TEXT("Start Vector : %f   , %f"), Start.X, Start.Y);

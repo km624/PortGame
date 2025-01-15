@@ -177,6 +177,19 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		MapAction = MAPC.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> CCurve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Weapon/AttackCameraCurve.AttackCameraCurve'"));
+	if (CCurve.Object)
+	{
+		AttackCurve = CCurve.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> DCurve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Weapon/DashCurve.DashCurve'"));
+	if (DCurve.Object)
+	{
+		DashCurve = DCurve.Object;
+	}
+
 	
 	
 
@@ -202,12 +215,9 @@ void APGPlayerCharacter::BeginPlay()
 
 	GetCapsuleComponent()->OnComponentHit.AddDynamic(this, &ThisClass::OnComponentHit);
 
-	FOnTimelineFloat TimelineProgress;
-	TimelineProgress.BindUFunction(this, FName("AimUpdate"));
-	AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
-
 	FGenericTeamId currentteam = GetGenericTeamId();
 
+	AllTimelineSetting();
 }
 
 void APGPlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -280,6 +290,8 @@ void APGPlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	AimTimeline.TickTimeline(DeltaTime);
+	AttackTimeline.TickTimeline(DeltaTime);
+	DashTimeline.TickTimeline(DeltaTime);
 	if (TargetingComponent->GetbIsTargetLock())
 	{
 		TargetingComponent->TargetLockOn(DeltaTime);
@@ -368,7 +380,6 @@ void APGPlayerCharacter::SetCharacterInputData(EControlData DataName)
 
 
 }
-
 
 void APGPlayerCharacter::Move(const FInputActionValue& Value)
 {
@@ -555,25 +566,6 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 			}
 		}
 
-		// 수류탄에 맞았을 시
-		/*if (DamageCauser && DamageCauser->ActorHasTag(TAG_GRENADE))
-		{
-			FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
-			Direction.Normalize();
-			HitImpulseVector = Direction * 750.0f + (FVector(0, 0, 1) * 100.0f);
-
-			if (EventInstigator && EventInstigator->GetPawn() && StatComponent)
-			{
-				if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
-				{
-					StatComponent->Damaged(DamageAmount, attackPawn->GetGenericTeamId());
-				}
-				else
-				{
-					StatComponent->Damaged(DamageAmount * 0.3f, attackPawn->GetGenericTeamId());
-				}
-			}
-		}*/
 	}
 
 	return DamageAmount;
@@ -706,7 +698,7 @@ void APGPlayerCharacter::OnDash()
 	AttackComponent->SetbIsGodMode(true);
 	OriginalMaxWalkSpeed = GetCharacterMovement()->GetMaxSpeed();
 	OriginalMaxAcceleration = GetCharacterMovement()->GetMaxAcceleration();
-
+	
 	GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed * 2.0f;
 	GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration * 3.0f;
 
@@ -717,14 +709,20 @@ void APGPlayerCharacter::OnDash()
 
 	//GetController()->SetIgnoreMoveInput(true);
 
+	CustomTimeDilation = 1.0f;
+
+	DashTimeline.PlayFromStart();
+
 	GetWorld()->GetTimerManager().SetTimer(
 		DashTimerHandle,
 		[this]() {
 
 			GetCharacterMovement()->MaxWalkSpeed = OriginalMaxWalkSpeed;
 			GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration;
-			//GetController()->SetIgnoreMoveInput(false);
+			
 			GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
+
+			DashTimeline.Reverse();
 
 			bIsDash = false;
 			AttackComponent->SetbIsGodMode(false);
@@ -767,7 +765,7 @@ void APGPlayerCharacter::OnAvoidEffect()
 		[this]() {
 
 			OnEvadePostPorcess(false);
-			CustomTimeDilation = 1.3f;
+			CustomTimeDilation = 1.0f;
 			GetWorld()->GetTimerManager().ClearTimer(EvadeTimerHandle);
 
 		}, EvadeTime, false
@@ -980,14 +978,14 @@ void APGPlayerCharacter::ChangeViewTarget(bool bstart)
 
 void APGPlayerCharacter::CreateHudWidget()
 {
-	//SLOG(TEXT("PLayerCharacter : CreateWidget"));
+	
 	PGHudWidget = CreateWidget<UPGHudWidget>(GetWorld(), PGHudWidgetClass);
 	if (PGHudWidget)
 	{
 
 		PGHudWidget->SetOwingCharcter(this);
 		SetUpHudWidget(PGHudWidget);
-		//SLOG(TEXT("CreateWidget : %s"), *GetActorNameOrLabel());
+		
 
 	}
 }
@@ -997,7 +995,7 @@ void APGPlayerCharacter::HudWidgetAddviewport()
 	if (PGHudWidget)
 		PGHudWidget->AddToViewport();
 
-	//SLOG(TEXT("%s: Addtoviewport"), *GetActorNameOrLabel());
+	
 }
 
 void APGPlayerCharacter::RemoveHudWidget()
@@ -1005,7 +1003,7 @@ void APGPlayerCharacter::RemoveHudWidget()
 	if (PGHudWidget)
 		PGHudWidget->RemoveFromParent();
 	
-	//SLOG(TEXT("%s: REmoveviewport"), *GetActorNameOrLabel());
+	
 }
 
 
@@ -1204,24 +1202,86 @@ void APGPlayerCharacter::OnComponentHit(UPrimitiveComponent* HitComponent, AActo
 		if (OtherCharacter)
 		{
 
-			// 밀리는 방향 계산
+			
 			FVector Direction = (OtherActor->GetActorLocation() - GetActorLocation()).GetSafeNormal();
 			Direction.Z = 0.0f;
-			// 밀리는 힘의 크기
-			float PushStrength = 500.0f; // 조절 가능
+		
+			float PushStrength = 500.0f; 
 
-			// 물리적 힘을 적용
-			//OtherCharacter->LaunchCharacter(Direction * PushStrength, true, true);
+			
 			OtherCharacter->GetCharacterMovement()->AddImpulse(Direction * PushStrength, true);
-			//OtherCharacter->LaunchCharacter(Direction * PushStrength, true, false);
-
 
 		}
 
 
-
 	}
 }
+
+void APGPlayerCharacter::AttackSlowStart()
+{
+	//SetbIsSlowMotion(true);
+	CustomTimeDilation = 0.8f;
+}
+
+void APGPlayerCharacter::AttackSlowEnd()
+{
+	//SetbIsSlowMotion(false);
+	CustomTimeDilation = 1.0f;
+}
+
+void APGPlayerCharacter::AllTimelineSetting()
+{
+	//에임 커브 세팅
+	FOnTimelineFloat TimelineProgress;
+	TimelineProgress.BindUFunction(this, FName("AimUpdate"));
+	AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
+
+
+	//공격 커브 세팅
+	FOnTimelineFloat AttackTimelineProgress;
+	AttackTimelineProgress.BindUFunction(this, FName("AttackCameraMove"));
+	AttackTimeline.AddInterpFloat(AttackCurve, AttackTimelineProgress);
+
+	//대쉬 커브 세팅
+	FOnTimelineFloat DashTimelineProgress;
+	DashTimelineProgress.BindUFunction(this, FName("DashCameraMove"));
+	DashTimeline.AddInterpFloat(DashCurve, DashTimelineProgress);
+
+}
+
+void APGPlayerCharacter::AttackCameraMove(float dt)
+{
+	
+	float AimY = FMath::Lerp(0, 50.0f, dt);
+	float AimZ = FMath::Lerp(0, -50.0f, dt);
+
+	float Fov  = FMath::Lerp(90.0f, 70.0f, dt);
+
+	Camera->SetFieldOfView(Fov);
+
+	Camera->SetRelativeLocation(FVector(0.0f, AimY, AimZ));
+}
+
+void APGPlayerCharacter::DashCameraMove(float dt)
+{
+
+	if (AttackTimeline.IsPlaying()||AimTimeline.IsPlaying())
+	{
+		AttackTimeline.Stop();
+		AimTimeline.Stop();
+	}
+
+
+	float AimX = FMath::Lerp(0.0f, -100.0f, dt);
+	float AimY = FMath::Lerp(0, 25.0f, dt);
+	
+	
+	Camera->SetRelativeLocation(FVector(AimX, AimY, 0.0f));
+}
+
+
+
+
 
 
 

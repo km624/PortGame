@@ -255,10 +255,7 @@ void APGPlayerController::SavesaveGameFile()
 
 void APGPlayerController::GameClear()
 {
-	/*APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(GetPawn());
-	if (playerCharacter)
-	{
-		SLOG(TEXT("GameClear controller"));*/
+	
 
 	bShowMouseCursor = true;
 

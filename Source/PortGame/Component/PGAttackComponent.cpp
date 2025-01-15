@@ -351,7 +351,7 @@ void UPGAttackComponent::AttackHitStop(float time, TSubclassOf<class UCameraShak
 	if (HitStoptimerHandle.IsValid())return;
 
 	IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
-	playerCharacter->SetbIsSlowMotion(true);
+	//playerCharacter->SetbIsSlowMotion(true);
 	
 	GetOwner()->CustomTimeDilation = 0.01f;
 	bIsGodMode = true;
@@ -359,7 +359,7 @@ void UPGAttackComponent::AttackHitStop(float time, TSubclassOf<class UCameraShak
 	GetWorld()->GetTimerManager().SetTimer(
 		HitStoptimerHandle,
 		[this, playerCharacter]() {
-			playerCharacter->SetbIsSlowMotion(false);
+			//playerCharacter->SetbIsSlowMotion(false);
 			playerCharacter->OnParryPostPorcess(false);
 			bIsGodMode = false;
 			GetOwner()->CustomTimeDilation = 1.0f;

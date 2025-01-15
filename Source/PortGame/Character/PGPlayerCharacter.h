@@ -233,7 +233,7 @@ protected:
 	float DashTime=0.25f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
-	float DashColltime = 0.8f;
+	float DashColltime = 1.0f;
 
 	FVector DashVector;
 
@@ -249,12 +249,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
 	uint8 bIsEvade : 1;
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
-	TObjectPtr<class UAnimMontage> LeftEvadeMontage;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
-	TObjectPtr<class UAnimMontage> RightEvadeMontage;*/
-
 	static const FString LeftEvadeMontage;
 	static const FString RightEvadeMontage;
 
@@ -268,9 +262,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
 	float EvadeTime = 0.5f;
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
-	TObjectPtr<class UAnimMontage> DashMontage;*/
 	
 	static const FString DashMontage;
 
@@ -345,8 +336,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = HUD)
 	TObjectPtr<class UPGHudWidget> PGHudWidget;
 	
-	
-
 
 	//캐릭터 교체 
 protected:
@@ -388,8 +377,6 @@ protected:
 
 	virtual void PlayerAddEXP() override;
 
-	//void PlayerLevelUp(int32 currentlevel);
-
 	void PlayLevelUpEffet(int32 currentlevel);
 
 	//적 처치 카운트
@@ -398,18 +385,49 @@ protected:
 
 	FOnKOCountChangeDelegate FKoCountChanged;
 
+	//게임 승리 , 패배 표시
 public:
 	void UpdateGameState(bool bIsclear);
 
 protected:
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	uint8 bIsGameStated : 1;
 
-	//TEST
+	// 액터를 해집고 가기 위해 ( 임시)
 protected:
 	UFUNCTION()
 	void OnComponentHit(UPrimitiveComponent* HitComponent, AActor*OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 
+	//공격 타격감을 위한 슬로우 ( npc의 패리 스테이트와 공통)
+protected:
+	virtual void AttackSlowStart() override;
+
+	virtual void AttackSlowEnd() override;
+
 	
+	//공격 , 대쉬 등 공통 카메라 무빙
+
+protected:
+	void AllTimelineSetting();
+
+	UFUNCTION()
+	void AttackCameraMove(float dt);
+
+	UFUNCTION()
+	void DashCameraMove(float dt);
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	TObjectPtr<class UCurveFloat> AttackCurve;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	TObjectPtr<class UCurveFloat> DashCurve;
+public:
+	//공격 카메라 타임라인
+	FTimeline AttackTimeline;
+
+protected:
+	//대쉬 카메라 타임라인
+	FTimeline DashTimeline;
 
 };

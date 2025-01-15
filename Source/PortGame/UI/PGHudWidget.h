@@ -23,6 +23,7 @@ public:
 	void SetOwingCharcter(class AActor* owningCharacter);
 
 protected:
+	UPROPERTY()
 	TObjectPtr<AActor> OwningCharacter;
 
 public:

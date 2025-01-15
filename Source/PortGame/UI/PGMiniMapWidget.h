@@ -104,6 +104,7 @@ protected:
 	UPROPERTY()
 	TArray<TObjectPtr<AActor>> Players;
 
+	UPROPERTY()
 	TArray<TObjectPtr<class APGAIController>> PlayersControllers;
 
 	int8 MyNum;

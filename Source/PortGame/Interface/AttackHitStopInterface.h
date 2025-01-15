@@ -28,6 +28,10 @@ public:
 	
 	virtual void OnSlowOVerlapToNPC(float time) = 0;
 
+	virtual void AttackSlowStart() = 0;
+	
+	virtual void AttackSlowEnd() = 0;
+
 	
 
 };

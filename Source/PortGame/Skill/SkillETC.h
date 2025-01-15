@@ -35,7 +35,7 @@ protected:
 
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ETC)
 	TObjectPtr<class UAnimMontage> SkillETCMontage;*/
-
+	
 	FOnMontageEnded EndDelegate;
 
 	const static FString SkillMontage;

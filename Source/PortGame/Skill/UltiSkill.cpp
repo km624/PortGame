@@ -47,11 +47,12 @@ void UUltiSkill::OnSkill()
 {
 	bIsSkill = true;
 	OnbIsSkill.Broadcast(true);
-	
+	StartCinematic();
 	GetWorld()->GetTimerManager().SetTimer(
 		FirstUltiSkillTimerHandle,
 		[this]() {
-			StartCinematic();
+			//StartCinematic();
+			OnBIsCutscened.Broadcast(bIsCutscene);
 		}, UltiDealy, false
 	);
 
@@ -93,7 +94,7 @@ void UUltiSkill::EndSkill()
 void UUltiSkill::StartCinematic()
 {
 	bIsCutscene = true;
-	OnBIsCutscened.Broadcast(bIsCutscene);
+	//OnBIsCutscened.Broadcast(bIsCutscene);
 	// 레벨 시퀀서 액터 생성
 	LevelSequenceActor = GetWorld()->SpawnActor<ALevelSequenceActor>(LevelSequenceActorClass,ownercharacter->GetActorLocation(),
 		ownercharacter->GetActorRotation());

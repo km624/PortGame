@@ -85,6 +85,7 @@ public:
 	FORCEINLINE APawn* GetTargetPawn() { return TargetPawn; }
 
 protected:
+	UPROPERTY()
 	TObjectPtr<APawn> TargetPawn;
 
 	//죽었을때 오버라이드

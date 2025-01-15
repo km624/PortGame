@@ -71,7 +71,7 @@ protected:
 	FTimerHandle FirstUltiSkillTimerHandle;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float UltiDealy = 1.0f;
+	float UltiDealy = 1.5f;
 
 	static const FString UltiSkillMontage;
 };
