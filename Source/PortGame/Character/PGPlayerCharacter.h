@@ -422,7 +422,7 @@ public:
 	
 	virtual void SetPlayerProtectPawn(APawn* pawn);
 
-	virtual int32 CheckContainPawn(APawn* pawn);
+	virtual float CalculateOffsetYPawn(APawn* pawn, float offsetY);
 		
 	virtual void DeletePlayerProtectPawn(APawn* pawn);
 

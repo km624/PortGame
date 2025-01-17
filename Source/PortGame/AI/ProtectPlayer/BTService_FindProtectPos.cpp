@@ -62,13 +62,13 @@ void UBTService_FindProtectPos::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 		return;
 
 	}
-	int32 num = playerCharacter->CheckContainPawn(ControllingPawn);
-	if (num == -1)
+	float CalOffsetY = playerCharacter->CalculateOffsetYPawn(ControllingPawn, OffsetY);
+	if (FMath::IsNaN(CalOffsetY))
 	{
 		return;
 	}
 
-	float CalOffsetY = (num - 2) * OffsetY;  // -120, -60, 0, 60, 120
+	//float CalOffsetY = (num - 2) * OffsetY;  // -120, -60, 0, 60, 120
 	
 	FVector Offset = TargetForwardLocation * -OffsetX + TArgetRightLoacation * CalOffsetY;
 

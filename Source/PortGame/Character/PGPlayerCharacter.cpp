@@ -34,6 +34,8 @@
 #include "UI/PGAllCharactersWidget.h"
 #include "UI/PGCharcterWidget.h"
 
+
+
 const FString APGPlayerCharacter::LeftEvadeMontage = TEXT("LeftEvadeMontage");
 const FString APGPlayerCharacter::RightEvadeMontage = TEXT("RightEvadeMontage");
 const FString APGPlayerCharacter::DashMontage = TEXT("DashMontage");
@@ -216,6 +218,8 @@ void APGPlayerCharacter::BeginPlay()
 	FGenericTeamId currentteam = GetGenericTeamId();
 
 	AllTimelineSetting();
+
+	
 }
 
 void APGPlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -1229,8 +1233,8 @@ void APGPlayerCharacter::AttackCameraMove(float dt)
 		DashTimeline.Stop();
 	}
 	
-	float AimX = FMath::Lerp(0.0f, 100.0f, dt);
-	float AimY = FMath::Lerp(0, 50.0f, dt);
+	float AimX = FMath::Lerp(0.0f, 120.0f, dt);
+	float AimY = FMath::Lerp(0, 75.0f, dt);
 	float AimZ = FMath::Lerp(0, -50.0f, dt);
 
 
@@ -1277,14 +1281,30 @@ void APGPlayerCharacter::SetPlayerProtectPawn(APawn* pawn)
 
 }
 
-int32 APGPlayerCharacter::CheckContainPawn(APawn* pawn)
+float APGPlayerCharacter::CalculateOffsetYPawn(APawn* pawn,float offsetY)
 {
 	if (!ProtectMePawns.Contains(pawn))
 	{
-		return -1;
+		return NAN;
 	}
-	int32 num = ProtectMePawns.IndexOfByKey(pawn);
-	return num;
+	int32 pawnnum = ProtectMePawns.IndexOfByKey(pawn);
+	
+	int32 currentCount = ProtectMePawns.Num();
+
+	float CalOffsetY = 0.0f;
+	if (currentCount % 2 == 0)
+	{
+		CalOffsetY = -offsetY* (currentCount * 0.5) + (offsetY * 0.5) + (pawnnum * offsetY);
+	}
+	else
+	{
+		CalOffsetY = (pawnnum - ((currentCount-1)/2)) * offsetY;
+	}
+	
+
+
+
+	return CalOffsetY;
 
 }
 
