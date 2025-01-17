@@ -77,6 +77,7 @@ APGNpcCharacter* UObjectPoolManager::GetPooledObject(const FCharacterSpawnParams
 	if (AiCharacter)
 	{
 		AiCharacter->SetupCharacterDataAsset(SpawnParams.CharacterData);
+		AiCharacter->SetupCharacterData(SpawnParams.CharacterData);
 		AiCharacter->SetteamId(SpawnParams.TeamId);
 
 			

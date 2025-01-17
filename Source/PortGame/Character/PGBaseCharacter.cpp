@@ -230,6 +230,7 @@ void APGBaseCharacter::ComboCheckStartToComp()
 
 void APGBaseCharacter::ComboCheckEndToComp()
 {
+	
 	AttackComponent->CombocheckEnd();
 }
 
@@ -449,7 +450,7 @@ void APGBaseCharacter::UltimateSkillToComponent()
 {
 	if (StatComponent->GetCurrentUltiSkillGauge() >= StatComponent->GetMaxUltiSkillGauge())
 	{
-
+	
 		AttackComponent->UltiSkillAttack();
 		if (CharacterTypeEffect)
 		{

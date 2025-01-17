@@ -175,9 +175,19 @@ void UPGAttackComponent::ComboCheckStart()
 
 void UPGAttackComponent::CombocheckEnd()
 {
-	OnNextCombo.Broadcast(HasNextComboCommand);
 	
-	//SLOG(TEXT("ComboCheckEnd"));
+	if (!Skill->GetbIsSkill())
+	{
+		
+		OnNextCombo.Broadcast(HasNextComboCommand);
+	}
+	else
+	{
+		SLOG(TEXT("isSkill going not next attack"));
+	}
+		
+	
+	
 	HasNextComboCommand = false;
 	ComboTiming = false;
 	

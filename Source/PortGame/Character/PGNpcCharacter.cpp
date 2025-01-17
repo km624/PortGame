@@ -27,6 +27,8 @@ APGNpcCharacter::APGNpcCharacter()
 
 	Tags.Add(TAG_AI);
 
+	GetCapsuleComponent()->InitCapsuleSize(10.0f, 96.0f);
+	
 	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 0.0f, 0.0f);
@@ -183,10 +185,7 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 			{
 				StatComponent->Damaged(DamageAmount, EventInstigator->GetPawn());
 			}
-			else
-			{
-				StatComponent->Damaged(DamageAmount * 0.3f, EventInstigator->GetPawn());
-			}
+			
 		}
 	}
 	

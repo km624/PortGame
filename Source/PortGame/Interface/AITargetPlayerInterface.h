@@ -22,9 +22,5 @@ class PORTGAME_API IAITargetPlayerInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	virtual bool CanPlayerTarget(APawn* enemy) = 0;
-
-	virtual void SetPlayerTargetPawn(APawn* enemy) = 0;
-
-	virtual void DeletePlayerTargetPawn(APawn* enemy) = 0;
+	
 };

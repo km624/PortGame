@@ -260,6 +260,7 @@ void APGPlayerController::GameClear()
 	bShowMouseCursor = true;
 
 	FInputModeGameAndUI gameandui;
+	SetIgnoreLookInput(true);
 	SetInputMode(gameandui);
 	for (APGPlayerCharacter* playerCharacter : PlayerCharacters)
 	{
@@ -276,6 +277,7 @@ void APGPlayerController::GameOver()
 	bShowMouseCursor = true;
 
 	FInputModeGameAndUI gameandui;
+	SetIgnoreLookInput(true);
 	SetInputMode(gameandui);
 	for (APGPlayerCharacter* playerCharacter : PlayerCharacters)
 	{

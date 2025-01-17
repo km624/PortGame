@@ -24,5 +24,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float AddAttackRange;
+
+	
 	
 };

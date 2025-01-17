@@ -9,6 +9,7 @@
 #include "PortGame/PortGame.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 APGAIBaseCharacter::APGAIBaseCharacter()
 {
@@ -24,6 +25,7 @@ APGAIBaseCharacter::APGAIBaseCharacter()
 void APGAIBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	CharacterOriginSpeed = GetCharacterMovement()->MaxWalkSpeed;
 }
 
 void APGAIBaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -187,12 +189,26 @@ void APGAIBaseCharacter::NotVisibleAttack(APawn* Target)
 	
 }
 
+void APGAIBaseCharacter::ProtectOutRange(bool bisout)
+{
+	if (bisout)
+	{
+		
+		GetCharacterMovement()->MaxWalkSpeed = 800.0f;
+		SLOG(TEXT("characterspeed :  %f"), GetCharacterMovement()->MaxWalkSpeed);
+	}
+	else
+	{
+		SLOG(TEXT("In"));
+		GetCharacterMovement()->MaxWalkSpeed =CharacterOriginSpeed;
+	}
+}
+
 
 
 void APGAIBaseCharacter::SetDead(AActor* DamageCauser)
 {
 	Super::SetDead(DamageCauser);
-
 
 }
 

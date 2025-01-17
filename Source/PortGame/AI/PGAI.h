@@ -10,4 +10,7 @@
 #define BBKEY_NEXTATTACKFIELD	TEXT("NextAttackField")
 #define BBKEY_FORCEMOVEVECTOR	TEXT("ForceMoveVector")
 #define BBKEY_VISIBLE	TEXT("Visible")
+#define BBKEY_PROTECTTARGET	TEXT("ProtectTarget")
+#define BBKEY_OUTPROTECTRANGE	TEXT("OutProtectRange")
+#define BBKEY_PROTECTPOS	TEXT("ProtectPos")
 

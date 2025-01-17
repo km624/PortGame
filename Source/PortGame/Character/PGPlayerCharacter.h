@@ -24,7 +24,7 @@ enum class EControlData : uint8
 	Aim
 };
 UCLASS()
-class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface, public IAITargetPlayerInterface, public IPlayerAddEXPInterface
+class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface,  public IPlayerAddEXPInterface
 {
 	GENERATED_BODY()
 
@@ -243,6 +243,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
 	float OriginalMaxWalkSpeed;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
 	float OriginalMaxAcceleration;
 
@@ -272,22 +273,6 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Slow")
 	float SlowRadius = 500.0f;
-
-
-public:
-	virtual bool CanPlayerTarget(APawn* enemy) override;
-
-	virtual void SetPlayerTargetPawn(APawn* enemy) override;
-
-	virtual void DeletePlayerTargetPawn(APawn* enemy)override;
-
-protected:
-	UPROPERTY(VisibleAnywhere)
-	TArray<TWeakObjectPtr<APawn>> TargetMePawns;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 MaxTargets = 3;
-
 
 	//스킬 입력
 protected:
@@ -416,6 +401,7 @@ protected:
 
 	UFUNCTION()
 	void DashCameraMove(float dt);
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	TObjectPtr<class UCurveFloat> AttackCurve;
@@ -429,5 +415,22 @@ public:
 protected:
 	//대쉬 카메라 타임라인
 	FTimeline DashTimeline;
+
+
+public:
+	virtual bool CanPlayerProtect(APawn* pawn);
+	
+	virtual void SetPlayerProtectPawn(APawn* pawn);
+
+	virtual int32 CheckContainPawn(APawn* pawn);
+		
+	virtual void DeletePlayerProtectPawn(APawn* pawn);
+
+protected:
+	UPROPERTY(VisibleAnywhere)
+	TArray<TWeakObjectPtr<APawn>> ProtectMePawns;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	uint8 MaxProtectcount = 5;
 
 };

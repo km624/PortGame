@@ -127,14 +127,14 @@ void APGAIController::BlackBoardReset()
 	UBlackboardComponent* BlackboardComp = Blackboard.Get();
 	if (BlackboardComp->GetValueAsObject(BBKEY_TARGET))
 	{
-		APawn* pawn = Cast<APawn>(BlackboardComp->GetValueAsObject(BBKEY_TARGET));	
+		/*APawn* pawn = Cast<APawn>(BlackboardComp->GetValueAsObject(BBKEY_TARGET));	
 		if (pawn->ActorHasTag(TAG_PLAYER))
 		{
 			
 			IAITargetPlayerInterface* player = Cast<IAITargetPlayerInterface>(pawn);
 			player->DeletePlayerTargetPawn(GetPawn());
 		
-		}
+		}*/
 
 		//BlackboardComp->SetValueAsObject(BBKEY_TARGET,nullptr);
 

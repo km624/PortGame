@@ -190,8 +190,6 @@ APGPlayerCharacter::APGPlayerCharacter()
 		DashCurve = DCurve.Object;
 	}
 
-	
-	
 
 	Tags.Add(TAG_PLAYER);
 
@@ -621,7 +619,17 @@ void APGPlayerCharacter::FindSideEnemyToComp(const FInputActionValue& Value)
 {
 
 	float direction = Value.Get<float>();
-	TargetingComponent->SetSideTargetLock(direction);
+	if (TargetingComponent->GetbIsTargetLock())
+	{
+		TargetingComponent->SetSideTargetLock(direction);
+	}
+	else
+	{
+		float addFov = Camera->FieldOfView += -direction * 2.5f ;
+		float newFov = FMath::Clamp(addFov, 70.0f, 110.0f);
+		Camera->SetFieldOfView(newFov);
+	}
+		
 
 
 }
@@ -876,42 +884,6 @@ void APGPlayerCharacter::OnSlowOVerlapToNPC(float time)
 
 			}
 		}
-	}
-}
-
-bool APGPlayerCharacter::CanPlayerTarget(APawn* enemy)
-{
-	if (TargetMePawns.Num() >= MaxTargets)
-	{
-		if (TargetMePawns.Contains(enemy))
-			return true;
-		else
-			return false;
-	}
-	else
-		return true;
-
-
-
-}
-
-void APGPlayerCharacter::SetPlayerTargetPawn(APawn* enemy)
-{
-	if (!TargetMePawns.Contains(enemy))
-	{
-		TargetMePawns.Add(enemy);
-
-	}
-
-
-}
-
-void APGPlayerCharacter::DeletePlayerTargetPawn(APawn* enemy)
-{
-	if (TargetMePawns.Contains(enemy))
-	{
-		TargetMePawns.Remove(enemy);
-
 	}
 }
 
@@ -1251,15 +1223,18 @@ void APGPlayerCharacter::AllTimelineSetting()
 
 void APGPlayerCharacter::AttackCameraMove(float dt)
 {
+
+	if (DashTimeline.IsReversing() || DashTimeline.IsPlaying())
+	{
+		DashTimeline.Stop();
+	}
 	
+	float AimX = FMath::Lerp(0.0f, 100.0f, dt);
 	float AimY = FMath::Lerp(0, 50.0f, dt);
 	float AimZ = FMath::Lerp(0, -50.0f, dt);
 
-	float Fov  = FMath::Lerp(90.0f, 70.0f, dt);
 
-	Camera->SetFieldOfView(Fov);
-
-	Camera->SetRelativeLocation(FVector(0.0f, AimY, AimZ));
+	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
 }
 
 void APGPlayerCharacter::DashCameraMove(float dt)
@@ -1269,6 +1244,7 @@ void APGPlayerCharacter::DashCameraMove(float dt)
 	{
 		AttackTimeline.Stop();
 		AimTimeline.Stop();
+		
 	}
 
 
@@ -1277,6 +1253,48 @@ void APGPlayerCharacter::DashCameraMove(float dt)
 	
 	
 	Camera->SetRelativeLocation(FVector(AimX, AimY, 0.0f));
+}
+
+bool APGPlayerCharacter::CanPlayerProtect(APawn* pawn)
+{
+	if (ProtectMePawns.Num() >= MaxProtectcount)
+	{
+		return false;
+	}
+	else
+	{
+		SetPlayerProtectPawn(pawn);
+		return true;
+	}
+}
+
+void APGPlayerCharacter::SetPlayerProtectPawn(APawn* pawn)
+{
+	if (!ProtectMePawns.Contains(pawn))
+	{
+		ProtectMePawns.Add(pawn);
+	}
+
+}
+
+int32 APGPlayerCharacter::CheckContainPawn(APawn* pawn)
+{
+	if (!ProtectMePawns.Contains(pawn))
+	{
+		return -1;
+	}
+	int32 num = ProtectMePawns.IndexOfByKey(pawn);
+	return num;
+
+}
+
+
+void APGPlayerCharacter::DeletePlayerProtectPawn(APawn* pawn)
+{
+	if (ProtectMePawns.Contains(pawn))
+	{
+		ProtectMePawns.Remove(pawn);
+	}
 }
 
 

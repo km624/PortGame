@@ -60,6 +60,8 @@ protected:
 	virtual bool CheckTargetDead() override;
 
 	virtual void NotVisibleAttack(APawn* Target) override;
+
+	virtual void ProtectOutRange(bool bisout) override;
 	
 protected:
 	FTimerHandle ShotCompeteTimerHandle;
@@ -77,6 +79,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TurnSpeed = 10.0f;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float CharacterOriginSpeed;
 
 
 	FAICharacterAttackFinished OnAttackFinished;

@@ -173,11 +173,11 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	AActor* TargetPlayer = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_TARGET));
 	if (TargetPlayer)
 	{
-		if (TargetPlayer->ActorHasTag(TAG_PLAYER))
+		/*if (TargetPlayer->ActorHasTag(TAG_PLAYER))
 		{
 			IAITargetPlayerInterface* player = Cast<IAITargetPlayerInterface>(TargetPlayer);
 			player->DeletePlayerTargetPawn(ControllingPawn);
-		}
+		}*/
 	}
 	/*APGBaseCharacter* basecharacter = Cast<APGBaseCharacter>(ControllingPawn);
 	if (basecharacter)
