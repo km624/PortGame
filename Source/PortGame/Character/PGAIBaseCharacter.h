@@ -10,6 +10,7 @@
 /**
  * 
  */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnDeadtoProtectDelegate, APawn* /*This*/);
 UCLASS()
 class PORTGAME_API APGAIBaseCharacter : public APGBaseCharacter ,public IPGAICharacterInterface
 {
@@ -91,6 +92,13 @@ public:
 protected:
 	UPROPERTY()
 	TObjectPtr<APawn> TargetPawn;
+
+
+protected:
+	virtual void BindDeadProtectTarget(APawn* protectTarget) override;
+
+protected:
+	FOnDeadtoProtectDelegate OnDeadProtect;
 
 	//죽었을때 오버라이드
 protected:

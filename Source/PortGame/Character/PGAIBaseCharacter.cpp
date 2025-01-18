@@ -11,6 +11,9 @@
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "Character/PGPlayerCharacter.h"
+#include	"Component/PGStatComponent.h"
+
 APGAIBaseCharacter::APGAIBaseCharacter()
 {
 
@@ -206,9 +209,20 @@ void APGAIBaseCharacter::ProtectOutRange(bool bisout)
 
 
 
+void APGAIBaseCharacter::BindDeadProtectTarget(APawn* protectTarget)
+{
+	APGPlayerCharacter* player = Cast<APGPlayerCharacter>(protectTarget);
+	if (player)
+	{
+		OnDeadProtect.AddUObject(player, &APGPlayerCharacter::DeletePlayerProtectPawn);
+	}
+}
+
 void APGAIBaseCharacter::SetDead(AActor* DamageCauser)
 {
 	Super::SetDead(DamageCauser);
-
+	OnDeadProtect.Broadcast(this);
+	OnDeadProtect.Clear();
+	
 }
 

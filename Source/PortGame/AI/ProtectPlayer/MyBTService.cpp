@@ -12,6 +12,9 @@
 #include "PortGame/PortGame.h"
 #include "GenericTeamAgentInterface.h"
 #include "Character/PGPlayerCharacter.h"
+#include "Field/PGField.h"
+
+
 
 //#include "Character/PGBaseCharacter.h"
 
@@ -27,10 +30,7 @@ void UMyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	if (OwnerComp.GetBlackboardComponent()->GetValueAsBool(BBKEY_PROTECTFIELD))
-	{
-		return;
-	}
+
 	if (OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_PROTECTTARGET))
 	{
 		return;
@@ -51,8 +51,7 @@ void UMyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 	IGenericTeamAgentInterface* MypawnTeam = Cast<IGenericTeamAgentInterface>(ControllingPawn);
 	if (MypawnTeam->GetGenericTeamId() != 1)
 	{
-		
-		SLOG(TEXT("Not team"));
+	
 		return;
 	}
 
@@ -115,9 +114,29 @@ void UMyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 						if (player->CanPlayerProtect(ControllingPawn))
 						{
 							APawn* playerPawn = Cast<APawn>(TargetActor);
+
+							//죽었을때 배열에서 삭제할 델리게이트 바인딩
+							AIPawn->BindDeadProtectTarget(playerPawn);
+
+							if (OwnerComp.GetBlackboardComponent()->GetValueAsBool(BBKEY_PROTECTFIELD))
+							{
+								
+								APGField* myfield = Cast<APGField>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_MYFIELD));
+								if (myfield)
+								{
+									if (!myfield->DeleteProtectAI(ControllingPawn))
+									{
+										SLOG(TEXT("Fail Delete field Array"));
+										return;
+									}
+									OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_PROTECTFIELD, false);
+								}
+							}
+
 							OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PROTECTTARGET, playerPawn);
 
 							OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_OUTPROTECTRANGE, false);
+							
 							return;
 						}
 					}

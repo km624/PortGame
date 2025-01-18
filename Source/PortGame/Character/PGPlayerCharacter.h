@@ -424,6 +424,7 @@ public:
 
 	virtual float CalculateOffsetYPawn(APawn* pawn, float offsetY);
 		
+	UFUNCTION()
 	virtual void DeletePlayerProtectPawn(APawn* pawn);
 
 protected:

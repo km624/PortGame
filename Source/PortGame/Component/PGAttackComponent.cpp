@@ -127,7 +127,7 @@ void UPGAttackComponent::SetUpWeapon()
 			BaseCharacter->SetUpModifierStat(spawnWeapon->ModifierStat);
 
 			OnNextCombo.AddUObject(Weapon, &AWeapon::SetHasNextCombo);
-
+			
 		}
 		
 	}
@@ -150,7 +150,9 @@ void UPGAttackComponent::ReturnWeaponPool()
 {
 	if (Weapon)
 	{
+		Weapon->ClearDelegateHandle();
 		Weapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		OnNextCombo.Clear();
 		IObjectPoolingInterface* poolmanager = Cast<IObjectPoolingInterface>(GetWorld()->GetLevelScriptActor());
 		if (poolmanager)
 		{

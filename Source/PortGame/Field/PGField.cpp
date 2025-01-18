@@ -155,25 +155,7 @@ void APGField::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 		}
 	}
-	/*APGNpcCharacter* NPCcharacter = Cast<APGNpcCharacter>(OtherActor);
-	if (NPCcharacter)
-	{
-		if (GetTeamAttitudeTowards(*NPCcharacter))
-		{
-
-			if (AttackPawns.Contains(NPCcharacter))
-			{
-
-				GetWorldTimerManager().ClearTimer(AttackPawns[NPCcharacter]);
-
-				AttackPawns.Remove(NPCcharacter);
-
-				SLOG(TEXT("Out and ClearTimer: %s"), *NPCcharacter->GetActorNameOrLabel());
-			}
-
-		}
-	}*/
-
+	
 }
 
 void APGField::SetTeamColor()
@@ -212,6 +194,8 @@ void APGField::SetTeamColor()
 
 void APGField::OnAISpawn()
 {
+	if (AICharacters.Num() == SpawnCount) return;
+
 	FVector FieldSize = GetActorScale()*50.0f;
 
 
@@ -273,8 +257,6 @@ void APGField::OnAISpawn()
 
 void APGField::DamageField(class APawn* deadpawn, int8 attackteamid)
 {
-
-
 	APGNpcCharacter* deadnpc = Cast<APGNpcCharacter>(deadpawn);
 	if (deadnpc)
 	{
@@ -555,6 +537,25 @@ void APGField::CheckAttackPawnIn()
 	}
 
 
+}
+
+bool APGField::DeleteProtectAI(APawn* ai)
+{
+	APGNpcCharacter* npcai=  Cast<APGNpcCharacter>(ai);
+	if (npcai)
+	{
+		if (AICharacters.Contains(npcai))
+		{
+			npcai->SetbIsAttackField(true);
+
+			AICharacters.Remove(npcai);
+			SLOG(TEXT("Field -> Player protect"));
+			OnAISpawn();
+			return true;
+		}
+		return false;
+	}
+	return false;
 }
 
 //void APGField::SetTimerAttackPawnDamage(APGNpcCharacter* attackPawn)

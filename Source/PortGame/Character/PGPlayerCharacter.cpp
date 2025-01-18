@@ -1277,6 +1277,11 @@ void APGPlayerCharacter::SetPlayerProtectPawn(APawn* pawn)
 	if (!ProtectMePawns.Contains(pawn))
 	{
 		ProtectMePawns.Add(pawn);
+		APGBaseCharacter* protectpawn = Cast<APGBaseCharacter>(pawn);
+		if (protectpawn)
+		{
+			
+		}
 	}
 
 }

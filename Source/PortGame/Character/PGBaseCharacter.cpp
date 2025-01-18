@@ -147,7 +147,7 @@ void APGBaseCharacter::EnableCharacter()
 	bIsReload = false;
 	bIsAim = false;
 	bIsShoot = false;
-	bIsRifle = false;
+	//bIsRifle = false;
 	SetActorEnableCollision(true);
 	SetActorHiddenInGame(false);
 	SetActorTickEnabled(true);
@@ -324,6 +324,8 @@ void APGBaseCharacter::PlayHitMontage()
 		return;
 
 	GetController()->SetIgnoreMoveInput(true);
+
+	
 	bIsGroggy = true;
 
 	IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
@@ -361,14 +363,14 @@ void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperl
 		return;
 
 	GetController()->SetIgnoreMoveInput(false);
+
+	
 	bIsGroggy = false;
 
 	IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
 	if (AIController)
 	{
 		AIController->StartTree();
-
-		
 	}
 
 }

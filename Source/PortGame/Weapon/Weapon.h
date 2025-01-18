@@ -101,4 +101,7 @@ protected:
 	
 	FOnMontageEnded EndDelegate;
 	FOnMontageEnded* CurrentMontageEndDelegate;
+
+public:
+	virtual void ClearDelegateHandle();
 };

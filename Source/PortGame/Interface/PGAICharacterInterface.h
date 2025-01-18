@@ -48,5 +48,7 @@ public:
 	virtual void NotVisibleAttack(APawn* Target) = 0;
 
 	virtual void ProtectOutRange(bool bisout) = 0;
+
+	virtual void BindDeadProtectTarget(APawn* protectTarget) = 0;
 	
 };

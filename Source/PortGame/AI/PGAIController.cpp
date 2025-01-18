@@ -141,6 +141,13 @@ void APGAIController::BlackBoardReset()
 		BlackboardComp->ClearValue(BBKEY_PROTECTFIELD);
 		BlackboardComp->ClearValue(BBKEY_MYFIELD);
 		BlackboardComp->ClearValue(BBKEY_TARGET);
+		BlackboardComp->ClearValue(BBKEY_PATROLPOS);
+		BlackboardComp->ClearValue(BBKEY_CIRCLEPOS);
+		BlackboardComp->ClearValue(BBKEY_OUTPROTECTRANGE);
+		BlackboardComp->ClearValue(BBKEY_NEXTATTACKFIELD);
+		BlackboardComp->ClearValue(BBKEY_PROTECTTARGET);
+		BlackboardComp->ClearValue(BBKEY_PROTECTPOS);
+		
 		
 
 		

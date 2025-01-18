@@ -53,11 +53,11 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 
 	}
 
-	OwnerCharacter->OnbIsShoot.AddUObject(this,
+	FOnbIsShoot= OwnerCharacter->OnbIsShoot.AddUObject(this,
 		&ThisClass::ShootCheck);
-	OwnerCharacter->OnbIsReload.AddUObject(this,
+	FOnbIsReload =OwnerCharacter->OnbIsReload.AddUObject(this,
 		&ThisClass::StartReloading);
-	OwnerCharacter->OnbIsAim.AddUObject(this,
+	FOnbIsAim= OwnerCharacter->OnbIsAim.AddUObject(this,
 		&ThisClass::InGunRange);
 	
 	APGPlayerCharacter* playerCharacter=  Cast<APGPlayerCharacter>(OwnerCharacter);
@@ -357,7 +357,9 @@ void ARifle::FireWithLineTrace()
 		GunDamage *= 0.25f;
 
 	const FVector start = WeaponStaticComponent->GetSocketLocation(FireLocation);
+	float TraceRadius = 20.0f;
 	DrawDebugLine(currentWorld, start, end, FColor::Red, false, 1.0f);
+	//DrawDebugSphere(currentWorld, start, TraceRadius, 12, FColor::Red, false, 1.0f);
 	if (currentWorld)
 	{
 		bool OutHitResult = currentWorld->LineTraceSingleByChannel(
@@ -406,6 +408,14 @@ void ARifle::StartGunEffect()
 	{
 		gunrecoil->PlayCameraShake(CameraShakeClass);
 	}
+}
+
+void ARifle::ClearDelegateHandle()
+{
+	SLOG(TEXT("Rifle Clear Delegate"));
+	OwnerCharacter->OnbIsShoot.Remove(FOnbIsShoot);
+	OwnerCharacter->OnbIsReload.Remove(FOnbIsReload);
+	OwnerCharacter->OnbIsAim.Remove(FOnbIsAim);
 }
 
 

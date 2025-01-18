@@ -180,6 +180,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
 	int32 MaxAttackAISpawnCount = 20.0f;
+
+public:
+	bool DeleteProtectAI(APawn* ai);
 	
 
 

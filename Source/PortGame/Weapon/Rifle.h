@@ -112,7 +112,14 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Effect)
 	TObjectPtr<class UNiagaraSystem> NAGunEffect;
+
+public:
+	virtual void ClearDelegateHandle() override;
 	
+protected:
+	FDelegateHandle FOnbIsShoot;
+	FDelegateHandle FOnbIsReload;
+	FDelegateHandle FOnbIsAim;
 
 
 

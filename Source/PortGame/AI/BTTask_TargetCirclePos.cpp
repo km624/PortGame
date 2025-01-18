@@ -62,16 +62,11 @@ EBTNodeResult::Type UBTTask_TargetCirclePos::ExecuteTask(UBehaviorTreeComponent&
 	FVector ControllingLocation = ControllingPawn->GetActorLocation();
 	float TraceDistance = AIPawn->GetAIAttackRange(ControllingPawn->GetDistanceTo(TargetPawn), TargetPawn);
 
-	/*APGBaseCharacter* character = Cast<APGBaseCharacter>(ControllingPawn);
-	if (character)
-	{
-		character->SetbIsAim(false);
-		character->SetbIsShoot(false);
-	}*/
+	
 	if (TraceDistance >200.f)
 	{
-		AddAttackRange = 1.0f;
-		CirlceAngle *= 0.1f;
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_CIRCLEPOS, ControllingPawn->GetActorLocation());
+		return EBTNodeResult::Succeeded;
 	}
 	// 상대방 방향 벡터 계산
 	FVector DirectionToPlayer = (TargetLocation - ControllingLocation).GetSafeNormal();

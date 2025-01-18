@@ -77,7 +77,7 @@ APGNpcCharacter* UObjectPoolManager::GetPooledObject(const FCharacterSpawnParams
 	if (AiCharacter)
 	{
 		AiCharacter->SetupCharacterDataAsset(SpawnParams.CharacterData);
-		AiCharacter->SetupCharacterData(SpawnParams.CharacterData);
+		//AiCharacter->SetupCharacterData(SpawnParams.CharacterData);
 		AiCharacter->SetteamId(SpawnParams.TeamId);
 
 			
@@ -193,12 +193,13 @@ void UObjectPoolManager::ReturnWeaponObjectToPool(AWeapon* weapon)
 {
 	if (!weapon) return;
 
+	
 	// 무기를 비활성화
 	weapon->SetActorTickEnabled(false);
 	weapon->SetActorHiddenInGame(true);
 	weapon->SetActorEnableCollision(false);
 	
-	//SLOG(TEXT("returnweapon : %s"), *weapon->GetActorNameOrLabel())
+	SLOG(TEXT("returnweapon : %s"), *weapon->GetActorNameOrLabel())
 
 }
 

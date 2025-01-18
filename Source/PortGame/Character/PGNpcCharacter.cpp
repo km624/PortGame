@@ -21,13 +21,15 @@
 #include "Components/SkeletalMeshComponent.h"
 
 
+
+
 APGNpcCharacter::APGNpcCharacter() 
 {
 	
 
 	Tags.Add(TAG_AI);
 
-	GetCapsuleComponent()->InitCapsuleSize(10.0f, 96.0f);
+	GetCapsuleComponent()->InitCapsuleSize(20.0f, 96.0f);
 	
 	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 	GetCharacterMovement()->bOrientRotationToMovement = false;

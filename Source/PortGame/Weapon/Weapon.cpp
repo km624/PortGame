@@ -134,7 +134,7 @@ void AWeapon::ComboCheck()
 	if (!IsValid(AnimInstance))return;
 	if (HasNextComboCommand)
 	{
-		if (CurrentMontageEndDelegate!=nullptr)
+		if (CurrentMontageEndDelegate != nullptr)
 		{
 			if (CurrentMontageEndDelegate->IsBound())
 			{
@@ -147,7 +147,7 @@ void AWeapon::ComboCheck()
 				CurrentCombo = 0;
 				return;
 			}
-				
+
 		}
 		else
 		{
@@ -158,7 +158,7 @@ void AWeapon::ComboCheck()
 		}
 		//CurrentMontageEndDelegate->Unbind();
 		CurrentCombo = FMath::Clamp(CurrentCombo + 1, 1, ComboData->MaxComboCount);
-
+		
 		//다음 섹션의 이름 정보 저장
 		FName NextSection = *FString::Printf(TEXT("%s%d"), *ComboData->MontageSectionName, CurrentCombo);
 
@@ -229,6 +229,10 @@ void AWeapon::NotifyComboActionEnd()
 	{
 		NPCEnd->NotifyComboEnd();
 	}
+}
+
+void AWeapon::ClearDelegateHandle()
+{
 }
 
 
