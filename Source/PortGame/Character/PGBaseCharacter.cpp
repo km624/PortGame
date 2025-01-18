@@ -147,7 +147,8 @@ void APGBaseCharacter::EnableCharacter()
 	bIsReload = false;
 	bIsAim = false;
 	bIsShoot = false;
-	//bIsRifle = false;
+	if(CharacterType==EPlayerCharacterType::ETC)
+		bIsRifle = false;
 	SetActorEnableCollision(true);
 	SetActorHiddenInGame(false);
 	SetActorTickEnabled(true);

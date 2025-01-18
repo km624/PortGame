@@ -199,7 +199,6 @@ void UObjectPoolManager::ReturnWeaponObjectToPool(AWeapon* weapon)
 	weapon->SetActorHiddenInGame(true);
 	weapon->SetActorEnableCollision(false);
 	
-	SLOG(TEXT("returnweapon : %s"), *weapon->GetActorNameOrLabel())
 
 }
 

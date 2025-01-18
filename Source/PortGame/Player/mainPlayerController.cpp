@@ -60,7 +60,7 @@ void AmainPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 
-
+	
 	AllFindCharacterData();
 
 	FindSwordData();
@@ -150,6 +150,7 @@ void AmainPlayerController::SetUpSelectWidget()
 	{
 		MainWidget->RemoveFromParent();
 		MainWidget = nullptr;
+		//MainWidget->SetVisibility(ESlateVisibility::Hidden);
 	}
 		
 
