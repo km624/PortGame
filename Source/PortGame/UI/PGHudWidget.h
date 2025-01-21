@@ -108,6 +108,12 @@ public:
 	UFUNCTION()
 	void UpdateGameState(bool bisclear);
 
+public:
+	void SetUpProtectMaxCount(int32 max);
+
+	UFUNCTION()
+	void UpdateProtectCount(int32 current);
+
 protected:
 	
 	virtual void NativeConstruct() override;
@@ -157,5 +163,8 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPGKoWidget> BP_KOWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UPGProtectWidget> BP_ProtectWidget;
 	
 };

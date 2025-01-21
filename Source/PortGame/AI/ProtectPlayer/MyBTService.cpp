@@ -11,8 +11,9 @@
 #include "Engine/OverlapResult.h"
 #include "PortGame/PortGame.h"
 #include "GenericTeamAgentInterface.h"
-#include "Character/PGPlayerCharacter.h"
+//#include "Character/PGPlayerCharacter.h"
 #include "Field/PGField.h"
+#include "Interface/AIBodyGuardInterface.h"
 
 
 
@@ -107,7 +108,9 @@ void UMyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 				if (TargetActor)
 				{
 
-					APGPlayerCharacter* player = Cast<APGPlayerCharacter>(TargetActor);
+					//APGPlayerCharacter* player = Cast<APGPlayerCharacter>(TargetActor);
+					IAIBodyGuardInterface* player = Cast<IAIBodyGuardInterface>(TargetActor);
+
 					if (player)
 					{
 						//SLOG(TEXT("PlayerDetect : %s"), *TargetActor->GetActorNameOrLabel());
@@ -132,6 +135,15 @@ void UMyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 									OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_PROTECTFIELD, false);
 								}
 							}
+							AActor* posactor = player->SetPlayerProtectPawn(ControllingPawn);
+
+							if (!posactor)
+							{
+								SLOG(TEXT("PosActor Failed(AIServiece)"));
+								return;
+							}
+							
+							OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PROTECTPOSACTOR, posactor);
 
 							OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PROTECTTARGET, playerPawn);
 

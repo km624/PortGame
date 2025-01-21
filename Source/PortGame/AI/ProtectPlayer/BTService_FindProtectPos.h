@@ -20,11 +20,11 @@ public:
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 
 protected:
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	/*UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	float OffsetX;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	float OffsetY;
+	float OffsetY;*/
 
 	
 };

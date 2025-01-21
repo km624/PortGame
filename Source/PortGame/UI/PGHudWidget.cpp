@@ -19,6 +19,7 @@
 #include "AI/PGAIController.h"
 #include "UI/PGGameStateWidget.h"
 #include "UI/PGKoWidget.h"
+#include "UI/PGProtectWidget.h"
 
 
 
@@ -218,6 +219,16 @@ void UPGHudWidget::UpdateGameState(bool bisclear)
 {
 	BP_GameStateWidget->SetVisibility(ESlateVisibility::Visible);
 	BP_GameStateWidget->UpdateGameState(bisclear);
+}
+
+void UPGHudWidget::SetUpProtectMaxCount(int32 max)
+{
+	BP_ProtectWidget->SetupMaxProtectCount(max);
+}
+
+void UPGHudWidget::UpdateProtectCount(int32 current)
+{
+	BP_ProtectWidget->UpdateprotectCount(current);
 }
 
 void UPGHudWidget::NativeConstruct()

@@ -474,6 +474,7 @@ void APGBaseCharacter::SetbIsUltiSkill(bool bisulti)
 	{
 
 		GetController()->SetIgnoreMoveInput(false);
+		GetController()->SetIgnoreLookInput(false);
 		IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
 		if (AIController)
 		{
@@ -484,6 +485,7 @@ void APGBaseCharacter::SetbIsUltiSkill(bool bisulti)
 	{
 
 		GetController()->SetIgnoreMoveInput(true);
+		GetController()->SetIgnoreLookInput(true);
 		IAIControllerInterface* AIController = Cast<IAIControllerInterface>(GetController());
 		if (AIController)
 		{

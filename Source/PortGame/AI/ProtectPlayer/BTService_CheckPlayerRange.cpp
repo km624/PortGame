@@ -8,7 +8,7 @@
 #include "Interface/PGAICharacterInterface.h"
 #include "Math/UnrealMathUtility.h"
 #include "DrawDebugHelpers.h"
-#include "Character/PGPlayerCharacter.h"
+//#include "Character/PGPlayerCharacter.h"
 
 UBTService_CheckPlayerRange::UBTService_CheckPlayerRange()
 {
@@ -68,6 +68,8 @@ void UBTService_CheckPlayerRange::TickNode(UBehaviorTreeComponent& OwnerComp, ui
 	{
 		AIPawn->ProtectOutRange(result);
 		OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_OUTPROTECTRANGE, result);
+		
+		
 	}
 		
 

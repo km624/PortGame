@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ // Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "AI/ProtectPlayer/BTService_FindProtectPos.h"
@@ -8,13 +8,14 @@
 #include "Interface/PGAICharacterInterface.h"
 #include "Math/UnrealMathUtility.h"
 #include "DrawDebugHelpers.h"
-#include "Character/PGPlayerCharacter.h"
+//#include "Character/PGPlayerCharacter.h"
+#include "Interface/AIBodyGuardInterface.h"
 
 UBTService_FindProtectPos::UBTService_FindProtectPos()
 {
 	Interval = 0.2f;
-	OffsetX = 150.0f;
-	OffsetY = 250.0f;
+	/*OffsetX = 150.0f;
+	OffsetY = 250.0f;*/
 
 }
 
@@ -56,24 +57,18 @@ void UBTService_FindProtectPos::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 	FVector ControllingLocation = ControllingPawn->GetActorLocation();
 	
 	
-	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(ProtectPawn);
+	//APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(ProtectPawn);
+	IAIBodyGuardInterface* playerCharacter = Cast<IAIBodyGuardInterface>(ProtectPawn);
 	if (nullptr == playerCharacter)
 	{
 		return;
 
 	}
-	float CalOffsetY = playerCharacter->CalculateOffsetYPawn(ControllingPawn, OffsetY);
-	if (FMath::IsNaN(CalOffsetY))
+	FVector Offset = playerCharacter->CalculateOffsetPawn(ControllingPawn);
+	if (Offset==FVector::Zero())
 	{
 		return;
 	}
-
-	//float CalOffsetY = (num - 2) * OffsetY;  // -120, -60, 0, 60, 120
-	
-	FVector Offset = TargetForwardLocation * -OffsetX + TArgetRightLoacation * CalOffsetY;
-
-	
-	
 
 	FVector AILocation = TargetLocation + Offset;
 	

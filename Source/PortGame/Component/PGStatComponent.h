@@ -144,7 +144,7 @@ protected:
 	float CurrentUltiSkillGauge;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
-	float addPrecentUlitSkillGuage = 10.0f;
+	float addPrecentUlitSkillGuage = 100.0f;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Stat)
 	float MaxUltiSkillGauge = 100.0f;
@@ -159,7 +159,6 @@ protected:
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	FPGCharacterStat LevelStat;
 
-	/*UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
-	TMap<FName, FPGCharacterStat> AllStat;*/
+	
 		
 };

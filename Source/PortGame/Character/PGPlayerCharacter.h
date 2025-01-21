@@ -8,10 +8,10 @@
 #include "Components/TimelineComponent.h"
 #include "Interface/PGHudWidgetInterface.h"
 #include "Interface/AttackHitStopInterface.h"
+#include "Interface/AIBodyGuardInterface.h"
 #include "Interface/AITargetPlayerInterface.h"
 #include "Interface/PlayerAddEXPInterface.h"
 #include "PGPlayerCharacter.generated.h"
-
 /**
  * 
  */
@@ -25,6 +25,7 @@ enum class EControlData : uint8
 };
 UCLASS()
 class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface,  public IPlayerAddEXPInterface
+	,public IAIBodyGuardInterface
 {
 	GENERATED_BODY()
 
@@ -418,20 +419,20 @@ protected:
 
 
 public:
-	virtual bool CanPlayerProtect(APawn* pawn);
-	
-	virtual void SetPlayerProtectPawn(APawn* pawn);
+	virtual bool CanPlayerProtect(APawn* pawn) override;
 
-	virtual float CalculateOffsetYPawn(APawn* pawn, float offsetY);
+	virtual AActor* SetPlayerProtectPawn(APawn* pawn) override;
+
+	virtual FVector CalculateOffsetPawn(APawn* pawn)  override;
 		
 	UFUNCTION()
 	virtual void DeletePlayerProtectPawn(APawn* pawn);
 
 protected:
-	UPROPERTY(VisibleAnywhere)
-	TArray<TWeakObjectPtr<APawn>> ProtectMePawns;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 MaxProtectcount = 5;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	TObjectPtr<class UAIBodyGuardComponent> AIBodyGuardComponent;
+
+	
 
 };

@@ -13,4 +13,5 @@
 #define BBKEY_PROTECTTARGET	TEXT("ProtectTarget")
 #define BBKEY_OUTPROTECTRANGE	TEXT("OutProtectRange")
 #define BBKEY_PROTECTPOS	TEXT("ProtectPos")
+#define BBKEY_PROTECTPOSACTOR	TEXT("ProtectPosActor")
 

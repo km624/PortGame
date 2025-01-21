@@ -34,6 +34,8 @@
 #include "UI/PGAllCharactersWidget.h"
 #include "UI/PGCharcterWidget.h"
 
+#include "Component/AIBodyGuardComponent.h"
+
 
 
 const FString APGPlayerCharacter::LeftEvadeMontage = TEXT("LeftEvadeMontage");
@@ -191,6 +193,8 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		DashCurve = DCurve.Object;
 	}
+
+	AIBodyGuardComponent = CreateDefaultSubobject<UAIBodyGuardComponent>(TEXT("AIBodyComponent"));
 
 
 	Tags.Add(TAG_PLAYER);
@@ -586,7 +590,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		hudWidget->UpdateHpBar(StatComponent->GetCurrentHp());
 		hudWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
 		hudWidget->UpdateKOCount(KOCount);
-
+		hudWidget->SetUpProtectMaxCount(AIBodyGuardComponent->GetMaxProtectCount());
 		//델리게이트 바인딩
 		StatComponent->OnStatChanged.AddUObject(hudWidget, &UPGHudWidget::SetUpWidget);
 		StatComponent->OnHpChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateHpBar);
@@ -595,7 +599,8 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		AttackComponent->GetSkill()->OnbCanSkill.AddUObject(hudWidget, &UPGHudWidget::StartSkillCoolTime);
 		OndashDelegate.AddUObject(hudWidget, &UPGHudWidget::StartDash);
 		FKoCountChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateKOCount);
-
+		AIBodyGuardComponent->OnProtectCountChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateProtectCount);
+		
 		//총이 있을때만
 		ARifle* rifle = Cast<ARifle>(AttackComponent->GetWeapon());
 		if (rifle)
@@ -924,6 +929,7 @@ void APGPlayerCharacter::StopDefenceNikke()
 void APGPlayerCharacter::OnUltimateSkill()
 {
 	if (bIsGameStated)return;
+	
 	UltimateSkillToComponent();
 }
 
@@ -1261,65 +1267,23 @@ void APGPlayerCharacter::DashCameraMove(float dt)
 
 bool APGPlayerCharacter::CanPlayerProtect(APawn* pawn)
 {
-	if (ProtectMePawns.Num() >= MaxProtectcount)
-	{
-		return false;
-	}
-	else
-	{
-		SetPlayerProtectPawn(pawn);
-		return true;
-	}
+	return AIBodyGuardComponent->CanPlayerProtect(pawn);
 }
 
-void APGPlayerCharacter::SetPlayerProtectPawn(APawn* pawn)
+AActor* APGPlayerCharacter::SetPlayerProtectPawn(APawn* pawn)
 {
-	if (!ProtectMePawns.Contains(pawn))
-	{
-		ProtectMePawns.Add(pawn);
-		APGBaseCharacter* protectpawn = Cast<APGBaseCharacter>(pawn);
-		if (protectpawn)
-		{
-			
-		}
-	}
-
+	return AIBodyGuardComponent->SetPlayerProtectPawn(pawn);
 }
 
-float APGPlayerCharacter::CalculateOffsetYPawn(APawn* pawn,float offsetY)
+FVector APGPlayerCharacter::CalculateOffsetPawn(APawn* pawn)
 {
-	if (!ProtectMePawns.Contains(pawn))
-	{
-		return NAN;
-	}
-	int32 pawnnum = ProtectMePawns.IndexOfByKey(pawn);
-	
-	int32 currentCount = ProtectMePawns.Num();
-
-	float CalOffsetY = 0.0f;
-	if (currentCount % 2 == 0)
-	{
-		CalOffsetY = -offsetY* (currentCount * 0.5) + (offsetY * 0.5) + (pawnnum * offsetY);
-	}
-	else
-	{
-		CalOffsetY = (pawnnum - ((currentCount-1)/2)) * offsetY;
-	}
-	
-
-
-
-	return CalOffsetY;
-
+	return AIBodyGuardComponent->CalculateOffsetPawn(pawn);
 }
 
 
 void APGPlayerCharacter::DeletePlayerProtectPawn(APawn* pawn)
 {
-	if (ProtectMePawns.Contains(pawn))
-	{
-		ProtectMePawns.Remove(pawn);
-	}
+	AIBodyGuardComponent->DeletePlayerProtectPawn(pawn);
 }
 
 
