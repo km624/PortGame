@@ -23,61 +23,61 @@ void UBTService_FindProtectPos::TickNode(UBehaviorTreeComponent& OwnerComp, uint
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
-	if (ControllingPawn == NULL)
-	{
-		return;
-	}
+	//APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
+	//if (ControllingPawn == NULL)
+	//{
+	//	return;
+	//}
 
-	UWorld* World = ControllingPawn->GetWorld();
-	if (nullptr == World)
-	{
-		return;
-	}
+	//UWorld* World = ControllingPawn->GetWorld();
+	//if (nullptr == World)
+	//{
+	//	return;
+	//}
 
-	
+	//
 
-	IPGAICharacterInterface* AIPawn = Cast<IPGAICharacterInterface>(ControllingPawn);
-	if (AIPawn == NULL)
-	{
-		return;
-	}
+	//IPGAICharacterInterface* AIPawn = Cast<IPGAICharacterInterface>(ControllingPawn);
+	//if (AIPawn == NULL)
+	//{
+	//	return;
+	//}
 
-	APawn* ProtectPawn = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_PROTECTTARGET));
-	if (nullptr == ProtectPawn)
-	{
-		return;
-	}
-
-
-	// 플레이어의 위치 가져오기
-	FVector TargetLocation = ProtectPawn->GetActorLocation();
-	FVector TargetForwardLocation = ProtectPawn->GetActorForwardVector();
-	FVector TArgetRightLoacation = ProtectPawn->GetActorRightVector();
-	FVector ControllingLocation = ControllingPawn->GetActorLocation();
-	
-	
-	//APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(ProtectPawn);
-	IAIBodyGuardInterface* playerCharacter = Cast<IAIBodyGuardInterface>(ProtectPawn);
-	if (nullptr == playerCharacter)
-	{
-		return;
-
-	}
-	FVector Offset = playerCharacter->CalculateOffsetPawn(ControllingPawn);
-	if (Offset==FVector::Zero())
-	{
-		return;
-	}
-
-	FVector AILocation = TargetLocation + Offset;
-	
-
-	OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_PROTECTPOS, AILocation);
+	//APawn* ProtectPawn = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_PROTECTTARGET));
+	//if (nullptr == ProtectPawn)
+	//{
+	//	return;
+	//}
 
 
-	DrawDebugPoint(World, AILocation, 10.0f, FColor::Blue, false, 1.0f);
-	DrawDebugLine(World, ControllingPawn->GetActorLocation(), AILocation, FColor::Blue, false, 1.0f);
+	//// 플레이어의 위치 가져오기
+	//FVector TargetLocation = ProtectPawn->GetActorLocation();
+	//FVector TargetForwardLocation = ProtectPawn->GetActorForwardVector();
+	//FVector TArgetRightLoacation = ProtectPawn->GetActorRightVector();
+	//FVector ControllingLocation = ControllingPawn->GetActorLocation();
+	//
+	//
+	////APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(ProtectPawn);
+	//IAIBodyGuardInterface* playerCharacter = Cast<IAIBodyGuardInterface>(ProtectPawn);
+	//if (nullptr == playerCharacter)
+	//{
+	//	return;
+
+	//}
+	//FVector Offset = playerCharacter->CalculateOffsetPawn(ControllingPawn);
+	//if (Offset==FVector::Zero())
+	//{
+	//	return;
+	//}
+
+	//FVector AILocation = TargetLocation + Offset;
+	//
+
+	//OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_PROTECTPOS, AILocation);
+
+
+	//DrawDebugPoint(World, AILocation, 10.0f, FColor::Blue, false, 1.0f);
+	//DrawDebugLine(World, ControllingPawn->GetActorLocation(), AILocation, FColor::Blue, false, 1.0f);
 
 
 

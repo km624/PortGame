@@ -14,6 +14,7 @@
 #include "Character/PGPlayerCharacter.h"
 #include "Component/PGStatComponent.h"
 
+
 APGAIBaseCharacter::APGAIBaseCharacter()
 {
 
@@ -197,7 +198,7 @@ void APGAIBaseCharacter::ProtectOutRange(bool bisout)
 	if (bisout)
 	{
 		
-		GetCharacterMovement()->MaxWalkSpeed = 800.0f;
+		GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
 		SLOG(TEXT("characterspeed :  %f"), GetCharacterMovement()->MaxWalkSpeed);
 	}
 	else
@@ -219,6 +220,8 @@ void APGAIBaseCharacter::BindDeadProtectTarget(APawn* protectTarget)
 		OnDeadProtect.AddUObject(player, &APGPlayerCharacter::DeletePlayerProtectPawn);
 	}
 }
+
+
 
 void APGAIBaseCharacter::SetDead(AActor* DamageCauser)
 {

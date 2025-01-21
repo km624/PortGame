@@ -97,6 +97,9 @@ protected:
 protected:
 	virtual void BindDeadProtectTarget(APawn* protectTarget) override;
 
+
+
+
 protected:
 	FOnDeadtoProtectDelegate OnDeadProtect;
 

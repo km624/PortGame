@@ -30,7 +30,7 @@ public:
 
 	virtual void OnClickStart();*/
 
-	virtual FVector CalculatePawnPostion(APawn* player ,int32 index, int32 arrayConut);
+	virtual FVector CalculatePawnPostion(AActor* player ,int32 index, int32 arrayConut);
 protected:
 
 	UPROPERTY()

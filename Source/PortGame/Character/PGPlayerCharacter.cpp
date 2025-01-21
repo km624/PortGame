@@ -1275,10 +1275,10 @@ AActor* APGPlayerCharacter::SetPlayerProtectPawn(APawn* pawn)
 	return AIBodyGuardComponent->SetPlayerProtectPawn(pawn);
 }
 
-FVector APGPlayerCharacter::CalculateOffsetPawn(APawn* pawn)
-{
-	return AIBodyGuardComponent->CalculateOffsetPawn(pawn);
-}
+//FVector APGPlayerCharacter::CalculateOffsetPawn(APawn* pawn)
+//{
+//	return AIBodyGuardComponent->CalculateOffsetPawn(pawn);
+//}
 
 
 void APGPlayerCharacter::DeletePlayerProtectPawn(APawn* pawn)

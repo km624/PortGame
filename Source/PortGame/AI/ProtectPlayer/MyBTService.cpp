@@ -143,6 +143,8 @@ void UMyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 								return;
 							}
 							
+							
+
 							OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PROTECTPOSACTOR, posactor);
 
 							OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_PROTECTTARGET, playerPawn);

@@ -28,7 +28,7 @@ public:
 
 	virtual AActor* SetPlayerProtectPawn(APawn* pawn);
 
-	virtual FVector CalculateOffsetPawn(APawn* pawn);
+	//virtual FVector CalculateOffsetPawn(APawn* pawn);
 
 	UFUNCTION()
 	virtual void DeletePlayerProtectPawn(APawn* pawn);
@@ -60,9 +60,12 @@ public:
 protected:
 	AActor* SpawnPosActor(FVector newlocation);
 
+
+	void AlignPawnsPosActor();
+
 protected:
 	UPROPERTY()
-	uint8 currentOption = 0;
+	uint8 currentPosOption = 0;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TArray<TObjectPtr<class UBodyGuardBase>> BodyGuardOptions;

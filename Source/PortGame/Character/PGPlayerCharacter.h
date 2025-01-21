@@ -423,7 +423,7 @@ public:
 
 	virtual AActor* SetPlayerProtectPawn(APawn* pawn) override;
 
-	virtual FVector CalculateOffsetPawn(APawn* pawn)  override;
+	//virtual FVector CalculateOffsetPawn(APawn* pawn)  override;
 		
 	UFUNCTION()
 	virtual void DeletePlayerProtectPawn(APawn* pawn);

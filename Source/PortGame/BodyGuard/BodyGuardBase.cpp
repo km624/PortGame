@@ -21,7 +21,7 @@ void UBodyGuardBase::SetOption(UAIBodyGuardComponent bodyguardcomp)
 
 
 
-FVector UBodyGuardBase::CalculatePawnPostion(APawn* player, int32 index, int32 arrayConut)
+FVector UBodyGuardBase::CalculatePawnPostion(AActor* player, int32 index, int32 arrayConut)
 {
 	
 	int32 pawnnum = index;

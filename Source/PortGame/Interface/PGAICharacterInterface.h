@@ -50,5 +50,6 @@ public:
 	virtual void ProtectOutRange(bool bisout) = 0;
 
 	virtual void BindDeadProtectTarget(APawn* protectTarget) = 0;
+
 	
 };

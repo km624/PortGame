@@ -21,8 +21,11 @@ protected:
 
 
 
+
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComponent;
+
+	
 
 };

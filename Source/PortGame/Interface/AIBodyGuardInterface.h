@@ -27,7 +27,7 @@ public:
 
 	virtual AActor* SetPlayerProtectPawn(APawn* pawn)=0;
 
-	virtual FVector CalculateOffsetPawn(APawn* pawn) = 0;
+	//virtual FVector CalculateOffsetPawn(APawn* pawn) = 0;
 
 	//UFUNCTION()
 	//virtual void DeletePlayerProtectPawn(APawn* pawn) = 0;
