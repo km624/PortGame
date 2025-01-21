@@ -204,7 +204,7 @@ void APGAIBaseCharacter::ProtectOutRange(bool bisout)
 	else
 	{
 		SLOG(TEXT("In"));
-		GetCharacterMovement()->MaxWalkSpeed =CharacterOriginSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = CharacterOriginSpeed;
 	}
 }
 
@@ -219,6 +219,12 @@ void APGAIBaseCharacter::BindDeadProtectTarget(APawn* protectTarget)
 	{
 		OnDeadProtect.AddUObject(player, &APGPlayerCharacter::DeletePlayerProtectPawn);
 	}
+}
+
+void APGAIBaseCharacter::SetMaxWalkSpeed(float maxspeed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = maxspeed;
+	CharacterOriginSpeed = maxspeed;
 }
 
 

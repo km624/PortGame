@@ -153,6 +153,7 @@ void APGBaseCharacter::EnableCharacter()
 	SetActorHiddenInGame(false);
 	SetActorTickEnabled(true);
 	HpBarWidgetComponent->SetHiddenInGame(true);
+	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 	
 	
 }

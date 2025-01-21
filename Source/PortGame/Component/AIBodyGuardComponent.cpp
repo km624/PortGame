@@ -5,6 +5,8 @@
 #include "BodyGuard/BodyGuardBase.h"
 #include "BodyGuard/DummyPosActor.h"
 #include "PortGame/PortGame.h"
+#include "BodyGuard/BodyGuardAroundPosition.h"
+#include "Interface/PGAICharacterInterface.h"
 
 UAIBodyGuardComponent::UAIBodyGuardComponent()
 {
@@ -33,7 +35,8 @@ void UAIBodyGuardComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UBodyGuardBase* DefaultBase = NewObject<UBodyGuardBase>();
+	//UBodyGuardBase* DefaultBase = NewObject<UBodyGuardBase>();
+	UBodyGuardAroundPosition* DefaultBase = NewObject<UBodyGuardAroundPosition>();
 	BodyGuardOptions.Add(DefaultBase);
 }
 
@@ -57,10 +60,15 @@ AActor* UAIBodyGuardComponent::SetPlayerProtectPawn(APawn* pawn)
 		ProtectMePawns.Add(pawn);
 		OnProtectCountChanged.Broadcast(ProtectMePawns.Num());
 		
-		
 		AActor* PosActor = SpawnPosActor(FVector::ZeroVector);
+
 		AlignPawnsPosActor();
 
+		IPGAICharacterInterface* aibodyguard = Cast<IPGAICharacterInterface>(pawn);
+		if (aibodyguard)
+		{
+			aibodyguard->SetMaxWalkSpeed(BodyGuardOptions[currentPosOption]->GetBodyGuardSpeed());
+		}
 		return PosActor;
 	}
 	return nullptr;

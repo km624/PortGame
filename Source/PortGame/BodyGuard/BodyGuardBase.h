@@ -26,6 +26,7 @@ public:
 
 	virtual void SetOption(class UAIBodyGuardComponent bodyguardcomp);
 	
+	virtual float GetBodyGuardSpeed();
 	/*virtual void OnHoverPriview();
 
 	virtual void OnClickStart();*/

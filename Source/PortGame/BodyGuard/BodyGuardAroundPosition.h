@@ -4,21 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "BodyGuard/BodyGuardBase.h"
-#include "BodyGuardPosition.generated.h"
+#include "BodyGuardAroundPosition.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PORTGAME_API UBodyGuardPosition : public UBodyGuardBase
+class PORTGAME_API UBodyGuardAroundPosition : public UBodyGuardBase
 {
 	GENERATED_BODY()
 
-
 public:
-	UBodyGuardPosition();
+	UBodyGuardAroundPosition();
 
 public:
 	virtual FVector CalculatePawnPostion(AActor* player, int32 index, int32 arrayConut);
+
+	virtual float GetBodyGuardSpeed();
+protected:
+	FVector DefacultCalculateRotator(FVector originalVector, float angleDegrees);
 	
 };

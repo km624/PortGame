@@ -19,6 +19,11 @@ void UBodyGuardBase::SetOption(UAIBodyGuardComponent bodyguardcomp)
 	BodyguardComponent = bodyguardcomp;
 }
 
+float UBodyGuardBase::GetBodyGuardSpeed()
+{
+	return 400.0f;
+}
+
 
 
 FVector UBodyGuardBase::CalculatePawnPostion(AActor* player, int32 index, int32 arrayConut)

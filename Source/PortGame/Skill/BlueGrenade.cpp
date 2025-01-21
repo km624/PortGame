@@ -45,8 +45,8 @@ ABlueGrenade::ABlueGrenade()
     ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
     
     ProjectileMovement->UpdatedComponent = CollisionBox; // 운동 계산에 사용할 컴포넌트
-    ProjectileMovement->InitialSpeed = 1000.f;           // 초기 속도
-    ProjectileMovement->MaxSpeed = 1000.f;               // 최대 속도
+    ProjectileMovement->InitialSpeed = 1250.f;           // 초기 속도
+    ProjectileMovement->MaxSpeed = 1250.f;               // 최대 속도
     ProjectileMovement->bRotationFollowsVelocity = true; // 속도 방향에 따라 회전
     ProjectileMovement->bShouldBounce = true;            // 충돌 시 튕김
     ProjectileMovement->Bounciness = 0.3f;               // 튕김 강도

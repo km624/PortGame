@@ -97,7 +97,7 @@ protected:
 protected:
 	virtual void BindDeadProtectTarget(APawn* protectTarget) override;
 
-
+	virtual void SetMaxWalkSpeed(float maxspeed) override;
 
 
 protected:

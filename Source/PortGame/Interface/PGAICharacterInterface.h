@@ -51,5 +51,5 @@ public:
 
 	virtual void BindDeadProtectTarget(APawn* protectTarget) = 0;
 
-	
+	virtual void SetMaxWalkSpeed(float maxspeed) = 0;
 };
