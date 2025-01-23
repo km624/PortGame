@@ -24,7 +24,7 @@ public:
 
 	void SetAttackAIData();
 
-	void SetForceMoveVector(FVector targetVector);
+	virtual void SetForceMoveVector(FVector targetVector) override;
 
 	void SetVisible(bool visible);
 

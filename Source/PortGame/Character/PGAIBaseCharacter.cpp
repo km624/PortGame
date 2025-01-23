@@ -199,11 +199,11 @@ void APGAIBaseCharacter::ProtectOutRange(bool bisout)
 	{
 		
 		GetCharacterMovement()->MaxWalkSpeed = 1000.0f;
-		SLOG(TEXT("characterspeed :  %f"), GetCharacterMovement()->MaxWalkSpeed);
+		//SLOG(TEXT("characterspeed :  %f"), GetCharacterMovement()->MaxWalkSpeed);
 	}
 	else
 	{
-		SLOG(TEXT("In"));
+		//SLOG(TEXT("In"));
 		GetCharacterMovement()->MaxWalkSpeed = CharacterOriginSpeed;
 	}
 }

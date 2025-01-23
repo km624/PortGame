@@ -288,4 +288,22 @@ void APGPlayerController::GameOver()
 	
 }
 
+void APGPlayerController::ShowBodyGuardOption(bool bShowOption)
+{
+	if (!bShowOption)
+	{
+		FInputModeGameOnly GameOnlyInputMode;
+		SetIgnoreLookInput(false);
+		bShowMouseCursor = false;
+		SetInputMode(GameOnlyInputMode);
+	}
+	else
+	{
+		FInputModeGameAndUI gameuionly;
+		SetIgnoreLookInput(true);
+		bShowMouseCursor = true;
+		SetInputMode(gameuionly);
+	}
+}
+
 

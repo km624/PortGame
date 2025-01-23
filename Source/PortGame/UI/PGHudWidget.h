@@ -109,10 +109,15 @@ public:
 	void UpdateGameState(bool bisclear);
 
 public:
+
 	void SetUpProtectMaxCount(int32 max);
 
 	UFUNCTION()
 	void UpdateProtectCount(int32 current);
+
+	void SetupBodyGuardOptionButton(AActor* playercharacter, int32 optionSize);
+
+	void ChangeBodyGuardOptionSize(bool bShowOption);
 
 protected:
 	

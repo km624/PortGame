@@ -24,12 +24,14 @@ class PORTGAME_API UBodyGuardBase : public UObject
 public:
 	UBodyGuardBase();
 
-	virtual void SetOption(class UAIBodyGuardComponent bodyguardcomp);
+	virtual void SetOption(class UAIBodyGuardComponent* bodyguardcomp,int32 optionnum);
 	
 	virtual float GetBodyGuardSpeed();
-	/*virtual void OnHoverPriview();
 
-	virtual void OnClickStart();*/
+	//button에서 onclick하면 여기 inclickstart가 호출되고 bodyguardcomp의 값을 변경
+	//virtual void OnHoverPriview();
+
+	virtual void OnClickStart();
 
 	virtual FVector CalculatePawnPostion(AActor* player ,int32 index, int32 arrayConut);
 protected:
@@ -48,7 +50,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float OffsetX = 150.0f;
 
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float OffsetX = -150.0f;*/
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float OffsetY = -150.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int32 BodyGuardOptionNum;
 	
 };

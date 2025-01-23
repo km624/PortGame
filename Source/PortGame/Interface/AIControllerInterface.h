@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "Data/AIAttackEnumData.h"
 #include "AIControllerInterface.generated.h"
 
 // This class does not need to be modified.
@@ -24,4 +25,5 @@ class PORTGAME_API IAIControllerInterface
 public:
 	virtual void StopTree() = 0;
 	virtual void StartTree() = 0;
+	virtual void SetForceMoveVector(FVector targetVector) = 0;
 };

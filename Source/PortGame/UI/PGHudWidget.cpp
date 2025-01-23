@@ -231,6 +231,38 @@ void UPGHudWidget::UpdateProtectCount(int32 current)
 	BP_ProtectWidget->UpdateprotectCount(current);
 }
 
+void UPGHudWidget::SetupBodyGuardOptionButton(AActor* playercharacter, int32 optionSize)
+{
+	BP_ProtectWidget->SetUpOptionButton(playercharacter, optionSize);
+}
+
+void UPGHudWidget::ChangeBodyGuardOptionSize(bool bShowOption)
+{
+	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(BP_ProtectWidget->Slot);
+	if (CanvasSlot)
+	{
+		if (!bShowOption)
+		{
+			CanvasSlot->SetSize(FVector2D(100.0, 150.0));
+
+			CanvasSlot->SetAnchors(FAnchors(0.5f, 1.0f, 0.5f, 1.0f));
+			CanvasSlot->SetAlignment(FVector2D(0.5f, 1.0f));
+
+			CanvasSlot->SetPosition(FVector2D(-450.0f, -25.0f));
+
+		}
+		else
+		{
+			CanvasSlot->SetSize(FVector2D(400.0f, 500.0f));
+			CanvasSlot->SetAnchors(FAnchors(0.5f, 0.5f));
+			CanvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));
+			CanvasSlot->SetPosition(FVector2D(0.0f, 0.0f));
+		}
+
+		
+	}
+}
+
 void UPGHudWidget::NativeConstruct()
 {
 	Super::NativeConstruct();

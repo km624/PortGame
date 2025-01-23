@@ -80,6 +80,9 @@ public:
 
 	void GameOver();
 
+public:
+	void ShowBodyGuardOption(bool bShowOption);
+
 	
 
 

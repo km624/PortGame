@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Data/AIAttackEnumData.h"
 #include "AIBodyGuardComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnProtectCountChangeDelegate, int32 /*ProtectMePawns.arraynum*/);
@@ -31,7 +32,7 @@ public:
 	//virtual FVector CalculateOffsetPawn(APawn* pawn);
 
 	UFUNCTION()
-	virtual void DeletePlayerProtectPawn(APawn* pawn);
+	 void DeletePlayerProtectPawn(APawn* pawn);
 
 
 public:
@@ -47,11 +48,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 MaxProtectcount = 5;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float OffsetX=150.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float OffsetY=150.0f;
 
 public:
 	FOnProtectCountChangeDelegate OnProtectCountChanged;
@@ -63,6 +59,7 @@ protected:
 
 	void AlignPawnsPosActor();
 
+
 protected:
 	UPROPERTY()
 	uint8 currentPosOption = 0;
@@ -72,6 +69,11 @@ protected:
 
 	UPROPERTY()
 	TSubclassOf<class ADummyPosActor> PosActorClass;
+
+public:
+	void BodyGuardOptionsClick(int32 optionnum);
+
+	void StartBodyGuardLogic(EAIAttackEnumData attackenum, int32 optionnum);
 
 		
 };

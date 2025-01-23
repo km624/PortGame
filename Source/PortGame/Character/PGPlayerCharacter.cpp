@@ -182,6 +182,12 @@ APGPlayerCharacter::APGPlayerCharacter()
 		MapAction = MAPC.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> BODYGUARD(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_BodyguardOption.IA_BodyguardOption'"));
+	if (BODYGUARD.Object)
+	{
+		BodyGuardOptionAction = BODYGUARD.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> CCurve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Weapon/AttackCameraCurve.AttackCameraCurve'"));
 	if (CCurve.Object)
 	{
@@ -200,6 +206,8 @@ APGPlayerCharacter::APGPlayerCharacter()
 	Tags.Add(TAG_PLAYER);
 
 	bIsGameStated = false;
+
+	bShowBodyGuardOption = false;
 }
 
 void APGPlayerCharacter::PostInitializeComponents()
@@ -282,6 +290,12 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(ThreeChangeCharacterAction, ETriggerEvent::Started, this, &APGPlayerCharacter::ThreeChangePlayerCharacter);
 
 		EnhancedInputComponent->BindAction(MapAction, ETriggerEvent::Started, this, &APGPlayerCharacter::ChangeMiniMapSize);
+		
+		
+		EnhancedInputComponent->BindAction(BodyGuardOptionAction, ETriggerEvent::Started, this, &APGPlayerCharacter::ShowBodyGuardOption);
+		EnhancedInputComponent->BindAction(BodyGuardOptionAction, ETriggerEvent::Completed, this, &APGPlayerCharacter::CloseBodyGuardOption);
+		
+		
 
 	}
 	else
@@ -591,6 +605,10 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		hudWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
 		hudWidget->UpdateKOCount(KOCount);
 		hudWidget->SetUpProtectMaxCount(AIBodyGuardComponent->GetMaxProtectCount());
+
+		//임시
+		hudWidget->SetupBodyGuardOptionButton(this, 1);
+
 		//델리게이트 바인딩
 		StatComponent->OnStatChanged.AddUObject(hudWidget, &UPGHudWidget::SetUpWidget);
 		StatComponent->OnHpChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateHpBar);
@@ -601,6 +619,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		FKoCountChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateKOCount);
 		AIBodyGuardComponent->OnProtectCountChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateProtectCount);
 		
+
 		//총이 있을때만
 		ARifle* rifle = Cast<ARifle>(AttackComponent->GetWeapon());
 		if (rifle)
@@ -1281,10 +1300,57 @@ AActor* APGPlayerCharacter::SetPlayerProtectPawn(APawn* pawn)
 //}
 
 
+void APGPlayerCharacter::BodyGuardOptionsClick(int32 optionnum)
+{
+	
+	CloseBodyGuardOption();
+	AIBodyGuardComponent->BodyGuardOptionsClick(optionnum);
+}
+
 void APGPlayerCharacter::DeletePlayerProtectPawn(APawn* pawn)
 {
 	AIBodyGuardComponent->DeletePlayerProtectPawn(pawn);
 }
+
+void APGPlayerCharacter::ShowBodyGuardOption()
+{
+	
+	if (bShowBodyGuardOption)
+	{
+		return;
+	}
+	bShowBodyGuardOption = true;
+	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
+	if (playerController)
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.2f);
+
+		playerController->ShowBodyGuardOption(bShowBodyGuardOption);
+
+		PGHudWidget->ChangeBodyGuardOptionSize(bShowBodyGuardOption);
+	}
+
+}
+
+
+void APGPlayerCharacter::CloseBodyGuardOption()
+{
+	
+	bShowBodyGuardOption = false;
+	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
+	if (playerController)
+	{
+	
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+		
+
+		playerController->ShowBodyGuardOption(bShowBodyGuardOption);
+
+		PGHudWidget->ChangeBodyGuardOptionSize(bShowBodyGuardOption);
+	}
+
+}
+
 
 
 

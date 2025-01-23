@@ -20,6 +20,7 @@ public:
 
 public:
 
+
 	void SetupMaxProtectCount(int32 max);
 
 	void UpdateprotectCount(int32 currentnum);
@@ -36,6 +37,10 @@ protected:
 	
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UTextBlock> TextBlock_CurrentCount;
+
+
+public:
+	void SetUpOptionButton(AActor* playercharacter ,int32 optionSize);
 
 protected:
 

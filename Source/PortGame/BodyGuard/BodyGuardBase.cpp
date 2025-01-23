@@ -3,6 +3,7 @@
 
 #include "BodyGuard/BodyGuardBase.h"
 #include "BodyGuard/DummyPrieviewActor.h"
+#include "Data/AIAttackEnumData.h"
 #include "Component/AIBodyGuardComponent.h"
 
 UBodyGuardBase::UBodyGuardBase()
@@ -14,9 +15,10 @@ UBodyGuardBase::UBodyGuardBase()
 	}
 }
 
-void UBodyGuardBase::SetOption(UAIBodyGuardComponent bodyguardcomp)
+void UBodyGuardBase::SetOption(UAIBodyGuardComponent* bodyguardcomp, int32 optionnum)
 {
 	BodyguardComponent = bodyguardcomp;
+	BodyGuardOptionNum = optionnum;
 }
 
 float UBodyGuardBase::GetBodyGuardSpeed()
@@ -25,6 +27,14 @@ float UBodyGuardBase::GetBodyGuardSpeed()
 }
 
 
+
+void UBodyGuardBase::OnClickStart()
+{
+	if (IsValid(BodyguardComponent))
+	{
+		BodyguardComponent->StartBodyGuardLogic(EAIAttackEnumData::NormalAttack, BodyGuardOptionNum);
+	}
+}
 
 FVector UBodyGuardBase::CalculatePawnPostion(AActor* player, int32 index, int32 arrayConut)
 {
@@ -44,7 +54,7 @@ FVector UBodyGuardBase::CalculatePawnPostion(AActor* player, int32 index, int32 
 	}
 
 
-	FVector Offset = player->GetActorForwardVector() * - OffsetX + player->GetActorRightVector() * CalOffsetY;
+	FVector Offset = player->GetActorForwardVector() * + OffsetX + player->GetActorRightVector() * CalOffsetY;
 
 	return Offset;
 

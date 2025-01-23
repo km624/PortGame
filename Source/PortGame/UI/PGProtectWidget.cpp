@@ -23,3 +23,18 @@ void UPGProtectWidget::UpdateprotectCount(int32 currentnum)
 {
 	TextBlock_CurrentCount->SetText(FText::AsNumber(currentnum));
 }
+
+void UPGProtectWidget::SetUpOptionButton(AActor* playercharacter, int32 optionSize)
+{
+	TArray<TObjectPtr<UPGProtectButtonWidget>> OptionsButton= {
+	   BP_ProtectOptionButton_1,
+	   BP_ProtectOptionButton_2,
+	   BP_ProtectOptionButton_3,
+	   BP_ProtectOptionButton_4
+	};
+
+	for (int32 i = 0; i < optionSize; i++)
+	{
+		OptionsButton[i]->SetupProtectButton(playercharacter,i+1);
+	}
+}

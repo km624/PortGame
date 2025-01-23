@@ -112,6 +112,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction>MapAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction>BodyGuardOptionAction;
+
 	//매개변수 받기 위해 헤더 인클루드
 	void Move(const struct FInputActionValue& Value);
 	void SetNoneMove();
@@ -424,6 +427,8 @@ public:
 	virtual AActor* SetPlayerProtectPawn(APawn* pawn) override;
 
 	//virtual FVector CalculateOffsetPawn(APawn* pawn)  override;
+
+	virtual void BodyGuardOptionsClick(int32 optionnum) override;
 		
 	UFUNCTION()
 	virtual void DeletePlayerProtectPawn(APawn* pawn);
@@ -432,6 +437,14 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TObjectPtr<class UAIBodyGuardComponent> AIBodyGuardComponent;
+
+protected:
+	void ShowBodyGuardOption();
+
+	void CloseBodyGuardOption();
+
+protected:
+	uint8 bShowBodyGuardOption : 1;
 
 	
 

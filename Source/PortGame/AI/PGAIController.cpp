@@ -139,6 +139,8 @@ void APGAIController::BlackBoardReset()
 		//BlackboardComp->SetValueAsObject(BBKEY_TARGET,nullptr);
 
 		BlackboardComp->ClearValue(BBKEY_PROTECTFIELD);
+		BlackboardComp->ClearValue(BBKEY_FORCEMOVEVECTOR);
+		BlackboardComp->ClearValue(BBKEY_ATTACKENUM);
 		BlackboardComp->ClearValue(BBKEY_MYFIELD);
 		BlackboardComp->ClearValue(BBKEY_TARGET);
 		BlackboardComp->ClearValue(BBKEY_PATROLPOS);

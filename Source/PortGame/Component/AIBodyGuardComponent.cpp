@@ -7,6 +7,8 @@
 #include "PortGame/PortGame.h"
 #include "BodyGuard/BodyGuardAroundPosition.h"
 #include "Interface/PGAICharacterInterface.h"
+#include "Interface/AIControllerInterface.h"
+
 
 UAIBodyGuardComponent::UAIBodyGuardComponent()
 {
@@ -37,7 +39,12 @@ void UAIBodyGuardComponent::BeginPlay()
 
 	//UBodyGuardBase* DefaultBase = NewObject<UBodyGuardBase>();
 	UBodyGuardAroundPosition* DefaultBase = NewObject<UBodyGuardAroundPosition>();
+	DefaultBase->SetOption(this,0);
 	BodyGuardOptions.Add(DefaultBase);
+
+	UBodyGuardBase* TestClick = NewObject<UBodyGuardBase>();
+	TestClick->SetOption(this, 1);
+	BodyGuardOptions.Add(TestClick);
 }
 
 bool UAIBodyGuardComponent::CanPlayerProtect(APawn* pawn)
@@ -133,7 +140,7 @@ AActor* UAIBodyGuardComponent::SpawnPosActor(FVector newlocation)
 		if (posactor)
 		{
 			PawnsPosActor.Add(posactor);
-			SLOG(TEXT("Add Pos Actor"));
+			//SLOG(TEXT("Add Pos Actor"));
 			posactor->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 			return posactor;
 		}
@@ -144,7 +151,7 @@ AActor* UAIBodyGuardComponent::SpawnPosActor(FVector newlocation)
 
 void UAIBodyGuardComponent::AlignPawnsPosActor()
 {
-	SLOG(TEXT("Pos Allign"));
+	//SLOG(TEXT("Pos Allign"));
 	if (BodyGuardOptions.IsValidIndex(currentPosOption))
 	{
 		if (PawnsPosActor.Num() > 0)
@@ -158,5 +165,38 @@ void UAIBodyGuardComponent::AlignPawnsPosActor()
 		}
 		
 		
+	}
+}
+
+void UAIBodyGuardComponent::BodyGuardOptionsClick(int32 optionnum)
+{
+	if (BodyGuardOptions.IsValidIndex(optionnum))
+	{
+		BodyGuardOptions[optionnum]->OnClickStart();
+	}
+}
+
+void UAIBodyGuardComponent::StartBodyGuardLogic(EAIAttackEnumData attackenum, int32 optionnum)
+{
+	if (attackenum == EAIAttackEnumData::NormalAttack)
+	{
+		
+		for (int32 i = 0; i < ProtectMePawns.Num(); i++)
+		{
+			AController* controller = ProtectMePawns[i]->GetController();
+			if (controller)
+			{
+				IAIControllerInterface* aicontroller= Cast<IAIControllerInterface>(controller);
+				if (aicontroller)
+				{
+					
+					FVector calculatevector = GetOwner()->GetActorLocation() + BodyGuardOptions[optionnum]->CalculatePawnPostion(GetOwner(), i, ProtectMePawns.Num());
+					SLOG(TEXT("%s"), *calculatevector.ToString());
+					aicontroller->SetForceMoveVector(calculatevector);
+				}
+			}
+			
+		}
+
 	}
 }
