@@ -200,6 +200,12 @@ APGPlayerCharacter::APGPlayerCharacter()
 		DashCurve = DCurve.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> BodyCurve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Weapon/BodyGuardCurve.BodyGuardCurve'"));
+	if (BodyCurve.Object)
+	{
+		BodyGuardCurve = BodyCurve.Object;
+	}
+
 	AIBodyGuardComponent = CreateDefaultSubobject<UAIBodyGuardComponent>(TEXT("AIBodyComponent"));
 
 
@@ -309,9 +315,11 @@ void APGPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	AimTimeline.TickTimeline(DeltaTime);
+	/*AimTimeline.TickTimeline(DeltaTime);
 	AttackTimeline.TickTimeline(DeltaTime);
-	DashTimeline.TickTimeline(DeltaTime);
+	DashTimeline.TickTimeline(DeltaTime);*/
+	AllTimelineTick(DeltaTime);
+
 	if (TargetingComponent->GetbIsTargetLock())
 	{
 		TargetingComponent->TargetLockOn(DeltaTime);
@@ -503,7 +511,8 @@ void APGPlayerCharacter::PressAim()
 	OnbIsAim.Broadcast(bIsAim);
 
 	SetCharacterInputData(EControlData::Aim);
-	AimTimeline.PlayFromStart();
+	//AimTimeline.Play();
+	StartSetCameraMoveSetting(false, ECameraMoveType::AimCamera);
 
 	AimLocation = Camera->GetComponentLocation();
 
@@ -525,7 +534,8 @@ void APGPlayerCharacter::ReleasedAim()
 	bIsShoot = false;
 	OnbIsShoot.Broadcast(bIsShoot);
 	SetCharacterInputData(EControlData::Base);
-	AimTimeline.Reverse();
+	StartSetCameraMoveSetting(true, ECameraMoveType::AimCamera);
+	//AimTimeline.Reverse();
 
 	if (bIsNikkeSkill)
 	{
@@ -547,10 +557,25 @@ void APGPlayerCharacter::PressReload()
 void APGPlayerCharacter::AimUpdate(float deltaTime)
 {
 
-	float AimX = FMath::Lerp(0.0f, 150.0f, deltaTime);
-	float AimY = FMath::Lerp(0, 75.0f, deltaTime);
+	float AimX;
+	float AimY;
+	float AimZ;
 
-	Camera->SetRelativeLocation(FVector(AimX, AimY, 0.0f));
+	if (!bIsReversed)
+	{
+		AimX = FMath::Lerp(CameraCurrentLocation.X, 150.0f, deltaTime);
+		AimY = FMath::Lerp(CameraCurrentLocation.Y, 75.0f, deltaTime);
+		
+	}
+	else
+	{
+		AimX = FMath::Lerp(CameraCurrentLocation.X, 0.0f, deltaTime);
+		AimY = FMath::Lerp(CameraCurrentLocation.Y, 0.0f, deltaTime);
+	
+	}
+	AimZ = FMath::Lerp(CameraCurrentLocation.Z, 0.0f, deltaTime);
+
+	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
 
 }
 
@@ -747,7 +772,7 @@ void APGPlayerCharacter::OnDash()
 
 	CustomTimeDilation = 1.0f;
 
-	DashTimeline.PlayFromStart();
+	StartSetCameraMoveSetting(false, ECameraMoveType::DashCamera);
 
 	GetWorld()->GetTimerManager().SetTimer(
 		DashTimerHandle,
@@ -758,7 +783,7 @@ void APGPlayerCharacter::OnDash()
 			
 			GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
 
-			DashTimeline.Reverse();
+			StartSetCameraMoveSetting(true, ECameraMoveType::DashCamera);
 
 			bIsDash = false;
 			AttackComponent->SetbIsGodMode(false);
@@ -1004,9 +1029,7 @@ void APGPlayerCharacter::RemoveHudWidget()
 	if (PGHudWidget)
 		PGHudWidget->RemoveFromParent();
 	
-	
 }
-
 
 void APGPlayerCharacter::OneChangePlayerCharacter()
 {
@@ -1232,36 +1255,90 @@ void APGPlayerCharacter::AttackSlowEnd()
 
 void APGPlayerCharacter::AllTimelineSetting()
 {
-	//에임 커브 세팅
-	FOnTimelineFloat TimelineProgress;
-	TimelineProgress.BindUFunction(this, FName("AimUpdate"));
-	AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
+	////에임 커브 세팅
+	//FOnTimelineFloat TimelineProgress;
+	//TimelineProgress.BindUFunction(this, FName("AimUpdate"));
+	//AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
 
+	 // 에임 타임라인
+	UTimeLineWrapper* AimWrapper = NewObject<UTimeLineWrapper>(this);
+	FOnTimelineFloat AimProgress;
+	AimProgress.BindUFunction(this, FName("AimUpdate"));
+	AimWrapper->Timeline.AddInterpFloat(AimCurve, AimProgress);
+	
 
-	//공격 커브 세팅
-	FOnTimelineFloat AttackTimelineProgress;
-	AttackTimelineProgress.BindUFunction(this, FName("AttackCameraMove"));
-	AttackTimeline.AddInterpFloat(AttackCurve, AttackTimelineProgress);
+	// 공격 타임라인
+	UTimeLineWrapper* AttackWrapper = NewObject<UTimeLineWrapper>(this);
+	FOnTimelineFloat AttackProgress;
+	AttackProgress.BindUFunction(this, FName("AttackCameraMove"));
+	AttackWrapper->Timeline.AddInterpFloat(AttackCurve, AttackProgress);
+	
 
-	//대쉬 커브 세팅
-	FOnTimelineFloat DashTimelineProgress;
-	DashTimelineProgress.BindUFunction(this, FName("DashCameraMove"));
-	DashTimeline.AddInterpFloat(DashCurve, DashTimelineProgress);
+	// 대쉬 타임라인
+	UTimeLineWrapper* DashWrapper = NewObject<UTimeLineWrapper>(this);
+	FOnTimelineFloat DashProgress;
+	DashProgress.BindUFunction(this, FName("DashCameraMove"));
+	DashWrapper->Timeline.AddInterpFloat(DashCurve, DashProgress);
+	
 
+	// 바디가드 타임라인
+	UTimeLineWrapper* BodyguardWrapper = NewObject<UTimeLineWrapper>(this);
+	FOnTimelineFloat BodyguardProgress;
+	BodyguardProgress.BindUFunction(this, FName("BodyGuardCameraMove"));
+	BodyguardWrapper->Timeline.AddInterpFloat(BodyGuardCurve, BodyguardProgress);
+	
+	AllCameraTimeline.Add(ECameraMoveType::AimCamera, AimWrapper);
+	AllCameraTimeline.Add(ECameraMoveType::AttackCamera, AttackWrapper);
+	AllCameraTimeline.Add(ECameraMoveType::DashCamera, DashWrapper);
+	AllCameraTimeline.Add(ECameraMoveType::BodyGuardCamera, BodyguardWrapper);
 }
+
+void APGPlayerCharacter::AllTimelineTick(float dt)
+{
+	AllCameraTimeline[ECameraMoveType::AimCamera]->Timeline.TickTimeline(dt);
+	AllCameraTimeline[ECameraMoveType::DashCamera]->Timeline.TickTimeline(dt);
+	AllCameraTimeline[ECameraMoveType::AttackCamera]->Timeline.TickTimeline(dt);
+	AllCameraTimeline[ECameraMoveType::BodyGuardCamera]->Timeline.TickTimeline(dt);
+	
+}
+
+
+void APGPlayerCharacter::AllTimelineStop(ECameraMoveType cameramovetype)
+{
+	for (TPair<ECameraMoveType, UTimeLineWrapper*>& Elem : AllCameraTimeline)
+	{
+		
+		UTimeLineWrapper* Timeline = Elem.Value;
+		if (Timeline->Timeline.IsPlaying()) 
+		{
+			Timeline->Timeline.Stop();
+		}
+	}
+}
+
+
+
 
 void APGPlayerCharacter::AttackCameraMove(float dt)
 {
 
-	if (DashTimeline.IsReversing() || DashTimeline.IsPlaying())
+	float AimX;
+	float AimY;
+	float AimZ;
+
+	if (!bIsReversed)
 	{
-		DashTimeline.Stop();
+		AimX = FMath::Lerp(CameraCurrentLocation.X, 120.0f, dt);
+		AimY = FMath::Lerp(CameraCurrentLocation.Y, 75.0f, dt);
+		AimZ = FMath::Lerp(CameraCurrentLocation.Z, -50.0f, dt);
+	}
+	else
+	{
+		AimX = FMath::Lerp(CameraCurrentLocation.X, 0.0f, dt);
+		AimY = FMath::Lerp(CameraCurrentLocation.Y, 0.0f, dt);
+		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 0.0f, dt);
 	}
 	
-	float AimX = FMath::Lerp(0.0f, 120.0f, dt);
-	float AimY = FMath::Lerp(0, 75.0f, dt);
-	float AimZ = FMath::Lerp(0, -50.0f, dt);
-
 
 	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
 }
@@ -1269,19 +1346,65 @@ void APGPlayerCharacter::AttackCameraMove(float dt)
 void APGPlayerCharacter::DashCameraMove(float dt)
 {
 
-	if (AttackTimeline.IsPlaying()||AimTimeline.IsPlaying())
+	
+	float AimX;
+	float AimY;
+	float AimZ;
+
+	if (!bIsReversed)
 	{
-		AttackTimeline.Stop();
-		AimTimeline.Stop();
-		
+		AimX = FMath::Lerp(CameraCurrentLocation.X, -100.0f, dt);
+		AimY = FMath::Lerp(CameraCurrentLocation.Y, 25.0f, dt);
 	}
+	else
+	{
+		AimX = FMath::Lerp(CameraCurrentLocation.X, 0.0f, dt);
+		AimY = FMath::Lerp(CameraCurrentLocation.Y, 0.0f, dt);
+	}
+	AimZ = FMath::Lerp(CameraCurrentLocation.Z, 0.0f, dt);
 
 
-	float AimX = FMath::Lerp(0.0f, -100.0f, dt);
-	float AimY = FMath::Lerp(0, 25.0f, dt);
+	/*float AimX = FMath::Lerp(0.0f, -100.0f, dt);
+	float AimY = FMath::Lerp(0, 25.0f, dt);*/
 	
 	
-	Camera->SetRelativeLocation(FVector(AimX, AimY, 0.0f));
+	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
+}
+
+void APGPlayerCharacter::BodyGuardCameraMove(float dt)
+{
+	float AimX;
+	float AimY;
+	float AimZ;
+	float RotatePitch;
+	if (!bIsReversed)
+	{
+		AimX = FMath::Lerp(CameraCurrentLocation.X, -300.0f, dt);
+		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 650.0f, dt);
+		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, -25.0f, dt);
+
+
+	}
+	else
+	{
+		AimX = FMath::Lerp(CameraCurrentLocation.X, 0.0f, dt);
+		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 0.0f, dt);
+		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, 0.0f, dt);
+	}
+	AimY = FMath::Lerp(CameraCurrentLocation.Y, 0.0f, dt);
+
+
+	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
+	Camera->SetRelativeRotation(FRotator(RotatePitch, 0.0f, 0.0f));
+}
+
+void APGPlayerCharacter::StartSetCameraMoveSetting(bool bisreversed, ECameraMoveType cameramovetype)
+{
+	bIsReversed = bisreversed;
+	CameraCurrentLocation = Camera->GetRelativeLocation();
+	CameraCurrentRotator = Camera->GetRelativeRotation();
+	AllTimelineStop(cameramovetype);
+	AllCameraTimeline[cameramovetype]->Timeline.PlayFromStart();
 }
 
 bool APGPlayerCharacter::CanPlayerProtect(APawn* pawn)
@@ -1320,6 +1443,9 @@ void APGPlayerCharacter::ShowBodyGuardOption()
 		return;
 	}
 	bShowBodyGuardOption = true;
+
+	StartSetCameraMoveSetting(false,ECameraMoveType::BodyGuardCamera);
+	
 	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
 	if (playerController)
 	{
@@ -1337,6 +1463,9 @@ void APGPlayerCharacter::CloseBodyGuardOption()
 {
 	
 	bShowBodyGuardOption = false;
+
+	StartSetCameraMoveSetting(true, ECameraMoveType::BodyGuardCamera);
+	
 	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
 	if (playerController)
 	{

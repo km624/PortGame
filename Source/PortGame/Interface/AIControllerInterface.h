@@ -26,4 +26,5 @@ public:
 	virtual void StopTree() = 0;
 	virtual void StartTree() = 0;
 	virtual void SetForceMoveVector(FVector targetVector) = 0;
+	virtual void SetBodyGuardAttack(EAIAttackEnumData attackenum, FRotator attackrotator) = 0;
 };

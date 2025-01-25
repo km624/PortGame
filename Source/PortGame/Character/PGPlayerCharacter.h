@@ -17,11 +17,28 @@
  */
 DECLARE_MULTICAST_DELEGATE(FOnDashDelegate);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnKOCountChangeDelegate, int32 /*KOCount*/);
+UENUM(BlueprintType)
+enum class ECameraMoveType :uint8
+{
+	AimCamera = 0 UMETA(DisplayName = "Aim"),
+	AttackCamera UMETA(DisplayName = "Attack"),
+	DashCamera UMETA(DisplayName = "Dash"),
+	BodyGuardCamera UMETA(DisplayName = "BodyGuard")
+};
 UENUM()
 enum class EControlData : uint8
 {
 	Base,
 	Aim
+};
+UCLASS(Blueprintable)
+class PORTGAME_API UTimeLineWrapper : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	// 타임라인 객체
+	FTimeline Timeline;
 };
 UCLASS()
 class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface,  public IPlayerAddEXPInterface
@@ -147,7 +164,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Aim")
 	TObjectPtr<class UCurveFloat> AimCurve;
 
-	FTimeline AimTimeline;
+	//FTimeline AimTimeline;
 
 	UFUNCTION()
 	void AimUpdate(float deltaTime);
@@ -400,11 +417,33 @@ protected:
 protected:
 	void AllTimelineSetting();
 
+	void AllTimelineTick(float dt);
+
+	void AllTimelineStop(ECameraMoveType cameramovetype);
+
 	UFUNCTION()
 	void AttackCameraMove(float dt);
 
 	UFUNCTION()
 	void DashCameraMove(float dt);
+
+	UFUNCTION()
+	void BodyGuardCameraMove(float dt);
+
+public:
+	void StartSetCameraMoveSetting(bool bisreversed, ECameraMoveType cameramovetype);
+
+protected:
+	UPROPERTY()
+	uint8 bIsReversed : 1;
+
+	FVector CameraCurrentLocation;
+	FRotator CameraCurrentRotator;
+	
+	UPROPERTY()
+	TMap<ECameraMoveType, UTimeLineWrapper*> AllCameraTimeline;
+
+	
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
@@ -412,15 +451,19 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	TObjectPtr<class UCurveFloat> DashCurve;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	TObjectPtr<class UCurveFloat> BodyGuardCurve;
 public:
 	//공격 카메라 타임라인
-	FTimeline AttackTimeline;
+	//FTimeline AttackTimeline;
 
 protected:
 	//대쉬 카메라 타임라인
-	FTimeline DashTimeline;
+	//FTimeline DashTimeline;
 
 
+	//바디가드 옵션
 public:
 	virtual bool CanPlayerProtect(APawn* pawn) override;
 
@@ -445,6 +488,8 @@ protected:
 
 protected:
 	uint8 bShowBodyGuardOption : 1;
+
+	//FTimeline BodyGuardTimeline;
 
 	
 

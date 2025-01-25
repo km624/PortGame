@@ -48,6 +48,11 @@ protected:
 
 	virtual void ShotByAI() override;
 
+	virtual void SkillByAI() override;
+
+	virtual void UltiSkillByAI() override;
+
+
 	virtual void SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished) override;
 
 	virtual void NotifyComboEnd() override;

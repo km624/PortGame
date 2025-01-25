@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Data/AIAttackEnumData.h"
 #include "Interface/AIControllerInterface.h"
 #include "PGAIController.generated.h"
 
@@ -25,6 +26,8 @@ public:
 	void SetAttackAIData();
 
 	virtual void SetForceMoveVector(FVector targetVector) override;
+
+	virtual void SetBodyGuardAttack(EAIAttackEnumData attackenum,FRotator attackrotator) override;
 
 	void SetVisible(bool visible);
 

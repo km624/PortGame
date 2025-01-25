@@ -5,6 +5,7 @@
 #include "Character/PGBaseCharacter.h"
 #include "TimerManager.h"
 #include "PortGame/PortGame.h"
+#include "Interface/PGAICharacterInterface.h"
 
 USkillBase::USkillBase()
 {
@@ -47,4 +48,16 @@ void USkillBase::EndSkill()
 	
 	bIsSkill = false;
 	OnbIsSkill.Broadcast(bIsSkill);
+	NotifySkillEnd();
+}
+
+void USkillBase::NotifySkillEnd()
+{
+	
+	IPGAICharacterInterface* NPCEnd = Cast<IPGAICharacterInterface>(ownercharacter);
+	if (NPCEnd)
+	{
+		NPCEnd->NotifyComboEnd();
+	}
+	
 }

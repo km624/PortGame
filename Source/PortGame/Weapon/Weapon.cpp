@@ -109,7 +109,8 @@ void AWeapon::ComboBegin()
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OwnerCharacter);
 	if (playerCharacter)
 	{
-		playerCharacter->AttackTimeline.PlayFromStart();
+		playerCharacter->StartSetCameraMoveSetting(false, ECameraMoveType::AttackCamera);
+		//playerCharacter->AttackTimeline.PlayFromStart();
 		playerCharacter->SetbIsAttackRotation(true);
 	}
 	if (OwnerCharacter->GetMesh()->bPauseAnims)
@@ -213,8 +214,8 @@ void AWeapon::ComboEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 	if (playerCharacter)
 	{
 		playerCharacter->SetbIsAttackRotation(false);
-
-		playerCharacter->AttackTimeline.Reverse();
+		playerCharacter->StartSetCameraMoveSetting(true, ECameraMoveType::AttackCamera);
+		//playerCharacter->AttackTimeline.PlayFromStart();
 	}
 	
 	NotifyComboActionEnd();

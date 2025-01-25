@@ -228,6 +228,12 @@ void UPGStatComponent::AddUlitSkillGauge(float AddUltigauge)
 	
 }
 
+void UPGStatComponent::FullUltiSkillGauge()
+{
+	CurrentUltiSkillGauge = MaxUltiSkillGauge;
+	OnUltiSkillGaugechanged.Broadcast(CurrentUltiSkillGauge);
+}
+
 void UPGStatComponent::ResetUlitSkillGauge()
 {
 	CurrentUltiSkillGauge = 0.0f;

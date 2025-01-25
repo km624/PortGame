@@ -8,6 +8,7 @@
 #include "BodyGuard/BodyGuardAroundPosition.h"
 #include "Interface/PGAICharacterInterface.h"
 #include "Interface/AIControllerInterface.h"
+#include "Data/AIAttackEnumData.h"
 
 
 UAIBodyGuardComponent::UAIBodyGuardComponent()
@@ -191,8 +192,10 @@ void UAIBodyGuardComponent::StartBodyGuardLogic(EAIAttackEnumData attackenum, in
 				{
 					
 					FVector calculatevector = GetOwner()->GetActorLocation() + BodyGuardOptions[optionnum]->CalculatePawnPostion(GetOwner(), i, ProtectMePawns.Num());
-					SLOG(TEXT("%s"), *calculatevector.ToString());
+					//SLOG(TEXT("%s"), *calculatevector.ToString());
+					aicontroller->SetBodyGuardAttack(EAIAttackEnumData::UlitAttack, GetOwner()->GetActorRotation());
 					aicontroller->SetForceMoveVector(calculatevector);
+					
 				}
 			}
 			

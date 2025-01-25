@@ -278,6 +278,8 @@ void APGNpcCharacter::PlayHitMontage()
 
 void APGNpcCharacter::OnParryStart(float time)
 {
+	if (TargetPawn == NULL) return;
+
 	if (!TargetPawn->ActorHasTag(TAG_PLAYER)) return;
 
 	if (bIsGroggy)return;

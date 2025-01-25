@@ -52,4 +52,8 @@ public:
 	virtual void BindDeadProtectTarget(APawn* protectTarget) = 0;
 
 	virtual void SetMaxWalkSpeed(float maxspeed) = 0;
+
+	virtual void SkillByAI() = 0;
+
+	virtual void UltiSkillByAI() = 0;
 };

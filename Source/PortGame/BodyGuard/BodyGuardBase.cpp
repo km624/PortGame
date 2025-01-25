@@ -34,6 +34,7 @@ void UBodyGuardBase::OnClickStart()
 	{
 		BodyguardComponent->StartBodyGuardLogic(EAIAttackEnumData::NormalAttack, BodyGuardOptionNum);
 	}
+	
 }
 
 FVector UBodyGuardBase::CalculatePawnPostion(AActor* player, int32 index, int32 arrayConut)

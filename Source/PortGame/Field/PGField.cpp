@@ -549,7 +549,7 @@ bool APGField::DeleteProtectAI(APawn* ai)
 			npcai->SetbIsAttackField(true);
 
 			AICharacters.Remove(npcai);
-			SLOG(TEXT("Field -> Player protect"));
+			//SLOG(TEXT("Field -> Player protect"));
 			OnAISpawn();
 			return true;
 		}

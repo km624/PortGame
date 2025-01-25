@@ -38,6 +38,8 @@ protected:
 
 	virtual void EndSkill();
 
+	void NotifySkillEnd();
+
 protected:
 	UPROPERTY()
 	TObjectPtr<class APGBaseCharacter> ownercharacter;

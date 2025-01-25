@@ -48,7 +48,7 @@ protected:
 	TArray<TObjectPtr<class ADummyPrieviewActor>> PriviewActors;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float OffsetX = 150.0f;
+	float OffsetX = 300.0f;
 
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float OffsetX = -150.0f;*/

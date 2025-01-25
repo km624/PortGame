@@ -12,6 +12,7 @@
 #include "Navigation/CrowdFollowingComponent.h"
 
 
+
 APGAIController::APGAIController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent")))
 {
@@ -62,6 +63,16 @@ void APGAIController::SetForceMoveVector(FVector targetVector)
 		
 
 		BlackboardComp->SetValueAsVector(BBKEY_FORCEMOVEVECTOR, targetVector);
+	}
+}
+
+void APGAIController::SetBodyGuardAttack(EAIAttackEnumData attackenum, FRotator attackrotator)
+{
+	UBlackboardComponent* BlackboardComp = Blackboard.Get();
+	if (BlackboardComp)
+	{
+		BlackboardComp->SetValueAsEnum(BBKEY_ATTACKENUM, static_cast<uint8>(attackenum));
+		BlackboardComp->SetValueAsRotator(BBKEY_BGATTACKROT, attackrotator);
 	}
 }
 
@@ -149,6 +160,7 @@ void APGAIController::BlackBoardReset()
 		BlackboardComp->ClearValue(BBKEY_NEXTATTACKFIELD);
 		BlackboardComp->ClearValue(BBKEY_PROTECTTARGET);
 		BlackboardComp->ClearValue(BBKEY_PROTECTPOS);
+		
 		
 		
 

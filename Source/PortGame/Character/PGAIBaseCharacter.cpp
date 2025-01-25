@@ -126,6 +126,17 @@ void APGAIBaseCharacter::ShotByAI()
 	OnbIsShoot.Broadcast(bIsShoot);
 }
 
+void APGAIBaseCharacter::SkillByAI()
+{
+	SkillToComponent();
+}
+
+void APGAIBaseCharacter::UltiSkillByAI()
+{
+	StatComponent->FullUltiSkillGauge();
+	UltimateSkillToComponent();
+}
+
 void APGAIBaseCharacter::SetAIAttackDelegate(const FAICharacterAttackFinished& InOnAttackFinished)
 {
 	OnAttackFinished = InOnAttackFinished;

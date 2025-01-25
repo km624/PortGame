@@ -97,6 +97,8 @@ public:
 
 	void AddUlitSkillGauge(float AddUltigauge);
 
+	void FullUltiSkillGauge();
+
 	void ResetUlitSkillGauge();
 
 	void AddEXP();

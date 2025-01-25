@@ -265,7 +265,7 @@ void UPGMiniMapWidget::ChangeMinimapSize(bool bisminimap)
             }
             else
             {
-                playerCanvasSlot->SetSize(FVector2D(100.0f, 100.0f));
+                playerCanvasSlot->SetSize(FVector2D(80.0f, 80.0f));
             }
 
             playericon->ChangePlayerIcon(bisminimap);

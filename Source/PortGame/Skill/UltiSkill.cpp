@@ -47,14 +47,29 @@ void UUltiSkill::OnSkill()
 {
 	bIsSkill = true;
 	OnbIsSkill.Broadcast(true);
-	StartCinematic();
-	GetWorld()->GetTimerManager().SetTimer(
-		FirstUltiSkillTimerHandle,
-		[this]() {
-			//StartCinematic();
-			OnBIsCutscened.Broadcast(bIsCutscene);
-		}, UltiDealy, false
-	);
+	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(ownercharacter);
+	if (playerCharacter)
+	{
+
+
+		StartCinematic();
+		GetWorld()->GetTimerManager().SetTimer(
+			FirstUltiSkillTimerHandle,
+			[this]() {
+				//StartCinematic();
+				OnBIsCutscened.Broadcast(bIsCutscene);
+			}, UltiDealy, false
+		);
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimer(
+			FirstUltiSkillTimerHandle,
+			[this]() {
+				PlayUltiSkillMontage();
+			}, 1.0f, false
+		);
+	}
 
 
 }

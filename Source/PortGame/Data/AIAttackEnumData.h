@@ -6,7 +6,7 @@
 #include "AIAttackEnumData.generated.h"
 
 UENUM(BlueprintType)
-enum class EAIAttackEnumData :uint8
+enum class EAIAttackEnumData : uint8
 {
 	NormalAttack = 0 UMETA(DisplayName = "Normal"),
 	SkillAttack UMETA(DisplayName = "Skill"),
