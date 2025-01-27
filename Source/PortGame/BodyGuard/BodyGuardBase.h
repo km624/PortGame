@@ -6,13 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "BodyGuardBase.generated.h"
 
-UENUM(BlueprintType)
-enum class EBodyGuardOptionType :uint8
-{
-	BodyGuardPostion = 0 UMETA(DisplayName = "Pos"),
-	BodyGuardLogic UMETA(DisplayName = "Logic")
 
-};
 /**
  * 
  */
@@ -24,7 +18,7 @@ class PORTGAME_API UBodyGuardBase : public UObject
 public:
 	UBodyGuardBase();
 
-	virtual void SetOption(class UAIBodyGuardComponent* bodyguardcomp,int32 optionnum);
+	virtual void SetOption(class UAIBodyGuardComponent* bodyguardcomp,int32 optionnum , class UBGBaseOptionDataAsset* dataassset);
 	
 	virtual float GetBodyGuardSpeed();
 
@@ -39,24 +33,31 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UAIBodyGuardComponent> BodyguardComponent;
 
-	EBodyGuardOptionType BodyGuardOptionType = EBodyGuardOptionType::BodyGuardPostion;
-
-	UPROPERTY()
-	TSubclassOf<class ADummyPrieviewActor> PriviewActorClass;
+	/*UPROPERTY()
+	TSubclassOf<class ADummyPrieviewActor> PriviewActorClass;*/
 
 	UPROPERTY()
 	TArray<TObjectPtr<class ADummyPrieviewActor>> PriviewActors;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float OffsetX = 300.0f;
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float OffsetX = -150.0f;*/
+	float OffsetX = -200.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float OffsetY = -150.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float BodyGuardSpeed = 400.0f;
+
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int32 BodyGuardOptionNum;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	uint8 BGGaugeOption;
+
+//protected:
+//	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+//	TObjectPtr<class UBGBaseOptionDataAsset> BodyGuardOpotionDataAsset;
 	
 };

@@ -20,8 +20,9 @@ public:
 
 public:
 
-
 	void SetupMaxProtectCount(int32 max);
+
+	void ChangeProtectButtonPadding(bool bShowOption);
 
 	void UpdateprotectCount(int32 currentnum);
 
@@ -40,7 +41,7 @@ protected:
 
 
 public:
-	void SetUpOptionButton(AActor* playercharacter ,int32 optionSize);
+	void SetUpOptionButton(AActor* playercharacter , TArray<class UBGBaseOptionDataAsset*>& optiondataAssets);
 
 protected:
 
@@ -56,4 +57,7 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPGProtectButtonWidget> BP_ProtectOptionButton_4;
 	
+
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<class UWidgetAnimation> PaddingAnimation;
 };

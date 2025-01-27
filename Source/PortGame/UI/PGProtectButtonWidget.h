@@ -15,7 +15,13 @@ class PORTGAME_API UPGProtectButtonWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void SetupProtectButton(AActor* playerCharacter, int32 optionnum);
+	UPGProtectButtonWidget(const FObjectInitializer& ObjectInitializer);
+
+	virtual void NativeOnInitialized();
+
+	void SetupProtectButton(AActor* playerCharacter, int32 optionnum, uint8 optionGauge, FString optionName, bool bislogic);
+
+	void SetChangeButtonStyle();
 
 protected:
 	UFUNCTION()
@@ -25,9 +31,20 @@ protected:
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UButton>  Button_protect;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UTextBlock> TextBlock_protect;
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr < class UHorizontalBox> HorizontalBox_BGImages;
+
+	UPROPERTY()
+	TSubclassOf<UUserWidget> BGImageClass;
 	
 	UPROPERTY()
 	int32 OptionNum;
+
+	UPROPERTY()
+	uint8 OptionGauge;
 
 	UPROPERTY()
 	TObjectPtr<AActor> PlayerCharacter;

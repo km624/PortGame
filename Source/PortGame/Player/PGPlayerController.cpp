@@ -300,6 +300,7 @@ void APGPlayerController::ShowBodyGuardOption(bool bShowOption)
 	else
 	{
 		FInputModeGameAndUI gameuionly;
+		//FInputModeUIOnly uionly;
 		SetIgnoreLookInput(true);
 		bShowMouseCursor = true;
 		SetInputMode(gameuionly);

@@ -9,6 +9,7 @@
 #include "Interface/PGAICharacterInterface.h"
 #include "Interface/AIControllerInterface.h"
 #include "Data/AIAttackEnumData.h"
+#include "Data/BGBaseOptionDataAsset.h"
 
 
 UAIBodyGuardComponent::UAIBodyGuardComponent()
@@ -22,8 +23,17 @@ UAIBodyGuardComponent::UAIBodyGuardComponent()
 		PosActorClass = dummy.Class;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UBGBaseOptionDataAsset> defaultdata(TEXT("/Script/PortGame.BGBaseOptionDataAsset'/Game/PortGame/Data/BodyGuardOption/DA_DefaultPos.DA_DefaultPos'"));
+	if(defaultdata.Object)
+	{
+		DefaultOptionDataAsset = defaultdata.Object;
+	}
+
 	bWantsInitializeComponent = true;
 
+	MaxBGGauge = MaxBGGaugeCount * 100.0f;
+
+	CurrentBGGauge = 300.0f;
 }
 
 
@@ -37,15 +47,29 @@ void UAIBodyGuardComponent::InitializeComponent()
 void UAIBodyGuardComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	SetBGGagueTimer();
+}
 
-	//UBodyGuardBase* DefaultBase = NewObject<UBodyGuardBase>();
-	UBodyGuardAroundPosition* DefaultBase = NewObject<UBodyGuardAroundPosition>();
-	DefaultBase->SetOption(this,0);
-	BodyGuardOptions.Add(DefaultBase);
+void UAIBodyGuardComponent::SetUpBodyGuardOptions(TArray<UBGBaseOptionDataAsset*>& OptionDataAssets)
+{
+	if (DefaultOptionDataAsset&& OptionDataAssets.Num()!=0)
+	{
+		UBodyGuardBase* DefaultBase = NewObject<UBodyGuardBase>();
+		DefaultBase->SetOption(this, 0, DefaultOptionDataAsset);
+		BodyGuardOptions.Add(DefaultBase);
 
-	UBodyGuardBase* TestClick = NewObject<UBodyGuardBase>();
-	TestClick->SetOption(this, 1);
-	BodyGuardOptions.Add(TestClick);
+		for (int i = 0; i < OptionDataAssets.Num(); i++)
+		{
+			if (OptionDataAssets[i]->BodyGuardClass)
+			{
+				UBodyGuardBase* bodyguardoption = NewObject<UBodyGuardBase>(this, OptionDataAssets[i]->BodyGuardClass);
+				bodyguardoption->SetOption(this, i + 1, OptionDataAssets[i]);
+				BodyGuardOptions.Add(bodyguardoption);
+			}
+		}
+	}
+
 }
 
 bool UAIBodyGuardComponent::CanPlayerProtect(APawn* pawn)
@@ -141,7 +165,7 @@ AActor* UAIBodyGuardComponent::SpawnPosActor(FVector newlocation)
 		if (posactor)
 		{
 			PawnsPosActor.Add(posactor);
-			//SLOG(TEXT("Add Pos Actor"));
+			
 			posactor->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 			return posactor;
 		}
@@ -152,7 +176,7 @@ AActor* UAIBodyGuardComponent::SpawnPosActor(FVector newlocation)
 
 void UAIBodyGuardComponent::AlignPawnsPosActor()
 {
-	//SLOG(TEXT("Pos Allign"));
+	
 	if (BodyGuardOptions.IsValidIndex(currentPosOption))
 	{
 		if (PawnsPosActor.Num() > 0)
@@ -160,7 +184,16 @@ void UAIBodyGuardComponent::AlignPawnsPosActor()
 			for (int32 i = 0; i < PawnsPosActor.Num(); i++)
 			{
 				FVector newPostion = GetOwner()->GetActorLocation() + BodyGuardOptions[currentPosOption]->CalculatePawnPostion(GetOwner(), i, PawnsPosActor.Num());
+				
 				PawnsPosActor[i]->SetActorLocation(newPostion);
+
+
+				IPGAICharacterInterface* aibodyguard = Cast<IPGAICharacterInterface>(ProtectMePawns[i]);
+				if (aibodyguard)
+				{
+					aibodyguard->SetMaxWalkSpeed(BodyGuardOptions[currentPosOption]->GetBodyGuardSpeed());
+				}
+
 			}
 
 		}
@@ -179,27 +212,73 @@ void UAIBodyGuardComponent::BodyGuardOptionsClick(int32 optionnum)
 
 void UAIBodyGuardComponent::StartBodyGuardLogic(EAIAttackEnumData attackenum, int32 optionnum)
 {
-	if (attackenum == EAIAttackEnumData::NormalAttack)
+	
+	for (int32 i = 0; i < ProtectMePawns.Num(); i++)
 	{
-		
-		for (int32 i = 0; i < ProtectMePawns.Num(); i++)
+		AController* controller = ProtectMePawns[i]->GetController();
+		if (controller)
 		{
-			AController* controller = ProtectMePawns[i]->GetController();
-			if (controller)
+			IAIControllerInterface* aicontroller = Cast<IAIControllerInterface>(controller);
+			if (aicontroller)
 			{
-				IAIControllerInterface* aicontroller= Cast<IAIControllerInterface>(controller);
-				if (aicontroller)
-				{
-					
-					FVector calculatevector = GetOwner()->GetActorLocation() + BodyGuardOptions[optionnum]->CalculatePawnPostion(GetOwner(), i, ProtectMePawns.Num());
-					//SLOG(TEXT("%s"), *calculatevector.ToString());
-					aicontroller->SetBodyGuardAttack(EAIAttackEnumData::UlitAttack, GetOwner()->GetActorRotation());
-					aicontroller->SetForceMoveVector(calculatevector);
-					
-				}
+
+				FVector calculatevector = GetOwner()->GetActorLocation() + BodyGuardOptions[optionnum]->CalculatePawnPostion(GetOwner(), i, ProtectMePawns.Num());
+				aicontroller->SetBodyGuardAttack(attackenum, GetOwner()->GetActorRotation());
+				aicontroller->SetForceMoveVector(calculatevector);
+
 			}
-			
 		}
 
+	}
+
+}
+
+
+void UAIBodyGuardComponent::ChangeBodyGuardPosition(int optionnum)
+{
+	currentPosOption = optionnum;
+
+	//포지션 바꾸고 재정렬
+	AlignPawnsPosActor();
+}
+
+void UAIBodyGuardComponent::SetBGGagueTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(BGGuageTimer, this, &ThisClass::TimerAddBGGauge, 0.01f, true);
+}
+
+void UAIBodyGuardComponent::TimerAddBGGauge()
+{
+	
+	CurrentBGGauge += AddBGGauge;
+	
+	if (CurrentBGGauge >= MaxBGGauge)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(BGGuageTimer);	
+		return;
+	}
+	//SLOG(TEXT("CurrentBGGauge %f"), CurrentBGGauge);
+	BGGaugeChanaged.Broadcast(CurrentBGGauge);
+}
+
+bool UAIBodyGuardComponent::UseBGOptionGauge(uint8 optiongauge)
+{
+	float ModifyOptionGauge = optiongauge * 100.0f;
+	if (ModifyOptionGauge >= CurrentBGGauge)
+	{
+		SLOG(TEXT("Can't StartOption"));
+		return false;
+	}
+	else
+	{
+		//Gauge를 깎고 타이머 멈춰있으면 다시 시작
+		SLOG(TEXT("Start!!!! StartOption"));
+		CurrentBGGauge -= ModifyOptionGauge;
+		BGGaugeChanaged.Broadcast(CurrentBGGauge);
+		if (!GetWorld()->GetTimerManager().IsTimerActive(BGGuageTimer))
+		{
+			SetBGGagueTimer();
+		}
+		return true;
 	}
 }

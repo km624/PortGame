@@ -115,9 +115,16 @@ public:
 	UFUNCTION()
 	void UpdateProtectCount(int32 current);
 
-	void SetupBodyGuardOptionButton(AActor* playercharacter, int32 optionSize);
+	void SetupBodyGuardOptionButton(AActor* playercharacter, TArray<class UBGBaseOptionDataAsset*>& optiondataAssets);
 
 	void ChangeBodyGuardOptionSize(bool bShowOption);
+
+public:
+	
+	void SetUpAllBGGauge(int32 count, float currentGauge);
+
+	UFUNCTION()
+	void UpdateBGGauge(float currentGauge);
 
 protected:
 	
@@ -171,5 +178,12 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UPGProtectWidget> BP_ProtectWidget;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UBGGaugeWidget> BP_BGGauge;
+
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	TObjectPtr<class UWidgetAnimation> BodyGuardAnimation;
+
 	
 };

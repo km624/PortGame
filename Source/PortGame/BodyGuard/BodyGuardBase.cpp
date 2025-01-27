@@ -4,26 +4,33 @@
 #include "BodyGuard/BodyGuardBase.h"
 #include "BodyGuard/DummyPrieviewActor.h"
 #include "Data/AIAttackEnumData.h"
+#include "Data/BGBaseOptionDataAsset.h"
 #include "Component/AIBodyGuardComponent.h"
 
 UBodyGuardBase::UBodyGuardBase()
 {
-	static ConstructorHelpers::FClassFinder<ADummyPrieviewActor> preview(TEXT(""));
+	/*static ConstructorHelpers::FClassFinder<ADummyPrieviewActor> preview(TEXT(""));
 	if (preview.Class)
 	{
 		PriviewActorClass = preview.Class;
-	}
+	}*/
 }
 
-void UBodyGuardBase::SetOption(UAIBodyGuardComponent* bodyguardcomp, int32 optionnum)
+void UBodyGuardBase::SetOption(UAIBodyGuardComponent* bodyguardcomp, int32 optionnum, UBGBaseOptionDataAsset* dataassset)
 {
 	BodyguardComponent = bodyguardcomp;
 	BodyGuardOptionNum = optionnum;
+
+	OffsetX = dataassset->OffsetX;
+	OffsetY = dataassset->OffsetY;
+	BodyGuardSpeed = dataassset->BodyGuardSpeed;
+	BGGaugeOption = dataassset->OptionBGGauge;
 }
+
 
 float UBodyGuardBase::GetBodyGuardSpeed()
 {
-	return 400.0f;
+	return BodyGuardSpeed;
 }
 
 
@@ -32,7 +39,7 @@ void UBodyGuardBase::OnClickStart()
 {
 	if (IsValid(BodyguardComponent))
 	{
-		BodyguardComponent->StartBodyGuardLogic(EAIAttackEnumData::NormalAttack, BodyGuardOptionNum);
+		BodyguardComponent->ChangeBodyGuardPosition(BodyGuardOptionNum);
 	}
 	
 }

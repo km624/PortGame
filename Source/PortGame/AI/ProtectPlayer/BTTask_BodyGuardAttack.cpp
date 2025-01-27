@@ -48,6 +48,7 @@ EBTNodeResult::Type UBTTask_BodyGuardAttack::ExecuteTask(UBehaviorTreeComponent&
 
 	AIPawn->SetAIAttackDelegate(OnAttackFinished);
 
+	
 	if (AttackEnumData == EAIAttackEnumData::NormalAttack)
 	{
 		AIPawn->AttackByAI();

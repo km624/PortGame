@@ -40,15 +40,19 @@ void UBTService_CheckPlayerRange::TickNode(UBehaviorTreeComponent& OwnerComp, ui
 		return;
 	}
 
-	APawn* ProtectPawn = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_PROTECTTARGET));
+	/*APawn* ProtectPawn = Cast<APawn>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_PROTECTTARGET));
 	if (nullptr == ProtectPawn)
+	{
+		return;
+	}*/
+	AActor* ProtectPos = Cast<AActor>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(BBKEY_PROTECTPOSACTOR));
+	if (nullptr == ProtectPos)
 	{
 		return;
 	}
 
-
 	// 플레이어의 위치 가져오기
-	FVector TargetLocation = ProtectPawn->GetActorLocation();
+	FVector TargetLocation = ProtectPos->GetActorLocation();
 	FVector ControllingLocation = ControllingPawn->GetActorLocation();
 	float TargetDistance = FVector::Distance(TargetLocation, ControllingLocation);
 

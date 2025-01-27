@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BodyGuard/BodyGuardBase.h"
+#include "Data/AIAttackEnumData.h"
 #include "BodyGuardLogic.generated.h"
 
 /**
@@ -17,8 +18,12 @@ class PORTGAME_API UBodyGuardLogic : public UBodyGuardBase
 public:
 	UBodyGuardLogic();
 
-public:
-	
-	virtual float GetBodyGuardSpeed();
+	virtual void SetOption(class UAIBodyGuardComponent* bodyguardcomp, int32 optionnum, class UBGBaseOptionDataAsset* dataassset) override;
+
+	virtual void OnClickStart() override;
+
+protected:
+	EAIAttackEnumData AttackType;
+
 
 };

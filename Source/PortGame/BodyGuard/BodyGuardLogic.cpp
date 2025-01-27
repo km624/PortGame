@@ -2,12 +2,30 @@
 
 
 #include "BodyGuard/BodyGuardLogic.h"
+#include "Data/BGLogicOptionDataAsset.h"
+#include "Component/AIBodyGuardComponent.h"
 
 UBodyGuardLogic::UBodyGuardLogic()
 {
 }
 
-float UBodyGuardLogic::GetBodyGuardSpeed()
+void UBodyGuardLogic::SetOption(UAIBodyGuardComponent* bodyguardcomp, int32 optionnum, UBGBaseOptionDataAsset* dataassset)
 {
-	return 0.0f;
+	Super::SetOption(bodyguardcomp, optionnum, dataassset);
+
+	UBGLogicOptionDataAsset* logicdata = Cast<UBGLogicOptionDataAsset>(dataassset);
+	if (logicdata)
+	{
+		AttackType = logicdata->AttackType;
+	}
+
 }
+
+void UBodyGuardLogic::OnClickStart()
+{
+	if (IsValid(BodyguardComponent))
+	{
+		BodyguardComponent->StartBodyGuardLogic(AttackType, BodyGuardOptionNum);
+	}
+}
+

@@ -4,6 +4,8 @@
 #include "UI/PGProtectWidget.h"
 #include "Components/TextBlock.h"
 #include "UI/PGProtectButtonWidget.h"
+#include "Animation/WidgetAnimation.h"
+#include "Data/BGBaseOptionDataAsset.h"
 
 UPGProtectWidget::UPGProtectWidget(const FObjectInitializer& ObjectInitializer):Super(ObjectInitializer)
 {
@@ -19,12 +21,24 @@ void UPGProtectWidget::SetupMaxProtectCount(int32 max)
 
 }
 
+void UPGProtectWidget::ChangeProtectButtonPadding(bool bShowOption)
+{
+	if (bShowOption)
+	{
+		PlayAnimation(PaddingAnimation);
+	}
+	else
+	{
+		PlayAnimationReverse(PaddingAnimation,2.0f);
+	}
+}
+
 void UPGProtectWidget::UpdateprotectCount(int32 currentnum)
 {
 	TextBlock_CurrentCount->SetText(FText::AsNumber(currentnum));
 }
 
-void UPGProtectWidget::SetUpOptionButton(AActor* playercharacter, int32 optionSize)
+void UPGProtectWidget::SetUpOptionButton(AActor* playercharacter, TArray<UBGBaseOptionDataAsset*>& optiondataAssets)
 {
 	TArray<TObjectPtr<UPGProtectButtonWidget>> OptionsButton= {
 	   BP_ProtectOptionButton_1,
@@ -33,8 +47,9 @@ void UPGProtectWidget::SetUpOptionButton(AActor* playercharacter, int32 optionSi
 	   BP_ProtectOptionButton_4
 	};
 
-	for (int32 i = 0; i < optionSize; i++)
+	for (int32 i = 0; i < optiondataAssets.Num(); i++)
 	{
-		OptionsButton[i]->SetupProtectButton(playercharacter,i+1);
+		
+		OptionsButton[i]->SetupProtectButton(playercharacter,i+1, optiondataAssets[i]->OptionBGGauge, optiondataAssets[i]->OptionName,  optiondataAssets[i]->bIsRogic);
 	}
 }

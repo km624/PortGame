@@ -13,6 +13,7 @@
 
 #include "Save/PGSaveGame.h"
 #include "GameMode/PGGameState.h" 
+#include "Data/BGBaseOptionDataAsset.h"
 //#include "Kismet/GameplayStatics.h"
 
 APGStartField::APGStartField()
@@ -92,6 +93,9 @@ void APGStartField::SetupPlayerbleCharacter()
 		if (playerCharacter)
 		{
 			playerCharacter->SetupCharacterDataAsset(PlayerCharacterData[i]);
+
+			playerCharacter->SetUpBodyGuardOption(OptionDataAssets);
+			
 			playerCharacter->SetteamId(TeamId);
 			playerCharacter->SetupPlayerLevel(savefile->CharacterLevel[PlayerCharacterData[i]->GetMeshNameAsString()]);
 

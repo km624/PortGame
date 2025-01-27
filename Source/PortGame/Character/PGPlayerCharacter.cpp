@@ -36,7 +36,7 @@
 
 #include "Component/AIBodyGuardComponent.h"
 
-
+#include "Data/BGBaseOptionDataAsset.h"
 
 const FString APGPlayerCharacter::LeftEvadeMontage = TEXT("LeftEvadeMontage");
 const FString APGPlayerCharacter::RightEvadeMontage = TEXT("RightEvadeMontage");
@@ -246,6 +246,7 @@ void APGPlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(DashCooltimeTimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(EvadeTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(AIBodyGuardComponent->BGGuageTimer);
 }
 
 //인풋 매핑 - 액션에 함수 바인딩
@@ -349,6 +350,20 @@ void APGPlayerCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterda
 	LoadAndPlayMontageByPath(CharacterName, DashMontage);
 	LoadAndPlayMontageByPath(CharacterName, LeftEvadeMontage);
 	LoadAndPlayMontageByPath(CharacterName, RightEvadeMontage);
+}
+
+void APGPlayerCharacter::SetUpBodyGuardOption(TArray<UBGBaseOptionDataAsset*>& optionDataAssets)
+{
+	if (optionDataAssets.Num() != 0)
+	{
+		OptionDataAssets = optionDataAssets;
+		AIBodyGuardComponent->SetUpBodyGuardOptions(OptionDataAssets);
+	}
+	else
+	{
+		SLOG(TEXT("NoOptionData : playercharacter"));
+	}
+	
 }
 
 void APGPlayerCharacter::SetCharacterInputData(EControlData DataName)
@@ -630,9 +645,8 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		hudWidget->UpdateHitGaugeBar(StatComponent->GetCurrentHitGauge());
 		hudWidget->UpdateKOCount(KOCount);
 		hudWidget->SetUpProtectMaxCount(AIBodyGuardComponent->GetMaxProtectCount());
-
-		//임시
-		hudWidget->SetupBodyGuardOptionButton(this, 1);
+		hudWidget->SetupBodyGuardOptionButton(this, OptionDataAssets);
+		hudWidget->SetUpAllBGGauge(AIBodyGuardComponent->GetMaxBGGaugeCount(), AIBodyGuardComponent->GetCurrentBGGauge());
 
 		//델리게이트 바인딩
 		StatComponent->OnStatChanged.AddUObject(hudWidget, &UPGHudWidget::SetUpWidget);
@@ -643,7 +657,7 @@ void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 		OndashDelegate.AddUObject(hudWidget, &UPGHudWidget::StartDash);
 		FKoCountChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateKOCount);
 		AIBodyGuardComponent->OnProtectCountChanged.AddUObject(hudWidget, &UPGHudWidget::UpdateProtectCount);
-		
+		AIBodyGuardComponent->BGGaugeChanaged.AddUObject(hudWidget, &UPGHudWidget::UpdateBGGauge);
 
 		//총이 있을때만
 		ARifle* rifle = Cast<ARifle>(AttackComponent->GetWeapon());
@@ -985,7 +999,6 @@ ULevelSequence* APGPlayerCharacter::GetLevelSequence()
 void APGPlayerCharacter::ChangeViewTarget(bool bstart)
 {
 
-
 	if (bstart)
 	{
 
@@ -994,7 +1007,7 @@ void APGPlayerCharacter::ChangeViewTarget(bool bstart)
 	}
 	else
 	{
-
+		GetController()->SetIgnoreLookInput(false);
 		Camera->SetActive(true);
 		CutSceneCamera->SetActive(false);
 	}
@@ -1379,7 +1392,7 @@ void APGPlayerCharacter::BodyGuardCameraMove(float dt)
 	float RotatePitch;
 	if (!bIsReversed)
 	{
-		AimX = FMath::Lerp(CameraCurrentLocation.X, -300.0f, dt);
+		AimX = FMath::Lerp(CameraCurrentLocation.X, -500.0f, dt);
 		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 650.0f, dt);
 		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, -25.0f, dt);
 
@@ -1423,11 +1436,15 @@ AActor* APGPlayerCharacter::SetPlayerProtectPawn(APawn* pawn)
 //}
 
 
-void APGPlayerCharacter::BodyGuardOptionsClick(int32 optionnum)
+void APGPlayerCharacter::BodyGuardOptionsClick(int32 optionnum,uint8 optionGauge)
 {
 	
-	CloseBodyGuardOption();
-	AIBodyGuardComponent->BodyGuardOptionsClick(optionnum);
+	if (AIBodyGuardComponent->UseBGOptionGauge(optionGauge))
+	{
+		CloseBodyGuardOption();
+		AIBodyGuardComponent->BodyGuardOptionsClick(optionnum);
+	}
+	
 }
 
 void APGPlayerCharacter::DeletePlayerProtectPawn(APawn* pawn)
@@ -1437,7 +1454,8 @@ void APGPlayerCharacter::DeletePlayerProtectPawn(APawn* pawn)
 
 void APGPlayerCharacter::ShowBodyGuardOption()
 {
-	
+
+	SLOG(TEXT("SHowBodyguard"));
 	if (bShowBodyGuardOption)
 	{
 		return;
@@ -1461,7 +1479,10 @@ void APGPlayerCharacter::ShowBodyGuardOption()
 
 void APGPlayerCharacter::CloseBodyGuardOption()
 {
-	
+	if (!bShowBodyGuardOption)
+	{
+		return;
+	}
 	bShowBodyGuardOption = false;
 
 	StartSetCameraMoveSetting(true, ECameraMoveType::BodyGuardCamera);

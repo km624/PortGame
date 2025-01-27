@@ -128,11 +128,13 @@ void APGAIBaseCharacter::ShotByAI()
 
 void APGAIBaseCharacter::SkillByAI()
 {
+	
 	SkillToComponent();
 }
 
 void APGAIBaseCharacter::UltiSkillByAI()
 {
+	
 	StatComponent->FullUltiSkillGauge();
 	UltimateSkillToComponent();
 }

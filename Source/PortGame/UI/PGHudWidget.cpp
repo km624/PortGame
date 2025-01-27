@@ -20,6 +20,9 @@
 #include "UI/PGGameStateWidget.h"
 #include "UI/PGKoWidget.h"
 #include "UI/PGProtectWidget.h"
+#include "Animation/WidgetAnimation.h"
+#include "Data/BGBaseOptionDataAsset.h"
+#include "UI/BGGaugeWidget.h"
 
 
 
@@ -231,36 +234,36 @@ void UPGHudWidget::UpdateProtectCount(int32 current)
 	BP_ProtectWidget->UpdateprotectCount(current);
 }
 
-void UPGHudWidget::SetupBodyGuardOptionButton(AActor* playercharacter, int32 optionSize)
+void UPGHudWidget::SetupBodyGuardOptionButton(AActor* playercharacter, TArray<UBGBaseOptionDataAsset*>& optiondataAssets)
 {
-	BP_ProtectWidget->SetUpOptionButton(playercharacter, optionSize);
+	BP_ProtectWidget->SetUpOptionButton(playercharacter, optiondataAssets);
 }
 
 void UPGHudWidget::ChangeBodyGuardOptionSize(bool bShowOption)
 {
-	UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(BP_ProtectWidget->Slot);
-	if (CanvasSlot)
+	
+	if (bShowOption)
 	{
-		if (!bShowOption)
-		{
-			CanvasSlot->SetSize(FVector2D(100.0, 150.0));
-
-			CanvasSlot->SetAnchors(FAnchors(0.5f, 1.0f, 0.5f, 1.0f));
-			CanvasSlot->SetAlignment(FVector2D(0.5f, 1.0f));
-
-			CanvasSlot->SetPosition(FVector2D(-450.0f, -25.0f));
-
-		}
-		else
-		{
-			CanvasSlot->SetSize(FVector2D(400.0f, 500.0f));
-			CanvasSlot->SetAnchors(FAnchors(0.5f, 0.5f));
-			CanvasSlot->SetAlignment(FVector2D(0.5f, 0.5f));
-			CanvasSlot->SetPosition(FVector2D(0.0f, 0.0f));
-		}
-
-		
+		PlayAnimation(BodyGuardAnimation);
 	}
+	else
+	{
+		PlayAnimationReverse(BodyGuardAnimation,2.0f);
+	}
+
+	BP_ProtectWidget->ChangeProtectButtonPadding(bShowOption);
+	
+
+}
+
+void UPGHudWidget::SetUpAllBGGauge(int32 count, float currentGauge)
+{
+	BP_BGGauge->SetGaugeProgressBar(count, currentGauge);
+}
+
+void UPGHudWidget::UpdateBGGauge(float currentGauge)
+{
+	BP_BGGauge->UpdateBGGauge(currentGauge);
 }
 
 void UPGHudWidget::NativeConstruct()

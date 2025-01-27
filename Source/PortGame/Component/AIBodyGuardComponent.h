@@ -8,6 +8,7 @@
 #include "AIBodyGuardComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnProtectCountChangeDelegate, int32 /*ProtectMePawns.arraynum*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnBGGaugeChangeDelegate, float /*CurrentBgGauge*/);
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class PORTGAME_API UAIBodyGuardComponent : public UActorComponent
 {
@@ -23,6 +24,9 @@ protected:
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+public:
+	void SetUpBodyGuardOptions(TArray<class UBGBaseOptionDataAsset*>& OptionDataAssets);
 
 public:
 	virtual bool CanPlayerProtect(APawn* pawn);
@@ -47,6 +51,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	uint8 MaxProtectcount = 5;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	TObjectPtr <class UBGBaseOptionDataAsset> DefaultOptionDataAsset;
 
 
 public:
@@ -75,5 +82,33 @@ public:
 
 	void StartBodyGuardLogic(EAIAttackEnumData attackenum, int32 optionnum);
 
+	void ChangeBodyGuardPosition(int optionnum);
+
+protected:
+	void SetBGGagueTimer();
+
+	void TimerAddBGGauge();
+
+public:
+	bool UseBGOptionGauge(uint8 optiongauge);
+
+	FORCEINLINE int32 GetMaxBGGaugeCount() { return MaxBGGaugeCount; }
+	FORCEINLINE float GetCurrentBGGauge() { return CurrentBGGauge; }
+
+protected:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	float MaxBGGauge;
+
+	int32 MaxBGGaugeCount = 5;
+
+	float CurrentBGGauge;
+
+	float AddBGGauge = 0.1f;
+
+
+public:
+	FOnBGGaugeChangeDelegate BGGaugeChanaged;
+	
+	FTimerHandle BGGuageTimer;
 		
 };

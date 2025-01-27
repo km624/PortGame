@@ -6,7 +6,7 @@
 
 UBodyGuardAroundPosition::UBodyGuardAroundPosition()
 {
-	OffsetY = 250.0f;
+	
 }
 
 FVector UBodyGuardAroundPosition::CalculatePawnPostion(AActor* player, int32 index, int32 arrayConut)
@@ -35,10 +35,6 @@ FVector UBodyGuardAroundPosition::CalculatePawnPostion(AActor* player, int32 ind
 	return Offset;
 }
 
-float UBodyGuardAroundPosition::GetBodyGuardSpeed()
-{
-	return 600.0f;
-}
 
 FVector UBodyGuardAroundPosition::DefacultCalculateRotator(FVector originalVector, float angleDegrees)
 {

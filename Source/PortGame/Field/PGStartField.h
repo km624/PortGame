@@ -35,6 +35,11 @@ protected:
 	virtual void PlayerGameState() override;
 
 
+	//TEST
+protected:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TArray<class UBGBaseOptionDataAsset*> OptionDataAssets;
+
 
 
 	

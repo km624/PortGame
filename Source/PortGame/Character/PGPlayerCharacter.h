@@ -66,7 +66,7 @@ protected:
 public:
 	virtual void SetupCharacterData(class UBaseCharacterDataAsset* characterdata) override;
 
-	
+	void SetUpBodyGuardOption(TArray<class UBGBaseOptionDataAsset*>& optionDataAssets);
 
 public:
 	void SetCharacterInputData(EControlData DataName);
@@ -471,7 +471,7 @@ public:
 
 	//virtual FVector CalculateOffsetPawn(APawn* pawn)  override;
 
-	virtual void BodyGuardOptionsClick(int32 optionnum) override;
+	virtual void BodyGuardOptionsClick(int32 optionnum, uint8 optionGauge) override;
 		
 	UFUNCTION()
 	virtual void DeletePlayerProtectPawn(APawn* pawn);
@@ -491,6 +491,8 @@ protected:
 
 	//FTimeline BodyGuardTimeline;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<class UBGBaseOptionDataAsset*> OptionDataAssets;
 	
 
 };

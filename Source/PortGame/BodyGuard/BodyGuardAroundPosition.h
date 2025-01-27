@@ -20,7 +20,6 @@ public:
 public:
 	virtual FVector CalculatePawnPostion(AActor* player, int32 index, int32 arrayConut);
 
-	virtual float GetBodyGuardSpeed();
 protected:
 	FVector DefacultCalculateRotator(FVector originalVector, float angleDegrees);
 	
