@@ -54,8 +54,8 @@ void UPGProtectButtonWidget::SetupProtectButton(AActor* playerCharacter ,int32 o
 
 void UPGProtectButtonWidget::SetChangeButtonStyle()
 {
-	FButtonStyle ButtonStyle = Button_protect->WidgetStyle; 
-
+	FButtonStyle ButtonStyle = Button_protect->GetStyle();
+	
 	FLinearColor NormalColor(FVector4d(0.5f, 0.09f, 0.11f,0.8f)); 
 	FSlateBrush NormalBrush = ButtonStyle.Normal;
 	NormalBrush.TintColor = FSlateColor(NormalColor);

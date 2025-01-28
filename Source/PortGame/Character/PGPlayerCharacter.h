@@ -493,6 +493,20 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class UBGBaseOptionDataAsset*> OptionDataAssets;
+
+
+protected:
+	void SetPostProcessMaterial();
+
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Materials")
+	TObjectPtr<class UMaterialInterface> PostProcessMaterial;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Materials")
+	TObjectPtr<class UMaterialInstanceDynamic> DynamicMaterialInstance;
+
+	
+
 	
 
 };

@@ -112,6 +112,9 @@ void APGNpcCharacter::ChangeNpcColor()
 	// 팀 색상 설정
 	FLinearColor TeamColor = (TeamId != 1) ? FLinearColor::Red : FLinearColor::Blue;
 
+	GetMesh()->SetCustomDepthStencilValue(TeamId);
+
+
 	// 캐릭터의 메쉬에서 현재 머티리얼 가져오기
 	UMaterialInterface* CurrentMaterial = GetMesh()->GetMaterial(0);
 	if (CurrentMaterial)
@@ -383,11 +386,13 @@ void APGNpcCharacter::CheckCharacterRender()
 {
 	if (GetMesh()->WasRecentlyRendered())
 	{
+		SLOG(TEXT("Render"));
 		OnRenderCharacter();
 		
 	}
 	else
 	{
+		SLOG(TEXT("Nope"));
 		NotRenderCharacter();
 	
 	}

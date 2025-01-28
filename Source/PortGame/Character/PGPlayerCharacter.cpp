@@ -37,6 +37,7 @@
 #include "Component/AIBodyGuardComponent.h"
 
 #include "Data/BGBaseOptionDataAsset.h"
+//#include "Materials/MaterialInstanceDynamic.h"
 
 const FString APGPlayerCharacter::LeftEvadeMontage = TEXT("LeftEvadeMontage");
 const FString APGPlayerCharacter::RightEvadeMontage = TEXT("RightEvadeMontage");
@@ -206,6 +207,12 @@ APGPlayerCharacter::APGPlayerCharacter()
 		BodyGuardCurve = BodyCurve.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface>BaseMaterial(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/PortGame/Effect/Material/M_Scan_Inst.M_Scan_Inst'"));
+	if (BaseMaterial.Object)
+	{
+		PostProcessMaterial = BaseMaterial.Object;
+	}
+
 	AIBodyGuardComponent = CreateDefaultSubobject<UAIBodyGuardComponent>(TEXT("AIBodyComponent"));
 
 
@@ -214,6 +221,8 @@ APGPlayerCharacter::APGPlayerCharacter()
 	bIsGameStated = false;
 
 	bShowBodyGuardOption = false;
+
+	GetMesh()->SetCustomDepthStencilValue(1);
 }
 
 void APGPlayerCharacter::PostInitializeComponents()
@@ -237,7 +246,7 @@ void APGPlayerCharacter::BeginPlay()
 
 	AllTimelineSetting();
 
-	
+	//SetPostProcessMaterial();
 }
 
 void APGPlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -1390,25 +1399,28 @@ void APGPlayerCharacter::BodyGuardCameraMove(float dt)
 	float AimY;
 	float AimZ;
 	float RotatePitch;
+	float Alpha;
 	if (!bIsReversed)
 	{
 		AimX = FMath::Lerp(CameraCurrentLocation.X, -500.0f, dt);
-		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 650.0f, dt);
+		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 400.0f, dt);
 		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, -25.0f, dt);
-
-
+		Alpha = FMath::Lerp(0.0f, 1.0f, dt);
 	}
 	else
 	{
 		AimX = FMath::Lerp(CameraCurrentLocation.X, 0.0f, dt);
 		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 0.0f, dt);
 		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, 0.0f, dt);
+		Alpha = FMath::Lerp(1.0f, 0.0f, dt);
 	}
 	AimY = FMath::Lerp(CameraCurrentLocation.Y, 0.0f, dt);
 
 
 	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
 	Camera->SetRelativeRotation(FRotator(RotatePitch, 0.0f, 0.0f));
+	if(DynamicMaterialInstance)
+		DynamicMaterialInstance->SetScalarParameterValue(FName("Alpha"), Alpha);
 }
 
 void APGPlayerCharacter::StartSetCameraMoveSetting(bool bisreversed, ECameraMoveType cameramovetype)
@@ -1499,6 +1511,20 @@ void APGPlayerCharacter::CloseBodyGuardOption()
 		PGHudWidget->ChangeBodyGuardOptionSize(bShowBodyGuardOption);
 	}
 
+}
+
+void APGPlayerCharacter::SetPostProcessMaterial()
+{
+	if (PostProcessMaterial)
+	{
+
+		DynamicMaterialInstance = UMaterialInstanceDynamic::Create(PostProcessMaterial, this);
+
+		if (Camera)
+		{
+			Camera->PostProcessSettings.AddBlendable(DynamicMaterialInstance, 1.0f);
+		}
+	}
 }
 
 

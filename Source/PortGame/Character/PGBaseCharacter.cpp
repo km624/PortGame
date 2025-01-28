@@ -93,14 +93,13 @@ APGBaseCharacter::APGBaseCharacter()
 		UE_LOG(LogTemp, Warning, TEXT("WidgetClassFail"));
 	}
 
-	
-
 	//나이아가라
 
 	BaseNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BaseNiagaraComp"));
 	BaseNiagaraComponent->SetupAttachment(RootComponent);
 	BaseNiagaraComponent->bAutoActivate = false;
 
+	GetMesh()->SetRenderCustomDepth(true);
 }
 
 void APGBaseCharacter::PostInitializeComponents()
