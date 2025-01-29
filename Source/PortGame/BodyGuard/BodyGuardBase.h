@@ -33,12 +33,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UAIBodyGuardComponent> BodyguardComponent;
 
-	/*UPROPERTY()
-	TSubclassOf<class ADummyPrieviewActor> PriviewActorClass;*/
-
-	UPROPERTY()
-	TArray<TObjectPtr<class ADummyPrieviewActor>> PriviewActors;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float OffsetX = -200.0f;
 

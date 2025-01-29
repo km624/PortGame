@@ -386,13 +386,13 @@ void APGNpcCharacter::CheckCharacterRender()
 {
 	if (GetMesh()->WasRecentlyRendered())
 	{
-		SLOG(TEXT("Render"));
+		
 		OnRenderCharacter();
 		
 	}
 	else
 	{
-		SLOG(TEXT("Nope"));
+		
 		NotRenderCharacter();
 	
 	}

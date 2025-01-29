@@ -48,7 +48,6 @@ void APGStartField::SetupPlayerbleCharacter()
 	}
 
 	UPGSaveGame* savefile= playerController->LoadSaveFile();
-
 	if (!savefile)
 	{
 		SLOG(TEXT("LoadFAil"));

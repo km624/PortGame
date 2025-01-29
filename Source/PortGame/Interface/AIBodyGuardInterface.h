@@ -28,6 +28,10 @@ public:
 	virtual AActor* SetPlayerProtectPawn(APawn* pawn)=0;
 
 	virtual void BodyGuardOptionsClick(int32 optionnum, uint8 optionGauge) = 0;
+
+	virtual void BoyGuardOptionHover(int32 optionnum) = 0;
+
+	virtual void HoverUp() = 0;
 	//virtual FVector CalculateOffsetPawn(APawn* pawn) = 0;
 
 	//UFUNCTION()

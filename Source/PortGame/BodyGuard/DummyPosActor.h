@@ -20,8 +20,6 @@ protected:
 	virtual void BeginPlay() override;
 
 
-
-
 protected:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TObjectPtr<class UStaticMeshComponent> StaticMeshComponent;

@@ -9,11 +9,7 @@
 
 UBodyGuardBase::UBodyGuardBase()
 {
-	/*static ConstructorHelpers::FClassFinder<ADummyPrieviewActor> preview(TEXT(""));
-	if (preview.Class)
-	{
-		PriviewActorClass = preview.Class;
-	}*/
+	
 }
 
 void UBodyGuardBase::SetOption(UAIBodyGuardComponent* bodyguardcomp, int32 optionnum, UBGBaseOptionDataAsset* dataassset)

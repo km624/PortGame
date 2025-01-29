@@ -12,15 +12,19 @@ class PORTGAME_API ADummyPrieviewActor : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+	
 	ADummyPrieviewActor();
 
 protected:
-	// Called when the game starts or when spawned
+	
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr <class USceneComponent> RootScene;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class USkeletalMeshComponent> SkeletalMeshComponent;
 
 };

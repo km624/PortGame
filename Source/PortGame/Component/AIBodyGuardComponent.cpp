@@ -10,6 +10,7 @@
 #include "Interface/AIControllerInterface.h"
 #include "Data/AIAttackEnumData.h"
 #include "Data/BGBaseOptionDataAsset.h"
+#include "BodyGuard/DummyPrieviewActor.h"
 
 
 UAIBodyGuardComponent::UAIBodyGuardComponent()
@@ -29,11 +30,19 @@ UAIBodyGuardComponent::UAIBodyGuardComponent()
 		DefaultOptionDataAsset = defaultdata.Object;
 	}
 
+	static ConstructorHelpers::FClassFinder<ADummyPrieviewActor> preview(TEXT("/Script/Engine.Blueprint'/Game/PortGame/Blueprint/BodyGuard/BP_PreviewActor.BP_PreviewActor_C'"));
+	if (preview.Class)
+	{
+		PreviewActorClass = preview.Class;
+	}
+
 	bWantsInitializeComponent = true;
 
 	MaxBGGauge = MaxBGGaugeCount * 100.0f;
 
 	CurrentBGGauge = 300.0f;
+
+	CurrentHover = 0;
 }
 
 
@@ -142,12 +151,18 @@ void UAIBodyGuardComponent::DeletePlayerProtectPawn(APawn* pawn)
 		int32 index = ProtectMePawns.IndexOfByKey(pawn);
 		ProtectMePawns.Remove(pawn);
 
+		//위치 액터
 		if (PawnsPosActor.IsValidIndex(index))
 		{
 			PawnsPosActor[index]->Destroy();
 			PawnsPosActor.RemoveAt(index);
 		}
-	
+		//프리뷰 액터
+		if (PreviewActors.IsValidIndex(index))
+		{
+			PreviewActors[index]->Destroy();
+			PreviewActors.RemoveAt(index);
+		}
 
 		AlignPawnsPosActor();
 
@@ -176,7 +191,7 @@ AActor* UAIBodyGuardComponent::SpawnPosActor(FVector newlocation)
 
 void UAIBodyGuardComponent::AlignPawnsPosActor()
 {
-	
+	//위치 액터 
 	if (BodyGuardOptions.IsValidIndex(currentPosOption))
 	{
 		if (PawnsPosActor.Num() > 0)
@@ -193,13 +208,24 @@ void UAIBodyGuardComponent::AlignPawnsPosActor()
 				{
 					aibodyguard->SetMaxWalkSpeed(BodyGuardOptions[currentPosOption]->GetBodyGuardSpeed());
 				}
-
 			}
-
 		}
-		
-		
 	}
+	//프리뷰 액터
+	if (BodyGuardOptions.IsValidIndex(CurrentHover))
+	{
+		if (PreviewActors.Num() > 0)
+		{
+			for (int32 i = 0; i < PreviewActors.Num(); i++)
+			{
+				FVector newPostion = GetOwner()->GetActorLocation() + BodyGuardOptions[CurrentHover]->CalculatePawnPostion(GetOwner(), i, PreviewActors.Num());
+
+				PreviewActors[i]->SetActorLocation(newPostion);
+			}
+		}
+
+	}
+
 }
 
 void UAIBodyGuardComponent::BodyGuardOptionsClick(int32 optionnum)
@@ -271,8 +297,7 @@ bool UAIBodyGuardComponent::UseBGOptionGauge(uint8 optiongauge)
 	}
 	else
 	{
-		//Gauge를 깎고 타이머 멈춰있으면 다시 시작
-		SLOG(TEXT("Start!!!! StartOption"));
+		
 		CurrentBGGauge -= ModifyOptionGauge;
 		BGGaugeChanaged.Broadcast(CurrentBGGauge);
 		if (!GetWorld()->GetTimerManager().IsTimerActive(BGGuageTimer))
@@ -281,4 +306,57 @@ bool UAIBodyGuardComponent::UseBGOptionGauge(uint8 optiongauge)
 		}
 		return true;
 	}
+}
+
+void UAIBodyGuardComponent::BoyGuardOptionHover(int32 optionnum)
+{
+	CurrentHover = optionnum;
+
+	for (int32 i = 0; i < ProtectMePawns.Num(); i++)
+	{
+		if (BodyGuardOptions.IsValidIndex(CurrentHover))
+		{
+			
+			AActor* preveiwactor = SpawnPriviewActors();
+
+			
+			/*if (preveiwactor)
+			{
+				FVector spawnlocdation = BodyGuardOptions[CurrentHover]->CalculatePawnPostion(GetOwner(), i, ProtectMePawns.Num());
+
+				preveiwactor->SetActorLocation(spawnlocdation);
+			}*/
+			
+		}
+	}
+	AlignPawnsPosActor();
+}
+
+void UAIBodyGuardComponent::DestroyAllPreviewActors()
+{
+	for (int32 i = 0; i < PreviewActors.Num(); i++)
+	{
+		PreviewActors[i]->Destroy();
+	}
+	PreviewActors.Empty();
+}
+
+AActor* UAIBodyGuardComponent::SpawnPriviewActors()
+{
+	if (PreviewActorClass)
+	{
+		ADummyPrieviewActor* preivewactor =
+			GetWorld()->SpawnActor<ADummyPrieviewActor>(PreviewActorClass, FVector::ZeroVector, FRotator::ZeroRotator, FActorSpawnParameters());
+
+		if (preivewactor)
+		{
+			PreviewActors.Add(preivewactor);
+
+			preivewactor->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+			
+			return preivewactor;
+		}
+	}
+	return nullptr;
+	
 }

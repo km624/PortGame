@@ -246,7 +246,7 @@ void APGPlayerCharacter::BeginPlay()
 
 	AllTimelineSetting();
 
-	//SetPostProcessMaterial();
+	SetPostProcessMaterial();
 }
 
 void APGPlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -1350,7 +1350,7 @@ void APGPlayerCharacter::AttackCameraMove(float dt)
 
 	if (!bIsReversed)
 	{
-		AimX = FMath::Lerp(CameraCurrentLocation.X, 120.0f, dt);
+		AimX = FMath::Lerp(CameraCurrentLocation.X, 75.0f, dt);
 		AimY = FMath::Lerp(CameraCurrentLocation.Y, 75.0f, dt);
 		AimZ = FMath::Lerp(CameraCurrentLocation.Z, -50.0f, dt);
 	}
@@ -1457,6 +1457,16 @@ void APGPlayerCharacter::BodyGuardOptionsClick(int32 optionnum,uint8 optionGauge
 		AIBodyGuardComponent->BodyGuardOptionsClick(optionnum);
 	}
 	
+}
+
+void APGPlayerCharacter::BoyGuardOptionHover(int32 optionnum)
+{
+	AIBodyGuardComponent->BoyGuardOptionHover(optionnum);
+}
+
+void APGPlayerCharacter::HoverUp()
+{
+	AIBodyGuardComponent->DestroyAllPreviewActors();
 }
 
 void APGPlayerCharacter::DeletePlayerProtectPawn(APawn* pawn)

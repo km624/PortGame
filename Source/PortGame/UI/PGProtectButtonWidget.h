@@ -27,6 +27,11 @@ protected:
 	UFUNCTION()
 	void OnButtonClick();
 
+	UFUNCTION()
+	void OnButtonHover();
+	UFUNCTION()
+	void UnButtonHover();
+
 	
 protected:
 	UPROPERTY(meta = (BindWidget))

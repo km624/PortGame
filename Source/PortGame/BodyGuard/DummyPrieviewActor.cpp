@@ -2,13 +2,18 @@
 
 
 #include "BodyGuard/DummyPrieviewActor.h"
-
+#include "Components/SkeletalMeshComponent.h"
 // Sets default values
 ADummyPrieviewActor::ADummyPrieviewActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	RootScene = CreateDefaultSubobject<USceneComponent>(TEXT("RootScene"));
+	SetRootComponent(RootScene);
 
+	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
+
+	SkeletalMeshComponent->SetCollisionProfileName(TEXT("OverlapAll"));
+
+	SkeletalMeshComponent->SetupAttachment(GetRootComponent());
 }
 
 // Called when the game starts or when spawned
@@ -18,10 +23,5 @@ void ADummyPrieviewActor::BeginPlay()
 	
 }
 
-// Called every frame
-void ADummyPrieviewActor::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
-}
 

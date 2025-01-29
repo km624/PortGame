@@ -495,7 +495,7 @@ void AmainPlayerController::OnLoadGameLevel()
 
 	
 	FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-	FString AssetPath = FString::Printf(TEXT("/Game/PortGame/Level/Asian_Village_Copy1.Asian_Village_Copy1"));
+	FString AssetPath = FString::Printf(TEXT("/Game/PortGame/Level/Asian_Village_Copy.Asian_Village_Copy"));
 	//FSoftObjectPath LevelRef(TEXT("/Game/PortGame/Level/Asian_Village_Copy1.Asian_Village_Copy1"));
 	FSoftObjectPath LevelRef(AssetPath);
 
@@ -508,7 +508,7 @@ void AmainPlayerController::OnLevelLoadCompleted()
 	
 	SLOG(TEXT("LoadComplete"));
 
-	UGameplayStatics::OpenLevel(this, TEXT("Asian_Village_Copy1"));
+	UGameplayStatics::OpenLevel(this, TEXT("Asian_Village_Copy"));
 	
 }
 

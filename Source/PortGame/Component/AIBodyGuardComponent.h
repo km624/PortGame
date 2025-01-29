@@ -110,5 +110,27 @@ public:
 	FOnBGGaugeChangeDelegate BGGaugeChanaged;
 	
 	FTimerHandle BGGuageTimer;
+
+
+public:
+	void BoyGuardOptionHover(int32 optionnum);
+
+	void DestroyAllPreviewActors();
+
+protected:
+	AActor* SpawnPriviewActors();
+
+protected:
+	UPROPERTY()
+	TSubclassOf<class ADummyPrieviewActor> PreviewActorClass;
+
+	UPROPERTY()
+	TArray<TObjectPtr<class ADummyPrieviewActor>> PreviewActors;
+
+	uint8 CurrentHover;
+
+
+	
+	///플레이어가 죽었을때 바디가드들 free  자유를 줘야함
 		
 };

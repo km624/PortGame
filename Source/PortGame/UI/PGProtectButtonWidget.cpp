@@ -49,7 +49,8 @@ void UPGProtectButtonWidget::SetupProtectButton(AActor* playerCharacter ,int32 o
 	
 
 	Button_protect->OnClicked.AddDynamic(this, &ThisClass::OnButtonClick);
-	
+	Button_protect->OnHovered.AddDynamic(this, &ThisClass::OnButtonHover);
+	Button_protect->OnUnhovered.AddDynamic(this, &ThisClass::UnButtonHover);
 }
 
 void UPGProtectButtonWidget::SetChangeButtonStyle()
@@ -74,6 +75,26 @@ void UPGProtectButtonWidget::OnButtonClick()
 	{
 		
 		bodyguard->BodyGuardOptionsClick(OptionNum,OptionGauge);
+	}
+}
+
+void UPGProtectButtonWidget::OnButtonHover()
+{
+	IAIBodyGuardInterface* bodyguard = Cast<IAIBodyGuardInterface>(PlayerCharacter);
+	if (bodyguard)
+	{
+
+		bodyguard->BoyGuardOptionHover(OptionNum);
+	}
+}
+
+void UPGProtectButtonWidget::UnButtonHover()
+{
+	IAIBodyGuardInterface* bodyguard = Cast<IAIBodyGuardInterface>(PlayerCharacter);
+	if (bodyguard)
+	{
+
+		bodyguard->HoverUp();
 	}
 }
 

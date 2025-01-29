@@ -472,6 +472,10 @@ public:
 	//virtual FVector CalculateOffsetPawn(APawn* pawn)  override;
 
 	virtual void BodyGuardOptionsClick(int32 optionnum, uint8 optionGauge) override;
+
+	virtual void BoyGuardOptionHover(int32 optionnum) override;
+
+	virtual void HoverUp()override;
 		
 	UFUNCTION()
 	virtual void DeletePlayerProtectPawn(APawn* pawn);
