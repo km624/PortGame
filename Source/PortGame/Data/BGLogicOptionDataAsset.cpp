@@ -3,6 +3,6 @@
 
 #include "Data/BGLogicOptionDataAsset.h"
 
-UBGLogicOptionDataAsset::UBGLogicOptionDataAsset() :AttackType(EAIAttackEnumData::NormalAttack)
+UBGLogicOptionDataAsset::UBGLogicOptionDataAsset() :AttackType(EAIAttackEnumData::NormalAttack),AnimationAsset(nullptr)
 {
 }

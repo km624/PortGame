@@ -10,6 +10,7 @@
 /**
  * 
  */
+class UAnimationAsset;
 UCLASS()
 class PORTGAME_API UBodyGuardBase : public UObject
 {
@@ -23,7 +24,7 @@ public:
 	virtual float GetBodyGuardSpeed();
 
 	//button에서 onclick하면 여기 inclickstart가 호출되고 bodyguardcomp의 값을 변경
-	//virtual void OnHoverPriview();
+	virtual UAnimationAsset* PreviewAnimation();
 
 	virtual void OnClickStart();
 

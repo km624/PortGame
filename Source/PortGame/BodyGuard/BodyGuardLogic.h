@@ -20,10 +20,15 @@ public:
 
 	virtual void SetOption(class UAIBodyGuardComponent* bodyguardcomp, int32 optionnum, class UBGBaseOptionDataAsset* dataassset) override;
 
+	virtual UAnimationAsset* PreviewAnimation() override;
+
 	virtual void OnClickStart() override;
 
 protected:
 	EAIAttackEnumData AttackType;
+
+	UPROPERTY()
+	TObjectPtr <class UAnimationAsset> AnimationAsset;
 
 
 };

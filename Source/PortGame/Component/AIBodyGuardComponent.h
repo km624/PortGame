@@ -120,6 +120,8 @@ public:
 protected:
 	AActor* SpawnPriviewActors();
 
+	
+
 protected:
 	UPROPERTY()
 	TSubclassOf<class ADummyPrieviewActor> PreviewActorClass;

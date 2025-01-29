@@ -19,6 +19,11 @@ protected:
 	
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float dt) override;
+
+public:
+
+	void SetAnimation(class UAnimationAsset* animasset);
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -26,5 +31,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class USkeletalMeshComponent> SkeletalMeshComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UCapsuleComponent> Capsule;
 
 };

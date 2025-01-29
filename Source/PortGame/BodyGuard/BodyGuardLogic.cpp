@@ -4,6 +4,7 @@
 #include "BodyGuard/BodyGuardLogic.h"
 #include "Data/BGLogicOptionDataAsset.h"
 #include "Component/AIBodyGuardComponent.h"
+#include "Animation/AnimationAsset.h"
 
 UBodyGuardLogic::UBodyGuardLogic()
 {
@@ -17,9 +18,16 @@ void UBodyGuardLogic::SetOption(UAIBodyGuardComponent* bodyguardcomp, int32 opti
 	if (logicdata)
 	{
 		AttackType = logicdata->AttackType;
+		AnimationAsset = logicdata->AnimationAsset;
 	}
 
 }
+
+UAnimationAsset* UBodyGuardLogic::PreviewAnimation()
+{
+	return AnimationAsset;
+}
+
 
 void UBodyGuardLogic::OnClickStart()
 {

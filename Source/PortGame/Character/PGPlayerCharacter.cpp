@@ -1477,7 +1477,7 @@ void APGPlayerCharacter::DeletePlayerProtectPawn(APawn* pawn)
 void APGPlayerCharacter::ShowBodyGuardOption()
 {
 
-	SLOG(TEXT("SHowBodyguard"));
+	//SLOG(TEXT("SHowBodyguard"));
 	if (bShowBodyGuardOption)
 	{
 		return;

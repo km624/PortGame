@@ -50,6 +50,6 @@ void UPGProtectWidget::SetUpOptionButton(AActor* playercharacter, TArray<UBGBase
 	for (int32 i = 0; i < optiondataAssets.Num(); i++)
 	{
 		
-		OptionsButton[i]->SetupProtectButton(playercharacter,i+1, optiondataAssets[i]->OptionBGGauge, optiondataAssets[i]->OptionName,  optiondataAssets[i]->bIsRogic);
+		OptionsButton[i]->SetupProtectButton(playercharacter,i+1, optiondataAssets[i]->OptionBGGauge, optiondataAssets[i]->OptionName,  optiondataAssets[i]->bIsBehavior);
 	}
 }

@@ -11,6 +11,8 @@
 #include "Data/AIAttackEnumData.h"
 #include "Data/BGBaseOptionDataAsset.h"
 #include "BodyGuard/DummyPrieviewActor.h"
+#include "Animation/AnimationAsset.h"
+//#include "BodyGuard/PreviewCharacter.h"
 
 
 UAIBodyGuardComponent::UAIBodyGuardComponent()
@@ -319,7 +321,6 @@ void UAIBodyGuardComponent::BoyGuardOptionHover(int32 optionnum)
 			
 			AActor* preveiwactor = SpawnPriviewActors();
 
-			
 			/*if (preveiwactor)
 			{
 				FVector spawnlocdation = BodyGuardOptions[CurrentHover]->CalculatePawnPostion(GetOwner(), i, ProtectMePawns.Num());
@@ -354,9 +355,20 @@ AActor* UAIBodyGuardComponent::SpawnPriviewActors()
 
 			preivewactor->AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 			
+			if (BodyGuardOptions.IsValidIndex(CurrentHover))
+			{
+				UAnimationAsset* animationasset = BodyGuardOptions[CurrentHover]->PreviewAnimation();
+				if (animationasset)
+				{
+					preivewactor->SetAnimation(animationasset);
+				}
+			}
+		
 			return preivewactor;
 		}
 	}
 	return nullptr;
 	
 }
+
+

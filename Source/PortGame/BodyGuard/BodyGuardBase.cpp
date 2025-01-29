@@ -31,6 +31,13 @@ float UBodyGuardBase::GetBodyGuardSpeed()
 
 
 
+
+
+UAnimationAsset* UBodyGuardBase::PreviewAnimation()
+{
+	return nullptr;
+}
+
 void UBodyGuardBase::OnClickStart()
 {
 	if (IsValid(BodyguardComponent))

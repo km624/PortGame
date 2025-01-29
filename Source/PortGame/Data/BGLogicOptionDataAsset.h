@@ -21,5 +21,8 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	EAIAttackEnumData AttackType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr <class UAnimationAsset> AnimationAsset;
+
 	
 };

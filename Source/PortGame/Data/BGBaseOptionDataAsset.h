@@ -36,7 +36,7 @@ public:
 	uint8 OptionBGGauge;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 bIsRogic : 1;
+	uint8 bIsBehavior : 1;
 
 
 
