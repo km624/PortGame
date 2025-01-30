@@ -26,6 +26,7 @@
 
 
 
+
 APGNpcCharacter::APGNpcCharacter() 
 {
 	
@@ -53,19 +54,25 @@ APGNpcCharacter::APGNpcCharacter()
 
 	bIsRendered = true;
 
-	BillboardComponent = CreateDefaultSubobject<UBillboardComponent>(TEXT("BillboardComponent"));
+	TargetWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("TargetWidgetComponent"));
 
-	BillboardComponent->SetupAttachment(RootComponent);
-	BillboardComponent->SetRelativeScale3D(FVector(0.07f));
-	
-	BillboardComponent->SetHiddenInGame(true);
-	static ConstructorHelpers::FObjectFinder<UTexture2D> SpriteTexture(TEXT("/Script/Engine.Texture2D'/Game/PortGame/Blueprint/TargetLock.TargetLock'"));
-	if (SpriteTexture.Succeeded())
+	TargetWidget->SetupAttachment(GetMesh());
+	TargetWidget->SetRelativeLocation(FVector(0.0f, 0.0f, 120.0f));
+	static ConstructorHelpers::FClassFinder<UUserWidget>TargetWidgetClass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/PortGame/UI/BP_TargetLock.BP_TargetLock_C'"));
+	if (TargetWidgetClass.Class)
 	{
-		BillboardComponent->SetSprite(SpriteTexture.Object);
-	}
+		TargetWidget->SetWidgetClass(TargetWidgetClass.Class);
+		TargetWidget->SetWidgetSpace(EWidgetSpace::Screen);
 
-	
+		// 위젯 크기 여기서 지정 ( 가느다란 크기)s
+		TargetWidget->SetDrawSize(FVector2D(30.0f, 30.0f));
+		TargetWidget->SetHiddenInGame(true);
+		TargetWidget->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("WidgetClassFail"));
+	}
 }
 
 void APGNpcCharacter::BeginPlay()
@@ -452,30 +459,8 @@ void APGNpcCharacter::SetAnimationDistanceFactor()
 
 void APGNpcCharacter::SetTargeting(bool targeting)
 {
+	TargetWidget->SetHiddenInGame(!targeting);
 	
-	BillboardComponent->SetHiddenInGame(!targeting);
-}
-
-void APGNpcCharacter::SetTargetImageLocaiton(AActor* player)
-{
-	if (!player) return;
-	// 액터의 현재 위치와 Forward 벡터 가져오기
-	FVector ActorLocation = GetActorLocation();
-	
-	FVector PlayerLocation = player->GetActorLocation();
-
-	FVector Direction = (ActorLocation - PlayerLocation).GetSafeNormal();
-	
-	FVector NewLocation = -(Direction * 40.0f) + ActorLocation +FVector::UpVector *20.0f;
-	
-	FVector NewInterpLocation = FMath::VInterpTo(
-		BillboardComponent->GetComponentLocation(),
-		NewLocation,
-		GetWorld()->GetDeltaSeconds(),
-		10.0f  
-	);
-	
-	BillboardComponent->SetWorldLocation(NewInterpLocation);
 }
 
 

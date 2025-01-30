@@ -25,5 +25,5 @@ public:
 
 	virtual void SetTargeting(bool targeting) = 0;
 
-	virtual void SetTargetImageLocaiton(AActor* player) = 0;
+	
 };

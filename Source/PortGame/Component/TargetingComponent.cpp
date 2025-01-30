@@ -38,10 +38,7 @@ void UTargetingComponent::BeginPlay()
 void UTargetingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if (TargetInstance)
-	{
-		TargetInstance->SetTargetImageLocaiton(GetOwner());
-	}
+	
 }
 
 void UTargetingComponent::SetTargetLock()
@@ -78,7 +75,9 @@ void UTargetingComponent::SetSideTargetLock(float direction)
 {
 
 	if (!bIsTargetLock) return;
+
 	FindClosestEnemy();
+
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(GetOwner());
 	const FVector palyerLocation = playerCharacter->GetActorLocation();
 	// 가장 가까운 액터의 위치
@@ -105,12 +104,11 @@ void UTargetingComponent::SetSideTargetLock(float direction)
 	
 	if (FindSideActor)
 	{
-		
-		INPCTargetLockInterface* targetBillboard = Cast<INPCTargetLockInterface>(TargetActor);
-		if (targetBillboard)
+		if (TargetInstance)
 		{
-			targetBillboard->SetTargeting(false);
+			TargetInstance->SetTargeting(false);
 		}
+
 		
 		TargetActor = FindSideActor;
 

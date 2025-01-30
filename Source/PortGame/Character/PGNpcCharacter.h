@@ -129,11 +129,9 @@ protected:
 
 	virtual void SetTargeting(bool targeting) override;
 
-	virtual void SetTargetImageLocaiton(AActor* player)override;
 
 protected:
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-	TObjectPtr<class UBillboardComponent> BillboardComponent;
-
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	TObjectPtr < class UWidgetComponent> TargetWidget;
 
 };

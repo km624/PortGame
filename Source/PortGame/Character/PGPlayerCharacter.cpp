@@ -565,7 +565,8 @@ void APGPlayerCharacter::ReleasedAim()
 	bIsShoot = false;
 	OnbIsShoot.Broadcast(bIsShoot);
 	SetCharacterInputData(EControlData::Base);
-	StartSetCameraMoveSetting(true, ECameraMoveType::AimCamera);
+	if(!bShowBodyGuardOption || !bIsGlobalTimeSlow)
+		StartSetCameraMoveSetting(true, ECameraMoveType::AimCamera);
 	//AimTimeline.Reverse();
 
 	if (bIsNikkeSkill)
@@ -707,7 +708,7 @@ void APGPlayerCharacter::FindSideEnemyToComp(const FInputActionValue& Value)
 	float direction = Value.Get<float>();
 	if (TargetingComponent->GetbIsTargetLock())
 	{
-		TargetingComponent->SetSideTargetLock(direction);
+		TargetingComponent->SetSideTargetLock(direction*-1.0f);
 	}
 	else
 	{
@@ -815,8 +816,8 @@ void APGPlayerCharacter::OnDash()
 			GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration;
 			
 			GetWorld()->GetTimerManager().ClearTimer(DashTimerHandle);
-
-			StartSetCameraMoveSetting(true, ECameraMoveType::DashCamera);
+			if(!bShowBodyGuardOption||!bIsGlobalTimeSlow)
+				StartSetCameraMoveSetting(true, ECameraMoveType::DashCamera);
 
 			bIsDash = false;
 			AttackComponent->SetbIsGodMode(false);
