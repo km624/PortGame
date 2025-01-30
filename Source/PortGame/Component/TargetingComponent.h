@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Interface/NPCTargetLockInterface.h"
 #include "TargetingComponent.generated.h"
 
 USTRUCT(BlueprintType)
@@ -35,6 +36,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
+
 
 public:
 
@@ -49,10 +52,11 @@ public:
 
 	float CharcterTargetDistance();
 
-protected:
+public:
 
 	void ResetTargeting();
 
+protected:
 	AActor* FindClosestEnemy();
 
 	AActor* FindSideClosetEnemy(const TArray<AActor*>& Actors, const FVector& DirectionLocation, const FVector& Origin, const FVector& Direction);
@@ -70,5 +74,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Target", meta = (AllowPrivateAccess = "true"))
 	TArray<AActor*> AllTargetActor;
+
+	UPROPERTY()
+	TScriptInterface<INPCTargetLockInterface> TargetInstance;
 		
 };

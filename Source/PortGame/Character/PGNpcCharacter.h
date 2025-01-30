@@ -7,13 +7,14 @@
 //#include "Interface/PGNPCCharacterInterface.h"
 #include "Character/PGAIBaseCharacter.h"
 #include "Interface/NPCParryCheckInterface.h"
+#include "Interface/NPCTargetLockInterface.h"
 #include "PGNpcCharacter.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PORTGAME_API APGNpcCharacter : public APGAIBaseCharacter , public INPCParryCheckInterface
+class PORTGAME_API APGNpcCharacter : public APGAIBaseCharacter , public INPCParryCheckInterface ,public INPCTargetLockInterface
 {
 	GENERATED_BODY()
 	
@@ -123,6 +124,16 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
 	uint8 bIsRendered : 1;
 
+
+protected:
+
+	virtual void SetTargeting(bool targeting) override;
+
+	virtual void SetTargetImageLocaiton(AActor* player)override;
+
+protected:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TObjectPtr<class UBillboardComponent> BillboardComponent;
 
 
 };

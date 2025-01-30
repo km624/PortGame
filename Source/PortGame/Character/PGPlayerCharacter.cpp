@@ -207,6 +207,11 @@ APGPlayerCharacter::APGPlayerCharacter()
 		BodyGuardCurve = BodyCurve.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> FieldCurve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Weapon/FieldChangeCurve.FieldChangeCurve'"));
+	if (FieldCurve.Object)
+	{
+		FieldChangeCurve = FieldCurve.Object;
+	}
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface>BaseMaterial(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/PortGame/Effect/Material/M_Scan_Inst.M_Scan_Inst'"));
 	if (BaseMaterial.Object)
 	{
@@ -230,6 +235,8 @@ void APGPlayerCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	if(baseCharacterData)
 		CreateHudWidget();
+
+	bIsGlobalTimeSlow = false;
 }
 
 void APGPlayerCharacter::BeginPlay()
@@ -489,7 +496,7 @@ void APGPlayerCharacter::Look(const FInputActionValue& Value)
 
 void APGPlayerCharacter::Attack()
 {
-	if (bIsSlow || bIsDash || !bIsMiniMap ||bIsGameStated)return;
+	if (bIsSlow || bIsDash || !bIsMiniMap ||bIsGameStated|| bShowBodyGuardOption)return;
 
 	if (bIsAim)
 	{
@@ -529,7 +536,7 @@ void APGPlayerCharacter::ReleasedAttack()
 
 void APGPlayerCharacter::PressAim()
 {
-	if (bIsSlow || bIsDash || bIsUltiSkill || !bIsMiniMap || bIsGameStated)return;
+	if (bIsSlow || bIsDash || bIsUltiSkill || !bIsMiniMap || bIsGameStated|| bShowBodyGuardOption)return;
 
 	bIsAim = true;
 	OnbIsAim.Broadcast(bIsAim);
@@ -572,7 +579,7 @@ void APGPlayerCharacter::ReleasedAim()
 
 void APGPlayerCharacter::PressReload()
 {
-	if (bIsSlow || bIsDash || bIsUltiSkill || !bIsMiniMap) return;
+	if (bIsSlow || bIsDash || bIsUltiSkill || !bIsMiniMap|| bShowBodyGuardOption) return;
 	ReloadToWeapon();
 }
 
@@ -600,6 +607,9 @@ void APGPlayerCharacter::AimUpdate(float deltaTime)
 	AimZ = FMath::Lerp(CameraCurrentLocation.Z, 0.0f, deltaTime);
 
 	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
+	Camera->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
+	if (DynamicMaterialInstance)
+		DynamicMaterialInstance->SetScalarParameterValue(FName("Alpha"), 0.0f);
 
 }
 
@@ -995,7 +1005,7 @@ void APGPlayerCharacter::StopDefenceNikke()
 
 void APGPlayerCharacter::OnUltimateSkill()
 {
-	if (bIsGameStated)return;
+	if (bIsGameStated|| bShowBodyGuardOption)return;
 	
 	UltimateSkillToComponent();
 }
@@ -1073,6 +1083,8 @@ void APGPlayerCharacter::ThreeChangePlayerCharacter()
 
 void APGPlayerCharacter::CheckandChangePlayerCharacter(int8 num)
 {
+	if (bIsGlobalTimeSlow)
+		return;
 	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
 	if (playerController)
 		playerController->ChangedCharacterPossess(num);
@@ -1308,11 +1320,19 @@ void APGPlayerCharacter::AllTimelineSetting()
 	FOnTimelineFloat BodyguardProgress;
 	BodyguardProgress.BindUFunction(this, FName("BodyGuardCameraMove"));
 	BodyguardWrapper->Timeline.AddInterpFloat(BodyGuardCurve, BodyguardProgress);
+
+	// 필드체인지 타임라인
+	UTimeLineWrapper* FieldChangeWrapper = NewObject<UTimeLineWrapper>(this);
+	FOnTimelineFloat FieldChangeProgress;
+	FieldChangeProgress.BindUFunction(this, FName("FieldChangeCameraMove"));
+	FieldChangeWrapper->Timeline.AddInterpFloat(FieldChangeCurve, FieldChangeProgress);
+
 	
 	AllCameraTimeline.Add(ECameraMoveType::AimCamera, AimWrapper);
 	AllCameraTimeline.Add(ECameraMoveType::AttackCamera, AttackWrapper);
 	AllCameraTimeline.Add(ECameraMoveType::DashCamera, DashWrapper);
 	AllCameraTimeline.Add(ECameraMoveType::BodyGuardCamera, BodyguardWrapper);
+	AllCameraTimeline.Add(ECameraMoveType::FieldChangeCamera, FieldChangeWrapper);
 }
 
 void APGPlayerCharacter::AllTimelineTick(float dt)
@@ -1321,6 +1341,7 @@ void APGPlayerCharacter::AllTimelineTick(float dt)
 	AllCameraTimeline[ECameraMoveType::DashCamera]->Timeline.TickTimeline(dt);
 	AllCameraTimeline[ECameraMoveType::AttackCamera]->Timeline.TickTimeline(dt);
 	AllCameraTimeline[ECameraMoveType::BodyGuardCamera]->Timeline.TickTimeline(dt);
+	AllCameraTimeline[ECameraMoveType::FieldChangeCamera]->Timeline.TickTimeline(dt);
 	
 }
 
@@ -1363,6 +1384,9 @@ void APGPlayerCharacter::AttackCameraMove(float dt)
 	
 
 	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
+	Camera->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
+	if (DynamicMaterialInstance)
+		DynamicMaterialInstance->SetScalarParameterValue(FName("Alpha"), 0.0f);
 }
 
 void APGPlayerCharacter::DashCameraMove(float dt)
@@ -1391,6 +1415,9 @@ void APGPlayerCharacter::DashCameraMove(float dt)
 	
 	
 	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
+	Camera->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
+	if (DynamicMaterialInstance)
+		DynamicMaterialInstance->SetScalarParameterValue(FName("Alpha"), 0.0f);
 }
 
 void APGPlayerCharacter::BodyGuardCameraMove(float dt)
@@ -1421,6 +1448,32 @@ void APGPlayerCharacter::BodyGuardCameraMove(float dt)
 	Camera->SetRelativeRotation(FRotator(RotatePitch, 0.0f, 0.0f));
 	if(DynamicMaterialInstance)
 		DynamicMaterialInstance->SetScalarParameterValue(FName("Alpha"), Alpha);
+}
+
+void APGPlayerCharacter::FieldChangeCameraMove(float dt)
+{
+	float AimX;
+	float AimY;
+	float AimZ;
+	float RotatePitch;
+	
+	if (!bIsReversed)
+	{
+		AimX = FMath::Lerp(CameraCurrentLocation.X, -300.0f, dt);
+		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 800.0f, dt);
+		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, -40.0f, dt);
+	}
+	else
+	{
+		AimX = FMath::Lerp(CameraCurrentLocation.X, 0.0f, dt);
+		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 0.0f, dt);
+		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, 0.0f, dt);
+	}
+	AimY = FMath::Lerp(CameraCurrentLocation.Y, 0.0f, dt);
+
+
+	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
+	Camera->SetRelativeRotation(FRotator(RotatePitch, 0.0f, 0.0f));
 }
 
 void APGPlayerCharacter::StartSetCameraMoveSetting(bool bisreversed, ECameraMoveType cameramovetype)
@@ -1483,7 +1536,7 @@ void APGPlayerCharacter::ShowBodyGuardOption()
 		return;
 	}
 	bShowBodyGuardOption = true;
-
+	bIsGlobalTimeSlow = bShowBodyGuardOption;
 	StartSetCameraMoveSetting(false,ECameraMoveType::BodyGuardCamera);
 	
 	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
@@ -1506,7 +1559,7 @@ void APGPlayerCharacter::CloseBodyGuardOption()
 		return;
 	}
 	bShowBodyGuardOption = false;
-
+	bIsGlobalTimeSlow = bShowBodyGuardOption;
 	StartSetCameraMoveSetting(true, ECameraMoveType::BodyGuardCamera);
 	
 	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
@@ -1534,6 +1587,32 @@ void APGPlayerCharacter::SetPostProcessMaterial()
 		{
 			Camera->PostProcessSettings.AddBlendable(DynamicMaterialInstance, 1.0f);
 		}
+	}
+}
+
+void APGPlayerCharacter::StartFieldChangedCamera(bool start)
+{
+
+	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
+	if (playerController)
+	{
+		bIsGlobalTimeSlow = start;
+		StartSetCameraMoveSetting(!start, ECameraMoveType::FieldChangeCamera);
+
+		if (start)
+		{
+			
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.5f);
+
+		}
+		else
+		{
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+		}
+
+		playerController->SetIgnoreLookInput(start);
+	
+		
 	}
 }
 

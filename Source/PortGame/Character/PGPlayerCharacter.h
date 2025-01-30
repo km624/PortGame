@@ -23,7 +23,8 @@ enum class ECameraMoveType :uint8
 	AimCamera = 0 UMETA(DisplayName = "Aim"),
 	AttackCamera UMETA(DisplayName = "Attack"),
 	DashCamera UMETA(DisplayName = "Dash"),
-	BodyGuardCamera UMETA(DisplayName = "BodyGuard")
+	BodyGuardCamera UMETA(DisplayName = "BodyGuard"),
+	FieldChangeCamera UMETA(DisplayName = "FieldChange")
 };
 UENUM()
 enum class EControlData : uint8
@@ -430,6 +431,9 @@ protected:
 	UFUNCTION()
 	void BodyGuardCameraMove(float dt);
 
+	UFUNCTION()
+	void FieldChangeCameraMove(float dt);
+
 public:
 	void StartSetCameraMoveSetting(bool bisreversed, ECameraMoveType cameramovetype);
 
@@ -454,6 +458,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	TObjectPtr<class UCurveFloat> BodyGuardCurve;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	TObjectPtr<class UCurveFloat> FieldChangeCurve;
 public:
 	//공격 카메라 타임라인
 	//FTimeline AttackTimeline;
@@ -509,8 +516,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Materials")
 	TObjectPtr<class UMaterialInstanceDynamic> DynamicMaterialInstance;
 
-	
+public:
+	void StartFieldChangedCamera(bool start);
 
+protected:
+	UPROPERTY()
+	uint8 bIsGlobalTimeSlow : 1;
 	
 
 };

@@ -8,6 +8,7 @@
 #include "Character/PGBaseCharacter.h"
 #include "Physics/PGCollision.h"
 #include "GenericTeamAgentInterface.h"
+#include "Interface/NPCTargetLockInterface.h"
 
 
 
@@ -16,6 +17,8 @@ UTargetingComponent::UTargetingComponent()
 {
 
 	bWantsInitializeComponent = true;
+	PrimaryComponentTick.bCanEverTick = true;
+	
 }
 
 
@@ -32,12 +35,22 @@ void UTargetingComponent::BeginPlay()
 	
 }
 
+void UTargetingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (TargetInstance)
+	{
+		TargetInstance->SetTargetImageLocaiton(GetOwner());
+	}
+}
+
 void UTargetingComponent::SetTargetLock()
 {
 	if (bIsTargetLock)
 	{
-		TargetActor = NULL;
-		bIsTargetLock = false;
+		ResetTargeting();
+		/*TargetActor = NULL;
+		bIsTargetLock = false;*/
 	}
 	else
 	{
@@ -46,6 +59,14 @@ void UTargetingComponent::SetTargetLock()
 		{
 			TargetActor = findActor;
 			bIsTargetLock = true;
+
+			INPCTargetLockInterface* targetBillboard = Cast<INPCTargetLockInterface>(TargetActor);
+			if (targetBillboard)
+			{
+				targetBillboard->SetTargeting(true);
+				TargetInstance = TargetActor;
+			}
+
 		}
 			
 	}
@@ -85,7 +106,21 @@ void UTargetingComponent::SetSideTargetLock(float direction)
 	if (FindSideActor)
 	{
 		
+		INPCTargetLockInterface* targetBillboard = Cast<INPCTargetLockInterface>(TargetActor);
+		if (targetBillboard)
+		{
+			targetBillboard->SetTargeting(false);
+		}
+		
 		TargetActor = FindSideActor;
+
+		INPCTargetLockInterface* targetnewBillboard = Cast<INPCTargetLockInterface>(TargetActor);
+		if (targetnewBillboard)
+		{
+			targetnewBillboard->SetTargeting(true);
+			TargetInstance = TargetActor;
+		}
+
 		DrawDebugLine(GetWorld(), palyerLocation, FindSideActor->GetActorLocation(), FColor::Green, false, 1.0f, 0, 2.0f);
 	}
 		
@@ -95,6 +130,11 @@ void UTargetingComponent::SetSideTargetLock(float direction)
 void UTargetingComponent::ResetTargeting()
 {
 	APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(GetOwner());
+	if (TargetInstance)
+	{
+		TargetInstance->SetTargeting(false);
+	}
+	TargetInstance = NULL;
 	TargetActor = NULL;
 	bIsTargetLock = false;
 	AllTargetActor.Empty();

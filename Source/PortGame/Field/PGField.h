@@ -84,7 +84,18 @@ protected:
 
 	//AI생성
 protected:
+	void AllProtectAISpawn();
+
 	void OnAISpawn();
+
+protected:
+	FTimerHandle ProtectAISpawnTimeHandler;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
+	float ProtectAISpawnTime = 30.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AIFieldData")
+	int32 CurrentProtectPawnCount;
 
 protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "AIFieldData")
@@ -183,6 +194,29 @@ protected:
 
 public:
 	bool DeleteProtectAI(APawn* ai);
+
+	//필드 점령시 이펙트
+public:
+	void StartFieldEffect(uint8 teamId);
+
+	UFUNCTION()
+	void OnNiagaraSystemFinished(class UNiagaraComponent* FinishedComponent);
+
+protected:
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UNiagaraComponent> NiagaraComponent;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effect)
+	TObjectPtr<class  UNiagaraSystem> BlueTeamEffect;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effect)
+	TObjectPtr<class  UNiagaraSystem> RedTeamEffect;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Effect)
+	uint8 bIsChangedEffect : 1;
+
+
 	
 
 

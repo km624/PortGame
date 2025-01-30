@@ -19,6 +19,9 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/BillboardComponent.h"
+
+
 
 
 
@@ -50,6 +53,19 @@ APGNpcCharacter::APGNpcCharacter()
 
 	bIsRendered = true;
 
+	BillboardComponent = CreateDefaultSubobject<UBillboardComponent>(TEXT("BillboardComponent"));
+
+	BillboardComponent->SetupAttachment(RootComponent);
+	BillboardComponent->SetRelativeScale3D(FVector(0.07f));
+	
+	BillboardComponent->SetHiddenInGame(true);
+	static ConstructorHelpers::FObjectFinder<UTexture2D> SpriteTexture(TEXT("/Script/Engine.Texture2D'/Game/PortGame/Blueprint/TargetLock.TargetLock'"));
+	if (SpriteTexture.Succeeded())
+	{
+		BillboardComponent->SetSprite(SpriteTexture.Object);
+	}
+
+	
 }
 
 void APGNpcCharacter::BeginPlay()
@@ -432,6 +448,34 @@ void APGNpcCharacter::SetAnimationDistanceFactor()
 
 		Params->BaseVisibleDistanceFactorThesholds = { 0.5f, 0.3f, 0.1f };
 	}
+}
+
+void APGNpcCharacter::SetTargeting(bool targeting)
+{
+	
+	BillboardComponent->SetHiddenInGame(!targeting);
+}
+
+void APGNpcCharacter::SetTargetImageLocaiton(AActor* player)
+{
+	if (!player) return;
+	// 액터의 현재 위치와 Forward 벡터 가져오기
+	FVector ActorLocation = GetActorLocation();
+	
+	FVector PlayerLocation = player->GetActorLocation();
+
+	FVector Direction = (ActorLocation - PlayerLocation).GetSafeNormal();
+	
+	FVector NewLocation = -(Direction * 40.0f) + ActorLocation +FVector::UpVector *20.0f;
+	
+	FVector NewInterpLocation = FMath::VInterpTo(
+		BillboardComponent->GetComponentLocation(),
+		NewLocation,
+		GetWorld()->GetDeltaSeconds(),
+		10.0f  
+	);
+	
+	BillboardComponent->SetWorldLocation(NewInterpLocation);
 }
 
 

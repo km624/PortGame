@@ -14,6 +14,9 @@
 #include "Engine/LevelScriptActor.h"
 #include "Field/ObjectPoolManager.h"
 #include "Engine/OverlapResult.h"
+#include "NiagaraComponent.h"   
+#include "NiagaraSystem.h"  
+#include "NiagaraFunctionLibrary.h"
 
 
 // Sets default values
@@ -36,13 +39,32 @@ APGField::APGField()
 	PrimaryActorTick.bCanEverTick = true;
 
 	bIsVisibled = false;
+
+	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BaseNiagaraComp"));
+	NiagaraComponent->SetupAttachment(RootComponent);
+	NiagaraComponent->bAutoActivate = false;
+
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> blueEffect(TEXT("/Script/Niagara.NiagaraSystem'/Game/PortGame/Effect/Niagara/NA_FieldBlueEffect.NA_FieldBlueEffect'"));
+	if (blueEffect.Object)
+	{
+		BlueTeamEffect = blueEffect.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> redEffect(TEXT("/Script/Niagara.NiagaraSystem'/Game/PortGame/Effect/Niagara/NA_FieldRedEffect.NA_FieldRedEffect'"));
+	if (redEffect.Object)
+	{
+		RedTeamEffect = redEffect.Object;
+	}
+
+	
 }
 
 
 void APGField::BeginPlay()
 {
 	Super::BeginPlay();
-
+	NiagaraComponent->OnSystemFinished.AddDynamic(this, &APGField::OnNiagaraSystemFinished);
 	AIField->OnComponentBeginOverlap.AddDynamic(this, &APGField::OnOverlapBegin);
 	AIField->OnComponentEndOverlap.AddDynamic(this, &APGField::OnOverlapEnd);
 
@@ -77,6 +99,11 @@ void APGField::InitializeField(uint8 teamid)
 	SetGenericTeamId(teamid);
 	
 	SetTeamColor();
+
+	AllProtectAISpawn();
+
+	GetWorld()->GetTimerManager().SetTimer(ProtectAISpawnTimeHandler,
+		this, &ThisClass::AllProtectAISpawn, ProtectAISpawnTime, true);
 
 	float RandSpawnTime = FMath::FRandRange(AttackAISpawnTime - 5.0f, AttackAISpawnTime + 5.0f);
 
@@ -149,6 +176,11 @@ void APGField::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 			{
 				
 				playerCharacter->GetPlayerHudWidget()->CollapsedFieldGauge();
+				if (bIsChangedEffect)
+				{
+					playerCharacter->StartFieldChangedCamera(false);
+				}
+
 				PlayerCharacters.Remove(playerCharacter);
 
 			}
@@ -190,6 +222,24 @@ void APGField::SetTeamColor()
 	}
 
 	
+}
+
+void APGField::AllProtectAISpawn()
+{
+	if (!bIsVisibled)
+	{
+		CurrentProtectPawnCount = SpawnCount;
+		return;
+	}
+
+	for (int32 i = CurrentProtectPawnCount; i < SpawnCount; i++)
+	{
+		OnAISpawn();
+		CurrentProtectPawnCount++;
+		SLOG(TEXT("protectPawn Add number: %d"), CurrentProtectPawnCount);
+	}
+
+	SLOG(TEXT("AllprotectPawn: %d"), CurrentProtectPawnCount);
 }
 
 void APGField::OnAISpawn()
@@ -247,7 +297,7 @@ void APGField::OnAISpawn()
 		if (aicharacter)
 		{
 			AICharacters.Add(aicharacter);
-
+			
 		}
 	}
 	
@@ -263,12 +313,14 @@ void APGField::DamageField(class APawn* deadpawn, int8 attackteamid)
 		if (AICharacters.Contains(deadnpc))
 		{
 			AICharacters.Remove(deadnpc);
+			CurrentProtectPawnCount--;
 		}
 	}
 	else
 		SLOG(TEXT("NODeadNPC"));
 
-	OnAISpawn();
+	//OnAISpawn();
+
 
 	DamageFieldGauge(attackteamid);
 }
@@ -321,10 +373,11 @@ void APGField::ChangedField(int8 teamid)
 			}
 		}
 	}
+
+	StartFieldEffect(teamid);
 	GetWorld()->GetTimerManager().ClearTimer(AttackAISpawnTimeHandler);
-
+	GetWorld()->GetTimerManager().ClearTimer(ProtectAISpawnTimeHandler);
 	InitializeField(teamid);
-
 
 	if (PlayerCharacters.Num() > 0)
 	{
@@ -333,6 +386,7 @@ void APGField::ChangedField(int8 teamid)
 			if (palyerCharacter)
 			{
 				palyerCharacter->GetPlayerHudWidget()->SetupFieldGauge(TeamId,MaxFieldGague,currentFieldGauge);
+				palyerCharacter->StartFieldChangedCamera(true);
 			}
 		}
 	}
@@ -434,8 +488,6 @@ void APGField::CheckFieldVisible()
 		//VisibleClearTimer();
 		bIsVisibled = true;
 		
-		
-	
 	}
 	else
 	{
@@ -470,6 +522,7 @@ void APGField::AllAIReturnObjectPool()
 	}
 
 	//배열 초기화
+	
 	AICharacters.Empty();
 }
 
@@ -477,8 +530,7 @@ void APGField::StartProtectAISpawn()
 {
 	if (bIsVisibled) return;
 	
-	//SLOG(TEXT("FieldStartSpawn"));
-	for (int i = AICharacters.Num(); i < SpawnCount; i++)
+	for (int i = 0; i < CurrentProtectPawnCount; i++)
 	{
 		OnAISpawn();
 	}
@@ -550,12 +602,50 @@ bool APGField::DeleteProtectAI(APawn* ai)
 
 			AICharacters.Remove(npcai);
 			//SLOG(TEXT("Field -> Player protect"));
-			OnAISpawn();
+			//OnAISpawn();
 			return true;
 		}
 		return false;
 	}
 	return false;
+}
+
+void APGField::StartFieldEffect(uint8 teamId)
+{
+	
+	if (NiagaraComponent->IsActive())
+		NiagaraComponent->Deactivate();
+
+	bIsChangedEffect = true;
+	if (teamId != 1)
+	{
+		NiagaraComponent->SetAsset(RedTeamEffect);
+	}
+	else
+	{
+		NiagaraComponent->SetAsset(BlueTeamEffect);
+	}
+
+	NiagaraComponent->SetWorldLocation(GetActorLocation());
+	
+	NiagaraComponent->Activate();
+}
+
+void APGField::OnNiagaraSystemFinished(UNiagaraComponent* FinishedComponent)
+{
+	bIsChangedEffect = false;
+	if (PlayerCharacters.Num() > 0)
+	{
+		for (TObjectPtr<APGPlayerCharacter>& palyerCharacter : PlayerCharacters)
+		{
+			if (palyerCharacter)
+			{
+				palyerCharacter->StartFieldChangedCamera(false);
+			}
+		}
+	}
+
+	FinishedComponent->Deactivate();
 }
 
 //void APGField::SetTimerAttackPawnDamage(APGNpcCharacter* attackPawn)
