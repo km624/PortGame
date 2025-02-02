@@ -129,7 +129,7 @@ void UMyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 								{
 									if (!myfield->DeleteProtectAI(ControllingPawn))
 									{
-										SLOG(TEXT("Fail Delete field Array"));
+										SLOG(TEXT("%s : Fail Delete field Array"), *ControllingPawn->GetActorNameOrLabel());
 										return;
 									}
 									OwnerComp.GetBlackboardComponent()->SetValueAsBool(BBKEY_PROTECTFIELD, false);

@@ -88,7 +88,7 @@ void APGNpcCharacter::BeginPlay()
 	}
 	//NPC 캐릭터 팀 색깔 설정
 	ChangeNpcColor();
-
+	currentSlowtime = 0.0f;
 	
 }
 
@@ -99,6 +99,7 @@ void APGNpcCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	GetWorld()->GetTimerManager().ClearTimer(DeadHiddentimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(NPCHitTimer);
 }
 
 
@@ -114,8 +115,10 @@ void APGNpcCharacter::EnableCharacter()
 {
 	Super::EnableCharacter();
 
+	bIshit = false;
 	bIsRendered = true;
 	bIsParry = false;
+	currentSlowtime = 0.0f;
 	
 }
 
@@ -126,6 +129,8 @@ void APGNpcCharacter::Tick(float deltatime)
 	CheckCharacterRender();
 
 }
+
+
 
 	
 
@@ -176,54 +181,98 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
-	if (!EventInstigator->GetPawn()) return DamageAmount;
-	APGBaseCharacter* attackPawn = Cast<APGBaseCharacter>(EventInstigator->GetPawn());
+	//if (!EventInstigator->GetPawn()) return DamageAmount;
+	//APGBaseCharacter* attackPawn = Cast<APGBaseCharacter>(EventInstigator->GetPawn());
 	
-	if(TeamId !=1)
-		HpBarWidgetComponent->SetHiddenInGame(false);
+	if (EventInstigator->GetPawn() ==NULL)return DamageAmount;
 
-	HitImpulseVector *= 2.0f;
-	if (attackPawn)
+	if (DamageCauser == NULL)return DamageAmount;
+
+	if (!GetTeamAttitudeTowards(*DamageCauser)) return DamageAmount;
+	
+	if (TeamId != 1)
 	{
-		//적팀일시
-		if (GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
-		{
-			//패리중일때
-			if (bIsParry)
-			{
+		bIshit = true;
+		HpBarWidgetComponent->SetHiddenInGame(false);
+		OnHited.Broadcast(bIshit);
 
-				StatComponent->HitGaugeDamaged(GetTotalStat().HitGauge);
-
-				NAParryUpdateEnd();
-
-			}
-			else
-				StatComponent->Damaged(DamageAmount, DamageCauser);
-		}
-
-		//수류탄에 맞았을시
-		if (DamageCauser->ActorHasTag(TAG_GRENADE))
-		{
-
-			/*FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
-			Direction.Normalize();*/
-			HitImpulseVector += (FVector(0, 0, 1) * 50.0f);
-
-			if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
-			{
-				StatComponent->Damaged(DamageAmount, EventInstigator->GetPawn());
-			}
-			
-		}
+		GetWorld()->GetTimerManager().SetTimer(
+			NPCHitTimer,
+			[this]() {
+				bIshit = false;
+				HpBarWidgetComponent->SetHiddenInGame(true);
+				OnHited.Broadcast(bIshit);
+				GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
+			}, WidgetShowTime, false
+		);
 	}
+	
+	HitImpulseVector *= 2.0f;
+	
+	AActor* AttackActor = DamageCauser;
+
+	if (DamageCauser->ActorHasTag(TAG_GRENADE))
+	{
+		HitImpulseVector += (FVector(0, 0, 1) * 50.0f);
+		AttackActor = EventInstigator->GetPawn();
+	}
+
+	//패리중일때
+	if (bIsParry)
+	{
+
+		StatComponent->HitGaugeDamaged(GetTotalStat().HitGauge);
+
+		NAParryUpdateEnd();
+	}
+	else
+		StatComponent->Damaged(DamageAmount, AttackActor);
+	
+	
+	//if (attackPawn)
+	//{
+	//	//적팀일시
+	//	if (GetTeamAttitudeTowards(*DamageCauser) && !DamageCauser->ActorHasTag(TAG_GRENADE))
+	//	{
+	//		//패리중일때
+	//		if (bIsParry)
+	//		{
+
+	//			StatComponent->HitGaugeDamaged(GetTotalStat().HitGauge);
+
+	//			NAParryUpdateEnd();
+
+	//		}
+	//		else
+	//			StatComponent->Damaged(DamageAmount, DamageCauser);
+	//	}
+
+	//	//수류탄에 맞았을시
+	//	if (DamageCauser->ActorHasTag(TAG_GRENADE))
+	//	{
+
+	//		/*FVector Direction = GetActorLocation() - DamageCauser->GetActorLocation();
+	//		Direction.Normalize();*/
+	//		HitImpulseVector += (FVector(0, 0, 1) * 50.0f);
+
+	//		if (GetTeamAttitudeTowards(*EventInstigator->GetPawn()))
+	//		{
+	//			StatComponent->Damaged(DamageAmount, EventInstigator->GetPawn());
+	//		}
+	//		
+	//	}
+	//}
 	
 	return DamageAmount;
 }
 
 void APGNpcCharacter::NPCAttackHitStop(float time)
 {
-	if (bIsDead)return;
+	
+	if (bIsDead) return;
+
 	if (currentSlowtime >= time)return;
+
 	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
 	currentSlowtime = time;
 	
@@ -232,6 +281,7 @@ void APGNpcCharacter::NPCAttackHitStop(float time)
 		NPCHitStoptimerHandle,
 		[this]() {
 			CustomTimeDilation = 1.0f;
+			currentSlowtime = 0.0f;
 			GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
 		}, time, false
 	);
@@ -242,26 +292,7 @@ void APGNpcCharacter::SetDead(AActor* DamageCauser)
 {
 	Super::SetDead(DamageCauser);
 
-	CustomTimeDilation = 1.0f;
-
-	//GetCapsuleComponent()->SetSimulatePhysics(false);
-
-	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
-
-	NAParryUpdateEnd();
-
-	GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
-
-	//자신의 필드에 데이터 내가 누가한테 죽었는지 보냄
-	if (MyAIController)
-	{
-		IGenericTeamAgentInterface* team = Cast<IGenericTeamAgentInterface>(DamageCauser);
-		int8 teamid = team->GetGenericTeamId();
-		//SLOG(TEXT("AI DEAD"));
-		if (teamid != 0)
-			MyAIController->TOMyFieldDead(teamid);
-	}
-
+	CommonNPCDeadLogic(DamageCauser);
 	
 	GetWorld()->GetTimerManager().SetTimer(
 		DeadHiddentimerHandle,
@@ -278,6 +309,29 @@ void APGNpcCharacter::SetDead(AActor* DamageCauser)
 
 }
 
+void APGNpcCharacter::CommonNPCDeadLogic(AActor* DamageCauser)
+{
+	CustomTimeDilation = 1.0f;
+
+	GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
+
+	NAParryUpdateEnd();
+
+	GetWorld()->GetTimerManager().ClearTimer(NAScaleTimerHandle);
+
+	GetWorld()->GetTimerManager().ClearTimer(NPCHitTimer);
+
+	//자신의 필드에 데이터 내가 누가한테 죽었는지 보냄
+	if (MyAIController)
+	{
+		IGenericTeamAgentInterface* team = Cast<IGenericTeamAgentInterface>(DamageCauser);
+		int8 teamid = team->GetGenericTeamId();
+		//SLOG(TEXT("AI DEAD"));
+		if (teamid != 0)
+			MyAIController->TOMyFieldDead(teamid);
+	}
+}
+
 void APGNpcCharacter::ReturnCharacterToPool()
 {
 	//애니메이션 제거
@@ -291,7 +345,6 @@ void APGNpcCharacter::ReturnCharacterToPool()
 		poolmanager->GetObjectPoolManager()->ReturnObjectToPool(this);
 	}
 }
-
 
 void APGNpcCharacter::PlayHitMontage()
 {

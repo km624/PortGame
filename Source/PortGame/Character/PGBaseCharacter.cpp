@@ -279,6 +279,7 @@ void APGBaseCharacter::HiddenWidget()
 
 void APGBaseCharacter::SetUpHpWidget(UPGUserWidget* InUserWidget)
 {
+
 	UPGHPBarWidget* HpBarWidget = Cast<UPGHPBarWidget>(InUserWidget);
 	if (HpBarWidget)
 	{
@@ -362,6 +363,13 @@ void APGBaseCharacter::HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperl
 
 	if (GetController() == NULL)
 		return;
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance->Montage_IsPlaying(TargetMontage))
+	{
+		return;
+	}
+	
 
 	GetController()->SetIgnoreMoveInput(false);
 

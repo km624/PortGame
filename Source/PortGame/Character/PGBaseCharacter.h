@@ -183,7 +183,7 @@ protected:
 	virtual void HitGaugeZeroEffect() override;
 	
 	UFUNCTION()
-	void HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	virtual void HitMontageEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 
 protected:
 	//그로기상태

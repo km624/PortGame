@@ -11,6 +11,8 @@
 #include "Interface/AIBodyGuardInterface.h"
 #include "Interface/AITargetPlayerInterface.h"
 #include "Interface/PlayerAddEXPInterface.h"
+#include "Interface/SetPlayerExecutionInterface.h"
+#include "Interface/ExecutionEliteNPCInterface.h"
 #include "PGPlayerCharacter.generated.h"
 /**
  * 
@@ -43,7 +45,7 @@ public:
 };
 UCLASS()
 class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface,  public IPlayerAddEXPInterface
-	,public IAIBodyGuardInterface
+	,public IAIBodyGuardInterface,public ISetPlayerExecutionInterface
 {
 	GENERATED_BODY()
 
@@ -131,7 +133,10 @@ protected:
 	TObjectPtr<class UInputAction>MapAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UInputAction>BodyGuardOptionAction;
+	TObjectPtr<class UInputAction> BodyGuardOptionAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ExecutionAction;
 
 	//매개변수 받기 위해 헤더 인클루드
 	void Move(const struct FInputActionValue& Value);
@@ -290,7 +295,7 @@ protected:
 
 	//범위 슬로우
 protected:
-	virtual void OnSlowOVerlapToNPC(float time) override;
+	virtual void OnSlowOVerlapToNPC(float time,AActor* ignoreActor) override;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Slow")
@@ -524,4 +529,32 @@ protected:
 	uint8 bIsGlobalTimeSlow : 1;
 	
 
+	//처형
+
+protected:
+	virtual void ArmorBreakCameraFocus(AActor* eliteNPC) override;
+
+	virtual bool HasPlayerController() override;
+
+	virtual void SetInExecutionRange(bool InRange, AActor* eliteNPC) override;
+	
+	void OnExecution();
+
+	void StartExecution();
+
+	void PlayExecutionMontage();
+
+	void EndExecuitionMontage(UAnimMontage* TargetMontage, bool IsProperlyEnded);
+	
+protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	uint8 bIsExecutionRange : 1;
+
+	const static FString ExcuisonAttackMontage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TScriptInterface<IExecutionEliteNPCInterface> ExecutionElite;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	uint8 bIsExecution : 1;
 };

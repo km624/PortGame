@@ -37,11 +37,12 @@
 #include "Component/AIBodyGuardComponent.h"
 
 #include "Data/BGBaseOptionDataAsset.h"
-//#include "Materials/MaterialInstanceDynamic.h"
+
 
 const FString APGPlayerCharacter::LeftEvadeMontage = TEXT("LeftEvadeMontage");
 const FString APGPlayerCharacter::RightEvadeMontage = TEXT("RightEvadeMontage");
 const FString APGPlayerCharacter::DashMontage = TEXT("DashMontage");
+const FString APGPlayerCharacter::ExcuisonAttackMontage = TEXT("ExcuisonAttackMontage");
 
 APGPlayerCharacter::APGPlayerCharacter()
 {
@@ -189,6 +190,12 @@ APGPlayerCharacter::APGPlayerCharacter()
 		BodyGuardOptionAction = BODYGUARD.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> EXECUTION(TEXT("/Script/EnhancedInput.InputAction'/Game/PortGame/Input/InputAction/IA_Excuison.IA_Excuison'"));
+	if (EXECUTION.Object)
+	{
+		ExecutionAction = EXECUTION.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> CCurve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Weapon/AttackCameraCurve.AttackCameraCurve'"));
 	if (CCurve.Object)
 	{
@@ -226,6 +233,8 @@ APGPlayerCharacter::APGPlayerCharacter()
 	bIsGameStated = false;
 
 	bShowBodyGuardOption = false;
+
+	bIsExecutionRange = false;
 
 	GetMesh()->SetCustomDepthStencilValue(1);
 }
@@ -318,7 +327,7 @@ void APGPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(BodyGuardOptionAction, ETriggerEvent::Started, this, &APGPlayerCharacter::ShowBodyGuardOption);
 		EnhancedInputComponent->BindAction(BodyGuardOptionAction, ETriggerEvent::Completed, this, &APGPlayerCharacter::CloseBodyGuardOption);
 		
-		
+		EnhancedInputComponent->BindAction(ExecutionAction, ETriggerEvent::Started, this, &APGPlayerCharacter::OnExecution);
 
 	}
 	else
@@ -366,6 +375,7 @@ void APGPlayerCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterda
 	LoadAndPlayMontageByPath(CharacterName, DashMontage);
 	LoadAndPlayMontageByPath(CharacterName, LeftEvadeMontage);
 	LoadAndPlayMontageByPath(CharacterName, RightEvadeMontage);
+	LoadAndPlayMontageByPath(CharacterName, ExcuisonAttackMontage);
 }
 
 void APGPlayerCharacter::SetUpBodyGuardOption(TArray<UBGBaseOptionDataAsset*>& optionDataAssets)
@@ -853,7 +863,7 @@ void APGPlayerCharacter::OnAvoidEffect()
 	GetCharacterMovement()->MaxAcceleration = OriginalMaxAcceleration;
 
 
-	OnSlowOVerlapToNPC(EvadeTime);
+	OnSlowOVerlapToNPC(EvadeTime,NULL);
 
 	GetWorld()->GetTimerManager().SetTimer(
 		EvadeTimerHandle,
@@ -941,13 +951,25 @@ void APGPlayerCharacter::SetEvadeRotation(FVector TargetVector)
 	SetActorRotation(NewRotation);
 }
 
-void APGPlayerCharacter::OnSlowOVerlapToNPC(float time)
+void APGPlayerCharacter::OnSlowOVerlapToNPC(float time , AActor* ignoreActor)
 {
+	
 	FVector Center = GetActorLocation();
 
 	//float SlowRadius = 500.0f;
 	TArray<FOverlapResult> OverlapResults;
+	
 	FCollisionQueryParams CollisionQueryParam(SCENE_QUERY_STAT(SLowMotion), false, this);
+
+	if (ignoreActor != nullptr)
+	{
+		CollisionQueryParam.AddIgnoredActor(ignoreActor);
+		
+	}
+	else
+	{
+		CollisionQueryParam.ClearIgnoredActors();
+	}
 
 	bool bResult = GetWorld()->OverlapMultiByChannel(
 		OverlapResults,
@@ -962,7 +984,7 @@ void APGPlayerCharacter::OnSlowOVerlapToNPC(float time)
 	{
 		for (auto const& OverlapResult : OverlapResults)
 		{
-
+			
 			INPCParryCheckInterface* NPC = Cast<INPCParryCheckInterface>(OverlapResult.GetActor());
 			if (NPC)
 			{
@@ -1086,6 +1108,12 @@ void APGPlayerCharacter::CheckandChangePlayerCharacter(int8 num)
 {
 	if (bIsGlobalTimeSlow)
 		return;
+
+	if (TargetingComponent->GetbIsTargetLock())
+	{
+		TargetingComponent->ResetTargeting();
+	}
+
 	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
 	if (playerController)
 		playerController->ChangedCharacterPossess(num);
@@ -1290,11 +1318,7 @@ void APGPlayerCharacter::AttackSlowEnd()
 
 void APGPlayerCharacter::AllTimelineSetting()
 {
-	////에임 커브 세팅
-	//FOnTimelineFloat TimelineProgress;
-	//TimelineProgress.BindUFunction(this, FName("AimUpdate"));
-	//AimTimeline.AddInterpFloat(AimCurve, TimelineProgress);
-
+	
 	 // 에임 타임라인
 	UTimeLineWrapper* AimWrapper = NewObject<UTimeLineWrapper>(this);
 	FOnTimelineFloat AimProgress;
@@ -1372,7 +1396,7 @@ void APGPlayerCharacter::AttackCameraMove(float dt)
 
 	if (!bIsReversed)
 	{
-		AimX = FMath::Lerp(CameraCurrentLocation.X, 75.0f, dt);
+		AimX = FMath::Lerp(CameraCurrentLocation.X, 150.0f, dt);
 		AimY = FMath::Lerp(CameraCurrentLocation.Y, 75.0f, dt);
 		AimZ = FMath::Lerp(CameraCurrentLocation.Z, -50.0f, dt);
 	}
@@ -1392,8 +1416,6 @@ void APGPlayerCharacter::AttackCameraMove(float dt)
 
 void APGPlayerCharacter::DashCameraMove(float dt)
 {
-
-	
 	float AimX;
 	float AimY;
 	float AimZ;
@@ -1615,6 +1637,88 @@ void APGPlayerCharacter::StartFieldChangedCamera(bool start)
 	
 		
 	}
+}
+
+void APGPlayerCharacter::ArmorBreakCameraFocus(AActor* eliteNPC)
+{
+
+}
+
+bool APGPlayerCharacter::HasPlayerController()
+{
+	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
+	if (playerController)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+
+}
+
+void APGPlayerCharacter::SetInExecutionRange(bool InRange, AActor* eliteNPC)
+{
+	bIsExecutionRange = InRange;
+	IExecutionEliteNPCInterface* elite = Cast<IExecutionEliteNPCInterface>(eliteNPC);
+	if (elite)
+	{
+		ExecutionElite = bIsExecutionRange ? eliteNPC : nullptr;
+		
+	}
+	
+}
+
+void APGPlayerCharacter::OnExecution()
+{
+	if (ExecutionElite)
+	{
+
+		AActor* eliteNPC = ExecutionElite->OnExecutionStart(this);
+		if (eliteNPC&& AllMontage[ExcuisonAttackMontage])
+		{
+			
+			OnSlowOVerlapToNPC(AllMontage[ExcuisonAttackMontage]->GetPlayLength(), eliteNPC);
+		}
+		StartExecution();
+	}
+}
+
+void APGPlayerCharacter::StartExecution()
+{
+	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
+	if (playerController)
+	{
+		DisableInput(playerController);
+	}
+
+	AttackComponent->SetbIsGodMode(bIsExecutionRange);
+	PlayExecutionMontage();
+}
+
+void APGPlayerCharacter::PlayExecutionMontage()
+{
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	AnimInstance->Montage_Play(AllMontage[ExcuisonAttackMontage], 1.0f);
+	FOnMontageEnded ExcuteEndDelegate;
+	ExcuteEndDelegate.BindUObject(this, &APGPlayerCharacter::EndExecuitionMontage);
+	AnimInstance->Montage_SetEndDelegate(ExcuteEndDelegate, AllMontage[ExcuisonAttackMontage]);
+}
+
+
+void APGPlayerCharacter::EndExecuitionMontage(UAnimMontage* TargetMontage, bool IsProperlyEnded)
+{
+	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
+	if (playerController)
+	{
+		EnableInput(playerController);
+	}
+	bIsExecutionRange = false;
+	AttackComponent->SetbIsGodMode(bIsExecutionRange);
+	
+	
 }
 
 

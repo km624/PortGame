@@ -92,7 +92,7 @@ protected:
 	FTimerHandle ProtectAISpawnTimeHandler;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
-	float ProtectAISpawnTime = 30.0f;
+	float ProtectAISpawnTime = 20.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AIFieldData")
 	int32 CurrentProtectPawnCount;
@@ -215,7 +215,19 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Effect)
 	uint8 bIsChangedEffect : 1;
+	
+protected:
+	void EliteAISpawn();
 
+protected:
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "AIFieldData")
+	uint8 EliteSpawnCount = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AIFieldData")
+	TObjectPtr<class UBaseCharacterDataAsset> EliteAIData;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<TObjectPtr<class APGEliteNpcCharacter>> EliteAICharacters;
 
 	
 

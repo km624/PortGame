@@ -26,7 +26,7 @@ public:
 
 	virtual void OnParryPostPorcess(bool effect) = 0;
 	
-	virtual void OnSlowOVerlapToNPC(float time) = 0;
+	virtual void OnSlowOVerlapToNPC(float time , AActor* ignoreActor) = 0;
 
 	virtual void AttackSlowStart() = 0;
 	

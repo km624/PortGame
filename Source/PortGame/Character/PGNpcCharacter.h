@@ -13,6 +13,7 @@
 /**
  * 
  */
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnHitDelegate, bool/*bIshit*/)
 UCLASS()
 class PORTGAME_API APGNpcCharacter : public APGAIBaseCharacter , public INPCParryCheckInterface ,public INPCTargetLockInterface
 {
@@ -31,6 +32,8 @@ public:
 
 	virtual void Tick(float deltatime) override;
 
+	
+
 	void ChangeNpcColor();
 
 protected:
@@ -48,9 +51,24 @@ protected:
 
 	virtual void SetDead(AActor* DamageCauser) override;
 
+	void CommonNPCDeadLogic(AActor* DamageCauser);
+
 	void ReturnCharacterToPool();
+
+	//À§Á¬ ÄÄÆ÷³ÍÆ® °ü·Ã
 protected:
 	
+	UPROPERTY()
+	uint8 bIshit : 1;
+
+	FOnHitDelegate OnHited;
+
+	FTimerHandle NPCHitTimer;
+	UPROPERTY()
+	float WidgetShowTime = 10.0f;
+
+protected:
+
 	FTimerHandle NPCHitStoptimerHandle;
 	
 	float currentSlowtime;

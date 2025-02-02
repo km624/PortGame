@@ -314,7 +314,7 @@ void UPGAttackComponent::AttackHitCheck()
 		}
 		if (playerCharacter)
 		{
-			playerCharacter->OnSlowOVerlapToNPC(stoptime);
+			playerCharacter->OnSlowOVerlapToNPC(stoptime,nullptr);
 
 			if (parry)
 			{
@@ -380,12 +380,16 @@ void UPGAttackComponent::AttackHitStop(float time, TSubclassOf<class UCameraShak
 	);
 
 	//카메라 쉐이크
-	APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
-	IPlayerCameraShakeInterface* playerCamera = Cast<IPlayerCameraShakeInterface>(BaseCharacter->GetController());
-	if (playerCamera)
+	if (camerashake)
 	{
-		playerCamera->PlayCameraShake(camerashake);
+		APGBaseCharacter* BaseCharacter = Cast<APGBaseCharacter>(GetOwner());
+		IPlayerCameraShakeInterface* playerCamera = Cast<IPlayerCameraShakeInterface>(BaseCharacter->GetController());
+		if (playerCamera)
+		{
+			playerCamera->PlayCameraShake(camerashake);
+		}
 	}
+	
 }
 
 void UPGAttackComponent::AttackEffect(AActor* target , FVector targetLocation)
@@ -467,7 +471,7 @@ void UPGAttackComponent::FirstUltiSkillEffect()
 {
 	IAttackHitStopInterface* playerCharacter = Cast<IAttackHitStopInterface>(GetOwner());
 	if (playerCharacter)
-		playerCharacter->OnSlowOVerlapToNPC(FirstSkillSlowTime);
+		playerCharacter->OnSlowOVerlapToNPC(FirstSkillSlowTime,NULL);
 }
 
 void UPGAttackComponent::ResetTimeHandle()

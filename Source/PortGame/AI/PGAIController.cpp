@@ -179,8 +179,11 @@ void APGAIController::OnPossess(APawn* pawn)
 
 void APGAIController::StopTree()
 {
+	//SLOG(TEXT("Stop"));
+	StopMovement();
 	StopAI();
-
+	
+	
 }
 
 void APGAIController::StartTree()

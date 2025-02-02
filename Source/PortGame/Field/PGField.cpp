@@ -17,6 +17,7 @@
 #include "NiagaraComponent.h"   
 #include "NiagaraSystem.h"  
 #include "NiagaraFunctionLibrary.h"
+#include "Character/PGEliteNpcCharacter.h"
 
 
 // Sets default values
@@ -101,6 +102,8 @@ void APGField::InitializeField(uint8 teamid)
 	SetTeamColor();
 
 	AllProtectAISpawn();
+
+	EliteAISpawn();
 
 	GetWorld()->GetTimerManager().SetTimer(ProtectAISpawnTimeHandler,
 		this, &ThisClass::AllProtectAISpawn, ProtectAISpawnTime, true);
@@ -646,6 +649,64 @@ void APGField::OnNiagaraSystemFinished(UNiagaraComponent* FinishedComponent)
 	}
 
 	FinishedComponent->Deactivate();
+}
+
+void APGField::EliteAISpawn()
+{
+	int32 startcount = EliteAICharacters.Num();
+	for (int32 i = startcount; i < EliteSpawnCount; i++)
+	{
+
+
+
+		FVector FieldSize = GetActorScale() * 50.0f;
+
+		FVector SpawnLocation = FVector(FMath::FRandRange(-FieldSize.X, FieldSize.X), FMath::FRandRange(-FieldSize.Y, FieldSize.Y), 125.0f) + GetActorLocation();
+		FRotator SpawnRotation = FRotator(0.0f, FMath::FRandRange(0.0f, 360.0f), 0.0f);
+
+		if (!EliteAIData)return;
+
+
+		APGEliteNpcCharacter* EliteCharacter = Cast<APGEliteNpcCharacter>((GetWorld()->SpawnActorDeferred<APGNpcCharacter>(
+			APGEliteNpcCharacter::StaticClass(),
+			FTransform(SpawnRotation, SpawnLocation),
+			this,
+			nullptr,
+			ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn
+		)));
+
+		if (EliteCharacter)
+		{
+			EliteCharacter->SetupCharacterDataAsset(EliteAIData);
+
+			EliteCharacter->SetteamId(TeamId);
+
+
+		}
+		EliteCharacter->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+
+
+		APGAIController* pgAIcontoller = Cast<APGAIController>((GetWorld()->SpawnActorDeferred<APGAIController>(
+			APGAIController::StaticClass(),
+			FTransform(SpawnRotation, SpawnLocation),
+			this,
+			nullptr
+		)));
+
+		if (pgAIcontoller)
+		{
+			pgAIcontoller->FinishSpawning(FTransform(SpawnRotation, SpawnLocation));
+
+			pgAIcontoller->SetMyFieldData(this);
+
+
+			//빙의시 바로 행동트리 시작
+			pgAIcontoller->Possess(EliteCharacter);
+		}
+	}
+
+
+
 }
 
 //void APGField::SetTimerAttackPawnDamage(APGNpcCharacter* attackPawn)

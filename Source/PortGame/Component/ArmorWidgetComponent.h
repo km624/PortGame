@@ -4,14 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "Components/WidgetComponent.h"
-#include "TargetLockWidgetComponent.generated.h"
+#include "ArmorWidgetComponent.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class PORTGAME_API UTargetLockWidgetComponent : public UWidgetComponent
+class PORTGAME_API UArmorWidgetComponent : public UWidgetComponent
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void InitWidget() override;
 	
 };

@@ -15,24 +15,6 @@
 
 UPGStatComponent::UPGStatComponent()
 {
-	//const UDataTable* DataTable;
-	//static ConstructorHelpers::FObjectFinder<UDataTable>DT_STAT(TEXT("/Script/Engine.DataTable'/Game/PortGame/Data/Stat/DT_CharacterStat.DT_CharacterStat'"));
-	//if (DT_STAT.Object)
-	//{
-	//	UDataTable* characterstatDataTable = DT_STAT.Object;
-
-	//	FString contextString;
-	//
-	//	//행의 네임을 가져와서 그 순 차례대로 하나씩 찾는법으로 map에 추가
-	//	TArray<FName> rowNames = characterstatDataTable->GetRowNames();
-
-	//	for (FName rowName : rowNames)
-	//	{
-	//		const FPGCharacterStat* rowInfo = characterstatDataTable->FindRow<FPGCharacterStat>(rowName, contextString);
-	//		AllStat.Add(rowName, *rowInfo);
-	//	}	
-
-	//}
 
 	CurrentCharacterRarity = TEXT("Normal");
 	
@@ -172,9 +154,9 @@ void UPGStatComponent::Damaged(float Damage, AActor* DamageActor)
 
 	SetHp(PrevHp - ActualDamage);
 	
-	HitGaugeDamaged(Damage);
+	if(!bIsSuperGroggy)
+		HitGaugeDamaged(Damage);
 
-	
 	if (CurrentHp <= 0)
 	{
 
@@ -207,7 +189,9 @@ void UPGStatComponent::HitGaugeDamaged(float Damage)
 
 	if (CurretHitGauge <= KINDA_SMALL_NUMBER)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("GaugeEnd"));
+		//죽었으니까 경직 필요 X
+		if (CurrentHp <= 0) return;
+
 		OnHitGaugeZero.Broadcast();
 		HitGaugeZeroEffect();
 	}

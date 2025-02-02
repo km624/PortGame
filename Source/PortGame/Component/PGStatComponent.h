@@ -88,6 +88,8 @@ public:
 
 	FORCEINLINE int32 GetCurrentLevel() { return CurrentCharacterLevel; }
 	
+	FORCEINLINE void SetbIsSuperGroggy(bool bissuper) { bIsSuperGroggy = bissuper; }
+	
 	
 public:
 
@@ -150,6 +152,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Stat)
 	float MaxUltiSkillGauge = 100.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = State)
+	uint8 bIsSuperGroggy : 1;
 	
 
 	UPROPERTY(Transient, VisibleInstanceOnly, Category = Stat, Meta= (AllowPrivateAccess="true"))
