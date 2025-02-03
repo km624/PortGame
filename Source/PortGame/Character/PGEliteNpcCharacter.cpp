@@ -167,6 +167,13 @@ float APGEliteNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& D
 
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	
+	//플레이어 컨트롤인지 확인
+	ISetPlayerExecutionInterface* player = Cast<ISetPlayerExecutionInterface>(DamageCauser);
+	if (player)
+	{
+		if (!player->HasPlayerController())return DamageAmount;
+	}
+
 
 	if (bIsSuperGroggy)
 	{
@@ -319,7 +326,6 @@ void APGEliteNpcCharacter::OnEndOverlap(UPrimitiveComponent* OverlappedComponent
 			player->SetInExecutionRange(bIsSuperGroggy,this);
 			
 		}
-
 
 	}
 }

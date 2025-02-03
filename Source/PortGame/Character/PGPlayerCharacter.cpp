@@ -219,6 +219,12 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		FieldChangeCurve = FieldCurve.Object;
 	}
+
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> AMCurve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Weapon/ArmorBreakCamera.ArmorBreakCamera'"));
+	if (AMCurve.Object)
+	{
+		ArmorBreakCurve = AMCurve.Object;
+	}
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface>BaseMaterial(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/PortGame/Effect/Material/M_Scan_Inst.M_Scan_Inst'"));
 	if (BaseMaterial.Object)
 	{
@@ -1352,12 +1358,23 @@ void APGPlayerCharacter::AllTimelineSetting()
 	FieldChangeProgress.BindUFunction(this, FName("FieldChangeCameraMove"));
 	FieldChangeWrapper->Timeline.AddInterpFloat(FieldChangeCurve, FieldChangeProgress);
 
+	UTimeLineWrapper* ArmorBreakWrapper = NewObject<UTimeLineWrapper>(this);
+	FOnTimelineFloat ArmorBreakProgress;
+	ArmorBreakProgress.BindUFunction(this, FName("ArmorBreakCameraMove"));
+	ArmorBreakWrapper->Timeline.AddInterpFloat(ArmorBreakCurve, ArmorBreakProgress);
+
+	FOnTimelineEvent TimelineFinished;
+	TimelineFinished.BindUFunction(this, FName("OnArmorBreakTimelineFinished"));
+	ArmorBreakWrapper->Timeline.SetTimelineFinishedFunc(TimelineFinished);
 	
 	AllCameraTimeline.Add(ECameraMoveType::AimCamera, AimWrapper);
 	AllCameraTimeline.Add(ECameraMoveType::AttackCamera, AttackWrapper);
 	AllCameraTimeline.Add(ECameraMoveType::DashCamera, DashWrapper);
 	AllCameraTimeline.Add(ECameraMoveType::BodyGuardCamera, BodyguardWrapper);
 	AllCameraTimeline.Add(ECameraMoveType::FieldChangeCamera, FieldChangeWrapper);
+	AllCameraTimeline.Add(ECameraMoveType::ArmorBreakCamera, ArmorBreakWrapper);
+
+
 }
 
 void APGPlayerCharacter::AllTimelineTick(float dt)
@@ -1367,6 +1384,7 @@ void APGPlayerCharacter::AllTimelineTick(float dt)
 	AllCameraTimeline[ECameraMoveType::AttackCamera]->Timeline.TickTimeline(dt);
 	AllCameraTimeline[ECameraMoveType::BodyGuardCamera]->Timeline.TickTimeline(dt);
 	AllCameraTimeline[ECameraMoveType::FieldChangeCamera]->Timeline.TickTimeline(dt);
+	AllCameraTimeline[ECameraMoveType::ArmorBreakCamera]->Timeline.TickTimeline(dt);
 	
 }
 
@@ -1422,7 +1440,7 @@ void APGPlayerCharacter::DashCameraMove(float dt)
 
 	if (!bIsReversed)
 	{
-		AimX = FMath::Lerp(CameraCurrentLocation.X, -100.0f, dt);
+		AimX = FMath::Lerp(CameraCurrentLocation.X, -50.0f, dt);
 		AimY = FMath::Lerp(CameraCurrentLocation.Y, 25.0f, dt);
 	}
 	else
@@ -1431,11 +1449,6 @@ void APGPlayerCharacter::DashCameraMove(float dt)
 		AimY = FMath::Lerp(CameraCurrentLocation.Y, 0.0f, dt);
 	}
 	AimZ = FMath::Lerp(CameraCurrentLocation.Z, 0.0f, dt);
-
-
-	/*float AimX = FMath::Lerp(0.0f, -100.0f, dt);
-	float AimY = FMath::Lerp(0, 25.0f, dt);*/
-	
 	
 	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
 	Camera->SetRelativeRotation(FRotator(0.0f, 0.0f, 0.0f));
@@ -1499,6 +1512,38 @@ void APGPlayerCharacter::FieldChangeCameraMove(float dt)
 	Camera->SetRelativeRotation(FRotator(RotatePitch, 0.0f, 0.0f));
 }
 
+void APGPlayerCharacter::ArmorBreakCameraMove(float dt)
+{
+	float AimX;
+	float AimY;
+	float AimZ;
+	float RotatePitch;
+	if (!ArmorBreakElite)return;
+	if (!bIsReversed)
+	{
+		AimX = FMath::Lerp(CameraCurrentLocation.X, -300.0f, dt);
+		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 800.0f, dt);
+		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, -40.0f, dt);
+	}
+	else
+	{
+		AimX = FMath::Lerp(CameraCurrentLocation.X, 0.0f, dt);
+		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 0.0f, dt);
+		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, 0.0f, dt);
+	}
+	AimY = FMath::Lerp(CameraCurrentLocation.Y, 0.0f, dt);
+
+
+	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
+	Camera->SetRelativeRotation(FRotator(RotatePitch, 0.0f, 0.0f));
+}
+
+void APGPlayerCharacter::OnArmorBreakTimelineFinished()
+{
+	ArmorBreakElite = nullptr;
+	SLOG(TEXT("Timeline End"));
+}
+
 void APGPlayerCharacter::StartSetCameraMoveSetting(bool bisreversed, ECameraMoveType cameramovetype)
 {
 	bIsReversed = bisreversed;
@@ -1517,11 +1562,6 @@ AActor* APGPlayerCharacter::SetPlayerProtectPawn(APawn* pawn)
 {
 	return AIBodyGuardComponent->SetPlayerProtectPawn(pawn);
 }
-
-//FVector APGPlayerCharacter::CalculateOffsetPawn(APawn* pawn)
-//{
-//	return AIBodyGuardComponent->CalculateOffsetPawn(pawn);
-//}
 
 
 void APGPlayerCharacter::BodyGuardOptionsClick(int32 optionnum,uint8 optionGauge)
