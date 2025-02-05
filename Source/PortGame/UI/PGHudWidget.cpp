@@ -157,14 +157,19 @@ void UPGHudWidget::OnStartChangeCooltime(int32 num)
 }
 
 
-void UPGHudWidget::SetupFieldGauge(uint8 teamid, float maxgauge, float currentgauge)
+void UPGHudWidget::SetupFieldGauge(uint8 teamid, float maxgauge, float currentgauge,int32 elitecount)
 {
-	BP_FieldGauge->SetUpWidget(teamid, maxgauge, currentgauge);
+	BP_FieldGauge->SetUpWidget(teamid, maxgauge, currentgauge, elitecount);
 }
 
 void UPGHudWidget::UpdateFieldGague(float newGauge)
 {
 	BP_FieldGauge->UpdateFieldGauge(newGauge);
+}
+
+void UPGHudWidget::UpdateEliteCount(int32 elitecount)
+{
+	BP_FieldGauge->UpdateEliteCount(elitecount);
 }
 
 void UPGHudWidget::CollapsedFieldGauge()

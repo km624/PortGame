@@ -41,11 +41,11 @@ void APGLastField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AAct
 
 }
 
-void APGLastField::DamageFieldGauge(int8 attackteamid)
+void APGLastField::DamageFieldGauge(int8 attackteamid, bool bIsElite)
 {
 	if (bIsLocked) return;
 
-	Super::DamageFieldGauge(attackteamid);
+	Super::DamageFieldGauge(attackteamid, bIsElite);
 }
 
 void APGLastField::ChangedField(int8 teamid)

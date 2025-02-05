@@ -166,13 +166,10 @@ void AWeapon::ComboCheck()
 
 		//몽타주 다음 섹션을 연결
 		AnimInstance->Montage_SetNextSection(AnimInstance->Montage_GetCurrentSection(), NextSection, OwnerCharacter->AllMontage[ComboMontage]);
-
-		//SLOG(TEXT("NextSection : %s"), *NextSection.ToString());
 		
 		//몽타주 다음 섹션 재생
 		AnimInstance->Montage_Play(OwnerCharacter->AllMontage[ComboMontage], ComboPlayTime);
 		AnimInstance->Montage_JumpToSection(NextSection, OwnerCharacter->AllMontage[ComboMontage]);
-
 
 		//플레이어 캐릭터만 값 받아서 돌리기
 		APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(OwnerCharacter);

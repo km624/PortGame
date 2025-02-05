@@ -80,9 +80,12 @@ public:
 
 public:
 	UFUNCTION()
-	void SetupFieldGauge(uint8 teamid, float maxgauge, float currentgauge);
+	void SetupFieldGauge(uint8 teamid, float maxgauge, float currentgauge, int32 elitecount);
 	UFUNCTION()
 	void UpdateFieldGague(float newGauge);
+	UFUNCTION()
+	void UpdateEliteCount(int32 elitecount);
+
 	UFUNCTION()
 	void CollapsedFieldGauge();
 	UFUNCTION()

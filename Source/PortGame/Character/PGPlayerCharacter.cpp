@@ -38,6 +38,10 @@
 
 #include "Data/BGBaseOptionDataAsset.h"
 
+#include "LevelSequenceActor.h"
+#include "LevelSequence.h"
+#include "LevelSequencePlayer.h"
+
 
 const FString APGPlayerCharacter::LeftEvadeMontage = TEXT("LeftEvadeMontage");
 const FString APGPlayerCharacter::RightEvadeMontage = TEXT("RightEvadeMontage");
@@ -231,6 +235,9 @@ APGPlayerCharacter::APGPlayerCharacter()
 		PostProcessMaterial = BaseMaterial.Object;
 	}
 
+
+	ExecutionLevelSequenceClass = ALevelSequenceActor::StaticClass();
+
 	AIBodyGuardComponent = CreateDefaultSubobject<UAIBodyGuardComponent>(TEXT("AIBodyComponent"));
 
 
@@ -373,6 +380,7 @@ void APGPlayerCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterda
 	UPlayerCharacterDataAsset* palyerdata = Cast<UPlayerCharacterDataAsset>(characterdata);
 
 	LevelSequence = palyerdata->LevelSequence;
+	ExecutionLevelSequence = palyerdata->ExecutionLevelSequence;
 
 	Super::SetupCharacterData(characterdata);
 
@@ -532,7 +540,7 @@ void APGPlayerCharacter::OnGoingAttack()
 {
 	if (bIsAim)
 	{
-
+		bIsShoot = true;
 		OnbIsShoot.Broadcast(bIsShoot);
 	}
 }
@@ -568,6 +576,7 @@ void APGPlayerCharacter::PressAim()
 
 void APGPlayerCharacter::OnGoingAim()
 {
+	bIsAim = true;
 	OnbIsAim.Broadcast(bIsAim);
 	AimLocation = Camera->GetComponentLocation();
 }
@@ -1514,38 +1523,45 @@ void APGPlayerCharacter::FieldChangeCameraMove(float dt)
 
 void APGPlayerCharacter::ArmorBreakCameraMove(float dt)
 {
-	float AimX;
-	float AimY;
-	float AimZ;
-	float RotatePitch;
+
 	if (!ArmorBreakElite)return;
-	if (!bIsReversed)
-	{
-		AimX = FMath::Lerp(CameraCurrentLocation.X, -300.0f, dt);
-		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 800.0f, dt);
-		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, -40.0f, dt);
-	}
-	else
-	{
-		AimX = FMath::Lerp(CameraCurrentLocation.X, 0.0f, dt);
-		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 0.0f, dt);
-		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, 0.0f, dt);
-	}
-	AimY = FMath::Lerp(CameraCurrentLocation.Y, 0.0f, dt);
+
+	FVector EliteLocation = ArmorBreakElite->GetActorLocation();
+
+	FVector Direction = (CameraWorldLocation - EliteLocation).GetSafeNormal();
 
 
-	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
-	Camera->SetRelativeRotation(FRotator(RotatePitch, 0.0f, 0.0f));
+	FVector CameraFocusLocation = EliteLocation + (Direction * 200.0f)+FVector::UpVector*25.0f;
+	FRotator CameraFocusRotation = (EliteLocation - CameraWorldLocation).Rotation();
+	
+
+	FVector NEWCameraLocation = FMath::VInterpTo(CameraWorldLocation, CameraFocusLocation, dt, 1.0f);
+	FRotator NEWCameraRotation= FMath::RInterpTo(CameraWorldRotation, CameraFocusRotation, dt, 1.0f);
+
+	
+
+	Camera->SetWorldLocationAndRotation(NEWCameraLocation, NEWCameraRotation);
 }
 
 void APGPlayerCharacter::OnArmorBreakTimelineFinished()
 {
+	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
+	if (playerController)
+	{
+		EnableInput(playerController);
+	}
 	ArmorBreakElite = nullptr;
+	Camera->SetRelativeLocation(FVector::Zero());
+	Camera->SetRelativeRotation(FRotator::ZeroRotator);
+
+
 	SLOG(TEXT("Timeline End"));
 }
 
 void APGPlayerCharacter::StartSetCameraMoveSetting(bool bisreversed, ECameraMoveType cameramovetype)
 {
+	if (AllCameraTimeline[ECameraMoveType::ArmorBreakCamera]->Timeline.IsPlaying())return;
+
 	bIsReversed = bisreversed;
 	CameraCurrentLocation = Camera->GetRelativeLocation();
 	CameraCurrentRotator = Camera->GetRelativeRotation();
@@ -1681,7 +1697,23 @@ void APGPlayerCharacter::StartFieldChangedCamera(bool start)
 
 void APGPlayerCharacter::ArmorBreakCameraFocus(AActor* eliteNPC)
 {
+	if (!eliteNPC) return;
+	ArmorBreakElite = eliteNPC;
+	
+	CameraWorldLocation = Camera->GetComponentLocation();
+	CameraWorldRotation = Camera->GetComponentRotation();
 
+	OnSlowOVerlapToNPC(1.0f, nullptr);
+
+	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
+	if (playerController)
+	{
+		DisableInput(playerController);
+	}
+	bIsShoot = false;
+	OnbIsShoot.Broadcast(bIsShoot);
+
+	StartSetCameraMoveSetting(false, ECameraMoveType::ArmorBreakCamera);
 }
 
 bool APGPlayerCharacter::HasPlayerController()
@@ -1735,6 +1767,7 @@ void APGPlayerCharacter::StartExecution()
 
 	AttackComponent->SetbIsGodMode(bIsExecutionRange);
 	PlayExecutionMontage();
+	StartExecutionSequence();
 }
 
 void APGPlayerCharacter::PlayExecutionMontage()
@@ -1759,6 +1792,47 @@ void APGPlayerCharacter::EndExecuitionMontage(UAnimMontage* TargetMontage, bool 
 	AttackComponent->SetbIsGodMode(bIsExecutionRange);
 	
 	
+}
+
+void APGPlayerCharacter::StartExecutionSequence()
+{
+	
+	ALevelSequenceActor* LevelSequenceActor = GetWorld()->SpawnActor<ALevelSequenceActor>(ExecutionLevelSequenceClass, GetActorLocation(),
+		GetActorRotation());
+
+	if (LevelSequenceActor)
+	{
+		// ·¹º§ ½ÃÄö½º ¼³Á¤
+		if (ExecutionLevelSequence)
+		{
+			LevelSequenceActor->SetSequence(ExecutionLevelSequence);
+
+			ULevelSequencePlayer* LevelSequencePlayer = LevelSequenceActor->GetSequencePlayer();
+
+			// ÄÆ¾À Àç»ý
+			if (LevelSequencePlayer)
+			{
+				FMovieSceneObjectBindingID id = ExecutionLevelSequence->FindBindingByTag(TEXT("Character"));
+				if (id.IsValid())
+				{
+
+					LevelSequenceActor->SetBinding(id, { this });
+
+				}
+
+				ChangeViewTarget(true);
+
+				LevelSequencePlayer->Play();
+
+				LevelSequencePlayer->OnFinished.AddDynamic(this, &ThisClass::FinishExecutionSequence);
+			}
+		}
+	}
+}
+
+void APGPlayerCharacter::FinishExecutionSequence()
+{
+	ChangeViewTarget(false);
 }
 
 

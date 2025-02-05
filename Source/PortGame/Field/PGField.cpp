@@ -132,7 +132,7 @@ void APGField::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 				if (playerCharacter->GetPlayerHudWidget())
 				{
 					
-					playerCharacter->GetPlayerHudWidget()->SetupFieldGauge(TeamId, MaxFieldGague, currentFieldGauge);
+					playerCharacter->GetPlayerHudWidget()->SetupFieldGauge(TeamId, MaxFieldGague, currentFieldGauge,EliteAICharacters.Num());
 				}
 			}
 
@@ -310,6 +310,7 @@ void APGField::OnAISpawn()
 
 void APGField::DamageField(class APawn* deadpawn, int8 attackteamid)
 {
+	bool bIsElite = false;
 	APGNpcCharacter* deadnpc = Cast<APGNpcCharacter>(deadpawn);
 	if (deadnpc)
 	{
@@ -318,6 +319,12 @@ void APGField::DamageField(class APawn* deadpawn, int8 attackteamid)
 			AICharacters.Remove(deadnpc);
 			CurrentProtectPawnCount--;
 		}
+
+		else if (EliteAICharacters.Contains(deadnpc))
+		{
+			EliteAICharacters.Remove(deadnpc);
+			bIsElite = true;
+		}
 	}
 	else
 		SLOG(TEXT("NODeadNPC"));
@@ -325,12 +332,12 @@ void APGField::DamageField(class APawn* deadpawn, int8 attackteamid)
 	//OnAISpawn();
 
 
-	DamageFieldGauge(attackteamid);
+	DamageFieldGauge(attackteamid, bIsElite);
 }
 
-void APGField::DamageFieldGauge(int8 attackteamid)
+void APGField::DamageFieldGauge(int8 attackteamid, bool bIsElite)
 {
-	float Add = 1.0f;
+	float Add = bIsElite? 2.0f : 1.0f;
 
 	if (!bIsVisibled)
 		Add *= 0.25f;
@@ -346,14 +353,22 @@ void APGField::DamageFieldGauge(int8 attackteamid)
 				if (palyerCharacter)
 				{
 					palyerCharacter->GetPlayerHudWidget()->UpdateFieldGague(currentFieldGauge);
+					palyerCharacter->GetPlayerHudWidget()->UpdateEliteCount(EliteAICharacters.Num());
+					
 				}
 			}
 		}
 	}
 
-	if (currentFieldGauge <= 0)
+	if (currentFieldGauge <= 0.0f)
 	{
+		currentFieldGauge = 0.0f;
 
+		if (EliteAICharacters.Num() > 0 && bIsVisibled)
+		{
+			SLOG(TEXT("Ellite remain"))
+			return;
+		}
 		ChangedField(attackteamid);
 
 	}
@@ -376,6 +391,13 @@ void APGField::ChangedField(int8 teamid)
 			}
 		}
 	}
+	if (EliteAICharacters.Num ()> 0)
+	{
+		for (APGNpcCharacter* elite : EliteAICharacters)
+		{
+			elite->Destroy();
+		}
+	}
 
 	StartFieldEffect(teamid);
 	GetWorld()->GetTimerManager().ClearTimer(AttackAISpawnTimeHandler);
@@ -388,7 +410,7 @@ void APGField::ChangedField(int8 teamid)
 		{
 			if (palyerCharacter)
 			{
-				palyerCharacter->GetPlayerHudWidget()->SetupFieldGauge(TeamId,MaxFieldGague,currentFieldGauge);
+				palyerCharacter->GetPlayerHudWidget()->SetupFieldGauge(TeamId,MaxFieldGague,currentFieldGauge, EliteAICharacters.Num());
 				palyerCharacter->StartFieldChangedCamera(true);
 			}
 		}
@@ -546,13 +568,12 @@ void APGField::OnAttackPawnIn(APGNpcCharacter* attackNPC)
 	
 		int8 teamid = attackNPC->GetGenericTeamId();
 		
-		DamageFieldGauge(teamid);
-		//SLOG(TEXT("Field Not Visible Attacked"));
+		DamageFieldGauge(teamid,false);
+		
 		
 		attackNPC->ForceReturnObjectPool();
 
-		//강제 귀한할때 overlapend 됨
-		//AttackPawns.Remove(attackNPC);
+		
 
 	}
 }
@@ -653,6 +674,7 @@ void APGField::OnNiagaraSystemFinished(UNiagaraComponent* FinishedComponent)
 
 void APGField::EliteAISpawn()
 {
+	if (TeamId == 1)return;
 	int32 startcount = EliteAICharacters.Num();
 	for (int32 i = startcount; i < EliteSpawnCount; i++)
 	{
@@ -702,6 +724,8 @@ void APGField::EliteAISpawn()
 
 			//빙의시 바로 행동트리 시작
 			pgAIcontoller->Possess(EliteCharacter);
+
+			EliteAICharacters.Add(EliteCharacter);
 		}
 	}
 

@@ -30,4 +30,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UltiSkill")
 	TObjectPtr<class ULevelSequence> LevelSequence;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Execution")
+	TObjectPtr<class ULevelSequence> ExecutionLevelSequence;
 };

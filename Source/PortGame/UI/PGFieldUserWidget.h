@@ -25,11 +25,15 @@ protected:
 
 public:
 
-	void SetUpWidget(uint8 teamid,float maxgauge,float currentgauge);
+	void SetUpWidget(uint8 teamid,float maxgauge,float currentgauge, int32 elitecount);
+
+	void CreateEliteImage();
 
 	void ChangeColor(uint8 teamid);
 	UFUNCTION()
 	void UpdateFieldGauge(float Newgauge);
+
+	void UpdateEliteCount(int32 elitecount);
 
 	void SetLockImage(bool lock);
 
@@ -59,6 +63,17 @@ protected:
 	//14°­ ÇöÀç hp
 	UPROPERTY()
 	float CurrentFieldGauge;
+
+
+protected:
+	UPROPERTY()
+	TObjectPtr<class UTexture2D> EliteImageAsset;
+
+	UPROPERTY()
+	TArray<TObjectPtr<class UImage>> EliteImages;
+
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UHorizontalBox> HorizontalBox_Elite;
 
 	
 };

@@ -169,10 +169,10 @@ float APGEliteNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& D
 	
 	//플레이어 컨트롤인지 확인
 	ISetPlayerExecutionInterface* player = Cast<ISetPlayerExecutionInterface>(DamageCauser);
-	if (player)
-	{
-		if (!player->HasPlayerController())return DamageAmount;
-	}
+	if (!player) return DamageAmount;
+
+	if (!player->HasPlayerController())return DamageAmount;
+	
 
 
 	if (bIsSuperGroggy)
@@ -196,6 +196,7 @@ float APGEliteNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& D
 				StatComponent->HitGaugeDamaged(GetTotalStat().HitGauge);
 			}
 
+			player->ArmorBreakCameraFocus(this);
 
 			bIsSuperGroggy = true;
 			

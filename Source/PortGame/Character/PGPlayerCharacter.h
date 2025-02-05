@@ -258,7 +258,7 @@ protected:
 	uint8 bIsDash : 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Dash")
-	float DashTime=0.25f;
+	float DashTime = 0.25f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash")
 	float DashColltime = 1.0f;
@@ -520,7 +520,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<class UBGBaseOptionDataAsset*> OptionDataAssets;
 
-
 protected:
 	void SetPostProcessMaterial();
 
@@ -556,6 +555,11 @@ protected:
 
 	void EndExecuitionMontage(UAnimMontage* TargetMontage, bool IsProperlyEnded);
 	
+	void StartExecutionSequence();
+
+	UFUNCTION()
+	void FinishExecutionSequence();
+	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	uint8 bIsExecutionRange : 1;
@@ -570,4 +574,15 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
 	TObjectPtr<AActor> ArmorBreakElite;
+
+	FVector CameraWorldLocation;
+	FRotator CameraWorldRotation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<class ALevelSequenceActor> ExecutionLevelSequenceClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class ULevelSequence> ExecutionLevelSequence;
+
+
 };

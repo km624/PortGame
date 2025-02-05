@@ -32,9 +32,7 @@ void UPGSelectWidget::SetUpPlayerButton(const TArray<UPlayerCharacterDataAsset*>
 	{
 		for (UPlayerCharacterDataAsset* Data : characterDatas)
 		{
-			
 			UPGPlayerButtonWidget* Button = CreateWidget<UPGPlayerButtonWidget>(GetOwningPlayer(), PlayerButtonClass);
-
 			Button->SetCharacterData(Data);
 
 			UVerticalBoxSlot* VerticalBoxSlot = nullptr;
@@ -50,8 +48,6 @@ void UPGSelectWidget::SetUpPlayerButton(const TArray<UPlayerCharacterDataAsset*>
 			{
 				VerticalBoxSlot= VerticalBox_ETC->AddChildToVerticalBox(Button);
 			}
-
-
 			if (VerticalBoxSlot)
 			{
 				

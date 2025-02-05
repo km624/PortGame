@@ -29,7 +29,7 @@ protected:
 protected:
 	virtual void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult) override;
 
-	virtual void DamageFieldGauge(int8 attackteamid) override;
+	virtual void DamageFieldGauge(int8 attackteamid,bool bIsElite) override;
 
 	virtual void ChangedField(int8 teamid) override;
 

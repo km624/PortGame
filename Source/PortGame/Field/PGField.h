@@ -124,7 +124,7 @@ public:
 
 protected:
 
-	virtual void DamageFieldGauge(int8 attackteamid);
+	virtual void DamageFieldGauge(int8 attackteamid,bool bIsElite);
 
 	virtual void ChangedField(int8 teamid);
 
@@ -165,11 +165,7 @@ protected:
 
 	void CheckAttackPawnIn();
 
-	/*void SetTimerAttackPawnDamage(class APGNpcCharacter* attackPawn);
 
-	void VisibleClearTimer();
-
-	void NotVisibleAllSetupTimer();*/
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
@@ -178,14 +174,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
 	float visibleTime = 3.0f;
 	
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
-	float AttackPawnDamageTime= 3.0f;*/
-
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
-	TMap<TObjectPtr<class APGNpcCharacter>, FTimerHandle> AttackPawns;*/
-
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Optimization")
-	TArray<TObjectPtr<class APGNpcCharacter>>AttackPawns;*/
+	
 
 protected:
 
@@ -227,7 +216,7 @@ protected:
 	TObjectPtr<class UBaseCharacterDataAsset> EliteAIData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TArray<TObjectPtr<class APGEliteNpcCharacter>> EliteAICharacters;
+	TArray<TObjectPtr<class APGNpcCharacter>> EliteAICharacters;
 
 	
 

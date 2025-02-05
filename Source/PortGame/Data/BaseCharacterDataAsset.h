@@ -57,13 +57,6 @@ public:
 		}
 	}
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite ,Category = "Character")
-	FName Rarity;*/
-
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
-	FString MeshName;*/
-
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 	EPlayerCharacterType Charactertype;
 
@@ -72,9 +65,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
 	TSubclassOf<class UAnimInstance> AnimInstanceClass;
-	
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character")
-	uint8 TeamId;*/
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Weapon)
 	TObjectPtr<class UWeaponData> WeaponData;

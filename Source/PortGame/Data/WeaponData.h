@@ -40,8 +40,6 @@ public:
 
 
 public:
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combo, Meta = (AllowPrivateAccess = "true"))
-	//TObjectPtr<class UAnimMontage> ComboMontage;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Combo, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UComboData> ComboData;
