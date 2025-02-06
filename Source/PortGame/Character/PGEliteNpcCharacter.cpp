@@ -261,6 +261,7 @@ void APGEliteNpcCharacter::SuperGroggyEndPlay()
 
 void APGEliteNpcCharacter::SuperGroggyEnd(UAnimMontage* TargetMontage, bool IsProperlyEnded)
 {
+	if (bIsExecution)return;
 
 	SLOG(TEXT("GroggyEnd %f"),GetWorld()->TimeSeconds);
 	bIsSuperGroggy = false;
