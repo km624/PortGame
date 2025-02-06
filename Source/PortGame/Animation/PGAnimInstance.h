@@ -83,6 +83,21 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = NikkeSkill)
 	uint8 bIsNikkeSkill : 1;
 
+public:
+	void SetForceTimer();
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Emotion)
+	float Eyeblink;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = AnimDynaimc)
+	FVector ForceVector;
+
+	FTimerHandle ForceTimer;
+
+
+
 	
 	
 

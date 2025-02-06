@@ -787,24 +787,49 @@ void APGPlayerCharacter::OnParryPostPorcess(bool effect)
 {
 	if (effect)
 	{
+		if (bIsExecution)
+		{
+			
+			CutSceneCamera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
+			CutSceneCamera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
+			CutSceneCamera->PostProcessSettings.DepthOfFieldFocalDistance = 500.0f;
+			CutSceneCamera->PostProcessSettings.DepthOfFieldSensorWidth = 2000.0f;;
 
-		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
-		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
-		Camera->PostProcessSettings.DepthOfFieldFocalDistance = 500.0f;
-		Camera->PostProcessSettings.DepthOfFieldSensorWidth = 2000.0f;;
+			CutSceneCamera->PostProcessSettings.bOverride_SceneFringeIntensity = true;
+			CutSceneCamera->PostProcessSettings.SceneFringeIntensity = 2.5f;
+		}
+		else
+		{
+			
+			Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = true;
+			Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = true;
+			Camera->PostProcessSettings.DepthOfFieldFocalDistance = 500.0f;
+			Camera->PostProcessSettings.DepthOfFieldSensorWidth = 2000.0f;;
 
-		Camera->PostProcessSettings.bOverride_SceneFringeIntensity = true;
-		Camera->PostProcessSettings.SceneFringeIntensity = 2.5f;
-
+			Camera->PostProcessSettings.bOverride_SceneFringeIntensity = true;
+			Camera->PostProcessSettings.SceneFringeIntensity = 2.5f;
+		}
+		
 
 	}
 	else
 	{
+		if (bIsExecution)
+		{
+			CutSceneCamera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = false;
+			CutSceneCamera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = false;
 
-		Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = false;
-		Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = false;
+			CutSceneCamera->PostProcessSettings.bOverride_SceneFringeIntensity = false;
+		}
+		else
+		{
+			Camera->PostProcessSettings.bOverride_DepthOfFieldSensorWidth = false;
+			Camera->PostProcessSettings.bOverride_DepthOfFieldFocalDistance = false;
 
-		Camera->PostProcessSettings.bOverride_SceneFringeIntensity = false;
+			Camera->PostProcessSettings.bOverride_SceneFringeIntensity = false;
+		}
+
+		
 	}
 }
 
@@ -1497,24 +1522,36 @@ void APGPlayerCharacter::BodyGuardCameraMove(float dt)
 
 void APGPlayerCharacter::FieldChangeCameraMove(float dt)
 {
+	
 	float AimX;
 	float AimY;
 	float AimZ;
 	float RotatePitch;
 	
+	float Add = 1.0f;
+	if (CustomTimeDilation < 1.0f)
+	{
+		
+		Add = 100.0f;
+		
+	}
+
 	if (!bIsReversed)
 	{
-		AimX = FMath::Lerp(CameraCurrentLocation.X, -300.0f, dt);
-		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 800.0f, dt);
-		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, -40.0f, dt);
+		
+		AimX = FMath::FInterpTo(CameraCurrentLocation.X, -300.0f, dt, Add);
+		AimZ = FMath::FInterpTo(CameraCurrentLocation.Z, 800.0f, dt, Add);
+		RotatePitch = FMath::FInterpTo(CameraCurrentRotator.Pitch, -40.0f, dt, Add);
+		
 	}
 	else
 	{
-		AimX = FMath::Lerp(CameraCurrentLocation.X, 0.0f, dt);
-		AimZ = FMath::Lerp(CameraCurrentLocation.Z, 0.0f, dt);
-		RotatePitch = FMath::Lerp(CameraCurrentRotator.Pitch, 0.0f, dt);
+		AimX = FMath::FInterpTo(CameraCurrentLocation.X, 0.0f, dt, Add);
+		AimZ = FMath::FInterpTo(CameraCurrentLocation.Z, 0.0f, dt, Add);
+		RotatePitch = FMath::FInterpTo(CameraCurrentRotator.Pitch, 0.0f, dt, Add);
+		
 	}
-	AimY = FMath::Lerp(CameraCurrentLocation.Y, 0.0f, dt);
+	AimY = FMath::FInterpTo(CameraCurrentLocation.Y, 0.0f, dt, Add);
 
 
 	Camera->SetRelativeLocation(FVector(AimX, AimY, AimZ));
@@ -1677,11 +1714,17 @@ void APGPlayerCharacter::StartFieldChangedCamera(bool start)
 	if (playerController)
 	{
 		bIsGlobalTimeSlow = start;
+
+		
 		StartSetCameraMoveSetting(!start, ECameraMoveType::FieldChangeCamera);
+
 
 		if (start)
 		{
-			
+			if (CutSceneCamera->IsActive())
+			{
+				ChangeViewTarget(false);
+			}
 			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.5f);
 
 		}
@@ -1766,8 +1809,8 @@ void APGPlayerCharacter::StartExecution()
 	{
 		DisableInput(playerController);
 	}
-
-	AttackComponent->SetbIsGodMode(bIsExecutionRange);
+	bIsExecution = true;
+	AttackComponent->SetbIsGodMode(bIsExecution);
 	PlayExecutionMontage();
 	StartExecutionSequence();
 }
@@ -1791,7 +1834,8 @@ void APGPlayerCharacter::EndExecuitionMontage(UAnimMontage* TargetMontage, bool 
 		EnableInput(playerController);
 	}
 	bIsExecutionRange = false;
-	AttackComponent->SetbIsGodMode(bIsExecutionRange);
+	bIsExecution = false;
+	AttackComponent->SetbIsGodMode(bIsExecution);
 	
 	
 }

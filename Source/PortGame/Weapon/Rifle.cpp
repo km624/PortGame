@@ -22,6 +22,7 @@
 #include "Character/PGAIBaseCharacter.h"
 #include "GenericTeamAgentInterface.h"
 #include "Character/PGPlayerCharacter.h"
+#include "Animation/PGAnimInstance.h"
 
 
 const FString ARifle::ReloadMontage = TEXT("ReloadingMontage");
@@ -95,6 +96,10 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 		//ReloadMontageTime = FirstReloadMontage->GetPlayLength() / reloadingTime - 0.3f;
 	}
 	Currentammo = ammoMaxCount;
+
+	UPGAnimInstance* AnimInstance = Cast<UPGAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
+	if (AnimInstance)
+		OnGunShooted.BindUObject(AnimInstance, &UPGAnimInstance::SetForceTimer);
 
 }
 
@@ -388,6 +393,7 @@ void ARifle::FireWithLineTrace()
 			}
 		}
 	}
+	OnGunShooted.ExecuteIfBound();
 	StartGunEffect();
 
 

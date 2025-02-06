@@ -8,6 +8,8 @@
 #include "Character/PGBaseCharacter.h"
 //#include "Kismet/KismetMathLibrary.h"
 #include "PortGame/PortGame.h"
+#include "Engine/World.h"
+
 
 //#include "Kismet/KismetAnimationLibrary.h"
 
@@ -30,6 +32,7 @@ void UPGAnimInstance::NativeInitializeAnimation()
 		Movement = Owner->GetCharacterMovement();
 
 	}
+	ForceVector = FVector(0.0f, 0.0f, 0.0f);
 }
 
 void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -103,5 +106,24 @@ float UPGAnimInstance::CalculateDirectionAlternative(const FVector& newVelocity,
 	float Angle = FMath::RadiansToDegrees(FMath::Atan2(RightDot, ForwardDot));
 
 	return Angle;
+}
+
+void UPGAnimInstance::SetForceTimer()
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(ForceTimer))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ForceTimer);
+		ForceVector = FVector(0.0f, 0.0f, 0.0f);
+	}
+	FVector BackwardVector = -(GetOwningActor()->GetActorForwardVector());
+
+	
+	ForceVector = BackwardVector * 5000.0f;
+	
+	GetWorld()->GetTimerManager().SetTimer(ForceTimer, [this]() 
+		{
+			ForceVector = FVector(0.0f, 0.0f, 0.0f);
+			GetWorld()->GetTimerManager().ClearTimer(ForceTimer);
+		}, 0.1f, false);
 }
 

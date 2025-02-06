@@ -13,6 +13,7 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnAmmoChanged, int32 /*CurrentAmmo*/);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FOnbIsGunReload, bool /*bIsGunReload*/,float /*ReloadMontageTime*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnbInGunRanged, bool /*bIsGunRange*/);
+DECLARE_DELEGATE(FOnGunShooted);
 UCLASS()
 class PORTGAME_API ARifle : public AWeapon
 {
@@ -120,6 +121,9 @@ protected:
 	FDelegateHandle FOnbIsShoot;
 	FDelegateHandle FOnbIsReload;
 	FDelegateHandle FOnbIsAim;
+
+public:
+	FOnGunShooted OnGunShooted;
 
 
 
