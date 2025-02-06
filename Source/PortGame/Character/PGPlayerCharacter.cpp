@@ -1548,14 +1548,15 @@ void APGPlayerCharacter::OnArmorBreakTimelineFinished()
 	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
 	if (playerController)
 	{
-		EnableInput(playerController);
+		playerController->SetIgnoreLookInput(false);
+		playerController->SetIgnoreMoveInput(false);
 	}
 	ArmorBreakElite = nullptr;
 	Camera->SetRelativeLocation(FVector::Zero());
 	Camera->SetRelativeRotation(FRotator::ZeroRotator);
 
 
-	SLOG(TEXT("Timeline End"));
+	
 }
 
 void APGPlayerCharacter::StartSetCameraMoveSetting(bool bisreversed, ECameraMoveType cameramovetype)
@@ -1708,12 +1709,13 @@ void APGPlayerCharacter::ArmorBreakCameraFocus(AActor* eliteNPC)
 	APGPlayerController* playerController = Cast<APGPlayerController>(GetController());
 	if (playerController)
 	{
-		DisableInput(playerController);
+
+		playerController->SetIgnoreLookInput(true);
+		playerController->SetIgnoreMoveInput(true);
 	}
-	bIsShoot = false;
-	OnbIsShoot.Broadcast(bIsShoot);
 
 	StartSetCameraMoveSetting(false, ECameraMoveType::ArmorBreakCamera);
+	
 }
 
 bool APGPlayerCharacter::HasPlayerController()

@@ -122,7 +122,7 @@ void UPGAttackComponent::SetUpWeapon()
 
 			spawnWeapon->OnInitializeWeapon(BaseCharacter, WeaponData);
 
-			spawnWeapon->AttachToComponent(BaseCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, spawnWeapon->GetWeaponFname());
+			spawnWeapon->AttachToComponent(BaseCharacter->GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponData->WeaponSocket);
 
 			BaseCharacter->SetUpModifierStat(spawnWeapon->ModifierStat);
 

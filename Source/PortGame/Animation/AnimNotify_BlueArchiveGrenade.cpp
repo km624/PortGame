@@ -37,7 +37,7 @@ void UAnimNotify_BlueArchiveGrenade::Notify(USkeletalMeshComponent* MeshComp, UA
     }
 
     // Calculate spawn transform
-    FVector SpawnLocation = MeshComp->GetSocketLocation(FName("weaponRifleSocket")) + Owner->GetActorForwardVector() * 25.0f;
+    FVector SpawnLocation = MeshComp->GetSocketLocation(FName("GrenadeSocket")) + Owner->GetActorForwardVector() * 25.0f;
     FRotator SpawnRotation = Owner->GetActorRotation() + FRotator(30.0f, 0.0f, 0.0f);
 
     // Spawn the grenade

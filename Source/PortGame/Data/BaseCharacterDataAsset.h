@@ -16,10 +16,14 @@ enum class EMeshNameOption : uint8
 	ManneQuin UMETA(DisplayName = "ManneQuin"),
 	Mika UMETA(DisplayName = "Mika"),
 	Rapi UMETA(DisplayName = "Rapi"),
-	Rover UMETA(DisplayName = "Rover")
+	Rover UMETA(DisplayName = "Rover"),
+	MikaV2 UMETA(DisplayName = "MikaV2"),
+	RapiV2 UMETA(DisplayName = "RapiV2"),
+	RoverV2 UMETA(DisplayName = "RoverV2"),
+	Aru UMETA(DisplayName = "Aru"),
+	Alice UMETA(DisplayName = "Alice"),
+	Ellen UMETA(DisplayName = "Ellen")
 	
-	/*RifleComboMontage UMETA(DisplayName = "RifleComboMontage"),
-	PistolComboMontage UMETA(DisplayName = "PistolComboMontage")*/
 };
 
 UCLASS()
@@ -52,6 +56,18 @@ public:
 			return TEXT("Rapi");
 		case EMeshNameOption::Rover:
 			return TEXT("Rover");
+		case EMeshNameOption::MikaV2:
+			return TEXT("MikaV2");
+		case EMeshNameOption::RapiV2:
+			return TEXT("RapiV2");
+		case EMeshNameOption::RoverV2:
+			return TEXT("RoverV2");
+		case EMeshNameOption::Aru:
+			return TEXT("Aru");
+		case EMeshNameOption::Alice:
+			return TEXT("Alice");
+		case EMeshNameOption::Ellen:
+			return TEXT("Ellen");
 		default:
 			return TEXT("");
 		}

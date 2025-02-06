@@ -451,6 +451,12 @@ void AmainPlayerController::LoadSaveFile()
 					FString charactername = playerdata->GetMeshNameAsString();
 					SLOG(TEXT("%s  : %d "), *charactername, SaveGameInstance->CharacterLevel[charactername]);
 				}
+				else
+				{
+					FString charactername = playerdata->GetMeshNameAsString();
+					SaveGameInstance->CharacterLevel.Add(playerdata->GetMeshNameAsString(), 5);
+					SLOG(TEXT("%s  : %d "), *charactername, SaveGameInstance->CharacterLevel[charactername]);
+				}
 
 			}
 			SLOG(TEXT("LoadComplete"));

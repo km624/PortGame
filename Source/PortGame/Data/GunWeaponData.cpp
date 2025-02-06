@@ -5,5 +5,5 @@
 
 UGunWeaponData::UGunWeaponData()
 {
-	WeaponSocket = TEXT("weaponRifleSocket");
+	
 }
