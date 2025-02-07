@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Interface/MorphTargetInterface.h"
 #include "PGAnimInstance.generated.h"
 
 /**
@@ -96,8 +97,8 @@ protected:
 
 	FTimerHandle ForceTimer;
 
-
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TScriptInterface<IMorphTargetInterface> MorphTarget;
 	
 	
 

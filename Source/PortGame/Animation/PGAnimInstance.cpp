@@ -27,6 +27,12 @@ void UPGAnimInstance::NativeInitializeAnimation()
 	Owner = Cast<ACharacter>(GetOwningActor());
 	BaseCharacter = Cast<APGBaseCharacter>(Owner);
 	
+	if (Cast<IMorphTargetInterface>(BaseCharacter))
+	{
+		MorphTarget = BaseCharacter;
+		MorphTarget->EyeBlinkStart();
+	}
+	
 	if (Owner)
 	{
 		Movement = Owner->GetCharacterMovement();
@@ -70,19 +76,10 @@ void UPGAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	else
 		AimOffsetPitch = 0.0f;
 
-	/*if (IsValid(BaseCharacter))
+	if (MorphTarget)
 	{
-		bIsReloading = BaseCharacter->GetCurrentIsReloading();
+		Eyeblink = MorphTarget->GetEyeBlink();
 	}
-
-	if (IsValid(BaseCharacter))
-	{
-		bIsDead = BaseCharacter->GetbIsDead();
-	}
-	if (IsValid(BaseCharacter))
-	{
-		bIsNikkeSkill = BaseCharacter->GetbIsNikkeSkill();
-	}*/
 	
 	
 }

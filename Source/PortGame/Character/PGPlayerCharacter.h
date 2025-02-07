@@ -13,6 +13,7 @@
 #include "Interface/PlayerAddEXPInterface.h"
 #include "Interface/SetPlayerExecutionInterface.h"
 #include "Interface/ExecutionEliteNPCInterface.h"
+#include "Interface/MorphTargetInterface.h"
 #include "PGPlayerCharacter.generated.h"
 /**
  * 
@@ -46,7 +47,7 @@ public:
 };
 UCLASS()
 class PORTGAME_API APGPlayerCharacter : public APGAIBaseCharacter, public IPGHudWidgetInterface ,public IAttackHitStopInterface,  public IPlayerAddEXPInterface
-	,public IAIBodyGuardInterface,public ISetPlayerExecutionInterface
+	,public IAIBodyGuardInterface,public ISetPlayerExecutionInterface,public IMorphTargetInterface
 {
 	GENERATED_BODY()
 
@@ -584,5 +585,25 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class ULevelSequence> ExecutionLevelSequence;
 
+protected:
+	virtual void EyeBlinkStart() override;
+
+	virtual float GetEyeBlink() override;
+
+	void SetEyeBlinkTimeline();
+
+	UFUNCTION()
+	void EyeBlinkUpdate(float dt);
+	UFUNCTION()
+	void EyeBlinkFinished();
+
+protected:
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly)
+	float EyeBlinkValue;
+
+	FTimeline EyeBlinkTimeline;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Morph")
+	TObjectPtr<class UCurveFloat> EyeBlinkCurve;
 
 };

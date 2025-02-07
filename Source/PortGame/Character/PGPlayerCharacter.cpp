@@ -229,6 +229,11 @@ APGPlayerCharacter::APGPlayerCharacter()
 	{
 		ArmorBreakCurve = AMCurve.Object;
 	}
+	static ConstructorHelpers::FObjectFinder<UCurveFloat> EBCurve(TEXT("/Script/Engine.CurveFloat'/Game/PortGame/Weapon/EyeBllinkCurve.EyeBllinkCurve'"));
+	if (EBCurve.Object)
+	{
+		EyeBlinkCurve = EBCurve.Object;
+	}
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface>BaseMaterial(TEXT("/Script/Engine.MaterialInstanceConstant'/Game/PortGame/Effect/Material/M_Scan_Inst.M_Scan_Inst'"));
 	if (BaseMaterial.Object)
 	{
@@ -276,6 +281,8 @@ void APGPlayerCharacter::BeginPlay()
 	AllTimelineSetting();
 
 	SetPostProcessMaterial();
+
+	SetEyeBlinkTimeline();
 }
 
 void APGPlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -354,9 +361,7 @@ void APGPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/*AimTimeline.TickTimeline(DeltaTime);
-	AttackTimeline.TickTimeline(DeltaTime);
-	DashTimeline.TickTimeline(DeltaTime);*/
+	
 	AllTimelineTick(DeltaTime);
 
 	if (TargetingComponent->GetbIsTargetLock())
@@ -370,7 +375,7 @@ void APGPlayerCharacter::Tick(float DeltaTime)
 
 	}
 	
-	
+	EyeBlinkTimeline.TickTimeline(DeltaTime);
 
 }
 
@@ -738,7 +743,7 @@ void APGPlayerCharacter::FindSideEnemyToComp(const FInputActionValue& Value)
 	else
 	{
 		float addFov = Camera->FieldOfView += -direction * 2.5f ;
-		float newFov = FMath::Clamp(addFov, 70.0f, 110.0f);
+		float newFov = FMath::Clamp(addFov, 50.0f, 110.0f);
 		Camera->SetFieldOfView(newFov);
 	}
 		
@@ -1392,6 +1397,7 @@ void APGPlayerCharacter::AllTimelineSetting()
 	FieldChangeProgress.BindUFunction(this, FName("FieldChangeCameraMove"));
 	FieldChangeWrapper->Timeline.AddInterpFloat(FieldChangeCurve, FieldChangeProgress);
 
+	//아버 브레이크 타임라인
 	UTimeLineWrapper* ArmorBreakWrapper = NewObject<UTimeLineWrapper>(this);
 	FOnTimelineFloat ArmorBreakProgress;
 	ArmorBreakProgress.BindUFunction(this, FName("ArmorBreakCameraMove"));
@@ -1879,6 +1885,40 @@ void APGPlayerCharacter::StartExecutionSequence()
 void APGPlayerCharacter::FinishExecutionSequence()
 {
 	ChangeViewTarget(false);
+}
+
+void APGPlayerCharacter::EyeBlinkStart()
+{
+	EyeBlinkTimeline.PlayFromStart();
+}
+
+float APGPlayerCharacter::GetEyeBlink()
+{
+	return EyeBlinkValue;
+}
+
+void APGPlayerCharacter::SetEyeBlinkTimeline()
+{
+	
+	FOnTimelineFloat EyeBlinkProgress;
+	EyeBlinkProgress.BindUFunction(this, FName("EyeBlinkUpdate"));
+	EyeBlinkTimeline.AddInterpFloat(EyeBlinkCurve, EyeBlinkProgress);
+
+	FOnTimelineEvent EyeBlinkTimelineFinished;
+	EyeBlinkTimelineFinished.BindUFunction(this, FName("EyeBlinkFinished"));
+	EyeBlinkTimeline.SetTimelineFinishedFunc(EyeBlinkTimelineFinished);
+}
+
+void APGPlayerCharacter::EyeBlinkUpdate(float dt)
+{
+	
+	EyeBlinkValue = FMath::FInterpTo(0.0f, 1.0f, dt,1.0f);
+	
+}
+
+void APGPlayerCharacter::EyeBlinkFinished()
+{
+	EyeBlinkTimeline.PlayFromStart();
 }
 
 
