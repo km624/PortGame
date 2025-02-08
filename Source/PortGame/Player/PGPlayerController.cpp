@@ -19,8 +19,19 @@
 
 #include "GameFramework/GameUserSettings.h"
 
+#include "Engine/LevelScriptActor.h"
+#include "Interface/LevelGameStartInterface.h"
+#include "UI/StartCountWidget.h"
+
 APGPlayerController::APGPlayerController()
 {
+	static ConstructorHelpers::FClassFinder<UStartCountWidget> startcountclass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/PortGame/UI/BP_StartWidget.BP_StartWidget_C'"));
+	if (startcountclass.Class)
+	{
+		StartCountWidgetClass = startcountclass.Class;
+	}
+
+	bGameStart = false;
 	
 }
 
@@ -45,6 +56,27 @@ void APGPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 	
+	APGPlayerCharacter* currentplayer = Cast<APGPlayerCharacter>(aPawn);
+	
+	SetViewTarget(GetPawn());
+
+	currentplayer->SetCharacterInputData(EControlData::Base);
+	
+	if (currentplayer)
+	{
+		currentplayer->HiddenWidget();
+		if (bGameStart)
+		{
+			SLOG(TEXT("Possess : Gameplayingtrue"));
+			currentplayer->HudWidgetAddviewport();
+		}
+			
+	}
+
+}
+
+void APGPlayerController::ShowResolutionSetting()
+{
 	UGameUserSettings* UserSettings = GEngine->GetGameUserSettings();
 	if (UserSettings)
 	{
@@ -56,18 +88,16 @@ void APGPlayerController::OnPossess(APawn* aPawn)
 			ScreenHeight);
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Blue, ResolutionText);
 	}
-	
-	APGPlayerCharacter* currentplayer = Cast<APGPlayerCharacter>(aPawn);
-	//PlayerCharacters.Add(currentplayer);
-	SetViewTarget(GetPawn());
+}
 
-	currentplayer->SetCharacterInputData(EControlData::Base);
-	//sSLOG(TEXT("Possess :%s"), *aPawn->GetActorNameOrLabel());
-	if (currentplayer)
-	{
-		currentplayer->HiddenWidget();
-		currentplayer->HudWidgetAddviewport();
-	}
+void APGPlayerController::BeginPlayingState()
+{
+	Super::BeginPlayingState();
+
+	SLOG(TEXT("BeginPlayingState"));
+	
+	CreateGameStartCountWidget();
+	BindGameStart();
 }
 
 void APGPlayerController::PlayCameraShake(TSubclassOf<class UCameraShakeBase> camerashake)
@@ -304,6 +334,82 @@ void APGPlayerController::ShowBodyGuardOption(bool bShowOption)
 		SetIgnoreLookInput(true);
 		bShowMouseCursor = true;
 		SetInputMode(gameuionly);
+	}
+}
+
+void APGPlayerController::BindGameStart()
+{
+	ILevelGameStartInterface* levelgamestart = Cast<ILevelGameStartInterface>(GetWorld()->GetLevelScriptActor());
+	if (levelgamestart)
+	{
+		
+		levelgamestart->SetGameStartPlayer(this);
+		SetGameStart(levelgamestart->GetbGameStart());
+
+		levelgamestart->SetGameStartTimer();
+
+	}
+}
+
+
+void APGPlayerController::CreateGameStartCountWidget()
+{
+	
+	if (StartCountWidgetClass)
+	{
+		StartCountWidget = CreateWidget<UStartCountWidget>(this, StartCountWidgetClass);
+		if (StartCountWidget)
+		{
+			
+			StartCountWidget->AddToViewport();
+			
+		}
+	}
+	
+}
+
+void APGPlayerController::SetGameStart(bool bisGameStart)
+{
+	if (GetPawn())
+	{
+		APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(GetPawn());
+		if (playerCharacter)
+		{
+			bGameStart = bisGameStart;
+			if (bGameStart)
+			{
+				
+				playerCharacter->HudWidgetAddviewport();
+				if (StartCountWidget)
+				{
+					
+							
+					StartCountWidget->RemoveFromParent();
+					StartCountWidget = NULL;
+					
+				}
+				playerCharacter->EnableInput(this);
+
+			}
+			else
+			{
+				
+				playerCharacter->RemoveHudWidget();
+				playerCharacter->DisableInput(this);
+				
+			}
+		}
+	}
+	
+	
+}
+
+void APGPlayerController::UpdateStartCount(int32 count)
+{
+	if (StartCountWidget)
+	{
+		
+		StartCountWidget->UpdateTextCount(count);
 	}
 }
 

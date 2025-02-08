@@ -16,4 +16,5 @@
 #define BBKEY_PROTECTPOSACTOR	TEXT("ProtectPosActor")
 #define BBKEY_ATTACKENUM	TEXT("AttackEnum")
 #define BBKEY_BGATTACKROT	TEXT("BGAttackRot")
+#define BBKEY_GAMESTART	TEXT("GameStart")
 

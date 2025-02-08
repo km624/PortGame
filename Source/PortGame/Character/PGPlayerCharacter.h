@@ -606,4 +606,5 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Morph")
 	TObjectPtr<class UCurveFloat> EyeBlinkCurve;
 
+
 };

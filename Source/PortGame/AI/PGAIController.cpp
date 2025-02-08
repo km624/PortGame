@@ -10,7 +10,8 @@
 #include "Interface/AITargetPlayerInterface.h"
 #include "Field/PGField.h"
 #include "Navigation/CrowdFollowingComponent.h"
-
+#include "Engine/LevelScriptActor.h"
+#include "Interface/LevelGameStartInterface.h"
 
 
 APGAIController::APGAIController(const FObjectInitializer& ObjectInitializer)
@@ -92,9 +93,42 @@ void APGAIController::RunAI()
 	if (UseBlackboard(BBAsset, BlackboardComp))
 	{
 		BlackboardComp->SetValueAsBool(BBKEY_VISIBLE, true);
+		CheckGameStart();
+		
 		bool RunResult = RunBehaviorTree(BTAsset);
 		ensure(RunResult);
 	}
+}
+
+void APGAIController::BindGameStart()
+{
+	ILevelGameStartInterface* levelgamestart = Cast<ILevelGameStartInterface>(GetWorld()->GetLevelScriptActor());
+	if (levelgamestart)
+	{
+		levelgamestart->SetGameStartAI(this);
+	}
+	
+}
+
+void APGAIController::CheckGameStart()
+{
+	ILevelGameStartInterface* levelgamestart = Cast<ILevelGameStartInterface>(GetWorld()->GetLevelScriptActor());
+	if (levelgamestart)
+	{
+		SetGameStart(levelgamestart->GetbGameStart());
+	}
+}
+
+void APGAIController::SetGameStart(bool bgameStart)
+{
+	UBlackboardComponent* BlackboardComp = Blackboard.Get();
+	if (BlackboardComp)
+	{
+		BlackboardComp->SetValueAsBool(BBKEY_GAMESTART, bgameStart);
+
+	}
+
+	
 }
 
 void APGAIController::TOMyFieldDead(int8 teamid)
@@ -138,16 +172,7 @@ void APGAIController::BlackBoardReset()
 	UBlackboardComponent* BlackboardComp = Blackboard.Get();
 	if (BlackboardComp->GetValueAsObject(BBKEY_TARGET))
 	{
-		/*APawn* pawn = Cast<APawn>(BlackboardComp->GetValueAsObject(BBKEY_TARGET));	
-		if (pawn->ActorHasTag(TAG_PLAYER))
-		{
-			
-			IAITargetPlayerInterface* player = Cast<IAITargetPlayerInterface>(pawn);
-			player->DeletePlayerTargetPawn(GetPawn());
 		
-		}*/
-
-		//BlackboardComp->SetValueAsObject(BBKEY_TARGET,nullptr);
 
 		BlackboardComp->ClearValue(BBKEY_PROTECTFIELD);
 		BlackboardComp->ClearValue(BBKEY_FORCEMOVEVECTOR);
@@ -161,13 +186,17 @@ void APGAIController::BlackBoardReset()
 		BlackboardComp->ClearValue(BBKEY_PROTECTTARGET);
 		BlackboardComp->ClearValue(BBKEY_PROTECTPOS);
 		
-		
-		
-
-		
 
 	}
 	
+}
+
+
+void APGAIController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	BindGameStart();
 }
 
 void APGAIController::OnPossess(APawn* pawn)
@@ -179,7 +208,7 @@ void APGAIController::OnPossess(APawn* pawn)
 
 void APGAIController::StopTree()
 {
-	//SLOG(TEXT("Stop"));
+	
 	StopMovement();
 	StopAI();
 	

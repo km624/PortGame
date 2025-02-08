@@ -33,6 +33,13 @@ public:
 
 	void RunAI();
 
+	void BindGameStart();
+
+	void CheckGameStart();
+
+	void SetGameStart(bool bgameStart);
+
+
 	void TOMyFieldDead(int8 teamid);
 
 	void AIIsDead();
@@ -44,6 +51,8 @@ public:
 	void BlackBoardReset();
 
 protected:
+	virtual void BeginPlay()override;
+
 	virtual void OnPossess(APawn* pawn) override;
 
 private:

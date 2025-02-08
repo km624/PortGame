@@ -25,7 +25,9 @@ protected:
 
 	virtual void OnPossess(APawn* aPawn) override;
 
+	void ShowResolutionSetting();
 
+	virtual void BeginPlayingState() override;
 protected:
 	
 	virtual void PlayCameraShake(TSubclassOf<class UCameraShakeBase> camerashake) override;
@@ -83,8 +85,31 @@ public:
 public:
 	void ShowBodyGuardOption(bool bShowOption);
 
+
+protected:
+	void BindGameStart();
+
+	
+	
+	void CreateGameStartCountWidget();
+
+public:
+	void SetGameStart(bool bisGameStart);
+
+	void UpdateStartCount(int32 count);
+
+protected:
+	UPROPERTY()
+	uint8 bGameStart : 1;
+
 	
 
+	UPROPERTY()
+	TSubclassOf<class UStartCountWidget> StartCountWidgetClass;
+	
+	UPROPERTY()
+	TObjectPtr<class UStartCountWidget> StartCountWidget;
 
+	
 	
 };

@@ -5,17 +5,16 @@
 #include "Field/PGField.h"
 #include "GenericTeamAgentInterface.h"
 #include "Kismet/GameplayStatics.h"
-#include "NavigationPath.h"
-#include "NavigationSystem.h"
 #include "PortGame/PortGame.h"
 #include "Field/FieldManager.h"
 #include "Field/ObjectPoolManager.h"
-#include "WorldPartition/WorldPartitionSubsystem.h"
-#include "WorldPartition/WorldPartition.h"
 #include "GameFramework/PlayerStart.h"
+#include "AI/PGAIController.h"
+#include "Player/PGPlayerController.h"
 
 APGGameLevelScriptActor::APGGameLevelScriptActor()
 {
+	bGameStart = false;
 }
 
 UFieldManager* APGGameLevelScriptActor::GetFieldManager() const
@@ -28,11 +27,65 @@ UObjectPoolManager* APGGameLevelScriptActor::GetObjectPoolManager() const
 	return ObjectPoolManager;
 }
 
+void APGGameLevelScriptActor::SetGameStartPlayer(APGPlayerController* playercontroller)
+{
+	if (playercontroller)
+	{
+		OnGameStarted.AddUObject(playercontroller, &APGPlayerController::SetGameStart);
+		OnCountValueChanged.AddUObject(playercontroller, &APGPlayerController::UpdateStartCount);
+		
+	}
+	
+}
+
+void APGGameLevelScriptActor::SetGameStartAI(APGAIController* aicontroller)
+{
+	if (aicontroller)
+	{
+		
+		OnGameStarted.AddUObject(aicontroller,&APGAIController::SetGameStart);
+		
+		
+	}
+	
+}
+
+void APGGameLevelScriptActor::SetGameStartTimer()
+{
+	GetWorld()->GetTimerManager().SetTimer(GameStartTimer,this,&ThisClass::CheckCount,
+		 1.0f, true);
+}
+
+void APGGameLevelScriptActor::CheckCount()
+{
+	if (GameStartCount < 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(GameStartTimer);
+		bGameStart = true;
+		OnGameStarted.Broadcast(bGameStart);
+	}
+	else
+	{
+		OnCountValueChanged.Broadcast(GameStartCount);
+		GameStartCount--;
+	}
+}
+
+int32 APGGameLevelScriptActor::GetStartCount()
+{
+	return GameStartCount;
+}
+
+bool APGGameLevelScriptActor::GetbGameStart()
+{
+	return bGameStart;
+}
+
 void APGGameLevelScriptActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-   
+	
 
 	ObjectPoolManager = NewObject<UObjectPoolManager>(this);
 
@@ -48,5 +101,6 @@ void APGGameLevelScriptActor::BeginPlay()
 		
 	}
 
+	//SetGameStartTimer();
 }
 
