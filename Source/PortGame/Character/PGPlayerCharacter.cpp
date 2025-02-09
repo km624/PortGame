@@ -43,6 +43,8 @@
 #include "LevelSequencePlayer.h"
 
 #include "Sound/SoundBase.h"
+#include "Components/AudioComponent.h"
+#include "Data/CharacterVoiceDataAsset.h"
 
 
 const FString APGPlayerCharacter::LeftEvadeMontage = TEXT("LeftEvadeMontage");
@@ -242,11 +244,22 @@ APGPlayerCharacter::APGPlayerCharacter()
 		PostProcessMaterial = BaseMaterial.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<USoundBase>evadesound(TEXT("/Script/Engine.SoundWave'/Game/PortGame/Sound/SFX/EvadeSFX.EvadeSFX'"));
+	if (evadesound.Object)
+	{
+		EvadeSFX = evadesound.Object;
+	}
+
 
 	ExecutionLevelSequenceClass = ALevelSequenceActor::StaticClass();
 
 	AIBodyGuardComponent = CreateDefaultSubobject<UAIBodyGuardComponent>(TEXT("AIBodyComponent"));
 
+	VoiceComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	VoiceComponent->bAutoActivate = false;
+	VoiceComponent->RegisterComponent();
+	VoiceComponent->bAllowSpatialization = true; // 3D 사운드 활성화
+	
 
 	Tags.Add(TAG_PLAYER);
 
@@ -388,7 +401,7 @@ void APGPlayerCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterda
 
 	LevelSequence = palyerdata->LevelSequence;
 	ExecutionLevelSequence = palyerdata->ExecutionLevelSequence;
-
+	VoiceDataAsset = palyerdata->VoiceDataAsset;
 	Super::SetupCharacterData(characterdata);
 
 	StatComponent->SetCurrentRarity(palyerdata->Rarity);
@@ -683,6 +696,13 @@ float APGPlayerCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Dam
 	return DamageAmount;
 }
 
+void APGPlayerCharacter::PlayHitMontage()
+{
+	Super::PlayHitMontage();
+
+	PlayCharacterVoice(ECharacterVoiceType::Damage);
+}
+
 
 void APGPlayerCharacter::SetUpHudWidget(UPGHudWidget* hudWidget)
 {
@@ -911,6 +931,11 @@ void APGPlayerCharacter::OnAvoidEffect()
 
 
 	OnSlowOVerlapToNPC(EvadeTime,NULL);
+
+	if (EvadeSFX)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, EvadeSFX, GetOwner()->GetActorLocation());
+	}
 
 	GetWorld()->GetTimerManager().SetTimer(
 		EvadeTimerHandle,
@@ -1739,6 +1764,7 @@ void APGPlayerCharacter::StartFieldChangedCamera(bool start)
 		else
 		{
 			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
+			PlayCharacterVoice(ECharacterVoiceType::TakeField);
 		}
 
 		playerController->SetIgnoreLookInput(start);
@@ -1844,6 +1870,8 @@ void APGPlayerCharacter::EndExecuitionMontage(UAnimMontage* TargetMontage, bool 
 	bIsExecutionRange = false;
 	bIsExecution = false;
 	AttackComponent->SetbIsGodMode(bIsExecution);
+
+	PlayCharacterVoice(ECharacterVoiceType::KillElite);
 	
 	
 }
@@ -1889,6 +1917,11 @@ void APGPlayerCharacter::FinishExecutionSequence()
 	ChangeViewTarget(false);
 }
 
+bool APGPlayerCharacter::GetExcution()
+{
+	return bIsExecution;
+}
+
 void APGPlayerCharacter::EyeBlinkStart()
 {
 	EyeBlinkTimeline.PlayFromStart();
@@ -1931,6 +1964,62 @@ USoundBase* APGPlayerCharacter::GetCharacterBGM()
 		return playerdata->CharacterBGM;
 	}
 	return nullptr;
+}
+
+void APGPlayerCharacter::PlayCharacterVoice(ECharacterVoiceType VoiceType)
+{
+	if (!VoiceDataAsset)
+		return;
+
+	TSoftObjectPtr<USoundBase> SelectedVoice = VoiceDataAsset->GetVoiceByType(VoiceType);
+	if (SelectedVoice.IsNull())
+		return;
+
+	//  데이터 에셋에서 우선순위를 가져옴
+	int32 Priority = VoiceDataAsset->GetVoicePriority(VoiceType);
+
+
+
+	if (VoiceComponent->IsPlaying())
+	{
+		// 현재 재생 중인 음성과 우선순위를 비교
+		if (VoiceComponent->Priority<= Priority)
+		{
+			VoiceComponent->Stop();
+		}
+		else
+		{
+			return; // 현재 재생 중인 음성이 더 중요하면 새로운 음성을 재생하지 않음
+		}
+	}
+	if (SelectedVoice.IsValid() == false)
+	{
+		SelectedVoice.LoadSynchronous(); // 만약 로드되지 않았다면 즉시 로드
+	}
+
+	if (SelectedVoice.IsValid())
+	{
+		
+		VoiceComponent->SetSound(SelectedVoice.Get());
+		VoiceComponent->Priority = Priority;
+		VoiceComponent->Play();
+	}
+	else
+	{
+		SLOG(TEXT("Failed Load PlayerVoice"));
+	}
+	/*{
+		
+		SelectedVoice->([this, Priority](USoundBase* LoadedSound)
+			{
+				if (LoadedSound)
+				{
+					VoiceComponent->SetSound(LoadedSound);
+					VoiceComponent->SetFloatParameter("Priority", Priority);
+					VoiceComponent->Play();
+				}
+			});
+	}*/
 }
 
 

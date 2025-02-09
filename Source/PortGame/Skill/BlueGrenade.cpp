@@ -18,12 +18,14 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Particles/ParticleSystem.h"
 
+#include "Sound/SoundBase.h"
+#include "Kismet/GameplayStatics.h"
+
 //#include "Components/"
 
 ABlueGrenade::ABlueGrenade()
 {
  	
-  
     CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
     RootComponent = CollisionBox;
 
@@ -113,6 +115,8 @@ void ABlueGrenade::PangBomb()
         baseCharacter->GetController(),      // Instigator
         true                            // Full Damage ¿©ºÎ
     );
+    if(ExplosionSFX)
+    UGameplayStatics::PlaySoundAtLocation(this, ExplosionSFX,GetActorLocation());
     PlayParticle();
    
     DrawDebugSphere(GetWorld(), GetActorLocation(), GrenadeRadius, 16, FColor::Yellow, false, 0.2f);

@@ -36,4 +36,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BGM")
 	TObjectPtr<class USoundBase> CharacterBGM;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Voice")
+	TObjectPtr<class UCharacterVoiceDataAsset> VoiceDataAsset;
 };

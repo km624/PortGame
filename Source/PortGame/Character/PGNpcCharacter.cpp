@@ -192,6 +192,13 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	
 	if (TeamId != 1)
 	{
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		if (!PlayerController || !PlayerController->GetPawn())
+		{
+
+			return;
+		}
+
 		bIshit = true;
 		HpBarWidgetComponent->SetHiddenInGame(false);
 		OnHited.Broadcast(bIshit);

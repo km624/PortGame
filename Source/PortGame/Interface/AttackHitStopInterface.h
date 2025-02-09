@@ -31,7 +31,8 @@ public:
 	virtual void AttackSlowStart() = 0;
 	
 	virtual void AttackSlowEnd() = 0;
-
+	
+	virtual bool GetExcution() = 0;
 	
 
 };

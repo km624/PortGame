@@ -4,10 +4,12 @@
 #include "Skill/NikkeWall.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "Particles/ParticleSystemComponent.h"
+#include "NiagaraComponent.h"
 #include "Physics/PGCollision.h"
 #include "Character/PGBaseCharacter.h"
 #include "PortGame/PortGame.h"
+#include "Sound/SoundBase.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ANikkeWall::ANikkeWall()
@@ -15,15 +17,14 @@ ANikkeWall::ANikkeWall()
 	BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("PhysicsBox"));
 	PawnBlockComponent= CreateDefaultSubobject<UBoxComponent>(TEXT("PawnBlockBox"));
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	//Effect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Effect"));
+	Effect = CreateDefaultSubobject<UNiagaraComponent>(TEXT("Effect"));
 	BackTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("BackTrigger"));
 	FrontTrigger = CreateDefaultSubobject<UBoxComponent>(TEXT("RightTrigger"));
 	
 	RootComponent = BoxComponent;
 
 	BoxComponent->SetCollisionProfileName(TEXT("BlockAllDynamic"));
-	/*BoxComponent->SetSimulatePhysics(true);
-	BoxComponent->SetAllMassScale(100.0f);*/
+	
 
 	PawnBlockComponent->SetupAttachment(RootComponent);
 
@@ -31,10 +32,10 @@ ANikkeWall::ANikkeWall()
 	Mesh->SetupAttachment(RootComponent);
 	BackTrigger->SetupAttachment(Mesh);
 	FrontTrigger->SetupAttachment(Mesh);
-	//Effect->SetupAttachment(Trigger);
+	Effect->SetupAttachment(RootComponent);
 
 	
-	//Trigger->SetCollisionProfileName(CPROFILE_ABTRIGGER);
+	
 	BoxComponent->SetBoxExtent(FVector(20.0f, 70.0f, 32.0f));
 	PawnBlockComponent->SetBoxExtent(FVector(100.0f, 100.0f, 1000.0f));
 	BackTrigger->SetBoxExtent(FVector(70.0f, 20.0f, 50.0f));
@@ -122,8 +123,12 @@ void ANikkeWall::OnBoxLand(UPrimitiveComponent* HitComponent, AActor* OtherActor
 		BoxComponent->OnComponentHit.RemoveDynamic(this, &ANikkeWall::OnBoxLand);
 
 		BoxComponent->SetSimulatePhysics(false);
-		////  ÀÌÆåÆ® »ý¼º
-		//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.ImpactPoint);
+
+		if (GroundSFX)
+		{
+			Effect->Activate();
+		}
+		
 	}
 }
 

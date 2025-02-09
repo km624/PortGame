@@ -70,7 +70,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = Wall)
 	TObjectPtr<class UBoxComponent> FrontTrigger;
 
-	/*UPROPERTY(VisibleAnywhere, Category = Wall)
-	TObjectPtr<class UParticleSystemComponent> Effect;*/
+	UPROPERTY(VisibleAnywhere, Category = Wall)
+	TObjectPtr<class UNiagaraComponent> Effect;
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effect)
+	TObjectPtr<class USoundBase> GroundSFX;
 };

@@ -142,7 +142,13 @@ protected:
 public:
 	void ResetTimeHandle();
 
+	//»ç¿îµå
+protected:
+	void ParraySFXPlay();
 
-		
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BGM")
+	TSoftObjectPtr<class USoundBase> ParrySFX;
 
 };

@@ -519,7 +519,7 @@ void APGField::CheckFieldVisible()
 
 		if (PlayerCharacters.Num() > 0)
 		{
-			SLOG(TEXT("PlayerAlready IN field"));
+			//SLOG(TEXT("PlayerAlready IN field"));
 			return;
 		}
 			

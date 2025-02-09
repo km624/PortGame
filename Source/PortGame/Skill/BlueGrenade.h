@@ -70,7 +70,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Particles")
 	class UParticleSystem* ParticleSystem;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effect)
+	TObjectPtr<class USoundBase> ExplosionSFX;
 
 	
 };

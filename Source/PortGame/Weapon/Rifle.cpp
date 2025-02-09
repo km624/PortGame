@@ -23,12 +23,20 @@
 #include "GenericTeamAgentInterface.h"
 #include "Character/PGPlayerCharacter.h"
 #include "Animation/PGAnimInstance.h"
+#include "Sound/SoundBase.h"
+#include "Kismet/GameplayStatics.h"
 
 
 const FString ARifle::ReloadMontage = TEXT("ReloadingMontage");
 
 ARifle::ARifle()
 {
+	static ConstructorHelpers::FObjectFinder<USoundBase>reloadsfx(TEXT("/Script/Engine.SoundWave'/Game/PortGame/Sound/SFX/Reload.Reload'"));
+	if (reloadsfx.Object)
+	{
+		ReloadSFX = reloadsfx.Object;
+	}
+
 	PrimaryActorTick.bCanEverTick = true;
 
 	GunNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("GunNiagara"));
@@ -77,6 +85,7 @@ void ARifle::OnInitializeWeapon(APGBaseCharacter* BaseCharacter, UWeaponData* we
 		CameraShakeClass = gunWeaponData->CameraShakeClass;
 		bIsRifle = gunWeaponData->bIsRifle;
 		OwnerCharacter->SetbIsRilfe(bIsRifle);
+		GunFireSFX = gunWeaponData->GunFireSFX;
 
 		if (bIsRifle)
 			WeaponSocket = TEXT("weaponRifleSocket");
@@ -238,7 +247,13 @@ void ARifle::StartReloading()
 
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	AnimInstance->Montage_Play(OwnerCharacter->AllMontage[ReloadMontage], reloadingTime);
+	
+	if (ReloadSFX)
+	{
+		SLOG(TEXT("Reload"));
+		UGameplayStatics::PlaySoundAtLocation(this, ReloadSFX, OwnerCharacter->GetActorLocation());
 
+	}
 
 	GetWorld()->GetTimerManager().SetTimer(
 		ReloadTimerHandle,
@@ -269,6 +284,8 @@ void ARifle::StopReloading()
 		bIsGunReloaded = false;
 		OwnerCharacter->SetbIsReload(bIsGunReloaded);
 		OnbIsGunReload.Broadcast(false, ReloadMontageTime);
+
+		
 	}
 }
 
@@ -414,6 +431,14 @@ void ARifle::StartGunEffect()
 	{
 		gunrecoil->PlayCameraShake(CameraShakeClass);
 	}
+
+	//»ç¿îµå
+	if (GunFireSFX)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, GunFireSFX, GunNiagaraComponent->GetComponentLocation());
+
+	}
+
 }
 
 void ARifle::ClearDelegateHandle()

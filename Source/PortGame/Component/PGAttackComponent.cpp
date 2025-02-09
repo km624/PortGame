@@ -24,6 +24,9 @@
 #include "Engine/LevelScriptActor.h"
 #include "Field/ObjectPoolManager.h"
 #include "Interface/ObjectPoolingInterface.h"
+#include "Sound/SoundBase.h"
+#include "Kismet/GameplayStatics.h"
+
 
 
 UPGAttackComponent::UPGAttackComponent()
@@ -40,6 +43,8 @@ UPGAttackComponent::UPGAttackComponent()
 	{
 		ParrayCameraShakeClass = ParryCameraShake.Class;
 	}
+
+	ParrySFX = TSoftObjectPtr<USoundBase>(FSoftObjectPath(TEXT("/Script/Engine.SoundWave'/Game/PortGame/Sound/SFX/ParrySFX.ParrySFX'")));
 }
 
 
@@ -318,9 +323,10 @@ void UPGAttackComponent::AttackHitCheck()
 
 			if (parry)
 			{
-				//임시
-				//if(BaseCharacter->GetController()->IsA<APlayerController>())
 				playerCharacter->OnParryPostPorcess(true);
+				
+				if(!playerCharacter->GetExcution())
+					ParraySFXPlay();
 				AttackHitStop(stoptime, ParrayCameraShakeClass);
 			}
 			else
@@ -478,6 +484,23 @@ void UPGAttackComponent::ResetTimeHandle()
 {
 	GetWorld()->GetTimerManager().ClearTimer(HitStoptimerHandle);
 	
+}
+
+void UPGAttackComponent::ParraySFXPlay()
+{
+	if (ParrySFX.IsValid() == false)
+	{
+		ParrySFX.LoadSynchronous(); // 만약 로드되지 않았다면 즉시 로드
+	}
+
+	if (ParrySFX.IsValid())
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ParrySFX.Get(), GetOwner()->GetActorLocation());
+	}
+	else
+	{
+		SLOG(TEXT("Failed to load Parry sound"));
+	}
 }
 
 

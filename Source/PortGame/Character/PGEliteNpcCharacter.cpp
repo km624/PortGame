@@ -162,6 +162,7 @@ float APGEliteNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& D
 	{
 		StatComponent->Damaged(StatComponent->GetTotalStat().MaxHp, DamageCauser);
 		ForceExecutionHitStop(1.0f);
+		
 		return DamageAmount;
 	}
 
@@ -194,6 +195,8 @@ float APGEliteNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& D
 			if (!bIsGroggy)
 			{
 				StatComponent->HitGaugeDamaged(GetTotalStat().HitGauge);
+
+				
 			}
 
 			player->ArmorBreakCameraFocus(this);

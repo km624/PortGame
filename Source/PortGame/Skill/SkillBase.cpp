@@ -6,6 +6,8 @@
 #include "TimerManager.h"
 #include "PortGame/PortGame.h"
 #include "Interface/PGAICharacterInterface.h"
+#include "Character/PGPlayerCharacter.h"
+#include "Data/CharacterVoiceEnumData.h"
 
 USkillBase::USkillBase()
 {
@@ -25,6 +27,12 @@ void USkillBase::OnSkill()
 	SetTimer();
 	bIsSkill = true;
 	OnbIsSkill.Broadcast(true);
+	APGPlayerCharacter* player = Cast<APGPlayerCharacter>(ownercharacter);
+	if (player)
+	{
+		player->PlayCharacterVoice(ECharacterVoiceType::Skill);
+	}
+
 	
 }
 

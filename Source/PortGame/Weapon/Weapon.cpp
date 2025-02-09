@@ -112,6 +112,7 @@ void AWeapon::ComboBegin()
 		playerCharacter->StartSetCameraMoveSetting(false, ECameraMoveType::AttackCamera);
 		//playerCharacter->AttackTimeline.PlayFromStart();
 		playerCharacter->SetbIsAttackRotation(true);
+		playerCharacter->PlayCharacterVoice(ECharacterVoiceType::Attack);
 	}
 	if (OwnerCharacter->GetMesh()->bPauseAnims)
 	{
@@ -129,7 +130,6 @@ void AWeapon::ComboBegin()
 
 void AWeapon::ComboCheck()
 {
-
 
 	UAnimInstance* AnimInstance = OwnerCharacter->GetMesh()->GetAnimInstance();
 	if (!IsValid(AnimInstance))return;
@@ -176,6 +176,7 @@ void AWeapon::ComboCheck()
 		if (playerCharacter)
 		{
 			playerCharacter->SetbIsAttackRotation(true);
+			playerCharacter->PlayCharacterVoice(ECharacterVoiceType::Attack);
 		}
 
 		//FOnMontageEnded EndDelegate;

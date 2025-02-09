@@ -125,6 +125,12 @@ protected:
 public:
 	FOnGunShooted OnGunShooted;
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effect)
+	TObjectPtr<class USoundBase> GunFireSFX;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effect)
+	TObjectPtr<class USoundBase> ReloadSFX;
 
 
 

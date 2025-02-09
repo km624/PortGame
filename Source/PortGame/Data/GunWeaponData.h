@@ -38,4 +38,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GunStat)
 	uint8 bIsRifle : 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effect)
+	TObjectPtr<class USoundBase> GunFireSFX;
 };

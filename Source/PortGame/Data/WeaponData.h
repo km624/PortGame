@@ -70,6 +70,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Effect)
 	TObjectPtr<class UNiagaraSystem> NAWeaponEffect;
 
+	
+
 
 
 

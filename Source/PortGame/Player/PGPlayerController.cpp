@@ -24,6 +24,7 @@
 #include "UI/StartCountWidget.h"
 #include "Components/AudioComponent.h"
 #include "Sound/SoundBase.h"
+#include "Data/CharacterVoiceEnumData.h"
 
 
 APGPlayerController::APGPlayerController()
@@ -35,10 +36,10 @@ APGPlayerController::APGPlayerController()
 	}
 
 	BGMComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("BGMComponent"));
-	BGMComponent->bIsUISound = true;  // 3D 공간 영향 받지 않도록 설정
-	
-	BGMComponent->SetVolumeMultiplier(0.3f);
+	BGMComponent->bIsUISound = true;  
+	BGMComponent->SetVolumeMultiplier(0.2f);
 	BGMComponent->RegisterComponent();
+
 	bGameStart = false;
 	
 }
@@ -85,8 +86,12 @@ void APGPlayerController::OnPossess(APawn* aPawn)
 		currentplayer->HiddenWidget();
 		if (bGameStart)
 		{
-			SLOG(TEXT("Possess : Gameplayingtrue"));
 			currentplayer->HudWidgetAddviewport();
+			currentplayer->PlayCharacterVoice(ECharacterVoiceType::Change);
+		}
+		else
+		{
+			currentplayer->PlayCharacterVoice(ECharacterVoiceType::Start);
 		}
 			
 	}
@@ -112,10 +117,9 @@ void APGPlayerController::BeginPlayingState()
 {
 	Super::BeginPlayingState();
 
-	SLOG(TEXT("BeginPlayingState"));
-	
 	CreateGameStartCountWidget();
 	BindGameStart();
+
 }
 
 void APGPlayerController::PlayCameraShake(TSubclassOf<class UCameraShakeBase> camerashake)

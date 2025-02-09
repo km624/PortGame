@@ -14,6 +14,7 @@
 #include "Interface/SetPlayerExecutionInterface.h"
 #include "Interface/ExecutionEliteNPCInterface.h"
 #include "Interface/MorphTargetInterface.h"
+#include "Data/CharacterVoiceEnumData.h"
 #include "PGPlayerCharacter.generated.h"
 /**
  * 
@@ -180,6 +181,8 @@ protected:
 	//데미지
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+
+	virtual void PlayHitMontage()override;
 	//HUD
 protected:
 	virtual void SetUpHudWidget(class UPGHudWidget* hudWidget) override;
@@ -560,6 +563,8 @@ protected:
 
 	UFUNCTION()
 	void FinishExecutionSequence();
+
+	virtual bool GetExcution() override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -609,5 +614,18 @@ protected:
 	//BGM사운드 
 public:
 	class USoundBase* GetCharacterBGM();
+
+	//캐릭터 대사
+public:
+	void PlayCharacterVoice(ECharacterVoiceType VoiceType);
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr <class UAudioComponent> VoiceComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UCharacterVoiceDataAsset> VoiceDataAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class USoundBase> EvadeSFX;
 
 };

@@ -64,7 +64,7 @@ void USkillNikke::SpawnNikkeWaill()
     if (NikkeWallClass)
     {
         FVector SpawnLocation = ownercharacter->GetActorLocation() + ownercharacter->GetActorForwardVector() * 150.0f +
-            ownercharacter->GetActorUpVector() * 750.0f;
+            ownercharacter->GetActorUpVector() * 1000.0f;
 
         FRotator SpawnRotation = ownercharacter->GetActorRotation();
         ANikkeWall* nikkewall = Cast<ANikkeWall>(GetWorld()->SpawnActorDeferred<ANikkeWall>(
