@@ -33,4 +33,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Execution")
 	TObjectPtr<class ULevelSequence> ExecutionLevelSequence;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BGM")
+	TObjectPtr<class USoundBase> CharacterBGM;
 };

@@ -42,6 +42,8 @@
 #include "LevelSequence.h"
 #include "LevelSequencePlayer.h"
 
+#include "Sound/SoundBase.h"
+
 
 const FString APGPlayerCharacter::LeftEvadeMontage = TEXT("LeftEvadeMontage");
 const FString APGPlayerCharacter::RightEvadeMontage = TEXT("RightEvadeMontage");
@@ -1919,6 +1921,16 @@ void APGPlayerCharacter::EyeBlinkUpdate(float dt)
 void APGPlayerCharacter::EyeBlinkFinished()
 {
 	EyeBlinkTimeline.PlayFromStart();
+}
+
+USoundBase* APGPlayerCharacter::GetCharacterBGM()
+{
+	UPlayerCharacterDataAsset* playerdata = Cast<UPlayerCharacterDataAsset>(baseCharacterData);
+	if (playerdata)
+	{
+		return playerdata->CharacterBGM;
+	}
+	return nullptr;
 }
 
 

@@ -22,6 +22,9 @@
 #include "Engine/LevelScriptActor.h"
 #include "Interface/LevelGameStartInterface.h"
 #include "UI/StartCountWidget.h"
+#include "Components/AudioComponent.h"
+#include "Sound/SoundBase.h"
+
 
 APGPlayerController::APGPlayerController()
 {
@@ -31,6 +34,11 @@ APGPlayerController::APGPlayerController()
 		StartCountWidgetClass = startcountclass.Class;
 	}
 
+	BGMComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("BGMComponent"));
+	BGMComponent->bIsUISound = true;  // 3D 공간 영향 받지 않도록 설정
+	
+	BGMComponent->SetVolumeMultiplier(0.3f);
+	BGMComponent->RegisterComponent();
 	bGameStart = false;
 	
 }
@@ -46,6 +54,14 @@ void APGPlayerController::BeginPlay()
 
 }
 
+void APGPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorld()->GetTimerManager().ClearTimer(ChangedCharacterTimerHanlde);
+	GetWorld()->GetTimerManager().ClearTimer(BGMTimerHandle);
+}
+
 void APGPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
@@ -58,6 +74,8 @@ void APGPlayerController::OnPossess(APawn* aPawn)
 	
 	APGPlayerCharacter* currentplayer = Cast<APGPlayerCharacter>(aPawn);
 	
+	ChangeBGM(currentplayer);
+
 	SetViewTarget(GetPawn());
 
 	currentplayer->SetCharacterInputData(EControlData::Base);
@@ -411,6 +429,73 @@ void APGPlayerController::UpdateStartCount(int32 count)
 		
 		StartCountWidget->UpdateTextCount(count);
 	}
+}
+
+void APGPlayerController::SetBGM(APGPlayerCharacter* playercharacter)
+{
+	if (GetPawn())
+	{
+		APGPlayerCharacter* playerCharacter = Cast<APGPlayerCharacter>(GetPawn());
+		if (playerCharacter)
+		{
+			USoundBase* characterbgm =  playerCharacter->GetCharacterBGM();
+			if (characterbgm)
+			{
+				if (BGMComponent->GetSound() != characterbgm)
+				{
+					BGMComponent->SetSound(characterbgm);
+				}
+
+			}
+		}
+	}
+
+}
+
+void APGPlayerController::ChangeBGM(APGPlayerCharacter* playercharacter)
+{
+	if (BGMComponent->IsPlaying())
+	{
+		
+		float CurrentPlaybackTime = GetBGMPlaybackTime();
+
+		BGMComponent->FadeOut(BGMFadeOut, 0.0f); 
+		GetWorld()->GetTimerManager().SetTimer(BGMTimerHandle, [this, playercharacter, CurrentPlaybackTime]()
+			{
+				SetBGM(playercharacter);
+				BGMComponent->FadeIn(BGMFadeIn, 1.0f);
+				BGMComponent->Play(CurrentPlaybackTime);
+
+				StartBGMTime = GetWorld()->GetTimeSeconds() - CurrentPlaybackTime;
+
+			}, BGMFadeOut, false);
+	}
+	else
+	{
+		
+		SetBGM(playercharacter);
+		BGMComponent->Play();
+		StartBGMTime = GetWorld()->GetTimeSeconds();
+		
+	}
+	
+	
+}
+
+float APGPlayerController::GetBGMPlaybackTime()
+{
+	if (!BGMComponent || !BGMComponent->IsPlaying() || !BGMComponent->Sound)
+		return 0.0f;
+
+	float BGMTime = GetWorld()->GetTimeSeconds() - StartBGMTime;
+	float BGMDuration = BGMComponent->Sound->GetDuration(); // // BGM 길이 가져오기
+
+	if (BGMDuration > 0.0f)
+	{
+		BGMTime = FMath::Fmod(BGMTime, BGMDuration); // 반복된 시간을 보정
+	}
+
+	return BGMTime;
 }
 
 

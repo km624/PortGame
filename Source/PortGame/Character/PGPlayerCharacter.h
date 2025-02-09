@@ -606,5 +606,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Morph")
 	TObjectPtr<class UCurveFloat> EyeBlinkCurve;
 
+	//BGM»ç¿îµå 
+public:
+	class USoundBase* GetCharacterBGM();
 
 };

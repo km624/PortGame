@@ -21,6 +21,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	virtual void PlayerTick(float DeltaTime)override;
 
 	virtual void OnPossess(APawn* aPawn) override;
@@ -102,13 +104,35 @@ protected:
 	UPROPERTY()
 	uint8 bGameStart : 1;
 
-	
-
 	UPROPERTY()
 	TSubclassOf<class UStartCountWidget> StartCountWidgetClass;
 	
 	UPROPERTY()
 	TObjectPtr<class UStartCountWidget> StartCountWidget;
+
+protected:
+	void SetBGM(class APGPlayerCharacter* playercharacter);
+
+	void ChangeBGM(class APGPlayerCharacter* playercharacter);
+
+	float GetBGMPlaybackTime();
+
+	//사운드
+protected:
+	//배경음악
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+	TObjectPtr <class UAudioComponent> BGMComponent; 
+	
+	UPROPERTY()
+	float BGMFadeIn = 0.5f;
+
+	UPROPERTY()
+	float BGMFadeOut=1.0f;
+
+	FTimerHandle BGMTimerHandle;
+	UPROPERTY()
+	float StartBGMTime;
+
 
 	
 	
