@@ -257,7 +257,7 @@ APGPlayerCharacter::APGPlayerCharacter()
 
 	VoiceComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
 	VoiceComponent->bAutoActivate = false;
-	VoiceComponent->RegisterComponent();
+	VoiceComponent->SetupAttachment(RootComponent);
 	VoiceComponent->bAllowSpatialization = true; // 3D 사운드 활성화
 	
 
