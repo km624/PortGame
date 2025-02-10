@@ -72,5 +72,5 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
-Content/PortGame/Character/Alice/Init/SK_alice-Apose.uasset
-Content/PortGame/Character/AliceReturn/Init/SK_alice-Apose.uasset
+
+
