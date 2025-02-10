@@ -196,7 +196,7 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 		if (!PlayerController || !PlayerController->GetPawn())
 		{
 
-			return;
+			return DamageAmount;
 		}
 
 		bIshit = true;
