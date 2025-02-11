@@ -20,10 +20,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/BillboardComponent.h"
-
-
-
-
+#include "Interface/SetPlayerExecutionInterface.h"
 
 
 
@@ -192,17 +189,15 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	
 	if (TeamId != 1)
 	{
-		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-		if (!PlayerController || !PlayerController->GetPawn())
-		{
+		ISetPlayerExecutionInterface* player = Cast<ISetPlayerExecutionInterface>(DamageCauser);
+		if (!player) return DamageAmount;
 
-			return DamageAmount;
-		}
+		if (!player->HasPlayerController())return DamageAmount;
 
 		bIshit = true;
 		HpBarWidgetComponent->SetHiddenInGame(false);
 		OnHited.Broadcast(bIshit);
-
+		SLOG(TEXT("Show Widget"));
 		GetWorld()->GetTimerManager().SetTimer(
 			NPCHitTimer,
 			[this]() {

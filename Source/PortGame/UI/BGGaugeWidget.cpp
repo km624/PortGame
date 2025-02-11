@@ -37,7 +37,6 @@ void UBGGaugeWidget::SetGaugeProgressBar(int32 progresscount, float currentGauge
 
 void UBGGaugeWidget::UpdateBGGauge(float CurrentGauge)
 {
-	//SLOG(TEXT("CurrentGaugeWidget : %f"), CurrentGauge);
 	float Totalgauge = CurrentGauge;
 	for (int32 i = 0; i < AllBGGaugeProgress.Num(); i++)
 	{
