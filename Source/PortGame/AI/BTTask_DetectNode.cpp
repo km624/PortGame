@@ -122,14 +122,15 @@ EBTNodeResult::Type UBTTask_DetectNode::ExecuteTask(UBehaviorTreeComponent& Owne
 			if(Pawn!=CurrentTarget)
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn);
 
-			if (protecteField)
+			//디버그
+			/*if (protecteField)
 				DrawDebugBox(World, myfield->GetActorLocation(), Detectsize, FColor::Green, false, 0.2f);
 			else
 			{
 				DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
 				DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
 				DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
-			}
+			}*/
 
 
 			return EBTNodeResult::Succeeded;
@@ -139,13 +140,14 @@ EBTNodeResult::Type UBTTask_DetectNode::ExecuteTask(UBehaviorTreeComponent& Owne
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);
 
-	if (protecteField)
+	//디버그
+	/*if (protecteField)
 	{
 		if (myfield != nullptr)
 			DrawDebugBox(World, myfield->GetActorLocation(), Detectsize, FColor::Yellow, false, 0.2f);
 	}
 	else
-		DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
+		DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);*/
 
 	return EBTNodeResult::Succeeded;
 }

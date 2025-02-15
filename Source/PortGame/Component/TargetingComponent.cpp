@@ -118,8 +118,8 @@ void UTargetingComponent::SetSideTargetLock(float direction)
 			targetnewBillboard->SetTargeting(true);
 			TargetInstance = TargetActor;
 		}
-
-		DrawDebugLine(GetWorld(), palyerLocation, FindSideActor->GetActorLocation(), FColor::Green, false, 1.0f, 0, 2.0f);
+		//디버그
+		//DrawDebugLine(GetWorld(), palyerLocation, FindSideActor->GetActorLocation(), FColor::Green, false, 1.0f, 0, 2.0f);
 	}
 		
 	
@@ -233,7 +233,8 @@ AActor* UTargetingComponent::FindClosestEnemy()
 		AllTargetActor.Empty();
 		//return nullptr;
 	}
-		
+	//디버그
+/*
 #if ENABLE_DRAW_DEBUG
 
 	// 캡슐의 중앙 위치 계산: 시작점과 끝점의 중간
@@ -260,6 +261,7 @@ AActor* UTargetingComponent::FindClosestEnemy()
 	);
 
 #endif
+*/
 
 	return ClosestEnemy;
 }

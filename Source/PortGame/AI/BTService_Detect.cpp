@@ -102,33 +102,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			if (MypawnTeam->GetTeamAttitudeTowards(*OverlapResult.GetActor()))
 			{
 				TargetActor = OverlapResult.GetActor();
-				/*if (OverlapResult.GetActor()->ActorHasTag(TAG_PLAYER))
-				{
-
-					APawn* TargetPawn = Cast<APawn>(TargetActor);
-					IAITargetPlayerInterface* player = Cast<IAITargetPlayerInterface>(TargetPawn);
-
-					if (player->CanPlayerTarget(ControllingPawn))
-					{
-						player->SetPlayerTargetPawn(ControllingPawn);
-						OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, TargetPawn);
-						
-						if(protecteField)
-							DrawDebugBox(World, myfield->GetActorLocation(), Detectsize, FColor::Purple, false, 0.2f);
-						else
-						{
-							DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Purple, false, 0.2f);
-							DrawDebugPoint(World, TargetPawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
-							DrawDebugLine(World, ControllingPawn->GetActorLocation(), TargetPawn->GetActorLocation(), FColor::Green, false, 0.27f);
-						}
-					
-						return;
-					}
-					
 				
-		
-				}
-				*/
 
 				// 거리별로 타겟팅
 				float TargetDistnace = TargetToDistance(ControllingPawn->GetActorLocation(), OverlapResult.GetActor()->GetActorLocation());
@@ -153,14 +127,15 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			if (Pawn != CurrentTarget)
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Pawn);
 			
-			if (protecteField)
+			//디버그 
+			/*if (protecteField)
 				DrawDebugBox(World, myfield->GetActorLocation(), Detectsize, FColor::Green, false, 0.2f);
 			else
 			{
 				DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Green, false, 0.2f);
 				DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
 				DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
-			}
+			}*/
 		
 	
 			return;
@@ -188,14 +163,14 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);
 
-
-	if (protecteField)
+	//디버그
+	/*if (protecteField)
 	{
 		if(myfield!=nullptr)
 			DrawDebugBox(World, myfield->GetActorLocation(), Detectsize, FColor::Yellow, false, 0.2f);
 	}
 	else
-		DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);
+		DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.2f);*/
 	
 
 }
@@ -203,10 +178,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 float UBTService_Detect::TargetToDistance(FVector myloc,FVector targetLoc)
 {
 
-	/*FVector MyLocation = myloc;
-	FVector TargetLocation = targetLoc;
-	float Distance = FVector::Dist(MyLocation, TargetLocation);
-	return Distance;*/
+	
 
 	UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
 	if (NavSys)

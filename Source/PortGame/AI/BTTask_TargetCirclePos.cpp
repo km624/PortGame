@@ -104,9 +104,9 @@ EBTNodeResult::Type UBTTask_TargetCirclePos::ExecuteTask(UBehaviorTreeComponent&
 
 
 	
-
-	DrawDebugPoint(World, NewLocation, 10.0f, FColor::Blue, false, 1.0f);
-	DrawDebugLine(World, ControllingPawn->GetActorLocation(), NewLocation, FColor::Blue, false, 1.0f);
+	//µð¹ö±×
+	/*DrawDebugPoint(World, NewLocation, 10.0f, FColor::Blue, false, 1.0f);
+	DrawDebugLine(World, ControllingPawn->GetActorLocation(), NewLocation, FColor::Blue, false, 1.0f);*/
 
 	
 

@@ -62,7 +62,7 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	uint8 MaxArmor = 1;
+	uint8 MaxArmor = 2;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	uint8 CurrentArmor;

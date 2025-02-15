@@ -162,8 +162,8 @@ void UMyBTService::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 	}
 
 
-
-	DrawDebugSphere(World, Center, DetectRange, 16, FColor::Purple, false, 0.2f);
+	//µð¹ö±×
+	//DrawDebugSphere(World, Center, DetectRange, 16, FColor::Purple, false, 0.2f);
 
 	return;
 }

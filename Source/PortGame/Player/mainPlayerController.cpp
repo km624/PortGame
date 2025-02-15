@@ -78,7 +78,6 @@ void AmainPlayerController::AllFindCharacterData()
 
 	TArray<FPrimaryAssetId> Assets;
 
-	//에셋 아이디 리스트에서 태그 아이디를 가지고 있는 애를 배열로 반환
 	Manager.GetPrimaryAssetIdList(TEXT("PlayerData"), Assets);
 
 	SLOG(TEXT("%d"), Assets.Num());
@@ -99,7 +98,6 @@ void AmainPlayerController::AllFindCharacterData()
 			AllPlayerDatas.Add(PlayerData);
 		}
 	}
-
 
 }
 

@@ -119,7 +119,7 @@ void ABlueGrenade::PangBomb()
     UGameplayStatics::PlaySoundAtLocation(this, ExplosionSFX,GetActorLocation());
     PlayParticle();
    
-    DrawDebugSphere(GetWorld(), GetActorLocation(), GrenadeRadius, 16, FColor::Yellow, false, 0.2f);
+    //DrawDebugSphere(GetWorld(), GetActorLocation(), GrenadeRadius, 16, FColor::Yellow, false, 0.2f);
    
 
 }
