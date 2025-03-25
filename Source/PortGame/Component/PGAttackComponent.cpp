@@ -104,7 +104,7 @@ void UPGAttackComponent::SetUpWeapon()
 		AWeapon* spawnWeapon = nullptr;
 
 		APGPlayerCharacter* player = Cast<APGPlayerCharacter>(GetOwner());
-		if (player)
+		if (player|| GetOwner()->ActorHasTag(TAG_ELITE))
 		{
 			spawnWeapon = GetWorld()->SpawnActor<AWeapon>(WeaponClass);
 		}
@@ -339,7 +339,7 @@ void UPGAttackComponent::AttackHitCheck()
 			
 	}
 	//µð¹ö±×
-/*
+
 #if ENABLE_DRAW_DEBUG
 
 	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
@@ -363,7 +363,7 @@ void UPGAttackComponent::AttackHitCheck()
 		DebugLifeTime);
 
 #endif
-*/
+
 }
 
 void UPGAttackComponent::AttackHitStop(float time, TSubclassOf<class UCameraShakeBase> camerashake)

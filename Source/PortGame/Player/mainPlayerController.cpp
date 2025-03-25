@@ -218,6 +218,7 @@ bool AmainPlayerController::SetSelectCharcterData(UPlayerCharacterDataAsset* cha
 
 		SpawnCharacters[*selectPlayerNum] = nullptr;
 
+		SelectWidget->HiddenStatWidget();
 		SLOG(TEXT("Select Back"));
 
 		return false;

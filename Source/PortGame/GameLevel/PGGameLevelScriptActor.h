@@ -54,6 +54,8 @@ protected:
 	
 	virtual bool GetbGameStart() override;
 
+	virtual void GameEnd() override;
+
 
 
 protected:

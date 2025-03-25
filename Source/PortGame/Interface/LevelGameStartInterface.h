@@ -31,4 +31,6 @@ public:
 	virtual int32 GetStartCount() = 0;
 
 	virtual bool GetbGameStart() = 0;
+
+	virtual void GameEnd() = 0;
 };

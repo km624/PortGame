@@ -84,6 +84,8 @@ public:
 
 	void GameOver();
 
+	void UpdateGameEnd();
+
 public:
 	void ShowBodyGuardOption(bool bShowOption);
 
@@ -133,6 +135,7 @@ protected:
 	UPROPERTY()
 	float StartBGMTime;
 
+	
 
 	
 	

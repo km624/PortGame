@@ -269,6 +269,8 @@ APGPlayerCharacter::APGPlayerCharacter()
 
 	bIsExecutionRange = false;
 
+	
+
 	GetMesh()->SetCustomDepthStencilValue(1);
 }
 
@@ -1014,10 +1016,10 @@ void APGPlayerCharacter::SetEvadeRotation(FVector TargetVector)
 {
 	FVector CharacterLocation = GetActorLocation();
 
-	// 타겟 방향 벡터를 계산합니다.
+	
 	FVector DirectionToTarget = (TargetVector - CharacterLocation).GetSafeNormal();
 
-	// 타겟 방향으로 회전합니다.
+	
 	FRotator NewRotation = DirectionToTarget.Rotation();
 
 	SetActorRotation(NewRotation);
@@ -1975,26 +1977,24 @@ void APGPlayerCharacter::PlayCharacterVoice(ECharacterVoiceType VoiceType)
 	if (SelectedVoice.IsNull())
 		return;
 
-	//  데이터 에셋에서 우선순위를 가져옴
+	//  데이터 에셋에서 우선순위
 	int32 Priority = VoiceDataAsset->GetVoicePriority(VoiceType);
-
-
 
 	if (VoiceComponent->IsPlaying())
 	{
-		// 현재 재생 중인 음성과 우선순위를 비교
+		//우선순위 비교
 		if (VoiceComponent->Priority<= Priority)
 		{
 			VoiceComponent->Stop();
 		}
 		else
 		{
-			return; // 현재 재생 중인 음성이 더 중요하면 새로운 음성을 재생하지 않음
+			return; 
 		}
 	}
 	if (SelectedVoice.IsValid() == false)
 	{
-		SelectedVoice.LoadSynchronous(); // 만약 로드되지 않았다면 즉시 로드
+		SelectedVoice.LoadSynchronous(); 
 	}
 
 	if (SelectedVoice.IsValid())
@@ -2008,18 +2008,7 @@ void APGPlayerCharacter::PlayCharacterVoice(ECharacterVoiceType VoiceType)
 	{
 		SLOG(TEXT("Failed Load PlayerVoice"));
 	}
-	/*{
-		
-		SelectedVoice->([this, Priority](USoundBase* LoadedSound)
-			{
-				if (LoadedSound)
-				{
-					VoiceComponent->SetSound(LoadedSound);
-					VoiceComponent->SetFloatParameter("Priority", Priority);
-					VoiceComponent->Play();
-				}
-			});
-	}*/
+	
 }
 
 

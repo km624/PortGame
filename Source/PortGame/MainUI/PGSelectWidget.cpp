@@ -160,6 +160,9 @@ void UPGSelectWidget::UpdateWeaponStatWidget(int8 num, UWeaponData* weapondata)
 void UPGSelectWidget::HiddenStatWidget()
 {
 	BP_FirstStatWidget->SetVisibility(ESlateVisibility::Hidden);
+	BP_FirstStatWidget->ClearAllStat();
 	BP_SecondStatWidget->SetVisibility(ESlateVisibility::Hidden);
+	BP_SecondStatWidget->ClearAllStat();
 	BP_ThirdStatWidget->SetVisibility(ESlateVisibility::Hidden);
+	BP_ThirdStatWidget->ClearAllStat();
 }

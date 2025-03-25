@@ -62,7 +62,7 @@ void APGAIController::SetForceMoveVector(FVector targetVector)
 			return;
 		}
 		
-
+		BlackboardComp->ClearValue(BBKEY_TARGET);
 		BlackboardComp->SetValueAsVector(BBKEY_FORCEMOVEVECTOR, targetVector);
 	}
 }

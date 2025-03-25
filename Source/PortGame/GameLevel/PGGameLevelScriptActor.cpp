@@ -81,6 +81,12 @@ bool APGGameLevelScriptActor::GetbGameStart()
 	return bGameStart;
 }
 
+void APGGameLevelScriptActor::GameEnd()
+{
+	bGameStart = false;
+	OnGameStarted.Broadcast(bGameStart);
+}
+
 void APGGameLevelScriptActor::BeginPlay()
 {
 	Super::BeginPlay();

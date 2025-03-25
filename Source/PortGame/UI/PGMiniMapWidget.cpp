@@ -692,9 +692,9 @@ int32 UPGMiniMapWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
                 AllottedGeometry.ToPaintGeometry(),
                 { Start, End },
                 ESlateDrawEffect::None,
-                FLinearColor::Green.CopyWithNewOpacity(1.0f), // 완전히 불투명
+                FLinearColor::Green.CopyWithNewOpacity(1.0f), 
                 true,
-                5.0f // 더 두꺼운 선
+                5.0f 
             );
         }
     }

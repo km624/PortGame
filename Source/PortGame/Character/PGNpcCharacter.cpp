@@ -21,6 +21,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/BillboardComponent.h"
 #include "Interface/SetPlayerExecutionInterface.h"
+#include "Player/PGPlayerController.h"
 
 
 
@@ -112,6 +113,7 @@ void APGNpcCharacter::EnableCharacter()
 {
 	Super::EnableCharacter();
 
+	GetMesh()->SetRenderCustomDepth(true);
 	bIshit = false;
 	bIsRendered = true;
 	bIsParry = false;
@@ -181,32 +183,35 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 	//if (!EventInstigator->GetPawn()) return DamageAmount;
 	//APGBaseCharacter* attackPawn = Cast<APGBaseCharacter>(EventInstigator->GetPawn());
 	
+
 	if (EventInstigator->GetPawn() ==NULL)return DamageAmount;
 
+	
 	if (DamageCauser == NULL)return DamageAmount;
 
+	
 	if (!GetTeamAttitudeTowards(*DamageCauser)) return DamageAmount;
+	
 	
 	if (TeamId != 1)
 	{
-		ISetPlayerExecutionInterface* player = Cast<ISetPlayerExecutionInterface>(DamageCauser);
-		if (!player) return DamageAmount;
-
-		if (!player->HasPlayerController())return DamageAmount;
-
-		bIshit = true;
-		HpBarWidgetComponent->SetHiddenInGame(false);
-		OnHited.Broadcast(bIshit);
-		SLOG(TEXT("Show Widget"));
-		GetWorld()->GetTimerManager().SetTimer(
-			NPCHitTimer,
-			[this]() {
-				bIshit = false;
-				HpBarWidgetComponent->SetHiddenInGame(true);
-				OnHited.Broadcast(bIshit);
-				GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
-			}, WidgetShowTime, false
-		);
+		APGPlayerController* playercontroller = Cast<APGPlayerController>(EventInstigator);
+		if (playercontroller)
+		{
+			bIshit = true;
+			HpBarWidgetComponent->SetHiddenInGame(false);
+			OnHited.Broadcast(bIshit);
+			SLOG(TEXT("Show Widget"));
+			GetWorld()->GetTimerManager().SetTimer(
+				NPCHitTimer,
+				[this]() {
+					bIshit = false;
+					HpBarWidgetComponent->SetHiddenInGame(true);
+					OnHited.Broadcast(bIshit);
+					GetWorld()->GetTimerManager().ClearTimer(NPCHitStoptimerHandle);
+				}, WidgetShowTime, false
+			);
+		}
 	}
 	
 	HitImpulseVector *= 2.0f;
@@ -215,6 +220,7 @@ float APGNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damage
 
 	if (DamageCauser->ActorHasTag(TAG_GRENADE))
 	{
+		
 		HitImpulseVector += (FVector(0, 0, 1) * 50.0f);
 		AttackActor = EventInstigator->GetPawn();
 	}
@@ -338,6 +344,7 @@ void APGNpcCharacter::ReturnCharacterToPool()
 {
 	//애니메이션 제거
 	GetMesh()->SetAnimInstanceClass(nullptr);
+	GetMesh()->SetRenderCustomDepth(false);
 	//무기 리턴
 	AttackComponent->ReturnWeaponPool();
 
@@ -362,6 +369,8 @@ void APGNpcCharacter::OnParryStart(float time)
 	if (TargetPawn == NULL) return;
 
 	if (!TargetPawn->ActorHasTag(TAG_PLAYER)) return;
+
+	if (TeamId == 1)return;
 
 	if (bIsGroggy)return;
 
@@ -462,19 +471,23 @@ void APGNpcCharacter::ForceReturnObjectPool()
 
 void APGNpcCharacter::CheckCharacterRender()
 {
+
+
 	if (GetMesh()->WasRecentlyRendered())
 	{
 		
 		OnRenderCharacter();
-		
+
 	}
 	else
 	{
 		
 		NotRenderCharacter();
-	
+
 	}
+	
 }
+
 
 void APGNpcCharacter::NotRenderCharacter()
 {
@@ -484,15 +497,17 @@ void APGNpcCharacter::NotRenderCharacter()
 	MyAIController->SetVisible(bIsRendered);
 	
 	GetMesh()->bPauseAnims = true;
+	
 }
 
 void APGNpcCharacter::OnRenderCharacter()
 {
 	if (bIsRendered) return;
 	bIsRendered = true;
-
+	
 	MyAIController->SetVisible(bIsRendered);
 	GetMesh()->bPauseAnims = false;
+	
 }
 
 void APGNpcCharacter::SetAnimationDistanceFactor()

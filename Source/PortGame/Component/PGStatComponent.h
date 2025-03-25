@@ -148,7 +148,7 @@ protected:
 	float CurrentUltiSkillGauge;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
-	float addPrecentUlitSkillGuage = 100.0f;
+	float addPrecentUlitSkillGuage = 10.0f;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Stat)
 	float MaxUltiSkillGauge = 100.0f;

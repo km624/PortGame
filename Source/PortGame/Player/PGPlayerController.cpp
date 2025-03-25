@@ -38,7 +38,7 @@ APGPlayerController::APGPlayerController()
 	BGMComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("BGMComponent"));
 	BGMComponent->bIsUISound = true;  
 	BGMComponent->SetVolumeMultiplier(0.2f);
-	BGMComponent->RegisterComponent();
+	//BGMComponent->RegisterComponent();
 
 	bGameStart = false;
 	
@@ -314,6 +314,7 @@ void APGPlayerController::GameClear()
 	FInputModeGameAndUI gameandui;
 	SetIgnoreLookInput(true);
 	SetInputMode(gameandui);
+	UpdateGameEnd();
 	for (APGPlayerCharacter* playerCharacter : PlayerCharacters)
 	{
 		if (!playerCharacter->GetbIsDead())
@@ -331,6 +332,7 @@ void APGPlayerController::GameOver()
 	FInputModeGameAndUI gameandui;
 	SetIgnoreLookInput(true);
 	SetInputMode(gameandui);
+	UpdateGameEnd();
 	for (APGPlayerCharacter* playerCharacter : PlayerCharacters)
 	{
 		if(!playerCharacter->GetbIsDead())
@@ -338,6 +340,16 @@ void APGPlayerController::GameOver()
 	}
 		SavesaveGameFile();
 	
+}
+
+void APGPlayerController::UpdateGameEnd()
+{
+	ILevelGameStartInterface* levelgamestart = Cast<ILevelGameStartInterface>(GetWorld()->GetLevelScriptActor());
+	if (levelgamestart)
+	{
+		levelgamestart->GameEnd();
+
+	}
 }
 
 void APGPlayerController::ShowBodyGuardOption(bool bShowOption)
@@ -368,6 +380,11 @@ void APGPlayerController::BindGameStart()
 		levelgamestart->SetGameStartPlayer(this);
 		SetGameStart(levelgamestart->GetbGameStart());
 
+		for (APGAIController* aicontroller : AIPlayerControllers)
+		{
+			levelgamestart->SetGameStartAI(aicontroller);
+		}
+		
 		levelgamestart->SetGameStartTimer();
 
 	}
@@ -416,7 +433,7 @@ void APGPlayerController::SetGameStart(bool bisGameStart)
 			else
 			{
 				
-				playerCharacter->RemoveHudWidget();
+				//playerCharacter->RemoveHudWidget();
 				playerCharacter->DisableInput(this);
 				
 			}
@@ -492,11 +509,11 @@ float APGPlayerController::GetBGMPlaybackTime()
 		return 0.0f;
 
 	float BGMTime = GetWorld()->GetTimeSeconds() - StartBGMTime;
-	float BGMDuration = BGMComponent->Sound->GetDuration(); // // BGM 길이 가져오기
+	float BGMDuration = BGMComponent->Sound->GetDuration(); 
 
 	if (BGMDuration > 0.0f)
 	{
-		BGMTime = FMath::Fmod(BGMTime, BGMDuration); // 반복된 시간을 보정
+		BGMTime = FMath::Fmod(BGMTime, BGMDuration); 
 	}
 
 	return BGMTime;

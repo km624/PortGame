@@ -47,6 +47,8 @@ APGEliteNpcCharacter::APGEliteNpcCharacter()
 	ExecutionTrigger->SetCollisionProfileName(TEXT("NoCollision"));
 	ExecutionTrigger->SetupAttachment(RootComponent);
 	ExecutionTrigger->SetSphereRadius(300.0f);
+
+	Tags.Add(TAG_ELITE);
 }
 
 void APGEliteNpcCharacter::SetupCharacterData(UBaseCharacterDataAsset* characterdata)
@@ -158,12 +160,18 @@ void APGEliteNpcCharacter::Tick(float deltatime)
 
 float APGEliteNpcCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (DamageCauser == ExecutionPlayer&& bIsExecution)
+	
+	if (bIsExecution)
 	{
-		StatComponent->Damaged(StatComponent->GetTotalStat().MaxHp, DamageCauser);
-		ForceExecutionHitStop(1.0f);
-		
+		if (DamageCauser == ExecutionPlayer)
+		{
+			StatComponent->Damaged(StatComponent->GetTotalStat().MaxHp, DamageCauser);
+			ForceExecutionHitStop(1.0f);
+			
+		}
 		return DamageAmount;
+		
+	
 	}
 
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);

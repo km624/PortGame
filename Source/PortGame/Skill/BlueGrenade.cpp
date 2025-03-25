@@ -93,7 +93,14 @@ void ABlueGrenade::BeginPlay()
 void ABlueGrenade::SetSkillOwnerCharacter(AActor* ownercharacter)
 {
     SkillOwnerCharacter = ownercharacter;
-   
+    uint8 teamid =0;
+    IGenericTeamAgentInterface* playertaem = Cast<IGenericTeamAgentInterface>(SkillOwnerCharacter);
+    if (playertaem)
+    {
+        teamid = playertaem->GetGenericTeamId();
+   }
+    SetGenericTeamId(teamid);
+    
 }
 
 void ABlueGrenade::PangBomb()
@@ -111,7 +118,7 @@ void ABlueGrenade::PangBomb()
         GrenadeRadius,            // 반경
         UDamageType::StaticClass(),     // 데미지 타입
         IgnoredActors,                  // 무시할 액터
-        this,                           // 데미지를 가한 액터
+        this,            // 데미지를 가한 액터
         baseCharacter->GetController(),      // Instigator
         true                            // Full Damage 여부
     );

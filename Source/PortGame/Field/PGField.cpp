@@ -324,6 +324,20 @@ void APGField::DamageField(class APawn* deadpawn, int8 attackteamid)
 		{
 			EliteAICharacters.Remove(deadnpc);
 			bIsElite = true;
+
+			if (bIsVisibled)
+			{
+				if (PlayerCharacters.Num() > 0)
+				{
+					for (TObjectPtr<APGPlayerCharacter>& palyerCharacter : PlayerCharacters)
+					{
+						if (palyerCharacter)
+						{
+							palyerCharacter->GetPlayerHudWidget()->UpdateEliteCount(EliteAICharacters.Num());
+						}
+					}
+				}
+			}
 		}
 	}
 	else
@@ -353,7 +367,7 @@ void APGField::DamageFieldGauge(int8 attackteamid, bool bIsElite)
 				if (palyerCharacter)
 				{
 					palyerCharacter->GetPlayerHudWidget()->UpdateFieldGague(currentFieldGauge);
-					palyerCharacter->GetPlayerHudWidget()->UpdateEliteCount(EliteAICharacters.Num());
+					
 					
 				}
 			}
@@ -625,6 +639,7 @@ bool APGField::DeleteProtectAI(APawn* ai)
 			npcai->SetbIsAttackField(true);
 
 			AICharacters.Remove(npcai);
+			CurrentProtectPawnCount--;
 			//SLOG(TEXT("Field -> Player protect"));
 			//OnAISpawn();
 			return true;

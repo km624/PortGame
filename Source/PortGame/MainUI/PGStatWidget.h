@@ -21,7 +21,7 @@ public:
 
 	void UpdateWeaponStat(class UWeaponData* weapondata);
 
-
+	void ClearAllStat();
 protected:
 	float MaxHp = 3000.0f;
 	float MaxAttack = 300.0f;

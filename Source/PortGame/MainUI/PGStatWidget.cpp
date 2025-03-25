@@ -87,4 +87,18 @@ void UPGStatWidget::UpdateWeaponStat(UWeaponData* weapondata)
 	
 }
 
+void UPGStatWidget::ClearAllStat()
+{
+	BP_StatProgressBar_HP->UpdateWeapon(0);
+	BP_StatProgressBar_Attack->UpdateWeapon(0);
+	BP_StatProgressBar_Range->UpdateWeapon(0);
+	BP_StatProgressBar_AttackSpeed->UpdateWeapon(0);
+	BP_StatProgressBar_HitGauge->UpdateWeapon(0);
+
+	BP_GunProgressBar_MaxAmmo->UpdateGunStat(0);
+	BP_GunProgressBar_Reload->UpdateGunStat(0);
+	BP_GunProgressBar_ShootInterval->UpdateGunStat(0);
+	BP_GunProgressBar_TraceDistanced->UpdateGunStat(0);
+}
+
 
